@@ -3,9 +3,7 @@ import { Html, Head, Main, NextScript } from "next/document";
 export default function Document() {
   return (
     <Html lang="en">
-      <Head>
-        <title>Sa'Bai Biometrics</title>
-      </Head>
+      <Head title="Sa'Bai Biometrics" />
       <body className="antialiased">
         <Main />
         <NextScript />

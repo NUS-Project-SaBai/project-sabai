@@ -1,7 +1,7 @@
 export default function Home() {
   return (
     <main>
-      <p>Project Sa'Bai</p>
+      <p>Project Sa&apos;Bai</p>
     </main>
   );
 }
