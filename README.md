@@ -1,41 +1,102 @@
-# Project Sa'Bai
+# Project Sa'bai
 
-## Setup
+This is a local-first monorepo for "Project Sa'bai". This guide focuses on getting your local development environment running.
 
-1. Install Node Version Manager(NVM): [Installation Guide](nvmnode.com/guide/installation.html)
+---
 
-2. Run the following command to set up the node.js version we would be using.
+## 🛠 Prerequisites
 
-   ```bash
-   # Install the latest version of node.js
-   nvm install 24.13.0
-   # Use the correct version node.js
-   nvm use 24.13.0
-   # Verify that you have installed node correctly
-   node -v  # v24.13.0
-   # Verify npm is installed
-   npm -v
-   ```
+Before you begin, ensure you have the following installed:
 
-3. Installation of pnpm <https://pnpm.io/installation>:
-
-   Next, install pnpm:
-
-   ```bash
-   # Installing pnpm
-   npm install -g pnpm
-   # Verify installation
-   pnpm --version
-   ```
-
-4. Install project libraries
+1.  **Node.js 20+**: [Download Link](https://nodejs.org/)
+2.  **pnpm**: Recommended package manager.
     ```bash
-    # Install the necessary libraries for the project
-    pnpm i
+    npm install -g pnpm
     ```
-## Running the Application
+3.  **Docker Desktop**: Required for running the local Supabase instance. [Download Link](https://www.docker.com/products/docker-desktop/)
+4.  **Supabase CLI**:
+    ```bash
+    brew install supabase/tap/supabase  # macOS
+    # Or via npm (slower but works): npm install -g supabase
+    ```
+
+---
+
+## 🚀 Quick Start (Local Development)
+
+Follow these steps in order to start developing.
+
+### 1. Clone & Install Dependencies
+Clone the repository and install the Node modules.
 
 ```bash
-# Run the development server.
+git clone <repository_url>
+cd project-sabai
+pnpm -i
+```
+
+### 2. Start Local Supabase
+Ensure Docker is running, then start the local Supabase stack. This spins up a full Postgres database, Auth server, and API gateway on your machine.
+
+```bash
+supabase start
+```
+
+> **Note:** The first time you run this, it may take a few minutes to download the Docker images.
+
+### 3. Setup Environment Variables
+Copy the example environment file.
+
+```bash
+cp .env.example .env.local
+```
+
+Now, populate `.env.local` with the values from your **local** Supabase instance.
+Running `supabase status` will output the API URL and keys.
+
+```bash
+supabase status
+```
+
+Copy the output values into `.env.local`:
+
+*   `APIs > Project URL` -> `NEXT_PUBLIC_SUPABASE_URL`
+*   `Authentication Keys > Secret` -> `NEXT_PUBLIC_SUPABASE_SECRET_KEY`
+
+Example `.env.local`:
+```env
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_secret_SECRET_KEY_HERE...
+```
+
+### 4. Run the Dev Server
+Start the Next.js development server.
+
+```bash
 pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 🔐 Local Development Accounts
+
+Sign in using the app's login page on your local development server (http://localhost:3000).
+
+| Role | Email | Password |
+|---|---|---|
+| User | `user@test.com` | `password123` |
+| Admin | `admin@test.com` | `password123` |
+
+---
+
+## 🛑 Stopping & Resetting
+
+To stop the Supabase containers to save battery/memory:
+```bash
+supabase stop
+```
+
+To **completely wipe** the database and restart:
+```bash
+supabase db reset
 ```
