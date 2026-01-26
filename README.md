@@ -33,7 +33,7 @@ Clone the repository and install the Node modules.
 ```bash
 git clone <repository_url>
 cd project-sabai
-pnpm -i
+pnpm i
 ```
 
 ### 2. Start Local Supabase
@@ -62,7 +62,7 @@ supabase status
 Copy the output values into `.env`:
 
 *   `APIs > Project URL` -> `NEXT_PUBLIC_SUPABASE_URL`
-*   `Authentication Keys > Secret` -> `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+*   `Authentication Keys > Publishable` -> `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
 Example `.env`:
 ```env
