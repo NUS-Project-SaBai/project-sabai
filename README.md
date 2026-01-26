@@ -14,11 +14,12 @@ Before you begin, ensure you have the following installed:
     npm install -g pnpm
     ```
 3.  **Docker Desktop**: Required for running the local Supabase instance. [Download Link](https://www.docker.com/products/docker-desktop/)
-4.  **Supabase CLI**:
+4.  **Supabase CLI**: Required to manage the local database.
     ```bash
     brew install supabase/tap/supabase  # macOS
-    # Or via npm (slower but works): npm install -g supabase
     ```
+    *   *Alternative:* You can use `npx supabase` via Node.js, but remember to prefix commands with `npx`.
+    *   For other OS instructions, see the [Supabase CLI Installation Guide](https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=macos#installing-the-supabase-cli).
 
 ---
 
@@ -48,25 +49,25 @@ supabase start
 Copy the example environment file.
 
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 ```
 
-Now, populate `.env.local` with the values from your **local** Supabase instance.
+Now, populate `.env` with the values from your **local** Supabase instance.
 Running `supabase status` will output the API URL and keys.
 
 ```bash
 supabase status
 ```
 
-Copy the output values into `.env.local`:
+Copy the output values into `.env`:
 
 *   `APIs > Project URL` -> `NEXT_PUBLIC_SUPABASE_URL`
 *   `Authentication Keys > Secret` -> `NEXT_PUBLIC_SUPABASE_SECRET_KEY`
 
-Example `.env.local`:
+Example `.env`:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_secret_SECRET_KEY_HERE...
+NEXT_PUBLIC_SUPABASE_SECRET_KEY=sb_secret_SECRET_KEY_HERE...
 ```
 
 ### 4. Run the Dev Server
