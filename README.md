@@ -62,12 +62,12 @@ supabase status
 Copy the output values into `.env`:
 
 *   `APIs > Project URL` -> `NEXT_PUBLIC_SUPABASE_URL`
-*   `Authentication Keys > Secret` -> `NEXT_PUBLIC_SUPABASE_SECRET_KEY`
+*   `Authentication Keys > Secret` -> `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
 Example `.env`:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
-NEXT_PUBLIC_SUPABASE_SECRET_KEY=sb_secret_SECRET_KEY_HERE...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_secret_PUBLISHABLE_KEY_HERE...
 ```
 
 ### 4. Run the Dev Server
