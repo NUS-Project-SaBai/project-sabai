@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 if (!supabaseUrl) {
@@ -12,4 +12,12 @@ if (!supabasePublishableKey) {
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabasePublishableKey);
+/**
+ * Browser client for Supabase.
+ * Uses @supabase/ssr which automatically manages auth state in cookies.
+ * This makes the session available to the server without exposing tokens to JS.
+ */
+export const supabase = createBrowserClient(
+  supabaseUrl,
+  supabasePublishableKey,
+);
