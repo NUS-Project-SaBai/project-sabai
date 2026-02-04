@@ -1,10 +1,10 @@
-import { useFormContext } from "react-hook-form";
+import { RegisterOptions, useFormContext } from "react-hook-form";
 
 export function useRHFRegister(
   name: string,
   label: string,
   isRequired: boolean = false,
-  registerOptions: Record<string, any> = {},
+  registerOptions: RegisterOptions = {},
 ) {
   const { register } = useFormContext();
   const registerProps = register(name, {

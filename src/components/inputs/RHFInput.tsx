@@ -2,7 +2,7 @@ import { DetailedHTMLProps, HTMLAttributes, InputHTMLAttributes } from "react";
 import { RegisterOptions, useFormContext } from "react-hook-form";
 import { useRHFRegister } from "./useRHFRegister";
 import { IsRequiredStar } from "./IsRequiredStar";
-<input type="" />;
+
 type RHFInputProps = {
   name: string;
   label: string;

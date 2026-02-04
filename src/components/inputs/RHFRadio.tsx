@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
-import { DetailedHTMLProps, HTMLAttributes, InputHTMLAttributes } from "react";
-import { Controller, RegisterOptions, useFormContext } from "react-hook-form";
+import { DetailedHTMLProps, HTMLAttributes } from "react";
+import { Controller, useFormContext } from "react-hook-form";
 import { FaCheck } from "react-icons/fa";
 import { IsRequiredStar } from "./IsRequiredStar";
 
@@ -64,6 +64,13 @@ export function RHFRadio({
           !numberOfColumns && "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
           fieldError ? "border-red-400 border-2 rounded" : "",
         ])}
+        style={
+          numberOfColumns
+            ? {
+                gridTemplateColumns: `repeat(${numberOfColumns}, minmax(0, 1fr))`,
+              }
+            : undefined
+        }
       >
         <Controller
           name={name}
