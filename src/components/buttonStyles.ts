@@ -45,4 +45,4 @@ const ButtonSizeTWClassNames: Record<ButtonSize, string> = {
 };
 
 const BASE_BUTTON_CLASSES =
-  "flex items-center gap-2 justify-center hover:cursor-pointer rounded-lg transition";
+  "flex items-center gap-2 justify-center hover:cursor-pointer rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed";

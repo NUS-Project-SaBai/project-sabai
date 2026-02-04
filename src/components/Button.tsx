@@ -4,6 +4,7 @@ import {
   getButonTwClassNames,
 } from "./buttonStyles";
 import { ButtonColour } from "./buttonStyles";
+import { FaSpinner } from "react-icons/fa";
 
 /**
  * A customizable button component with support for multiple styles and variants.
@@ -15,6 +16,7 @@ import { ButtonColour } from "./buttonStyles";
  * @param {ButtonColour} [colour="white"] - The color scheme of the button
  * @param {ButtonVariant} [variant="outline"] - The visual style variant of the button @see ButtonVariant
  * @param {ButtonSize} [size="medium"] - The size of the button
+ * @param {boolean} [loading=false] - Whether the button is in loading state; disables the button and shows a spinner
  */
 export function Button({
   onClick,
@@ -24,6 +26,7 @@ export function Button({
   colour = "white",
   variant = "outline",
   size = "medium",
+  loading = false,
 }: {
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
@@ -32,16 +35,24 @@ export function Button({
   colour?: ButtonColour;
   variant?: ButtonVariant;
   size?: ButtonSize;
+  loading?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
       type={type}
       title={title}
+      disabled={loading}
       className={getButonTwClassNames(colour, variant, size)}
     >
-      {icon}
-      {variant === "icon" || <p>{title}</p>}
+      {loading ? (
+        <FaSpinner className="animate-spin" />
+      ) : (
+        <>
+          {icon}
+          {variant !== "icon" && <p>{title}</p>}
+        </>
+      )}
     </button>
   );
 }
