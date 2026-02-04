@@ -3,8 +3,9 @@ import {
   HTMLAttributes,
   TextareaHTMLAttributes,
 } from "react";
-import { RegisterOptions } from "react-hook-form";
+import { RegisterOptions, useFormContext } from "react-hook-form";
 import { useRHFRegister } from "./useRHFRegister";
+import { IsRequiredStar } from "./IsRequiredStar";
 
 type RHFTextAreaProps = {
   name: string;
@@ -55,12 +56,25 @@ export function RHFTextArea({
     registerOptions,
   );
 
+  const { formState } = useFormContext();
+  const fieldError = formState?.errors[name];
   return (
     <div className={className}>
       <label htmlFor={name} className="mb-1 block text-sm font-medium">
         {label}
+        <IsRequiredStar isRequired={isRequired} />
       </label>
-      <textarea id={name} {...registerProps} {...props} />
+      <textarea
+        id={name}
+        className={
+          fieldError ? "border-red-400 border-l-8 border-2" : "border-2"
+        }
+        {...registerProps}
+        {...props}
+      />
+      <p className="min-h-6 text-red-400">
+        {fieldError ? fieldError.message?.toString() : ""}
+      </p>
     </div>
   );
 }

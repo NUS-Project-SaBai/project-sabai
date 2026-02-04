@@ -1,6 +1,7 @@
 import { DetailedHTMLProps, HTMLAttributes, InputHTMLAttributes } from "react";
-import { RegisterOptions } from "react-hook-form";
+import { RegisterOptions, useFormContext } from "react-hook-form";
 import { useRHFRegister } from "./useRHFRegister";
+import { IsRequiredStar } from "./IsRequiredStar";
 <input type="" />;
 type RHFInputProps = {
   name: string;
@@ -57,10 +58,27 @@ export function RHFInput({
     registerOptions,
   );
 
+  const { formState } = useFormContext();
+  const fieldError = formState?.errors[name];
+
   return (
     <div className={className}>
-      <label htmlFor={name}>{label}</label>
-      <input id={name} type={type} {...registerProps} {...props} />
+      <label htmlFor={name}>
+        {label}
+        <IsRequiredStar isRequired={isRequired} />
+      </label>
+      <input
+        id={name}
+        type={type}
+        {...registerProps}
+        {...props}
+        className={
+          fieldError ? "border-red-400 border-l-8 border-2" : "border-2"
+        }
+      />
+      <p className="min-h-6 text-red-400">
+        {fieldError ? fieldError.message?.toString() : ""}
+      </p>
     </div>
   );
 }

@@ -12,7 +12,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-
 body {
   background: var(--background);
   color: var(--foreground);
@@ -21,10 +20,13 @@ body {
 
 input,
 textarea {
-  @apply block rounded-md border-2 p-1.5 w-full sm:text-sm focus:outline-2 outline-blue-400;
+  @apply block rounded-md p-1.5 w-full sm:text-sm focus:outline-2 outline-blue-400;
+}
+
+input[type="submit"] {
+  @apply border-2;
 }
 
 label {
   @apply text-sm font-semibold md:text-base;
-
 }

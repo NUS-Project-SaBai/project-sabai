@@ -2,6 +2,7 @@ import { clsx } from "clsx";
 import { DetailedHTMLProps, HTMLAttributes, InputHTMLAttributes } from "react";
 import { Controller, RegisterOptions, useFormContext } from "react-hook-form";
 import { FaCheck } from "react-icons/fa";
+import { IsRequiredStar } from "./IsRequiredStar";
 
 type RHFRadioProps = {
   name: string;
@@ -49,16 +50,19 @@ export function RHFRadio({
   className = "",
   numberOfColumns = undefined,
 }: RHFRadioProps) {
-  const { control } = useFormContext();
+  const { control, formState } = useFormContext();
+  const fieldError = formState?.errors[name];
   return (
     <div className={className}>
-      <label>{label}</label>
+      <label>
+        {label}
+        <IsRequiredStar isRequired={isRequired} />
+      </label>
       <div
         className={clsx([
-          "grid gap-2",
-          numberOfColumns
-            ? `grid-cols-${numberOfColumns}`
-            : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
+          "grid gap-2 p-1",
+          !numberOfColumns && "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
+          fieldError ? "border-red-400 border-2 rounded" : "",
         ])}
       >
         <Controller
@@ -93,6 +97,9 @@ export function RHFRadio({
           )}
         />
       </div>
+      <p className="min-h-6 text-red-400">
+        {fieldError ? fieldError.message?.toString() : ""}
+      </p>
     </div>
   );
 }
