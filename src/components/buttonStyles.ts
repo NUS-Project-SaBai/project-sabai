@@ -15,18 +15,18 @@ export type ButtonVariant = "filled" | "outline" | "text" | "icon";
 
 export type ButtonSize = "small" | "medium" | "large";
 
-export const getButonTwClassNames = (
+export const getButonTwClassName = (
   colour: ButtonColour,
   variant: ButtonVariant,
   size: ButtonSize | undefined = undefined,
 ): string => {
-  return `${ButtonTWClassNames[colour][variant]} ${
-    size && ButtonSizeTWClassNames[size]
-  } ${BASE_BUTTON_CLASSES}`;
+  return `${ButtonTWClassName[colour][variant]} ${
+    size && ButtonSizeTWClassName[size]
+  } ${BASE_BUTTON_CLASS}`;
 };
 
 type TWClassName = HTMLProps<HTMLElement>["className"];
-const ButtonTWClassNames: Record<
+const ButtonTWClassName: Record<
   ButtonColour,
   Record<ButtonVariant, TWClassName>
 > = {
@@ -38,11 +38,11 @@ const ButtonTWClassNames: Record<
   },
 };
 
-const ButtonSizeTWClassNames: Record<ButtonSize, string> = {
+const ButtonSizeTWClassName: Record<ButtonSize, string> = {
   small: "px-3 py-1 text-sm",
   medium: "px-4 py-2 text-base",
   large: "px-5 py-3 text-lg",
 };
 
-const BASE_BUTTON_CLASSES =
+const BASE_BUTTON_CLASS =
   "flex items-center gap-2 justify-center hover:cursor-pointer rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed";

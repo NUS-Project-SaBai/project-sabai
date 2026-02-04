@@ -60,7 +60,7 @@ export function RHFTextArea({
   const fieldError = formState?.errors[name];
   return (
     <div className={className}>
-      <label htmlFor={name} className="mb-1 block text-sm font-medium">
+      <label htmlFor={name}>
         {label}
         <IsRequiredStar isRequired={isRequired} />
       </label>

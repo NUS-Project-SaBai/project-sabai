@@ -1,8 +1,4 @@
-import {
-  ButtonSize,
-  ButtonVariant,
-  getButonTwClassNames,
-} from "./buttonStyles";
+import { ButtonSize, ButtonVariant, getButonTwClassName } from "./buttonStyles";
 import { ButtonColour } from "./buttonStyles";
 import { FaSpinner } from "react-icons/fa";
 
@@ -43,7 +39,7 @@ export function Button({
       type={type}
       title={title}
       disabled={loading}
-      className={getButonTwClassNames(colour, variant, size)}
+      className={getButonTwClassName(colour, variant, size)}
     >
       {loading ? (
         <FaSpinner className="animate-spin" />
