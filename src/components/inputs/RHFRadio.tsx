@@ -17,7 +17,9 @@ type RHFRadioProps = {
 };
 
 /**
- * A controlled radio button group component integrated with React Hook Form.
+ * **Important:** This component must be used within a `FormProvider` context.
+ *
+ * A React form component that wraps a radio element with React Hook Form integration.
  *
  * Renders a set of radio button options in a responsive grid layout. The component
  * manages form state through React Hook Form's `Controller` and displays visual

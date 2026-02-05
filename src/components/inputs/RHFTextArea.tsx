@@ -23,7 +23,16 @@ type RHFTextAreaProps = {
 >;
 
 /**
+ * **Important:** This component must be used within a `FormProvider` context.
+ *
  * A React form component that wraps a textarea element with React Hook Form integration.
+ *
+ * @param {string} name - The field name for form registration
+ * @param {string} label - The label text displayed above the textarea
+ * @param {boolean} [isRequired=false] - Whether the field is required for form validation
+ * @param {string} [className=""] - Additional CSS classes to apply to the wrapper div
+ * @param {RegisterOptions} [registerOptions={}] - React Hook Form register options for validation rules
+ * @param {React.TextareaHTMLAttributes<HTMLTextAreaElement>} props - Standard HTML textarea attributes
  *
  * @example
  * ```tsx
@@ -33,13 +42,6 @@ type RHFTextAreaProps = {
  *   isRequired={true}
  * />
  * ```
- *
- * @param {string} name - The field name for form registration
- * @param {string} label - The label text displayed above the textarea
- * @param {boolean} [isRequired=false] - Whether the field is required for form validation
- * @param {string} [className=""] - Additional CSS classes to apply to the wrapper div
- * @param {RegisterOptions} [registerOptions={}] - React Hook Form register options for validation rules
- * @param {React.TextareaHTMLAttributes<HTMLTextAreaElement>} props - Standard HTML textarea attributes
  */
 export function RHFTextArea({
   name,
