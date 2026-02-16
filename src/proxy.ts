@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { url } from "zod/v4/mini";
 
 /**
  * Middleware to refresh Supabase auth session.
@@ -42,10 +43,31 @@ export async function proxy(request: NextRequest) {
   });
 
   // IMPORTANT: Do not run any Supabase logic between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make your app insecure.
+  // supabase.auth.getUser(). A simple mistake could make the app insecure.
 
-  // This will refresh the session if expired and set cookies
-  await supabase.auth.getUser();
+  // get user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser(); // This will also refresh the session if expired and set cookies
+
+
+  // Redirect logic:
+  const { pathname } = new URL(request.url);
+  const isLoginRoute = pathname === "/login";
+
+  // If NOT logged in and NOT on /login → force to /login
+  if (!user && !isLoginRoute) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("redirectTo", pathname + request.url.search);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // If logged in and trying to hit /login → send to main app
+  if (user && isLoginRoute) {
+    const dashboardUrl = new URL("/", request.url);
+    return NextResponse.redirect(dashboardUrl);
+  }
+
 
   return supabaseResponse;
 }
