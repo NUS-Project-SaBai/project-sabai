@@ -63,14 +63,35 @@ Copy the output values into `.env`:
 
 *   `APIs > Project URL` -> `NEXT_PUBLIC_SUPABASE_URL`
 *   `Authentication Keys > Publishable` -> `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+*   `Authentication Keys > Secret` -> `SUPABASE_SECRET_KEY`
+*   `Database > URL` -> `DATABASE_URL`
 
 Example `.env`:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_secret_PUBLISHABLE_KEY_HERE...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=SB_PUBLISHABLE_KEY_HERE...
+
+SUPABASE_SECRET_KEY=SB_SECRET_KEY_HERE... 
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
 ```
 
-### 4. Run the Dev Server
+### 4. Seed Test Data
+Seed your database and auth users.
+
+```bash
+# Seed domain data (patients, etc.)
+supabase db reset
+
+# Seed auth users (user@test.com / admin@test.com, password: password123)
+pnpm auth:seed
+```
+
+**Or run both:**
+```bash
+pnpm seed:all
+```
+
+### 5. Run the Dev Server
 Start the Next.js development server.
 
 ```bash
