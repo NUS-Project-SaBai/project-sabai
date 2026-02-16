@@ -1,6 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { url } from "zod/v4/mini";
 
 /**
  * Middleware to refresh Supabase auth session.
@@ -50,7 +49,6 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser(); // This will also refresh the session if expired and set cookies
 
-
   // Redirect logic:
   const { pathname } = new URL(request.url);
   const isLoginRoute = pathname === "/login";
@@ -67,7 +65,6 @@ export async function proxy(request: NextRequest) {
     const dashboardUrl = new URL("/", request.url);
     return NextResponse.redirect(dashboardUrl);
   }
-
 
   return supabaseResponse;
 }
