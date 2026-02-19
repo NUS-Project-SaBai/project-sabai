@@ -80,10 +80,10 @@ Seed your database and auth users.
 
 ```bash
 # Seed domain data (patients, etc.)
-supabase db reset
+pnpm seed:db
 
 # Seed auth users (user@test.com / admin@test.com, password: password123)
-pnpm auth:seed
+pnpm seed:users
 ```
 
 **Or run both:**
