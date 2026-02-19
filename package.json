@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write \"src/**/*.{ts,tsx,json}\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "seed:db": "supabase db reset",
+    "seed:users": "ts-node supabase/scripts/seed-users.ts",
+    "seed:all": "npm run seed:db && npm run seed:users"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",

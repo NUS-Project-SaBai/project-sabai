@@ -31,7 +31,9 @@ function Home({ session }: { session: Session }) {
                 <span className="text-sm font-medium text-slate-900">
                   {session?.user.email}
                 </span>
-                <span className="text-xs text-slate-500">Member</span>
+                <span className="text-xs text-slate-500">
+                  {session?.user.user_metadata.role}
+                </span>
               </div>
               <button
                 onClick={handleSignOut}
