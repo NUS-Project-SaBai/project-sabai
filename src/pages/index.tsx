@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { supabase } from "@/lib/supabaseClient";
-import { withAuth } from "@/lib/auth";
+import { withSession } from "@/lib/session";
 import { Session } from "@supabase/supabase-js/dist/index.cjs";
 
 function Home({ session }: { session: Session }) {
@@ -139,4 +139,4 @@ function Home({ session }: { session: Session }) {
   );
 }
 
-export default withAuth(Home);
+export default withSession(Home);

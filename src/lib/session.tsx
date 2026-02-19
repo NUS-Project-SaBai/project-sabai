@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Session } from "@supabase/supabase-js";
@@ -33,8 +32,7 @@ import { Session } from "@supabase/supabase-js";
  * @see {@link https://supabase.com/docs/guides/auth} for Supabase auth details.
  * @since 1.0.0
  */
-export function useAuth() {
-  const router = useRouter();
+export function useSession() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -51,31 +49,18 @@ export function useAuth() {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setLoading(false);
-
-      // Redirect to login if session is lost on a protected route
-      if (!session) {
-        router.push("/login");
-      }
     });
-
     return () => subscription.unsubscribe();
-  }, [router]);
+  }, []);
 
   return { session, loading };
 }
 
-export function withAuth<P extends object>(
+export function withSession<P extends object>(
   WrappedComponent: React.ComponentType<P>,
 ) {
   return function ProtectedRoute(props: P) {
-    const router = useRouter();
-    const { session, loading } = useAuth();
-
-    useEffect(() => {
-      if (!loading && !session) {
-        router.push("/login");
-      }
-    }, [loading, session, router]);
+    const { session, loading } = useSession();
 
     if (loading) {
       return (
@@ -105,7 +90,7 @@ export function withAuth<P extends object>(
     }
 
     if (!session) {
-      return null; // or a custom loading/redirecting UI
+      return null; // proxy should prevent this and redirect to login
     }
 
     return <WrappedComponent {...props} session={session} />;

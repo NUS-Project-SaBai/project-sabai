@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { trpc } from "@/utils/trpc";
-import { withAuth } from "@/lib/auth";
+import { withSession } from "@/lib/session";
 import { VillageCode, NewVillageCode } from "@/db/schema";
 import Link from "next/link";
 
@@ -317,4 +317,4 @@ function VillageCodesPage() {
   );
 }
 
-export default withAuth(VillageCodesPage);
+export default withSession(VillageCodesPage);
