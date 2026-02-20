@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { Session } from "@supabase/supabase-js";
 
 /**
- * useAuth — React hook for managing Supabase authentication state (client-side).
+ * useSession — React hook for managing Supabase authentication state (client-side).
  *
  * This hook retrieves the initial Supabase session, subscribes to auth state changes,
  * and exposes a minimal public API for components to react to authentication state.
@@ -13,8 +13,6 @@ import { Session } from "@supabase/supabase-js";
  * - It subscribes to `supabase.auth.onAuthStateChange` to keep `session` up to date.
  * - The subscription is cleaned up on unmount.
  * - The hook updates a `loading` flag until the initial session is resolved.
- * - The implementation optionally performs a router push to `/login` when the session
- *   becomes null; adapt this behavior for protected vs. public routes as needed.
  *
  * @returns {{
  *   session: Session | null;
@@ -23,7 +21,7 @@ import { Session } from "@supabase/supabase-js";
  *
  * @example
  * ```tsx
- * const { session, loading } = useAuth();
+ * const { session, loading } = useSession();
  * if (loading) return <Loading />;
  * if (!session) return <LoginPrompt />;
  * return <AuthenticatedApp />;

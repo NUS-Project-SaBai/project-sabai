@@ -6,7 +6,6 @@ import {
   timestamp,
   text,
   pgEnum,
-  bigint,
 } from "drizzle-orm/pg-core";
 
 // Define enums
@@ -51,15 +50,12 @@ Patients Table:
 - gender: Gender of the patient.
 - drugAllergy: Drug allergy information of the patient.
 - dateOfBirth: Date of birth of the patient.
-- poor: Indicates if the patient is poor.
-- bs2: Indicates if the patient has BS2.
-- sabaiCard: Indicates if the patient has a Sabai card. 
+- poor: Indicates if the patient has a POOR card or not.
+- bs2: Indicates if the patient has a BS2 card or not.
+- sabaiCard: Indicates if the patient has a Sabai card or not.
 */
 export const patients = pgTable("patients", {
   id: serial("id").primaryKey(),
-  villageCodeId: bigint("village_code_id", { mode: "bigint" })
-    .notNull()
-    .references(() => villageCodes.id),
   name: varchar("name", { length: 255 }).notNull(),
   identificationNumber: varchar("identification_number", { length: 255 }),
   contactNo: varchar("contact_no", { length: 255 }),

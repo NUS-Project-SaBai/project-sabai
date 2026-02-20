@@ -7,9 +7,7 @@ interface SidebarLayoutProps {
   children: ReactNode;
 }
 
-export default function SidebarLayout({
-  children,
-}: SidebarLayoutProps) {
+export default function SidebarLayout({ children }: SidebarLayoutProps) {
   const router = useRouter();
 
   const handleSignOut = async () => {

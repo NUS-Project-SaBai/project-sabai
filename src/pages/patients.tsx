@@ -101,8 +101,7 @@ function PatientsPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
                           <span className="text-sm font-medium text-slate-900">
-                            {getPatientId(patient.villageCode, patient.id, 4) ||
-                              "No ID"}
+                            {getPatientId(patient.id, 4) || "No ID"}
                           </span>
                         </div>
                       </td>
@@ -197,9 +196,8 @@ function calculateAge(birthDate: Date) {
   return Math.abs(ageDate.getUTCFullYear() - 1970);
 }
 
-function getPatientId(villageCode: string, id: number, padLength: number) {
-  const paddedId = id.toString().padStart(padLength, "0");
-  return `${villageCode}${paddedId}`;
+function getPatientId(id: number, padLength: number) {
+  return id.toString().padStart(padLength, "0");
 }
 
 export default withSession(PatientsPage);

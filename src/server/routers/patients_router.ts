@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../trpc";
 import { db } from "@/db/drizzle";
-import { patients, villageCodes, genderEnum, yesNoEnum } from "@/db/schema";
+import { patients, genderEnum, yesNoEnum } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export const patientsRouter = router({
@@ -10,7 +10,6 @@ export const patientsRouter = router({
     const result = await db
       .select({
         id: patients.id,
-        villageCode: villageCodes.code,
         name: patients.name,
         identificationNumber: patients.identificationNumber,
         contactNo: patients.contactNo,
@@ -21,8 +20,7 @@ export const patientsRouter = router({
         drugAllergy: patients.drugAllergy,
         sabaiCard: patients.sabaiCard,
       })
-      .from(patients)
-      .innerJoin(villageCodes, eq(patients.villageCodeId, villageCodes.id));
+      .from(patients);
 
     return result;
   }),
@@ -34,7 +32,6 @@ export const patientsRouter = router({
       const [result] = await db
         .select({
           id: patients.id,
-          villageCode: villageCodes.code,
           name: patients.name,
           identificationNumber: patients.identificationNumber,
           contactNo: patients.contactNo,
@@ -46,7 +43,6 @@ export const patientsRouter = router({
           sabaiCard: patients.sabaiCard,
         })
         .from(patients)
-        .innerJoin(villageCodes, eq(patients.villageCodeId, villageCodes.id))
         .where(eq(patients.id, input.id))
         .limit(1);
 
@@ -57,7 +53,6 @@ export const patientsRouter = router({
   create: protectedProcedure
     .input(
       z.object({
-        villageCodeId: z.bigint(),
         name: z.string().min(1, "Name is required"),
         identificationNumber: z.string().optional(),
         contactNo: z.string().optional(),
@@ -79,7 +74,6 @@ export const patientsRouter = router({
     .input(
       z.object({
         id: z.number().int(),
-        villageCodeId: z.bigint().optional(),
         name: z.string().min(1).optional(),
         identificationNumber: z.string().optional(),
         contactNo: z.string().optional(),
