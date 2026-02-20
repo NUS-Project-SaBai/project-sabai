@@ -22,6 +22,7 @@ This guide helps orientate new developers to the project.
   - Install: `pnpm i`
   - Start Supabase: `supabase start`
   - Run dev server: `pnpm dev`
+   - See script details in [Appendix A: package.json scripts](#appendix-a-packagejson-scripts).
 
 See [README.md](../README.md) for full details and local credentials.
 
@@ -109,3 +110,20 @@ See [docs/trpc.md](./trpc.md) for the full flow.
 - Validate inputs with Zod in each procedure.
 - Keep router files focused by feature (one router per feature domain).
 - List of React-Icons that can be imported in this project: [Font Awesome 5 React Icons](https://react-icons.github.io/react-icons/icons/fa/)
+
+## Appendix A: package.json scripts
+
+Use these commands from the project root:
+
+| Script | What it does | When to use |
+|---|---|---|
+| `pnpm dev` | Starts Next.js in development mode. | Day-to-day local development. |
+| `pnpm build` | Builds the production bundle. | Before deploy checks and CI validation. |
+| `pnpm start` | Runs the production build. | Local production-like smoke testing after `pnpm build`. |
+| `pnpm lint` | Runs ESLint checks. | Runs before push. Note: It checks the current codebase, including uncommited changes |
+| `pnpm format` | Formats source files with Prettier. | Runs before every commit. |
+| `pnpm seed:db` | Resets local Supabase DB and reapplies migrations/seeds. | When you need a clean local database state. |
+| `pnpm seed:users` | Seeds auth users from `supabase/scripts/seed-users.ts`. | When test users are missing locally. |
+| `pnpm seed:all` | Runs DB reset/seed, then user seeding. | Full local environment reset. |
+
+> ⚠️ `pnpm seed:db` is destructive! 
