@@ -3,15 +3,13 @@ import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-interface DashboardLayoutProps {
+interface SidebarLayoutProps {
   children: ReactNode;
-  title?: string;
 }
 
-export default function DashboardLayout({
+export default function SidebarLayout({
   children,
-  title,
-}: DashboardLayoutProps) {
+}: SidebarLayoutProps) {
   const router = useRouter();
 
   const handleSignOut = async () => {
