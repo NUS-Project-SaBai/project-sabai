@@ -5,7 +5,7 @@ import { db } from "@/db/drizzle";
 import { villageCodes } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 
-export const villageCodeRouter = router({
+export const villageCodesRouter = router({
   // 1. List all (with optional filter)
   list: protectedProcedure
     .input(z.object({ includeHidden: z.boolean().default(false) }))

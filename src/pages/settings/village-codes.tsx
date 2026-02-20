@@ -19,27 +19,27 @@ function VillageCodesPage() {
 
   // 2. Data Fetching
   const utils = trpc.useUtils();
-  const { data: codes, isLoading } = trpc.villageCodeRouter.list.useQuery({
+  const { data: codes, isLoading } = trpc.villageCodesRouter.list.useQuery({
     includeHidden: showHidden,
   });
 
   // 3. Mutations
-  const createMutation = trpc.villageCodeRouter.create.useMutation({
+  const createMutation = trpc.villageCodesRouter.create.useMutation({
     onSuccess: () => {
-      utils.villageCodeRouter.list.invalidate();
+      utils.villageCodesRouter.list.invalidate();
       closeForm();
     },
   });
 
-  const updateMutation = trpc.villageCodeRouter.update.useMutation({
+  const updateMutation = trpc.villageCodesRouter.update.useMutation({
     onSuccess: () => {
-      utils.villageCodeRouter.list.invalidate();
+      utils.villageCodesRouter.list.invalidate();
       closeForm();
     },
   });
 
-  const deleteMutation = trpc.villageCodeRouter.delete.useMutation({
-    onSuccess: () => utils.villageCodeRouter.list.invalidate(),
+  const deleteMutation = trpc.villageCodesRouter.delete.useMutation({
+    onSuccess: () => utils.villageCodesRouter.list.invalidate(),
   });
 
   // 4. Handlers

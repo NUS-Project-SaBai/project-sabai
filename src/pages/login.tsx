@@ -179,3 +179,8 @@ export default function Login() {
     </div>
   );
 }
+
+// This page does not use the default layout, so we return the page directly
+Login.getLayout = function getLayout(page: React.ReactElement) {
+  return page;
+};
