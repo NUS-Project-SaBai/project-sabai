@@ -2,21 +2,18 @@ import { httpBatchStreamLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import type { AppRouter } from "@/server/routers/_app";
-import env from "@/lib/env/server";
+import env from "@/lib/env/client";
 import { transformer } from "./transformer";
 
 function getBaseUrl() {
   if (typeof window !== "undefined")
     // browser should use relative path
     return "";
-  if (env.VERCEL_URL)
+  if (env.NEXT_PUBLIC_VERCEL_URL)
     // reference for vercel.com
-    return `https://${env.VERCEL_URL}`;
-  if (env.RENDER_INTERNAL_HOSTNAME)
-    // reference for render.com
-    return `http://${env.RENDER_INTERNAL_HOSTNAME}:${env.PORT}`;
+    return `https://${env.NEXT_PUBLIC_VERCEL_URL}`;
   // assume localhost
-  return `http://localhost:${env.PORT}`;
+  return `http://localhost:${env.NEXT_PUBLIC_PORT}`;
 }
 
 /**
@@ -37,7 +34,7 @@ export const trpc = createTRPCNext<AppRouter>({
         // adds pretty logs to your console in development and logs errors in production
         loggerLink({
           enabled: (opts) =>
-            env.NODE_ENV === "development" ||
+            process.env.NODE_ENV === "development" ||
             (opts.direction === "down" && opts.result instanceof Error),
         }),
         httpBatchStreamLink({
