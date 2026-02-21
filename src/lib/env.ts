@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+/**
+ * Centralizes runtime environment configuration for the app.
+ *
+ * This module validates required values from `process.env` (Supabase, database,
+ * deployment, and Node settings) using a Zod schema, applies defaults where
+ * appropriate, and throws a clear startup error if any variable is missing or invalid.
+ */
+
 const envSchema = z.object({
   // Supabase
   NEXT_PUBLIC_SUPABASE_URL: z.url(),
