@@ -4,6 +4,7 @@ import type { NextPage } from "next";
 import type { ReactElement, ReactNode } from "react";
 import { trpc } from "@/utils/trpc";
 import SidebarLayout from "@/lib/components/layout";
+import { SessionProvider } from "@/context/sessionContext";
 
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -15,7 +16,12 @@ type AppPropsWithLayout = AppProps & {
 
 function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout =
-    Component.getLayout ?? ((page) => <SidebarLayout>{page}</SidebarLayout>);
+    Component.getLayout ??
+    ((page) => (
+      <SessionProvider>
+        <SidebarLayout>{page}</SidebarLayout>
+      </SessionProvider>
+    ));
 
   return getLayout(<Component {...pageProps} />);
 }

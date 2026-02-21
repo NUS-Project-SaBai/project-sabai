@@ -1,5 +1,4 @@
 import { trpc } from "@/utils/trpc";
-import { withSession } from "@/lib/session";
 import Link from "next/link";
 
 function PatientsPage() {
@@ -200,4 +199,4 @@ function getPatientId(id: number, padLength: number) {
   return id.toString().padStart(padLength, "0");
 }
 
-export default withSession(PatientsPage);
+export default PatientsPage;
