@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { router, protectedProcedure } from "../trpc";
+import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { villageCodes } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";

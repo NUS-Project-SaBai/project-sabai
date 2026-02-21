@@ -1,9 +1,9 @@
 import { httpBatchStreamLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
-import type { AppRouter } from "../server/routers/_app";
+import type { AppRouter } from "@/server/routers/_app";
 import { transformer } from "./transformer";
-import env from "../lib/env";
+import env from "@/lib/env";
 
 function getBaseUrl() {
   if (typeof window !== "undefined")

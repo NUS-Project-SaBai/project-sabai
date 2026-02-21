@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
-import env from "../lib/env";
+import env from "@/lib/env";
 
 // Disable prefetch for serverless environments usually, but fine for standalone
 const connectionString = env.DATABASE_URL;

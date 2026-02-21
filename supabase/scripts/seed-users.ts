@@ -1,6 +1,6 @@
 import "dotenv/config";   
 import { createClient } from "@supabase/supabase-js";
-import env from "../../src/lib/env";
+import env from "@/lib/env";
 
 const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseSecretKey = env.SUPABASE_SECRET_KEY; // NEVER expose to browser

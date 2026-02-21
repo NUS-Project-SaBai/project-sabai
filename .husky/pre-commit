@@ -1,3 +1,5 @@
+npx lint-staged
+
 branch_name=$(git branch --show-current)
 
 if [ "$branch_name" = "main" ] || [ "$branch_name" = "dev" ]; then
