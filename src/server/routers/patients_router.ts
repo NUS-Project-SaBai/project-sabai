@@ -4,6 +4,11 @@ import { db } from "@/db/drizzle";
 import { patients, genderEnum, yesNoEnum } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
+const cloudinaryUrl = process.env.CLOUDINARY_URL;
+if (!cloudinaryUrl) {
+  throw new Error("CLOUDINARY_URL environment variable is not set");
+}
+
 export const patientsRouter = router({
   // List all patients with village details
   list: protectedProcedure.query(async () => {
@@ -19,10 +24,16 @@ export const patientsRouter = router({
         bs2: patients.bs2,
         drugAllergy: patients.drugAllergy,
         sabaiCard: patients.sabaiCard,
+        patientImageUrl: patients.patientImageUrl,
       })
       .from(patients);
 
-    return result;
+    return result.map((patient) => ({
+      ...patient,
+      patientImageUrl: patient.patientImageUrl
+        ? `${cloudinaryUrl}/${patient.patientImageUrl}`
+        : null,
+    }));
   }),
 
   // Get single patient by ID with village details
@@ -41,6 +52,7 @@ export const patientsRouter = router({
           bs2: patients.bs2,
           drugAllergy: patients.drugAllergy,
           sabaiCard: patients.sabaiCard,
+          patientImageUrl: patients.patientImageUrl,
         })
         .from(patients)
         .where(eq(patients.id, input.id))
@@ -62,6 +74,7 @@ export const patientsRouter = router({
         poor: z.enum(yesNoEnum.enumValues), // Matches schema enum
         bs2: z.enum(yesNoEnum.enumValues), // Keep varchar as-is
         sabaiCard: z.enum(yesNoEnum.enumValues), // Keep varchar as-is
+        patientImageUrl: z.string(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -83,6 +96,7 @@ export const patientsRouter = router({
         poor: z.enum(yesNoEnum.enumValues).optional(),
         bs2: z.enum(yesNoEnum.enumValues).optional(),
         sabaiCard: z.enum(yesNoEnum.enumValues).optional(),
+        patientImageUrl: z.string(),
       }),
     )
     .mutation(async ({ input }) => {
