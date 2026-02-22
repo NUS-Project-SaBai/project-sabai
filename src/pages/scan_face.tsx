@@ -29,6 +29,7 @@ type PatientForm = {
 function ScanFacePage() {
   const [cameraIsOpen, setCameraIsOpen] = useState(false);
   const [imgDetails, setImgDetails] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const DEFAULT_FORM: PatientForm = {
     name: "",
@@ -47,24 +48,30 @@ function ScanFacePage() {
 
   const createMutation = trpc.patientsRouter.create.useMutation();
 
-  function urlToFile(url: string, filename: string, mimeType: string) {
-    return fetch(url)
-      .then((res) => res.arrayBuffer())
-      .then((buf) => new File([buf], filename, { type: mimeType }));
+  function dataUrlToFile(dataUrl: string, filename: string): File {
+    const [header, base64] = dataUrl.split(",");
+    const mimeType = header.match(/:(.*?);/)?.[1] ?? "image/jpeg";
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return new File([bytes], filename, { type: mimeType });
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault(); // ← move this to the top
+    setIsSubmitting(true);
 
     if (!imgDetails) {
       alert("Please capture a face image before submitting.");
+      setIsSubmitting(false);
       return;
     }
 
-    const patientImage = await urlToFile(
+    const patientImage = dataUrlToFile(
       imgDetails,
       `${patientFormData.name}.jpg`,
-      "image/jpeg",
     );
 
     // ✅ Build FormData instead of a plain object
@@ -85,11 +92,13 @@ function ScanFacePage() {
 
     createMutation.mutate(formData, {
       onSuccess() {
+        setIsSubmitting(false);
         alert("Patient created successfully!");
         setPatientFormData(DEFAULT_FORM);
         setImgDetails(null);
       },
       onError(error) {
+        setIsSubmitting(false);
         console.error("Error creating patient:", error);
         alert("Failed to create patient. Please try again.");
       },
@@ -281,10 +290,12 @@ function ScanFacePage() {
             </label>
           </div>
 
+          {/* Submit Button */}
           <div className="flex gap-3 mt-6">
             <button
               type="submit"
-              className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 hover:cursor-pointer"
+              disabled={isSubmitting}
+              className={`flex-1 px-4 py-2 rounded-lg font-medium ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 text-white hover:bg-indigo-700 hover:cursor-pointer"}`}
             >
               Create New Patient
             </button>
