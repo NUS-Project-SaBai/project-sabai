@@ -23,6 +23,7 @@ export function Button({
   variant = "outline",
   size = "medium",
   loading = false,
+  disabled = false,
 }: {
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
@@ -32,13 +33,14 @@ export function Button({
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
       type={type}
       title={title}
-      disabled={loading}
+      disabled={loading || disabled}
       className={getButonTwClassName(colour, variant, size)}
     >
       {loading ? (
