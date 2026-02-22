@@ -44,7 +44,10 @@ export function Button({
       className={getButonTwClassName(colour, variant, size)}
     >
       {loading ? (
-        <FaSpinner className="animate-spin" />
+        <>
+          <FaSpinner className="animate-spin" />
+          {variant !== "icon" && <p className="ml-2">{title}</p>}
+        </>
       ) : (
         <>
           {icon}
