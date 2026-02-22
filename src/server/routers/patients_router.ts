@@ -61,7 +61,7 @@ export const patientsRouter = router({
         .limit(1);
 
       if (result) {
-        result.patientImageUrl = `${cloudinaryUrl}/${result.patientImageUrl}`;
+        result.patientImageUrl = `${cloudinaryUrlPrefix}/${result.patientImageUrl}`;
       }
 
       return result ?? null;
