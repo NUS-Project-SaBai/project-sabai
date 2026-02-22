@@ -1,8 +1,12 @@
-# Developer Guide (Quick)
+---
+title: Developer Guide
+excerpt: Quick orientation to the project
+permalink: /docs/developer-guide/
+---
 
 This guide helps orientate new developers to the project.
 
-## 1) What we use in this project
+## 1. What we use in this project
 
 - Next.js (Pages Router): Web framework and routing.
 - React: UI rendering and component model.
@@ -15,7 +19,7 @@ This guide helps orientate new developers to the project.
 - superjson: Data transformer for non-JSON types in tRPC.
 - react-hook-form: Form state management.
 
-## 2) Quick start (local)
+## 2. Quick start (local)
 
 - Follow the step-by-step instructions in README.
 - Key commands:
@@ -26,7 +30,7 @@ This guide helps orientate new developers to the project.
 
 See [README.md](../README.md) for full details and local credentials.
 
-## 3) Project layout
+## 3. Project layout
 
 ```
 project-sabai/
@@ -64,7 +68,7 @@ Quick pointers:
 - New API procedure: add to a router in [src/server/routers](../src/server/routers) and mount in [src/server/routers/\_app.ts](../src/server/routers/_app.ts).
 - New DB table/column: edit [src/db/schema.ts](../src/db/schema.ts) and create a migration in [supabase/migrations](../supabase/migrations).
 
-## 4) Common tasks
+## 4. Common tasks
 
 ### Add a new table or column
 
@@ -96,7 +100,7 @@ See [docs/trpc.md](./trpc.md) for a full walkthrough.
 
 - Place shared components in [src/components](../src/components).
 
-## 5) Auth model (short)
+## 5. Auth model (short)
 
 - Login sets HttpOnly cookies via Supabase.
 - `createContext` reads cookies and provides `ctx.user`.
@@ -104,7 +108,7 @@ See [docs/trpc.md](./trpc.md) for a full walkthrough.
 
 See [docs/trpc.md](./trpc.md) for the full flow.
 
-## 6) Tips
+## 6. Tips
 
 - Validate inputs with Zod in each procedure.
 - Keep router files focused by feature (one router per feature domain).

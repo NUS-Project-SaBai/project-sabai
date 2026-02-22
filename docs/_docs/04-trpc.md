@@ -1,4 +1,8 @@
-# tRPC Setup Documentation
+---
+title: tRPC Setup Documentation
+excerpt: How tRPC is configured and used in this project
+permalink: /docs/trpc/
+---
 
 This document explains how tRPC is configured in this project, including authentication via Supabase and the data flow between client and server.
 
@@ -17,13 +21,13 @@ This document explains how tRPC is configured in this project, including authent
 
 ### Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Framework | Next.js 14+ (Pages Router) |
-| API Layer | tRPC v11 |
-| Auth | Supabase Auth (HttpOnly cookies via `@supabase/ssr`) |
-| Database | Supabase Postgres + Drizzle ORM |
-| Validation | Zod |
+| Layer      | Technology                                           |
+| ---------- | ---------------------------------------------------- |
+| Framework  | Next.js 14+ (Pages Router)                           |
+| API Layer  | tRPC v11                                             |
+| Auth       | Supabase Auth (HttpOnly cookies via `@supabase/ssr`) |
+| Database   | Supabase Postgres + Drizzle ORM                      |
+| Validation | Zod                                                  |
 
 ### Folder Structure
 
@@ -99,7 +103,7 @@ import { createBrowserClient } from "@supabase/ssr";
 
 export const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
 );
 
 // Login triggers Supabase to set HttpOnly cookies automatically
@@ -107,6 +111,7 @@ await supabase.auth.signInWithPassword({ email, password });
 ```
 
 When a user logs in, Supabase sets several HttpOnly cookies:
+
 - `sb-<project-ref>-auth-token` — Contains the access token and refresh token
 
 #### 2. Browser Makes tRPC Request
@@ -156,20 +161,25 @@ export const createContext = async ({ req, res }: CreateNextContextOptions) => {
         // Parse cookies from the raw header string
         return parseCookieHeader(req.headers.cookie ?? "").filter(
           (cookie): cookie is { name: string; value: string } =>
-            cookie.value !== undefined
+            cookie.value !== undefined,
         );
       },
       setAll(cookiesToSet) {
         // Write refreshed cookies back to the response
         cookiesToSet.forEach(({ name, value, options }) => {
-          res.appendHeader("Set-Cookie", serializeCookieHeader(name, value, options));
+          res.appendHeader(
+            "Set-Cookie",
+            serializeCookieHeader(name, value, options),
+          );
         });
       },
     },
   });
 
   // Validate the session and get the user
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return {
     req,
@@ -188,7 +198,7 @@ list: protectedProcedure
   .query(async ({ ctx, input }) => {
     // ctx.user is guaranteed to be non-null in protectedProcedure
     console.log("Request by:", ctx.user.email);
-    
+
     return await db.query.villageCodes.findMany({...});
   }),
 ```
@@ -247,10 +257,10 @@ export const protectedProcedure = t.procedure.use(isAuthed);
 
 ```typescript
 // server/routers/_app.ts
-import { publicProcedure, router } from '../trpc';
+import { publicProcedure, router } from "../trpc";
 
 export const appRouter = router({
-  healthcheck: publicProcedure.query(() => 'yay!'),
+  healthcheck: publicProcedure.query(() => "yay!"),
 });
 ```
 
@@ -269,16 +279,20 @@ export const villageCodeRouter = router({
     .query(async ({ ctx, input }) => {
       // ctx.user is typed as non-nullable here
       return await db.query.villageCodes.findMany({
-        where: input.includeHidden ? undefined : eq(villageCodes.isVisible, true),
+        where: input.includeHidden
+          ? undefined
+          : eq(villageCodes.isVisible, true),
       });
     }),
 
   create: protectedProcedure
-    .input(z.object({
-      code: z.string().min(1),
-      name: z.string().min(1),
-      colorHex: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/),
-    }))
+    .input(
+      z.object({
+        code: z.string().min(1),
+        name: z.string().min(1),
+        colorHex: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/),
+      }),
+    )
     .mutation(async ({ input }) => {
       const [newCode] = await db.insert(villageCodes).values(input).returning();
       return newCode;
@@ -318,7 +332,7 @@ import { trpc } from "@/utils/trpc";
 
 function CreateVillageCode() {
   const utils = trpc.useUtils();
-  
+
   const createMutation = trpc.villageCodeRouter.create.useMutation({
     onSuccess: () => {
       // Invalidate and refetch the list
@@ -353,7 +367,9 @@ function CreateVillageCode() {
 #### Error Handling
 
 ```tsx
-const { data, error } = trpc.villageCodeRouter.list.useQuery({ includeHidden: false });
+const { data, error } = trpc.villageCodeRouter.list.useQuery({
+  includeHidden: false,
+});
 
 if (error) {
   switch (error.data?.code) {
@@ -386,11 +402,11 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key-here
 
 ### Variable Descriptions
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | ✅ | The **publishable** (public) key. Safe for browser. Used for auth flows. |
-| `SUPABASE_SERVICE_ROLE_KEY` | ❌ | Admin key. **Never expose to browser.** Only use in server-side code for admin operations. |
+| Variable                               | Required | Description                                                                                |
+| -------------------------------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SUPABASE_URL`             | ✅       | Your Supabase project URL                                                                  |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | ✅       | The **publishable** (public) key. Safe for browser. Used for auth flows.                   |
+| `SUPABASE_SERVICE_ROLE_KEY`            | ❌       | Admin key. **Never expose to browser.** Only use in server-side code for admin operations. |
 
 > ⚠️ **Security Note**: Variables prefixed with `NEXT_PUBLIC_` are bundled into the client JavaScript. Never put sensitive keys there.
 
@@ -425,13 +441,16 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key-here
 // Add to server/context.ts temporarily
 export const createContext = async ({ req, res }: CreateNextContextOptions) => {
   console.log("Raw cookies:", req.headers.cookie);
-  
+
   const supabase = createServerClient(/* ... */);
-  
-  const { data: { user }, error } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
   console.log("User:", user?.email ?? "null");
   console.log("Error:", error?.message ?? "none");
-  
+
   return { req, res, user };
 };
 ```
@@ -441,11 +460,13 @@ export const createContext = async ({ req, res }: CreateNextContextOptions) => {
 **Cause:** The API route file is in the wrong location.
 
 **Fix:** Ensure the file is at:
+
 ```
 src/pages/api/trpc/[trpc].ts
 ```
 
 Not at:
+
 ```
 src/pages/api/[trpc].ts  ❌
 ```
@@ -519,7 +540,7 @@ import { transformer } from "./transformer";
 export const trpc = createTRPCNext<AppRouter>({
   config() {
     return {
-      links: [httpBatchStreamLink({ transformer, /* ... */ })],
+      links: [httpBatchStreamLink({ transformer /* ... */ })],
     };
   },
   transformer,
@@ -537,7 +558,7 @@ export const trpc = createTRPCNext<AppRouter>({
 3. Register in `src/server/routers/_app.ts`:
 
 ```typescript
-import { myFeatureRouter } from './myFeatureRouter';
+import { myFeatureRouter } from "./myFeatureRouter";
 
 export const appRouter = router({
   myFeature: myFeatureRouter,
