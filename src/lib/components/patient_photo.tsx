@@ -1,5 +1,5 @@
-import { ImgProps } from 'next/dist/shared/lib/get-img-props';
-import Image from 'next/image';
+import { ImgProps } from "next/dist/shared/lib/get-img-props";
+import Image from "next/image";
 
 /**
  * PatientPhoto component displays a patient's photo, or a default image if the src is missing.
@@ -14,7 +14,7 @@ export function PatientPhoto({
 }: { pictureUrl: string | null } & Partial<ImgProps>) {
   return (
     <Image
-      src={pictureUrl ?? '/default-profile.webp'}
+      src={pictureUrl ?? "/default-profile.webp"}
       unoptimized={true}
       alt="Patient Photo"
       height={150}
