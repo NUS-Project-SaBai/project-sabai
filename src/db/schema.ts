@@ -96,3 +96,16 @@ export type MedicationActiveIngredient =
   typeof medicationActiveIngredients.$inferSelect;
 export type NewMedicationActiveIngredient =
   typeof medicationActiveIngredients.$inferInsert;
+
+export const medicationBrands = pgTable("medication_brands", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  activeIngredientId: integer("active_ingredient_id")
+    .notNull()
+    .references(() => medicationActiveIngredients.id, {
+      onDelete: "restrict",
+    }),
+});
+
+export type MedicationBrands = typeof medicationBrands.$inferSelect;
+export type NewMedicationBrands = typeof medicationBrands.$inferInsert;
