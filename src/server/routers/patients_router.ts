@@ -58,6 +58,10 @@ export const patientsRouter = router({
         .where(eq(patients.id, input.id))
         .limit(1);
 
+      if (result) {
+        result.patientImageUrl = `${cloudinaryUrl}/${result.patientImageUrl}`;
+      }
+
       return result ?? null;
     }),
 
