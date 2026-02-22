@@ -22,7 +22,7 @@ This guide helps orientate new developers to the project.
   - Install: `pnpm i`
   - Start Supabase: `supabase start`
   - Run dev server: `pnpm dev`
-   - See script details in [Appendix A: package.json scripts](#appendix-a-packagejson-scripts).
+  - See script details in [Appendix A: package.json scripts](#appendix-a-packagejson-scripts).
 
 See [README.md](../README.md) for full details and local credentials.
 
@@ -34,19 +34,18 @@ project-sabai/
 |   |-- pages/                 # Next.js routes
 |   |   |-- api/
 |   |   |   |-- trpc/
-|   |   |   |   |-- [trpc].ts   # tRPC API handler
+|   |   |   |   |-- [trpc].ts   # tRPC API handler (don't need to touch)
 |   |   |-- index.tsx          # Home page
 |   |-- components/            # Shared UI components
 |   |   |-- inputs/            # RHF input components
-|   |-- server/
+|   |
+|   |-- server/                # Main backend server
 |   |   |-- context.ts         # tRPC context (auth)
 |   |   |-- trpc.ts            # tRPC setup + procedures
 |   |   |-- routers/           # Feature routers
 |   |   |   |-- _app.ts        # Root router
-|   |   |   |-- villageCodeRouters.ts
 |   |-- utils/
 |   |   |-- trpc.ts            # tRPC React hooks
-|   |   |-- transformer.ts     # superjson transformer
 |   |-- db/
 |   |   |-- schema.ts          # Drizzle schema
 |   |   |-- drizzle.ts         # Drizzle client
@@ -67,10 +66,18 @@ Quick pointers:
 
 ## 4) Common tasks
 
+### Add a new table or column
+
+1. Update Drizzle schema in [src/db/schema.ts](../src/db/schema.ts).
+2. Generate a migration with Drizzle Kit.
+3. Apply the migration to local Supabase.
+
+See [docs/orm.md](./orm.md) for details and commands.
+
 ### Add a new page that calls the backend
 
 1. Add or update a tRPC procedure
-   - Create or update a router in [src/server/routers](../src/server/routers).
+   - Create or update a router in [src/server/routers](../src/server/routers) folder.
    - Use `publicProcedure` (no auth) or `protectedProcedure` (auth required).
    - Example reference: [src/server/routers/villageCodeRouters.ts](../src/server/routers/villageCodeRouters.ts)
 
@@ -84,14 +91,6 @@ Quick pointers:
    - Use hooks from [src/utils/trpc.ts](../src/utils/trpc.ts).
 
 See [docs/trpc.md](./trpc.md) for a full walkthrough.
-
-### Add a new table or column
-
-1. Update Drizzle schema in [src/db/schema.ts](../src/db/schema.ts).
-2. Generate a migration with Drizzle Kit.
-3. Apply the migration to local Supabase.
-
-See [docs/orm.md](./orm.md) for details and commands.
 
 ### Add a new UI component
 
@@ -115,15 +114,15 @@ See [docs/trpc.md](./trpc.md) for the full flow.
 
 Use these commands from the project root:
 
-| Script | What it does | When to use |
-|---|---|---|
-| `pnpm dev` | Starts Next.js in development mode. | Day-to-day local development. |
-| `pnpm build` | Builds the production bundle. | Before deploy checks and CI validation. |
-| `pnpm start` | Runs the production build. | Local production-like smoke testing after `pnpm build`. |
-| `pnpm lint` | Runs ESLint checks. | Runs before push. Note: It checks the current codebase, including uncommited changes |
-| `pnpm format` | Formats source files with Prettier. | Runs before every commit. |
-| `pnpm seed:db` | Resets local Supabase DB and reapplies migrations/seeds. | When you need a clean local database state. |
-| `pnpm seed:users` | Seeds auth users from `supabase/scripts/seed-users.ts`. | When test users are missing locally. |
-| `pnpm seed:all` | Runs DB reset/seed, then user seeding. | Full local environment reset. |
+| Script            | What it does                                             | When to use                                                                          |
+| ----------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `pnpm dev`        | Starts Next.js in development mode.                      | Day-to-day local development.                                                        |
+| `pnpm build`      | Builds the production bundle.                            | Before deploy checks and CI validation.                                              |
+| `pnpm start`      | Runs the production build.                               | Local production-like smoke testing after `pnpm build`.                              |
+| `pnpm lint`       | Runs ESLint checks.                                      | Runs before push. Note: It checks the current codebase, including uncommited changes |
+| `pnpm format`     | Formats source files with Prettier.                      | Runs before every commit.                                                            |
+| `pnpm seed:db`    | Resets local Supabase DB and reapplies migrations/seeds. | When you need a clean local database state.                                          |
+| `pnpm seed:users` | Seeds auth users from `supabase/scripts/seed-users.ts`.  | When test users are missing locally.                                                 |
+| `pnpm seed:all`   | Runs DB reset/seed, then user seeding.                   | Full local environment reset.                                                        |
 
-> ⚠️ `pnpm seed:db` is destructive! 
+> ⚠️ `pnpm seed:db` is destructive!
