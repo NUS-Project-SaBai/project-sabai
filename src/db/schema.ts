@@ -6,11 +6,18 @@ import {
   timestamp,
   text,
   pgEnum,
+  integer,
 } from "drizzle-orm/pg-core";
 
 // Define enums
 export const genderEnum = pgEnum("gender", ["male", "female"]);
 export const yesNoEnum = pgEnum("yes_no", ["yes", "no"]);
+export const medicationStatusEnum = pgEnum("medication_status", [
+  "active",
+  "disposed",
+  "donated",
+  "expired",
+]);
 
 // Define tables
 
@@ -72,3 +79,20 @@ export const patients = pgTable("patients", {
 
 export type Patient = typeof patients.$inferSelect;
 export type NewPatient = typeof patients.$inferInsert;
+
+export const medicationActiveIngredients = pgTable(
+  "medication_active_ingredients",
+  {
+    id: serial("id").primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    unitOfMeasurement: varchar("unit_of_measurement", {
+      length: 255,
+    }).notNull(),
+    fallBelow: integer("fall_below"),
+  },
+);
+
+export type MedicationActiveIngredient =
+  typeof medicationActiveIngredients.$inferSelect;
+export type NewMedicationActiveIngredient =
+  typeof medicationActiveIngredients.$inferInsert;
