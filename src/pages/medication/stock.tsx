@@ -22,7 +22,7 @@ function Stock() {
           </thead>
           <tbody>
             {stock.map((i) => (
-              <tr>
+              <tr key={i.id}>
                 <td>{i.id}</td>
                 <td>{i.medicationBrandId}</td>
                 <td>{i.quantity}</td>

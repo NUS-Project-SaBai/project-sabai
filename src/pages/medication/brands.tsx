@@ -20,7 +20,7 @@ function BrandsPage() {
           </thead>
           <tbody>
             {brands.map((i) => (
-              <tr>
+              <tr key={i.id}>
                 <td>{i.id}</td>
                 <td>{i.name}</td>
                 <td>{i.activeIngredientId}</td>

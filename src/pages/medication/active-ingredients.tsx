@@ -1,8 +1,3 @@
-import { useState } from "react";
-import {
-  MedicationActiveIngredient,
-  NewMedicationActiveIngredient,
-} from "@/db/schema";
 import { trpc } from "@/utils/trpc";
 import { withSession } from "@/lib/session";
 
@@ -26,7 +21,7 @@ function ActiveIngredientsPage() {
           </thead>
           <tbody>
             {activeIngredients.map((i) => (
-              <tr>
+              <tr key={i.id}>
                 <td>{i.id}</td>
                 <td>{i.name}</td>
                 <td>{i.unitOfMeasurement}</td>
