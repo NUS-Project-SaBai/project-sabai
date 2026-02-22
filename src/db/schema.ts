@@ -109,3 +109,22 @@ export const medicationBrands = pgTable("medication_brands", {
 
 export type MedicationBrands = typeof medicationBrands.$inferSelect;
 export type NewMedicationBrands = typeof medicationBrands.$inferInsert;
+
+export const medicationStock = pgTable("medication_stock", {
+  id: serial("id").primaryKey(),
+  medicationBrandId: integer("medication_brand_id")
+    .notNull()
+    .references(() => medicationBrands.id, {
+      onDelete: "restrict",
+    }),
+  quantity: integer("quantity").notNull().default(0),
+  expiry: timestamp("expiry"),
+  location: varchar("location", { length: 255 }),
+  state: medicationStatusEnum("state").default("active"),
+});
+
+export type MedicationStock = typeof medicationStock.$inferSelect;
+export type NewMedicationStock = typeof medicationStock.$inferInsert;
+
+// todo: medication_log table (after users table done)
+// todo: medication_review table (after users table done)
