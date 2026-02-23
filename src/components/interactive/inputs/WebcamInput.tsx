@@ -6,7 +6,7 @@ THIS FILE WAS COPIED OVER FROM OLD REPO TO MOCK FRONTEND WORKFLOW
 
 */
 
-import { Button } from "@/lib/components/button";
+import { OldButton } from "@/components/interactive/OldButton/OldButton";
 import { useToggle } from "@/lib/hooks/useToggle";
 import Image from "next/image";
 import { useCallback, useEffect, useRef } from "react";
@@ -78,19 +78,19 @@ export function WebcamInput({
             screenshotQuality={1}
             videoConstraints={videoConstraints}
           />
-          <Button text="Capture" onClick={webcamCapture} colour="green" />
+          <OldButton text="Capture" onClick={webcamCapture} colour="green" />
         </div>
       )}
       <div className="mt-2 flex items-center justify-center">
         {!cameraIsOpen ? (
           imageDetails == null ? (
-            <Button
+            <OldButton
               colour="green"
               text="Take Photo"
               onClick={toggleCameraOpen}
             />
           ) : (
-            <Button
+            <OldButton
               colour="orange"
               text="Retake Photo"
               onClick={toggleCameraOpen}
@@ -99,7 +99,7 @@ export function WebcamInput({
         ) : (
           // don't show cancel button when there is no image captured yet
           imageDetails != null && (
-            <Button colour="red" text="Cancel" onClick={toggleCameraOpen} />
+            <OldButton colour="red" text="Cancel" onClick={toggleCameraOpen} />
           )
         )}
       </div>

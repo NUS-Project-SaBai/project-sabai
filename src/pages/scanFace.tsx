@@ -8,8 +8,7 @@ TO BE REFACTORED LATER:
 - The page currently does not handle optional fields or validation beyond basic HTML5 constraints.
 */
 
-import { WebcamInput } from "@/lib/components/webcam_input";
-import { withSession } from "@/lib/session";
+import { WebcamInput } from "@/components/interactive/inputs/WebcamInput";
 import { trpc } from "@/utils/trpc";
 import { useState } from "react";
 
@@ -306,4 +305,4 @@ function ScanFacePage() {
   );
 }
 
-export default withSession(ScanFacePage);
+export default ScanFacePage;

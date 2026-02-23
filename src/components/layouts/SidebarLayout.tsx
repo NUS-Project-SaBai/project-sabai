@@ -5,10 +5,11 @@ import { supabase } from "@/lib/supabaseClient";
 import { AiOutlineSetting, AiOutlineUser } from "react-icons/ai";
 import { PiSignOutFill } from "react-icons/pi";
 import { IoMdMenu } from "react-icons/io";
+import { LuScanFace } from "react-icons/lu";
 import LogoTitle from "@/components/LogoTitle";
-import { SessionProvider } from "@/lib/context/SessionContext";
 import SabaiLogo from "@/components/SabaiLogo";
 import { PatientsProvider } from "@/lib/context/PatientsContext";
+import { SessionProvider } from "@/lib/context/SessionContext";
 
 interface SidebarLayoutProps {
   children: ReactNode;
@@ -54,6 +55,7 @@ function SidebarNavButtons() {
   };
 
   const navigation = [
+    { name: "Scan Face", href: "/scanFace", icon: LuScanFace },
     { name: "Patient", href: "/patient", icon: AiOutlineUser },
     {
       name: "Settings",

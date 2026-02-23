@@ -15,7 +15,7 @@ import {
   ButtonVariant,
   COLOUR_MAP,
   SIZE_MAP,
-} from "./buttonStyles";
+} from "./oldButtonStyles";
 import {
   ButtonHTMLAttributes,
   MouseEvent,
@@ -36,7 +36,7 @@ type ButtonProps = {
   className?: string;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
-export function Button({
+export function OldButton({
   text,
   onClick,
   type = "button",

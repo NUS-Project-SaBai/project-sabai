@@ -4,6 +4,8 @@ import clientEnv from "./client";
 const serverEnvSchema = z.object({
   SUPABASE_SECRET_KEY: z.string().min(1),
   DATABASE_URL: z.url(),
+  CLOUDINARY_URL_PREFIX: z.string().min(1),
+  CLOUDINARY_URL: z.string().min(1),
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),

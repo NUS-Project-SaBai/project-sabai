@@ -4,12 +4,10 @@ import { uploadToCloudinary } from "@/server/utils/cloudinary";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { patients, genderEnum, yesNoEnum } from "@/db/schema";
+import serverEnv from "@/lib/env/server";
 import { eq } from "drizzle-orm";
 
-const cloudinaryUrlPrefix = process.env.CLOUDINARY_URL_PREFIX;
-if (!cloudinaryUrlPrefix) {
-  throw new Error("CLOUDINARY_URL environment variable is not set");
-}
+const cloudinaryUrlPrefix = serverEnv.CLOUDINARY_URL_PREFIX;
 
 export const patientsRouter = router({
   // List all patients with village details

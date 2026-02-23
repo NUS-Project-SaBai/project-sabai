@@ -2,7 +2,7 @@ import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import { withDefaultLayout } from "@/components/layouts/SidebarLayout";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
-import { PatientPhoto } from "@/lib/components/patient_photo";
+import { PatientPhoto } from "@/components/PatientPhoto";
 
 function PatientsBasePage() {
   // 1. Fetch data

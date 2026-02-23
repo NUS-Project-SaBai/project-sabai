@@ -1,9 +1,25 @@
 import "dotenv/config";   
-import { createClient } from "@supabase/supabase-js";
-import env from "@/lib/env";
+import { createClient } from "@supabase/supabase-js";import { z } from "zod";
 
-const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseSecretKey = env.SUPABASE_SECRET_KEY; // NEVER expose to browser
+const seedUsersEnvSchema = z.object({
+  NEXT_PUBLIC_SUPABASE_URL: z.url(),
+  SUPABASE_SECRET_KEY: z.string().min(1),
+});
+
+const parsedEnv = seedUsersEnvSchema.safeParse(process.env);
+
+if (!parsedEnv.success) {
+  const issues = parsedEnv.error.issues.map(
+    (issue) => `${issue.path.join(".")}: ${issue.message}`,
+  );
+
+  throw new Error(
+    `Missing or invalid environment variables for seed-users:\n${issues.map((value) => `- ${value}`).join("\n")}`,
+  );
+}
+
+const { NEXT_PUBLIC_SUPABASE_URL: supabaseUrl, SUPABASE_SECRET_KEY: supabaseSecretKey } =
+  parsedEnv.data;
 
 const supabase = createClient(supabaseUrl, supabaseSecretKey, {
   auth: {
