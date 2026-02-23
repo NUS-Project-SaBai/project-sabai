@@ -1,5 +1,6 @@
 import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import SidebarLayout from "@/components/layouts/SidebarLayout";
+import { calculateAge } from "@/lib/utils/patient";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 
@@ -189,12 +190,6 @@ function Badge({
       {label}
     </span>
   );
-}
-
-function calculateAge(birthDate: Date) {
-  const diff = Date.now() - birthDate.getTime();
-  const ageDate = new Date(diff);
-  return Math.abs(ageDate.getUTCFullYear() - 1970);
 }
 
 function getPatientId(id: number, padLength: number) {

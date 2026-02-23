@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Patient } from "@/db/schema";
+import PatientSearchResultItem from "@/components/interactive/PatientSearchResultItem";
 import useDebounce from "@/hooks/useDebounce";
 
 interface PatientSearchResultsProps {
@@ -17,7 +17,7 @@ export default function PatientSearchResults({
   isRefetching,
   onSelect,
 }: PatientSearchResultsProps) {
-  const debouncedSearchText = useDebounce(searchText, 500);
+  const debouncedSearchText = useDebounce(searchText, 300);
   if (debouncedSearchText.trim() === "") {
     return null;
   }
@@ -31,14 +31,11 @@ export default function PatientSearchResults({
       ) : (
         <div className="flex flex-col gap-1 max-h-72 overflow-y-auto">
           {filteredPatients.map((patient) => (
-            <Link
+            <PatientSearchResultItem
               key={patient.id}
-              href={`/patient/${patient.id}`}
-              onClick={onSelect}
-              className="text-sm text-neutral-700 px-2 py-1 rounded bg-white border border-neutral-100 hover:bg-neutral-75"
-            >
-              {patient.name} (ID: {patient.id})
-            </Link>
+              patient={patient}
+              onSelect={onSelect}
+            />
           ))}
         </div>
       )}

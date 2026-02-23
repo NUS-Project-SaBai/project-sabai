@@ -12,7 +12,7 @@ export default function PatientTopMenuLayout({
   children,
 }: PatientTopMenuLayoutProps) {
   const [searchText, setSearchText] = useState("");
-  const debouncedSearchText = useDebounce(searchText, 500);
+  const debouncedSearchText = useDebounce(searchText, 300);
   const { patientsById, isLoading, isRefetching } = usePatients();
 
   const filteredPatients = useMemo(() => {
