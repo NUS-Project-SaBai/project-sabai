@@ -3,7 +3,7 @@ import SidebarLayout from "@/components/layouts/SidebarLayout";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 
-function PatientPage() {
+function PatientsTable() {
   // 1. Fetch data
   const { data: patients, isLoading } = trpc.patientsRouter.list.useQuery();
 
@@ -201,10 +201,10 @@ function getPatientId(id: number, padLength: number) {
   return id.toString().padStart(padLength, "0");
 }
 
-PatientPage.getLayout = (page: React.ReactNode) => (
+PatientsTable.getLayout = (page: React.ReactNode) => (
   <SidebarLayout>
     <PatientTopMenuLayout>{page}</PatientTopMenuLayout>
   </SidebarLayout>
 );
 
-export default PatientPage;
+export default PatientsTable;

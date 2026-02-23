@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import Image from "next/image";
+import SabaiLogo from "./SabaiLogo";
 
 export default function LogoTitle({
   className,
@@ -10,13 +10,7 @@ export default function LogoTitle({
 }) {
   return (
     <div className={clsx("flex flex-row h-min items-center gap-2", className)}>
-      <Image
-        src="/favicon.ico"
-        alt="Logo"
-        width={32}
-        height={32}
-        className="h-8 w-8"
-      />
+      <SabaiLogo />
       <span className={clsx("text-2xl font-extrabold", textClassName)}>
         Project Sa&apos;bai
       </span>

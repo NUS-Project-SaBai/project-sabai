@@ -1,3 +1,4 @@
+import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
@@ -12,6 +13,7 @@ export default function PatientTopMenuLayout({
   children,
 }: PatientTopMenuLayoutProps) {
   const router = useRouter();
+  const { data: patients, isLoading } = trpc.patientsRouter.list.useQuery();
 
   return (
     <div className="min-h-screen flex flex-col">
