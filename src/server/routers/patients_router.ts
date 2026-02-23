@@ -11,15 +11,15 @@ if (!cloudinaryUrl) {
 
 /**
  * Transforms a patient object by adding a complete image URL.
- * 
+ *
  * @param patient - The patient object to transform
- * @returns A new patient object with the `patientImageUrl` property added. If the patient has a `patientImageId`, 
- *          the URL is constructed as `{cloudinaryUrl}/{patientImageId}`. Otherwise, `patientImageUrl` is `null`.
+ * @returns A new patient object with the `patientImageUrl` property added. If the patient has a `patientImagePublicId`,
+ *          the URL is constructed as `{cloudinaryUrl}/{patientImagePublicId}`. Otherwise, `patientImageUrl` is `null`.
  */
 const getPatientWithImageUrl = (patient: Patient) => ({
   ...patient,
-  patientImageUrl: patient.patientImageId
-    ? `${cloudinaryUrl}/${patient.patientImageId}`
+  patientImageUrl: patient.patientImagePublicId
+    ? `${cloudinaryUrl}/${patient.patientImagePublicId}`
     : null,
 });
 
@@ -38,7 +38,7 @@ export const patientsRouter = router({
         hasBS2Card: patients.hasBS2Card,
         drugAllergy: patients.drugAllergy,
         hasSabaiCard: patients.hasSabaiCard,
-        patientImageId: patients.patientImageId,
+        patientImagePublicId: patients.patientImagePublicId,
       })
       .from(patients);
 
@@ -61,14 +61,14 @@ export const patientsRouter = router({
           hasPoorCard: patients.hasPoorCard,
           hasBS2Card: patients.hasBS2Card,
           hasSabaiCard: patients.hasSabaiCard,
-          patientImageId: patients.patientImageId,
+          patientImagePublicId: patients.patientImagePublicId,
         })
         .from(patients)
         .where(eq(patients.id, input.id))
         .limit(1);
 
       if (result) {
-        // Create patientImageUrl via map function based on patientImageId and CLOUDINARY_URL
+        // Create patientImageUrl via map function based on patientImagePublicId and CLOUDINARY_URL
         return getPatientWithImageUrl(result);
       }
 
@@ -85,10 +85,10 @@ export const patientsRouter = router({
         gender: z.enum(genderEnum.enumValues), // Matches schema enum
         dateOfBirth: z.coerce.date(), // Auto-parses strings/dates
         drugAllergy: z.string().min(0),
-        hasPoorCard: z.boolean(), 
-        hasBS2Card: z.boolean(), 
+        hasPoorCard: z.boolean(),
+        hasBS2Card: z.boolean(),
         hasSabaiCard: z.boolean(),
-        patientImageId: z.string(),
+        patientImagePublicId: z.string(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -107,10 +107,10 @@ export const patientsRouter = router({
         gender: z.enum(genderEnum.enumValues).optional(),
         dateOfBirth: z.coerce.date().optional(),
         drugAllergy: z.string().optional(),
-        hasPoorCard: z.boolean().optional(), 
-        hasBS2Card: z.boolean().optional(), 
+        hasPoorCard: z.boolean().optional(),
+        hasBS2Card: z.boolean().optional(),
         hasSabaiCard: z.boolean().optional(),
-        patientImageId: z.string().optional(),
+        patientImagePublicId: z.string().optional(),
       }),
     )
     .mutation(async ({ input }) => {

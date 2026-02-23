@@ -69,8 +69,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "patient_image_id": {
-          "name": "patient_image_id",
+        "patient_image_public_id": {
+          "name": "patient_image_public_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true

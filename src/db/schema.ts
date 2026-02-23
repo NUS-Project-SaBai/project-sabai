@@ -52,7 +52,7 @@ Patients Table:
 - has_poor_card: Indicates if the patient has a POOR card or not.
 - has_bs2_card: Indicates if the patient has a BS2 card or not.
 - has_sabai_card: Indicates if the patient has a Sabai card or not.
-- patientImageId: Cloudinary ID of the patient's image.
+- patientImagePublicId: Cloudinary public ID of the patient's image.
 */
 export const patients = pgTable("patients", {
   id: serial("id").primaryKey(),
@@ -68,7 +68,7 @@ export const patients = pgTable("patients", {
   hasPoorCard: boolean("has_poor_card").notNull(),
   hasBS2Card: boolean("has_bs2_card").notNull(),
   hasSabaiCard: boolean("has_sabai_card").notNull(),
-  patientImageId: text("patient_image_id").notNull(),
+  patientImagePublicId: text("patient_image_public_id").notNull(),
 });
 
 export type Patient = typeof patients.$inferSelect;
