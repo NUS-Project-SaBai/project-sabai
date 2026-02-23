@@ -1,5 +1,5 @@
 {
-  "id": "65f8cfc8-0f5e-45b9-837a-81927ce469b5",
+  "id": "f8b8d411-5138-45fe-b6ba-5371dc69b6d5",
   "prevId": "885e34ce-b992-4fd5-8cfd-fae5c67cd366",
   "version": "7",
   "dialect": "postgresql",
@@ -51,29 +51,26 @@
           "primaryKey": false,
           "notNull": true
         },
-        "poor": {
-          "name": "poor",
-          "type": "yes_no",
-          "typeSchema": "public",
+        "has_poor_card": {
+          "name": "has_poor_card",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
-        "bs2": {
-          "name": "bs2",
-          "type": "yes_no",
-          "typeSchema": "public",
+        "has_bs2_card": {
+          "name": "has_bs2_card",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
-        "sabai_card": {
-          "name": "sabai_card",
-          "type": "yes_no",
-          "typeSchema": "public",
+        "has_sabai_card": {
+          "name": "has_sabai_card",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
-        "patient_image_url": {
-          "name": "patient_image_url",
+        "patient_image_id": {
+          "name": "patient_image_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -161,14 +158,6 @@
       "values": [
         "male",
         "female"
-      ]
-    },
-    "public.yes_no": {
-      "name": "yes_no",
-      "schema": "public",
-      "values": [
-        "yes",
-        "no"
       ]
     }
   },
