@@ -133,17 +133,17 @@ function PatientsPage() {
                         <div className="flex gap-2">
                           <Badge
                             label="Poor"
-                            active={patient.poor === "yes"}
+                            active={patient.hasPoorCard}
                             color="orange"
                           />
                           <Badge
                             label="BS2"
-                            active={patient.bs2 === "yes"}
+                            active={patient.hasBS2Card}
                             color="blue"
                           />
                           <Badge
                             label="Sabai"
-                            active={patient.sabaiCard === "yes"}
+                            active={patient.hasSabaiCard}
                             color="green"
                           />
                         </div>
