@@ -29,7 +29,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
         </button>
       </div>
       <div
-        className={`${mobileSidebarOpen ? "flex" : "hidden"} flex-col absolute z-100 w-full p-2 top-16 bg-neutral-50 shadow-2xl`}
+        className={`${mobileSidebarOpen ? "flex" : "hidden"} flex-col absolute z-2 w-full p-2 top-16 bg-neutral-50 shadow-2xl`}
       >
         <SidebarNavButtons />
       </div>
