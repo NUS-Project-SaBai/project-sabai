@@ -1,4 +1,10 @@
-import { httpBatchStreamLink, loggerLink } from "@trpc/client";
+import {
+  httpBatchStreamLink,
+  httpLink,
+  isNonJsonSerializable,
+  loggerLink,
+  splitLink,
+} from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import type { AppRouter } from "@/server/routers/_app";
@@ -37,13 +43,21 @@ export const trpc = createTRPCNext<AppRouter>({
             process.env.NODE_ENV === "development" ||
             (opts.direction === "down" && opts.result instanceof Error),
         }),
-        httpBatchStreamLink({
-          url: `${getBaseUrl()}/api/trpc`,
-          /**
-           * Cookies are sent automatically by the browser.
-           * No need to manually attach Authorization headers.
-           */
-          transformer,
+        splitLink({
+          condition: (op) => isNonJsonSerializable(op.input),
+          // File/FormData uploads — single request, no serialization
+          true: httpLink({
+            url: `${getBaseUrl()}/api/trpc`,
+            transformer: {
+              serialize: (data) => data, // leave FormData untouched
+              deserialize: transformer.deserialize,
+            },
+          }),
+          // Normal JSON queries/mutations — batched as before
+          false: httpBatchStreamLink({
+            url: `${getBaseUrl()}/api/trpc`,
+            transformer,
+          }),
         }),
       ],
       /**

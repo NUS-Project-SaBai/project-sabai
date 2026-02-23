@@ -53,6 +53,7 @@ Patients Table:
 - poor: Indicates if the patient has a POOR card or not.
 - bs2: Indicates if the patient has a BS2 card or not.
 - sabaiCard: Indicates if the patient has a Sabai card or not.
+- patientImageUrl: Cloudinary URL of the patient's image.
 */
 export const patients = pgTable("patients", {
   id: serial("id").primaryKey(),
@@ -68,6 +69,7 @@ export const patients = pgTable("patients", {
   poor: yesNoEnum("poor").notNull(),
   bs2: yesNoEnum("bs2").notNull(),
   sabaiCard: yesNoEnum("sabai_card").notNull(),
+  patientImageUrl: text("patient_image_url").notNull(),
 });
 
 export type Patient = typeof patients.$inferSelect;

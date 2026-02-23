@@ -66,6 +66,8 @@ Copy the output values into `.env`:
 *   `Authentication Keys > Secret` -> `SUPABASE_SECRET_KEY`
 *   `Database > URL` -> `DATABASE_URL`
 
+Add the other envars from our project – see `.env.example`
+
 Example `.env`:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
@@ -73,6 +75,11 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=SB_PUBLISHABLE_KEY_HERE...
 
 SUPABASE_SECRET_KEY=SB_SECRET_KEY_HERE... 
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
+
+# CLOUDINARY
+CLOUDINARY_URL_PREFIX=your_cloudinary_url_prefix
+CLOUDINARY_URL=your_cloudinary_url
+...
 ```
 
 ### 4. Seed Test Data

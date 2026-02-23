@@ -2,6 +2,7 @@ import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import { withDefaultLayout } from "@/components/layouts/SidebarLayout";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
+import { PatientPhoto } from "@/lib/components/patient_photo";
 
 function PatientsBasePage() {
   // 1. Fetch data
@@ -77,7 +78,7 @@ function PatientsBasePage() {
                 <thead className="bg-slate-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      ID
+                      ID / Photo
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                       Name
@@ -100,10 +101,15 @@ function PatientsBasePage() {
                       className="hover:bg-slate-50 transition-colors"
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex flex-col">
+                        <div className="flex flex-col items-center gap-2">
                           <span className="text-sm font-medium text-slate-900">
-                            {getPatientId(patient.id, 4) || "No ID"}
+                            {getPatientIdWithZeroPadding(patient.id, 4) ||
+                              "No ID"}
                           </span>
+                          <PatientPhoto
+                            pictureUrl={patient.patientImageUrl}
+                            className="rounded-full border border-slate-200"
+                          />
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -197,7 +203,7 @@ function calculateAge(birthDate: Date) {
   return Math.abs(ageDate.getUTCFullYear() - 1970);
 }
 
-function getPatientId(id: number, padLength: number) {
+function getPatientIdWithZeroPadding(id: number, padLength: number) {
   return id.toString().padStart(padLength, "0");
 }
 

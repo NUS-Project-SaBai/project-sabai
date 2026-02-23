@@ -1,0 +1,1 @@
+ALTER TABLE "patients" ADD COLUMN "patient_image_url" text NOT NULL;
