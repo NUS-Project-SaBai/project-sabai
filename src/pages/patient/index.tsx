@@ -1,3 +1,5 @@
+import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
+import SidebarLayout from "@/components/layouts/SidebarLayout";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 
@@ -198,5 +200,11 @@ function calculateAge(birthDate: Date) {
 function getPatientId(id: number, padLength: number) {
   return id.toString().padStart(padLength, "0");
 }
+
+PatientsPage.getLayout = (page: React.ReactNode) => (
+  <SidebarLayout>
+    <PatientTopMenuLayout>{page}</PatientTopMenuLayout>
+  </SidebarLayout>
+);
 
 export default PatientsPage;

@@ -4,8 +4,9 @@ import { ReactNode } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { AiOutlineSetting, AiOutlineUser } from "react-icons/ai";
 import { PiSignOutFill } from "react-icons/pi";
-import LogoTitle from "./LogoTitle";
-import { Button } from "@/components/Button";
+import LogoTitle from "@/components/LogoTitle";
+import { Button } from "@/components/interactive/Button";
+import { SessionProvider } from "@/lib/context/sessionContext";
 
 interface SidebarLayoutProps {
   children: ReactNode;
@@ -20,7 +21,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
   };
 
   const navigation = [
-    { name: "Patients", href: "/patients", icon: AiOutlineUser },
+    { name: "Patient", href: "/patient", icon: AiOutlineUser },
     {
       name: "Settings",
       href: "/settings/village-codes",
@@ -65,3 +66,9 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
     </div>
   );
 }
+
+export const withDefaultLayout = (page: ReactNode) => (
+  <SessionProvider>
+    <SidebarLayout>{page}</SidebarLayout>
+  </SessionProvider>
+);

@@ -1,6 +1,10 @@
-import { ButtonSize, ButtonVariant, getButonTwClassName } from "./buttonStyles";
-import { ButtonColour } from "./buttonStyles";
 import { FaSpinner } from "react-icons/fa";
+import {
+  ButtonColour,
+  ButtonVariant,
+  ButtonSize,
+  getButonTwClassName,
+} from "./buttonStyles";
 
 /**
  * A customizable button component with support for multiple styles and variants.

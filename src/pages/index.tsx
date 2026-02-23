@@ -5,7 +5,7 @@ function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    router.push("/patients");
+    router.push("/patient");
   }, [router]);
 
   return null;

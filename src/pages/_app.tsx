@@ -3,8 +3,8 @@ import type { AppProps } from "next/app";
 import type { NextPage } from "next";
 import type { ReactElement, ReactNode } from "react";
 import { trpc } from "@/utils/trpc";
-import SidebarLayout from "@/lib/components/SidebarLayout";
-import { SessionProvider } from "@/context/sessionContext";
+import SidebarLayout from "@/components/layouts/SidebarLayout";
+import { SessionProvider } from "@/lib/context/sessionContext";
 
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
