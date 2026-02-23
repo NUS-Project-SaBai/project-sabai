@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Patient } from "@/db/schema";
-import { calculateAge, getInitials } from "@/lib/utils/patient";
+import { calculateAge } from "@/lib/utils/patient";
+import { PatientPhoto } from "@/components/PatientPhoto";
 
 interface PatientSearchResultItemProps {
   patient: Patient;
@@ -17,9 +18,12 @@ export default function PatientSearchResultItem({
       onClick={onSelect}
       className="flex items-center gap-3 text-sm text-neutral-700 px-2 py-2 rounded bg-white border border-neutral-100 hover:bg-neutral-75"
     >
-      <div className="h-9 w-9 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-xs font-medium text-neutral-600 shrink-0">
-        {getInitials(patient.name)}
-      </div>
+      <PatientPhoto
+        pictureUrl={patient.patientImageUrl}
+        height={40}
+        width={40}
+        className="rounded-full border border-slate-200"
+      />
       <div className="flex min-w-0 flex-col">
         <span className="font-medium truncate">{patient.name}</span>
         <span className="text-xs text-neutral-500">
