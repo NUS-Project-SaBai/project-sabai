@@ -6,8 +6,9 @@ import { AiOutlineSetting, AiOutlineUser } from "react-icons/ai";
 import { PiSignOutFill } from "react-icons/pi";
 import { IoMdMenu } from "react-icons/io";
 import LogoTitle from "@/components/LogoTitle";
-import { SessionProvider } from "@/lib/context/sessionContext";
+import { SessionProvider } from "@/lib/context/SessionContext";
 import SabaiLogo from "@/components/SabaiLogo";
+import { PatientsProvider } from "@/lib/context/PatientsContext";
 
 interface SidebarLayoutProps {
   children: ReactNode;
@@ -96,6 +97,8 @@ function SidebarNavButtons() {
 
 export const withDefaultLayout = (page: ReactNode) => (
   <SessionProvider>
-    <SidebarLayout>{page}</SidebarLayout>
+    <PatientsProvider>
+      <SidebarLayout>{page}</SidebarLayout>
+    </PatientsProvider>
   </SessionProvider>
 );

@@ -1,9 +1,9 @@
 import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
-import SidebarLayout from "@/components/layouts/SidebarLayout";
+import { withDefaultLayout } from "@/components/layouts/SidebarLayout";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 
-function PatientPage() {
+function PatientsBasePage() {
   // 1. Fetch data
   const { data: patients, isLoading } = trpc.patientsRouter.list.useQuery();
 
@@ -201,10 +201,7 @@ function getPatientId(id: number, padLength: number) {
   return id.toString().padStart(padLength, "0");
 }
 
-PatientPage.getLayout = (page: React.ReactNode) => (
-  <SidebarLayout>
-    <PatientTopMenuLayout>{page}</PatientTopMenuLayout>
-  </SidebarLayout>
-);
+PatientsBasePage.getLayout = (page: React.ReactNode) =>
+  withDefaultLayout(<PatientTopMenuLayout>{page}</PatientTopMenuLayout>);
 
-export default PatientPage;
+export default PatientsBasePage;
