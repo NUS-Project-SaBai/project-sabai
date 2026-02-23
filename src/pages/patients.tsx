@@ -6,8 +6,8 @@ function PatientsPage() {
   const { data: patients, isLoading } = trpc.patientsRouter.list.useQuery();
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen flex-1 p-8">
+      <div className="w-full mx-auto">
         {/* Navigation / Breadcrumbs */}
         <nav className="flex items-center gap-2 text-sm mb-6">
           <Link
