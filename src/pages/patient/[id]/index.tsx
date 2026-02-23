@@ -41,7 +41,9 @@ export default function PatientPage() {
             <h1 className="text-2xl font-semibold text-slate-900 mb-2">
               Patient not found
             </h1>
-            <p className="text-slate-600">No patient exists for ID: {patientId}</p>
+            <p className="text-slate-600">
+              No patient exists for ID: {patientId}
+            </p>
           </div>
         </div>
       </div>
@@ -51,10 +53,16 @@ export default function PatientPage() {
   const details = [
     { label: "ID", value: patient.id.toString() },
     { label: "Name", value: patient.name },
-    { label: "Identification Number", value: patient.identificationNumber || "-" },
+    {
+      label: "Identification Number",
+      value: patient.identificationNumber || "-",
+    },
     { label: "Contact Number", value: patient.contactNo || "-" },
     { label: "Gender", value: patient.gender },
-    { label: "Date of Birth", value: new Date(patient.dateOfBirth).toLocaleDateString() },
+    {
+      label: "Date of Birth",
+      value: new Date(patient.dateOfBirth).toLocaleDateString(),
+    },
     { label: "Age", value: `${calculateAge(patient.dateOfBirth)} years` },
     { label: "Drug Allergy", value: patient.drugAllergy },
     { label: "POOR", value: patient.poor },
@@ -75,16 +83,25 @@ export default function PatientPage() {
               className="h-16 w-16 rounded-full object-cover border border-slate-200"
             />
             <div>
-              <h1 className="text-2xl font-semibold text-slate-900">{patient.name}</h1>
+              <h1 className="text-2xl font-semibold text-slate-900">
+                {patient.name}
+              </h1>
               <p className="text-slate-600">Simple patient profile details</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {details.map((detail) => (
-              <div key={detail.label} className="rounded-lg border border-slate-200 p-3">
-                <p className="text-xs font-medium text-slate-500 mb-1">{detail.label}</p>
-                <p className="text-sm text-slate-900 wrap-break-word">{detail.value}</p>
+              <div
+                key={detail.label}
+                className="rounded-lg border border-slate-200 p-3"
+              >
+                <p className="text-xs font-medium text-slate-500 mb-1">
+                  {detail.label}
+                </p>
+                <p className="text-sm text-slate-900 wrap-break-word">
+                  {detail.value}
+                </p>
               </div>
             ))}
           </div>
