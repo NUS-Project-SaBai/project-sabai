@@ -10,7 +10,6 @@ import {
 
 // Define enums
 export const genderEnum = pgEnum("gender", ["male", "female"]);
-export const yesNoEnum = pgEnum("yes_no", ["yes", "no"]);
 
 // Define tables
 
@@ -50,9 +49,10 @@ Patients Table:
 - gender: Gender of the patient.
 - drugAllergy: Drug allergy information of the patient.
 - dateOfBirth: Date of birth of the patient.
-- poor: Indicates if the patient has a POOR card or not.
-- bs2: Indicates if the patient has a BS2 card or not.
-- sabaiCard: Indicates if the patient has a Sabai card or not.
+- has_poor_card: Indicates if the patient has a POOR card or not.
+- has_bs2_card: Indicates if the patient has a BS2 card or not.
+- has_sabai_card: Indicates if the patient has a Sabai card or not.
+- patientImagePublicId: Cloudinary public ID of the patient's image.
 */
 export const patients = pgTable("patients", {
   id: serial("id").primaryKey(),
@@ -65,9 +65,10 @@ export const patients = pgTable("patients", {
     withTimezone: true,
     mode: "date",
   }).notNull(),
-  poor: yesNoEnum("poor").notNull(),
-  bs2: yesNoEnum("bs2").notNull(),
-  sabaiCard: yesNoEnum("sabai_card").notNull(),
+  hasPoorCard: boolean("has_poor_card").notNull(),
+  hasBS2Card: boolean("has_bs2_card").notNull(),
+  hasSabaiCard: boolean("has_sabai_card").notNull(),
+  patientImagePublicId: text("patient_image_public_id").notNull(),
 });
 
 export type Patient = typeof patients.$inferSelect;
