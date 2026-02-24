@@ -26,15 +26,8 @@
     {
       "idx": 3,
       "version": "7",
-      "when": 1771663256509,
-      "tag": "20260221084056_add_patient_image",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1771664706960,
-      "tag": "0004_add_patient_image",
+      "when": 1771851139483,
+      "tag": "0003_add_patient_image",
       "breakpoints": true
     }
   ]
