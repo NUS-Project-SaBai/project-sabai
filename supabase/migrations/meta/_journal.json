@@ -24,11 +24,17 @@
       "breakpoints": true
     },
     {
+      "idx": 3,
+      "version": "7",
+      "when": 1771851139483,
+      "tag": "0003_add_patient_image",
+      "breakpoints": true
+    },
+    {
       "idx": 4,
       "version": "7",
       "when": 1771690479511,
-      "tag": "0004_thankful_proudstar",
-      "breakpoints": true
+      "tag": "0004_thankful_proudstar"
     }
   ]
 }

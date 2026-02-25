@@ -1,8 +1,27 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../trpc";
 import { db } from "@/db/drizzle";
-import { patients, genderEnum, yesNoEnum } from "@/db/schema";
+import { patients, genderEnum, Patient } from "@/db/schema";
 import { eq } from "drizzle-orm";
+
+const cloudinaryUrl = process.env.CLOUDINARY_URL;
+if (!cloudinaryUrl) {
+  throw new Error("CLOUDINARY_URL environment variable is not set");
+}
+
+/**
+ * Transforms a patient object by adding a complete image URL.
+ *
+ * @param patient - The patient object to transform
+ * @returns A new patient object with the `patientImageUrl` property added. If the patient has a `patientImagePublicId`,
+ *          the URL is constructed as `{cloudinaryUrl}/{patientImagePublicId}`. Otherwise, `patientImageUrl` is `null`.
+ */
+const getPatientWithImageUrl = (patient: Patient) => ({
+  ...patient,
+  patientImageUrl: patient.patientImagePublicId
+    ? `${cloudinaryUrl}/${patient.patientImagePublicId}`
+    : null,
+});
 
 export const patientsRouter = router({
   // List all patients with village details
@@ -15,14 +34,15 @@ export const patientsRouter = router({
         contactNo: patients.contactNo,
         gender: patients.gender,
         dateOfBirth: patients.dateOfBirth,
-        poor: patients.poor,
-        bs2: patients.bs2,
+        hasPoorCard: patients.hasPoorCard,
+        hasBS2Card: patients.hasBS2Card,
         drugAllergy: patients.drugAllergy,
-        sabaiCard: patients.sabaiCard,
+        hasSabaiCard: patients.hasSabaiCard,
+        patientImagePublicId: patients.patientImagePublicId,
       })
       .from(patients);
 
-    return result;
+    return result.map(getPatientWithImageUrl);
   }),
 
   // Get single patient by ID with village details
@@ -37,16 +57,22 @@ export const patientsRouter = router({
           contactNo: patients.contactNo,
           gender: patients.gender,
           dateOfBirth: patients.dateOfBirth,
-          poor: patients.poor,
-          bs2: patients.bs2,
           drugAllergy: patients.drugAllergy,
-          sabaiCard: patients.sabaiCard,
+          hasPoorCard: patients.hasPoorCard,
+          hasBS2Card: patients.hasBS2Card,
+          hasSabaiCard: patients.hasSabaiCard,
+          patientImagePublicId: patients.patientImagePublicId,
         })
         .from(patients)
         .where(eq(patients.id, input.id))
         .limit(1);
 
-      return result ?? null;
+      if (result) {
+        // Create patientImageUrl via map function based on patientImagePublicId and CLOUDINARY_URL
+        return getPatientWithImageUrl(result);
+      }
+
+      return null;
     }),
 
   // Create new patient
@@ -59,14 +85,15 @@ export const patientsRouter = router({
         gender: z.enum(genderEnum.enumValues), // Matches schema enum
         dateOfBirth: z.coerce.date(), // Auto-parses strings/dates
         drugAllergy: z.string().min(0),
-        poor: z.enum(yesNoEnum.enumValues), // Matches schema enum
-        bs2: z.enum(yesNoEnum.enumValues), // Keep varchar as-is
-        sabaiCard: z.enum(yesNoEnum.enumValues), // Keep varchar as-is
+        hasPoorCard: z.boolean(),
+        hasBS2Card: z.boolean(),
+        hasSabaiCard: z.boolean(),
+        patientImagePublicId: z.string(),
       }),
     )
     .mutation(async ({ input }) => {
       const [newPatient] = await db.insert(patients).values(input).returning();
-      return newPatient;
+      return getPatientWithImageUrl(newPatient);
     }),
 
   // Update patient
@@ -80,9 +107,10 @@ export const patientsRouter = router({
         gender: z.enum(genderEnum.enumValues).optional(),
         dateOfBirth: z.coerce.date().optional(),
         drugAllergy: z.string().optional(),
-        poor: z.enum(yesNoEnum.enumValues).optional(),
-        bs2: z.enum(yesNoEnum.enumValues).optional(),
-        sabaiCard: z.enum(yesNoEnum.enumValues).optional(),
+        hasPoorCard: z.boolean().optional(),
+        hasBS2Card: z.boolean().optional(),
+        hasSabaiCard: z.boolean().optional(),
+        patientImagePublicId: z.string().optional(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -93,7 +121,7 @@ export const patientsRouter = router({
         .where(eq(patients.id, id))
         .returning();
 
-      return result ?? null;
+      return result ? getPatientWithImageUrl(result) : null;
     }),
 
   // Delete patient
