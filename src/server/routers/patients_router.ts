@@ -81,11 +81,11 @@ export const patientsRouter = router({
   create: protectedProcedure
     .input(
       zfd.formData({
-        name: zfd.text(z.string().min(1)),
-        identificationNumber: zfd.text(z.string().optional()),
+        name: zfd.text(),
+        identificationNumber: zfd.text(),
         gender: zfd.text(z.enum(genderEnum.enumValues)),
         dateOfBirth: zfd.text(z.coerce.date()),
-        drugAllergy: zfd.text(z.string().min(1)),
+        drugAllergy: zfd.text(),
         hasPoorCard: zfd.text(
           z.enum(["true", "false"]).transform((val) => val === "true"),
         ),
@@ -116,27 +116,31 @@ export const patientsRouter = router({
   update: protectedProcedure
     .input(
       z.object({
-        id: zfd.text(
-          z
-            .string()
-            .min(1)
-            .transform((val) => parseInt(val, 10)),
-        ), // ID must be included for updates
-        name: zfd.text(z.string().min(1)),
+        id: zfd.numeric(z.number().int()), // ID must be included for updates
+        name: zfd.text(z.string().optional()),
         identificationNumber: zfd.text(z.string().optional()),
-        gender: zfd.text(z.enum(genderEnum.enumValues)),
-        dateOfBirth: zfd.text(z.coerce.date()),
-        drugAllergy: zfd.text(z.string().min(1)),
+        gender: zfd.text(z.enum(genderEnum.enumValues).optional()),
+        dateOfBirth: zfd.text(z.coerce.date().optional()),
+        drugAllergy: zfd.text(z.string().optional()),
         hasPoorCard: zfd.text(
-          z.enum(["true", "false"]).transform((val) => val === "true"),
+          z
+            .enum(["true", "false"])
+            .transform((val) => val === "true")
+            .optional(),
         ),
         hasBS2Card: zfd.text(
-          z.enum(["true", "false"]).transform((val) => val === "true"),
+          z
+            .enum(["true", "false"])
+            .transform((val) => val === "true")
+            .optional(),
         ),
         hasSabaiCard: zfd.text(
-          z.enum(["true", "false"]).transform((val) => val === "true"),
+          z
+            .enum(["true", "false"])
+            .transform((val) => val === "true")
+            .optional(),
         ),
-        patientImage: zfd.file().optional(),
+        patientImage: zfd.file(z.instanceof(File).optional()),
       }),
     )
     .mutation(async ({ input }) => {

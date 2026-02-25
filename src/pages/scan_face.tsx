@@ -206,6 +206,7 @@ function ScanFacePage() {
               Drug Allergy
             </label>
             <input
+              required
               value={patientFormData.drugAllergy}
               onChange={(e) =>
                 setPatientFormData({
@@ -263,7 +264,7 @@ function ScanFacePage() {
                 onChange={(e) =>
                   setPatientFormData({
                     ...patientFormData,
-                    hasBS2Card: e.target.checked
+                    hasBS2Card: e.target.checked,
                   })
                 }
                 className="rounded border-slate-300"
