@@ -115,7 +115,7 @@ export const patientsRouter = router({
   // Update patient
   update: protectedProcedure
     .input(
-      z.object({
+      zfd.formData({
         id: zfd.numeric(z.number().int()), // ID must be included for updates
         name: zfd.text(z.string().optional()),
         identificationNumber: zfd.text(z.string().optional()),
