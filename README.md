@@ -66,8 +66,6 @@ Copy the output values into `.env`:
 *   `Authentication Keys > Secret` -> `SUPABASE_SECRET_KEY`
 *   `Database > URL` -> `DATABASE_URL`
 
-Add the other envars from our project – see `.env.example`
-
 Add the other envars from our project. Reference the [.env.example](./.env.example) file
 
 ### 4. Seed Test Data
