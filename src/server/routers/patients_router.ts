@@ -1,11 +1,13 @@
 import { z } from "zod";
+import { zfd } from "zod-form-data";
+import { uploadToCloudinary } from "../utils/cloudinary";
 import { router, protectedProcedure } from "../trpc";
 import { db } from "@/db/drizzle";
 import { patients, genderEnum, Patient } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-const cloudinaryUrl = process.env.CLOUDINARY_URL;
-if (!cloudinaryUrl) {
+const cloudinaryUrlPrefix = process.env.CLOUDINARY_URL_PREFIX;
+if (!cloudinaryUrlPrefix) {
   throw new Error("CLOUDINARY_URL environment variable is not set");
 }
 
@@ -19,7 +21,7 @@ if (!cloudinaryUrl) {
 const getPatientWithImageUrl = (patient: Patient) => ({
   ...patient,
   patientImageUrl: patient.patientImagePublicId
-    ? `${cloudinaryUrl}/${patient.patientImagePublicId}`
+    ? `${cloudinaryUrlPrefix}/${patient.patientImagePublicId}`
     : null,
 });
 
@@ -78,46 +80,78 @@ export const patientsRouter = router({
   // Create new patient
   create: protectedProcedure
     .input(
-      z.object({
-        name: z.string().min(1, "Name is required"),
-        identificationNumber: z.string().optional(),
-        contactNo: z.string().optional(),
-        gender: z.enum(genderEnum.enumValues), // Matches schema enum
-        dateOfBirth: z.coerce.date(), // Auto-parses strings/dates
-        drugAllergy: z.string().min(0),
-        hasPoorCard: z.boolean(),
-        hasBS2Card: z.boolean(),
-        hasSabaiCard: z.boolean(),
-        patientImagePublicId: z.string(),
+      zfd.formData({
+        name: zfd.text(),
+        identificationNumber: zfd.text(),
+        gender: zfd.text(z.enum(genderEnum.enumValues)),
+        dateOfBirth: zfd.text(z.coerce.date()),
+        drugAllergy: zfd.text(),
+        hasPoorCard: zfd.text(
+          z.enum(["true", "false"]).transform((val) => val === "true"),
+        ),
+        hasBS2Card: zfd.text(
+          z.enum(["true", "false"]).transform((val) => val === "true"),
+        ),
+        hasSabaiCard: zfd.text(
+          z.enum(["true", "false"]).transform((val) => val === "true"),
+        ),
+        patientImage: zfd.file(),
       }),
     )
     .mutation(async ({ input }) => {
-      const [newPatient] = await db.insert(patients).values(input).returning();
-      return getPatientWithImageUrl(newPatient);
+      // Upload image to Cloudinary and get the public ID
+      const patientImagePublicId = await uploadToCloudinary(input.patientImage);
+
+      const newPatientInput = { ...input, patientImagePublicId };
+
+      const [newPatient] = await db
+        .insert(patients)
+        .values(newPatientInput)
+        .returning();
+
+      return newPatient;
     }),
 
   // Update patient
   update: protectedProcedure
     .input(
-      z.object({
-        id: z.number().int(),
-        name: z.string().min(1).optional(),
-        identificationNumber: z.string().optional(),
-        contactNo: z.string().optional(),
-        gender: z.enum(genderEnum.enumValues).optional(),
-        dateOfBirth: z.coerce.date().optional(),
-        drugAllergy: z.string().optional(),
-        hasPoorCard: z.boolean().optional(),
-        hasBS2Card: z.boolean().optional(),
-        hasSabaiCard: z.boolean().optional(),
-        patientImagePublicId: z.string().optional(),
+      zfd.formData({
+        id: zfd.numeric(z.number().int()), // ID must be included for updates
+        name: zfd.text(z.string().optional()),
+        identificationNumber: zfd.text(z.string().optional()),
+        gender: zfd.text(z.enum(genderEnum.enumValues).optional()),
+        dateOfBirth: zfd.text(z.coerce.date().optional()),
+        drugAllergy: zfd.text(z.string().optional()),
+        hasPoorCard: zfd.text(
+          z
+            .enum(["true", "false"])
+            .transform((val) => val === "true")
+            .optional(),
+        ),
+        hasBS2Card: zfd.text(
+          z
+            .enum(["true", "false"])
+            .transform((val) => val === "true")
+            .optional(),
+        ),
+        hasSabaiCard: zfd.text(
+          z
+            .enum(["true", "false"])
+            .transform((val) => val === "true")
+            .optional(),
+        ),
+        patientImage: zfd.file(z.instanceof(File).optional()),
       }),
     )
     .mutation(async ({ input }) => {
-      const { id, ...updateData } = input;
+      const { id, patientImage, ...updateData } = input;
+      let patientImagePublicId;
+      if (patientImage) {
+        patientImagePublicId = await uploadToCloudinary(patientImage);
+      }
       const [result] = await db
         .update(patients)
-        .set(updateData)
+        .set({ ...updateData, patientImagePublicId })
         .where(eq(patients.id, id))
         .returning();
 
