@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "../trpc";
 import { db } from "@/db/drizzle";
 import { eq } from "drizzle-orm";
@@ -18,9 +19,9 @@ export const medicationBrandRouter = router({
 
   create: protectedProcedure
     .input(
-      z.object({
-        name: z.string().nonoptional(),
-        activeIngredientId: z.number().int(),
+      zfd.formData({
+        name: zfd.text(z.string().nonoptional()),
+        activeIngredientId: zfd.numeric(z.number().int()),
       }),
     )
     .mutation(async ({ input }) => {
