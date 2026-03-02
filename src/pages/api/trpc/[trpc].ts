@@ -5,6 +5,12 @@ import * as trpcNext from "@trpc/server/adapters/next";
 import { createContext } from "@/server/context";
 import { appRouter } from "@/server/routers/_app";
 
+export const config = {
+  api: {
+    bodyParser: false, // Disable Next.js's default body parser to handle multipart/form-data
+  },
+};
+
 export default trpcNext.createNextApiHandler({
   router: appRouter,
   /**

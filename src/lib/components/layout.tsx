@@ -16,8 +16,9 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
   };
 
   const navigation = [
+    { name: "Scan Face", href: "/scan_face", icon: UsersIcon },
     { name: "Patients", href: "/patients", icon: UsersIcon },
-    { name: "Settings", href: "/settings/village-codes", icon: Cog6ToothIcon },
+    { name: "Settings", href: "/settings/village_codes", icon: Cog6ToothIcon },
   ];
 
   return (
