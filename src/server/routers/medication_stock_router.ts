@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "../trpc";
 import { db } from "@/db/drizzle";
 import { eq } from "drizzle-orm";
@@ -21,12 +22,12 @@ export const medicationStockRouter = router({
 
   create: protectedProcedure
     .input(
-      z.object({
-        medicationBrandId: z.number().int(),
-        quantity: z.number().int(),
-        expiry: z.coerce.date(),
-        location: z.string(),
-        state: z.enum(medicationStatusEnum.enumValues),
+      zfd.formData({
+        medicationBrandId: zfd.numeric(z.number().int()),
+        quantity: zfd.numeric(z.number().int()),
+        expiry: zfd.text(z.coerce.date()),
+        location: zfd.text(),
+        state: zfd.text(z.enum(medicationStatusEnum.enumValues)),
       }),
     )
     .mutation(async ({ input }) => {
