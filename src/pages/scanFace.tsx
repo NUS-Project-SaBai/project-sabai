@@ -19,9 +19,9 @@ type PatientForm = {
   gender: "male" | "female";
   drugAllergy: string;
   dateOfBirth: Date;
-  poor: "yes" | "no";
-  bs2: "yes" | "no";
-  sabaiCard: "yes" | "no";
+  hasPoorCard: boolean;
+  hasBS2Card: boolean;
+  hasSabaiCard: boolean;
   patientImage: File;
 };
 
@@ -37,9 +37,9 @@ function ScanFacePage() {
     gender: "male",
     drugAllergy: "",
     dateOfBirth: new Date(),
-    poor: "no",
-    bs2: "no",
-    sabaiCard: "no",
+    hasPoorCard: false,
+    hasBS2Card: false,
+    hasSabaiCard: false,
     patientImage: new File([], ""), // Initialize with an empty File object
   };
   const [patientFormData, setPatientFormData] =
@@ -84,9 +84,9 @@ function ScanFacePage() {
     formData.append("gender", patientFormData.gender);
     formData.append("drugAllergy", patientFormData.drugAllergy);
     formData.append("dateOfBirth", patientFormData.dateOfBirth.toISOString());
-    formData.append("poor", patientFormData.poor);
-    formData.append("bs2", patientFormData.bs2);
-    formData.append("sabaiCard", patientFormData.sabaiCard);
+    formData.append("hasPoorCard", patientFormData.hasPoorCard.toString());
+    formData.append("hasBS2Card", patientFormData.hasBS2Card.toString());
+    formData.append("hasSabaiCard", patientFormData.hasSabaiCard.toString());
     formData.append("patientImage", patientImage); // ← File goes in last
 
     createMutation.mutate(formData, {
@@ -205,6 +205,7 @@ function ScanFacePage() {
               Drug Allergy
             </label>
             <input
+              required
               value={patientFormData.drugAllergy}
               onChange={(e) =>
                 setPatientFormData({
@@ -240,11 +241,11 @@ function ScanFacePage() {
             <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
               <input
                 type="checkbox"
-                checked={patientFormData.poor === "yes"}
+                checked={patientFormData.hasPoorCard}
                 onChange={(e) =>
                   setPatientFormData({
                     ...patientFormData,
-                    poor: e.target.checked ? "yes" : "no",
+                    hasPoorCard: e.target.checked,
                   })
                 }
                 className="rounded border-slate-300"
@@ -258,11 +259,11 @@ function ScanFacePage() {
             <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
               <input
                 type="checkbox"
-                checked={patientFormData.bs2 === "yes"}
+                checked={patientFormData.hasBS2Card}
                 onChange={(e) =>
                   setPatientFormData({
                     ...patientFormData,
-                    bs2: e.target.checked ? "yes" : "no",
+                    hasBS2Card: e.target.checked,
                   })
                 }
                 className="rounded border-slate-300"
@@ -276,11 +277,11 @@ function ScanFacePage() {
             <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
               <input
                 type="checkbox"
-                checked={patientFormData.sabaiCard === "yes"}
+                checked={patientFormData.hasSabaiCard}
                 onChange={(e) =>
                   setPatientFormData({
                     ...patientFormData,
-                    sabaiCard: e.target.checked ? "yes" : "no",
+                    hasSabaiCard: e.target.checked,
                   })
                 }
                 className="rounded border-slate-300"

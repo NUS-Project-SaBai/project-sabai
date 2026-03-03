@@ -1,4 +1,4 @@
-import "dotenv/config"; // Load environment variables from .env file for CLOUDINARY_URL
+import "dotenv/config"; // Cloudinary SDK automatically loads CLOUDINARY_URL environment variable from .env file
 import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 
 cloudinary.config({

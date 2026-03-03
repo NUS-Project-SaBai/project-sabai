@@ -4,10 +4,10 @@ INSERT INTO "patients" (
     "contact_no", "gender", 
     "date_of_birth", 
     "drug_allergy", 
-    "poor", 
-    "bs2", 
-    "sabai_card",
-    "patient_image_url"
+    "has_poor_card", 
+    "has_bs2_card", 
+    "has_sabai_card",
+    "patient_image_public_id"
 ) VALUES
 ('Somchai Phuket', 'ID001', '08-1234-5678', 'male', '1985-03-15', 'Penicillin', 'yes', 'no', 'yes', 'image/upload/v1765419261/zlsgdl0ah4awsqbwhym8.jpg'),
 ('Niran Chiang', 'ID002', '08-2345-6789', 'male', '1992-07-22', 'None', 'no', 'yes', 'no', 'image/upload/v1765419261/zlsgdl0ah4awsqbwhym8.jpg'),
