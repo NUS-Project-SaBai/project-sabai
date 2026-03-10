@@ -34,10 +34,10 @@ export const medicationBrandRouter = router({
 
   update: protectedProcedure
     .input(
-      z.object({
-        id: z.number().int().nonoptional(),
-        name: z.string().optional(),
-        activeIngredientId: z.number().int(),
+      zfd.formData({
+        id: zfd.numeric(z.number().int()).nonoptional(),
+        name: zfd.text().optional(),
+        activeIngredientId: zfd.numeric(z.number().int()),
       }),
     )
     .mutation(async ({ input }) => {
@@ -53,8 +53,8 @@ export const medicationBrandRouter = router({
 
   delete: protectedProcedure
     .input(
-      z.object({
-        id: z.number().int(),
+      zfd.formData({
+        id: zfd.numeric(z.number().int()),
       }),
     )
     .mutation(async ({ input }) => {
