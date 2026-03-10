@@ -39,7 +39,11 @@ export const medicationStockRouter = router({
     }),
 
   delete: protectedProcedure
-    .input(z.object({ id: z.number().int() }))
+    .input(
+      zfd.formData({
+        id: zfd.numeric(z.number().int()),
+      }),
+    )
     .mutation(async ({ input }) => {
       const [result] = await db
         .delete(medicationStock)
