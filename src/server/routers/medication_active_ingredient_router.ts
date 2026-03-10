@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zfd } from "zod-form-data";
 import { db } from "@/db/drizzle";
 import { router, protectedProcedure } from "../trpc";
 import { medicationActiveIngredients } from "@/db/schema";
@@ -19,10 +20,10 @@ export const medicationActiveIngredientsRouter = router({
 
   create: protectedProcedure
     .input(
-      z.object({
-        name: z.string().nonoptional(),
-        unitOfMeasurement: z.string().nonoptional(),
-        fallBelow: z.number().int().optional(),
+      zfd.formData({
+        name: zfd.text().nonoptional(),
+        unitOfMeasurement: zfd.text().nonoptional(),
+        fallBelow: zfd.numeric(z.number().int()).optional(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -35,11 +36,11 @@ export const medicationActiveIngredientsRouter = router({
 
   update: protectedProcedure
     .input(
-      z.object({
-        id: z.number().int(),
-        name: z.string().nonoptional(),
-        unitOfMeasurement: z.string().nonoptional(),
-        fallBelow: z.number().int().optional(),
+      zfd.formData({
+        id: zfd.numeric(z.number().int()),
+        name: zfd.text().nonoptional(),
+        unitOfMeasurement: zfd.text().nonoptional(),
+        fallBelow: zfd.numeric(z.number().int()).optional(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -54,8 +55,8 @@ export const medicationActiveIngredientsRouter = router({
 
   delete: protectedProcedure
     .input(
-      z.object({
-        id: z.number().int(),
+      zfd.formData({
+        id: zfd.numeric(z.number().int()),
       }),
     )
     .mutation(async ({ input }) => {
