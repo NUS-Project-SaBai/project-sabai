@@ -52,4 +52,27 @@ export const medicationStockRouter = router({
 
       return { success: !!result };
     }),
+
+  // id, quantity, expiry, location, state
+  update: protectedProcedure
+    .input(
+      zfd.formData({
+        id: zfd.numeric(z.number().int()),
+        medicationBrandId: zfd.numeric(z.number().int().optional()),
+        quantity: zfd.numeric(z.number().int().optional()),
+        expiry: zfd.text(z.coerce.date().optional()),
+        location: zfd.text(z.string().optional()),
+        state: zfd.text(z.enum(medicationStatusEnum.enumValues).optional()),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...updateData } = input;
+      const [result] = await db
+        .update(medicationStock)
+        .set({ ...updateData })
+        .where(eq(medicationStock.id, id))
+        .returning();
+
+      return result ? result : null;
+    })
 });
