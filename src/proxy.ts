@@ -54,7 +54,7 @@ export async function proxy(request: NextRequest) {
   const isLoginRoute = pathname === "/login";
   const isApiRoute = pathname.startsWith("/api/");
 
-  // If NOT logged in and NOT on /login → force to /login 
+  // If NOT logged in and NOT on /login → force to /login
   // If the user is trying to access an API route, we don't want to redirect to /login, we want the API route to handle the 401 response
   if (!user && !isLoginRoute && !isApiRoute) {
     const loginUrl = new URL("/login", request.url);
