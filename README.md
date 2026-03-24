@@ -115,3 +115,105 @@ To **completely wipe** the database and restart:
 ```bash
 supabase db reset
 ```
+
+---
+
+## 🧪 Testing the Backend API with Postman
+
+### Prerequisites
+- The dev server is running (`pnpm dev`)
+- Postman has **"Automatically follow redirects"** enabled and the **cookie jar** active (on by default). This is required because the login response sets HttpOnly `sb-*` session cookies that Postman must store and replay automatically on all subsequent requests.
+
+---
+
+### 1. Login
+
+Send a `POST` request to obtain a session:
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **URL** | `http://localhost:3000/api/login` |
+| **Content-Type** | `application/json` |
+
+**Body (raw JSON):**
+```json
+{
+    "email": "user@test.com",
+    "password": "password123"
+}
+```
+
+A successful response returns HTTP 200 with the Supabase user object and sets `sb-*` session cookies in Postman's cookie jar. All protected endpoints below will use these cookies automatically.
+
+---
+
+### 2. tRPC Endpoint Structure
+
+All API logic is exposed via [tRPC](https://trpc.io/) under `/api/trpc/`.
+
+#### Queries (GET)
+
+```
+GET /api/trpc/<router>.<procedure>?batch=1&input=<URL-encoded JSON>
+```
+
+The `batch=1` parameter indicates a single-procedure call. The `input` query param is a URL-encoded JSON object with the shape:
+
+```json
+{"0": {"json": <your input object>}}
+```
+
+**Example — `villageCodesRouter.list`:**
+```
+http://localhost:3000/api/trpc/villageCodesRouter.list?batch=1&input=%7B%220%22%3A%7B%22json%22%3A%7B%22includeHidden%22%3Afalse%7D%7D%7D
+```
+
+Decoded `input`:
+```json
+{"0": {"json": {"includeHidden": false}}}
+```
+
+#### Mutations — JSON body (POST)
+
+Used for mutations that **do not** involve file uploads.
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **URL** | `http://localhost:3000/api/trpc/<router>.<procedure>` |
+| **Content-Type** | `application/json` |
+
+**Body (raw JSON):**
+```json
+[{"json": <your input object>}]
+```
+
+**Example — `villageCodesRouter.delete`:**
+```json
+[{"json": {"id": 1}}]
+```
+
+#### Mutations — form-data (POST)
+
+Used for mutations that carry **file uploads** (e.g. `patientsRouter.create`, `patientsRouter.update`). Set the body type to `form-data` in Postman — do **not** set `Content-Type` manually, as Postman will add the correct `multipart/form-data` boundary automatically.
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **URL** | `http://localhost:3000/api/trpc/<router>.<procedure>` |
+| **Body type** | `form-data` |
+
+**Example — `patientsRouter.create` form fields:**
+
+| Key | Type | Example Value |
+|---|---|---|
+| `name` | Text | `Jane Doe` |
+| `identificationNumber` | Text | `123456789` |
+| `gender` | Text | `female` |
+| `dateOfBirth` | Text | `1990-01-15` |
+| `drugAllergy` | Text | `penicillin` |
+| `hasPoorCard` | Text | `true` |
+| `hasBS2Card` | Text | `false` |
+| `hasSabaiCard` | Text | `false` |
+| `patientImage` | File | _(select a file)_ |
