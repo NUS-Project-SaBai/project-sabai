@@ -34,10 +34,10 @@ Sidebar links are defined in `docs/_data/navigation.yml` under `docs:`.
 
 ```yml
 docs:
-	- title: "Backend Code"
-		children:
-			- title: "My Topic"
-				url: /docs/my-topic/  # based on permalink or filename
+  - title: "Getting Started"
+    children:
+      - title: "My Topic"
+        url: /docs/my-topic/  # based on permalink or filename
 ```
 
 3. Run `bundle exec jekyll serve` and verify the link appears in the left sidebar.
