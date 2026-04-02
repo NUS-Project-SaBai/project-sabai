@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { Patient } from "@/db/schema";
 import { calculateAge } from "@/lib/utils/patient";
 import { PatientPhoto } from "@/components/PatientPhoto";
+import { PatientsRouterListItem } from "@/utils/trpc-types";
 
 interface PatientSearchResultItemProps {
-  patient: Patient;
+  patient: PatientsRouterListItem;
   onSelect: () => void;
 }
 

@@ -1,10 +1,10 @@
-import { Patient } from "@/db/schema";
 import PatientSearchResultItem from "@/components/interactive/PatientSearchResultItem";
 import useDebounce from "@/hooks/useDebounce";
+import { PatientsRouterListItem } from "@/utils/trpc-types";
 
 interface PatientSearchResultsProps {
   searchText: string;
-  filteredPatients: Patient[];
+  filteredPatients: PatientsRouterListItem[];
   isLoading: boolean;
   isRefetching: boolean;
   onSelect: () => void;

@@ -1,8 +1,8 @@
 import { createContext, useContext, useMemo, ReactNode } from "react";
-import { Patient } from "@/db/schema";
 import { trpc } from "@/utils/trpc";
+import { PatientsRouterListItem } from "@/utils/trpc-types";
 
-type PatientsById = Record<number, Patient>;
+type PatientsById = Record<number, PatientsRouterListItem>;
 
 interface PatientsContextType {
   patientsById: PatientsById;

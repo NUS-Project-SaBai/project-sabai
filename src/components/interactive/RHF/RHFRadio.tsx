@@ -1,8 +1,8 @@
+import { IsRequiredStar } from "@/components/IsRequiredStar";
 import { clsx } from "clsx";
 import { DetailedHTMLProps, HTMLAttributes } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { FaCheck } from "react-icons/fa";
-import { IsRequiredStar } from "./IsRequiredStar";
 
 type RHFRadioProps = {
   name: string;

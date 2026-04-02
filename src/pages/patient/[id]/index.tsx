@@ -65,9 +65,9 @@ export default function PatientPage() {
     },
     { label: "Age", value: `${calculateAge(patient.dateOfBirth)} years` },
     { label: "Drug Allergy", value: patient.drugAllergy },
-    { label: "POOR", value: patient.poor },
-    { label: "BS2", value: patient.bs2 },
-    { label: "Sabai Card", value: patient.sabaiCard },
+    { label: "POOR", value: patient.hasPoorCard },
+    { label: "BS2", value: patient.hasBS2Card },
+    { label: "Sabai Card", value: patient.hasSabaiCard },
     { label: "Patient Image URL", value: patient.patientImageUrl },
   ];
 
