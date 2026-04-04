@@ -20,9 +20,9 @@ export default function SearchInput({
         placeholder="Search patients..."
         value={searchText}
       />
-      <button className="p-2">
+      <div className="p-2">
         <IoSearch className="text-neutral-400" />
-      </button>
+      </div>
     </div>
   );
 }
