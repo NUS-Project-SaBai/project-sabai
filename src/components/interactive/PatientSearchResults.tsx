@@ -1,5 +1,4 @@
 import PatientSearchResultItem from "@/components/interactive/PatientSearchResultItem";
-import useDebounce from "@/hooks/useDebounce";
 import { PatientsRouterListItem } from "@/utils/trpc-types";
 
 interface PatientSearchResultsProps {
@@ -17,8 +16,8 @@ export default function PatientSearchResults({
   isRefetching,
   onSelect,
 }: PatientSearchResultsProps) {
-  const debouncedSearchText = useDebounce(searchText, 300);
-  if (debouncedSearchText.trim() === "") {
+  // const debouncedSearchText = useDebounce(searchText, 300);
+  if (searchText.trim() === "") {
     return null;
   }
 

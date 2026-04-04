@@ -44,7 +44,7 @@ export default function PatientTopMenuLayout({
           {/* search input */}
           <SearchInput searchText={searchText} setSearchText={setSearchText} />
           <PatientSearchResults
-            searchText={searchText}
+            searchText={debouncedSearchText}
             filteredPatients={filteredPatients}
             isLoading={isLoading}
             isRefetching={isRefetching}
