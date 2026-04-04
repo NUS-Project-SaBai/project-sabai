@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_PUBLISHABLE_KEY =
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+const IS_API_LOGIN_ENABLED = process.env.ENABLE_API_LOGIN === "true";
 
 /**
  * Proxy to refresh Supabase auth session and enforce route protection.
@@ -45,11 +46,13 @@ export async function proxy(request: NextRequest) {
   // Use request.nextUrl (NextURL object) throughout — never request.url (plain string)
   const { pathname } = request.nextUrl;
   const isLoginRoute = pathname === "/login";
+
+  // Special case: allow unauthenticated access to and /api routes without redirecting, so the API can return 401/403 as appropriate
   const isApiRoute = pathname.startsWith("/api");
+  const allowAPILogin = IS_API_LOGIN_ENABLED && isApiRoute;
 
   // Unauthenticated: redirect to /login, preserving the intended destination
-  // Special case: allow unauthenticated access to and /api routes without redirecting, so the API can return 401/403 as appropriate
-  if (!user && !isLoginRoute && !isApiRoute) {
+  if (!user && !isLoginRoute && !allowAPILogin) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
     loginUrl.search = ""; // clear current route's params before setting redirectTo
