@@ -39,7 +39,7 @@ export default function PatientTopMenuLayout({
   return (
     <div className="min-h-screen flex flex-col">
       {/* top menu */}
-      <div className="sticky top-0 z-10">
+      <div className="sticky top-0 z-1">
         <div className="relative flex flex-row p-2 bg-neutral-75 shadow-lg">
           {/* search input */}
           <SearchInput searchText={searchText} setSearchText={setSearchText} />

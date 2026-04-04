@@ -19,7 +19,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="h-screen flex-col sm:flex-row sm:flex">
+    <div className="flex h-screen flex-col sm:flex-row">
       {/* mobile sidebar */}
       <div className="flex sm:hidden flex-row w-full p-2 justify-between items-center bg-neutral-200">
         <SabaiLogo />
@@ -31,7 +31,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
         </button>
       </div>
       <div
-        className={`${mobileSidebarOpen ? "flex" : "hidden"} flex-col absolute z-2 w-full p-2 top-16 bg-neutral-50 shadow-2xl`}
+        className={`${mobileSidebarOpen ? "flex" : "hidden"} flex-col absolute z-2 w-full p-2 top-15 bg-neutral-50 shadow-2xl`}
       >
         <SidebarNavButtons />
       </div>
