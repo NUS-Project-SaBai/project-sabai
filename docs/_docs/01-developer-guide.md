@@ -90,6 +90,7 @@ See [docs/orm.md](./orm.md) for details and commands.
 
 3. Create the page
    - Add `src/pages/my-page.tsx`.
+   - We are using [hyphens instead of underscores](https://stackoverflow.com/questions/119312/urls-dash-vs-underscore) for spaces in route names
 
 4. Call the procedure from the page
    - Use hooks from [src/utils/trpc.ts](../src/utils/trpc.ts).
