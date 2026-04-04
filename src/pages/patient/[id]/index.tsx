@@ -5,20 +5,19 @@ import PatientDetailSkeleton from "@/components/PatientDetailSkeleton";
 import { calculateAge } from "@/lib/utils/patient";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
+
+function parsePatientId(id: string | string[] | undefined) {
+  if (typeof id !== "string") {
+    return null;
+  }
+
+  const parsedId = Number.parseInt(id, 10);
+  return Number.isNaN(parsedId) ? null : parsedId;
+}
 
 export default function PatientPage() {
   const router = useRouter();
-
-  const patientId = useMemo(() => {
-    const { id } = router.query;
-    if (typeof id !== "string") {
-      return null;
-    }
-
-    const parsedId = Number.parseInt(id, 10);
-    return Number.isNaN(parsedId) ? null : parsedId;
-  }, [router.query]);
+  const patientId = parsePatientId(router.query.id);
 
   const {
     data: patient,
