@@ -13,7 +13,8 @@ This document explains how tRPC is configured in this project, including authent
 3. [Auth Middleware](#3-auth-middleware)
 4. [Usage Examples](#4-usage-examples)
 5. [Environment Variables](#5-environment-variables)
-6. [Troubleshooting](#6-troubleshooting)
+6. [API Structure](#6-api-structure)
+7. [Troubleshooting](#7-troubleshooting)
 
 ---
 
@@ -412,7 +413,77 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key-here
 
 ---
 
-## 6. Troubleshooting
+## 6. API Structure
+
+All API logic is exposed via [tRPC](https://trpc.io/) under `/api/trpc/`.
+
+### Queries (GET)
+
+```
+GET /api/trpc/<router>.<procedure>?batch=1&input=<URL-encoded JSON>
+```
+
+The `batch=1` parameter indicates a single-procedure call. The `input` query param is a URL-encoded JSON object with the shape:
+
+```json
+{"0": {"json": <your input object>}}
+```
+
+**Example — `villageCodesRouter.list`:**
+```
+http://localhost:3000/api/trpc/villageCodesRouter.list?batch=1&input=%7B%220%22%3A%7B%22json%22%3A%7B%22includeHidden%22%3Afalse%7D%7D%7D
+```
+
+Decoded `input`:
+```json
+{"0": {"json": {"includeHidden": false}}}
+```
+
+#### Mutations — JSON body (POST)
+
+Used for mutations that **do not** involve file uploads.
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **URL** | `http://localhost:3000/api/trpc/<router>.<procedure>` |
+| **Content-Type** | `application/json` |
+
+**Body (raw JSON):**
+```json
+[{"json": <your input object>}]
+```
+
+**Example — `villageCodesRouter.delete`:**
+```json
+[{"json": {"id": 1}}]
+```
+
+### Mutations — form-data (POST)
+
+Used for mutations that carry **file uploads** (e.g. `patientsRouter.create`, `patientsRouter.update`). Set the body type to `form-data` in Postman — do **not** set `Content-Type` manually, as Postman will add the correct `multipart/form-data` boundary automatically.
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **URL** | `http://localhost:3000/api/trpc/<router>.<procedure>` |
+| **Body type** | `form-data` |
+
+**Example — `patientsRouter.create` form fields:**
+
+| Key | Type | Example Value |
+|---|---|---|
+| `name` | Text | `Jane Doe` |
+| `identificationNumber` | Text | `123456789` |
+| `gender` | Text | `female` |
+| `dateOfBirth` | Text | `1990-01-15` |
+| `drugAllergy` | Text | `penicillin` |
+| `hasPoorCard` | Text | `true` |
+| `hasBS2Card` | Text | `false` |
+| `hasSabaiCard` | Text | `false` |
+| `patientImage` | File | _(select a file)_ |
+
+## 7. Troubleshooting
 
 ### Problem: `ctx.user` is always `null`
 
