@@ -1,10 +1,10 @@
 import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import { PatientPhoto } from "@/components/PatientPhoto";
-import { withDefaultLayout } from "@/components/layouts/SidebarLayout";
 import PatientDetailSkeleton from "@/components/PatientDetailSkeleton";
 import { calculateAge } from "@/lib/utils/patient";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
+import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 
 function parsePatientId(id: string | string[] | undefined) {
   if (typeof id !== "string") {

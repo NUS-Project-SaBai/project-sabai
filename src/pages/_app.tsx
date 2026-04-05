@@ -4,9 +4,7 @@ import type { NextPage } from "next";
 import type { ReactElement, ReactNode } from "react";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
-import SidebarLayout from "@/components/layouts/SidebarLayout";
-import { SessionProvider } from "@/lib/context/SessionContext";
-import { PatientsProvider } from "@/lib/context/PatientsContext";
+import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -35,15 +33,7 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
    */
   const isPatientRoute = router.pathname.startsWith("/patient");
 
-  const getLayout =
-    Component.getLayout ??
-    ((page) => (
-      <SessionProvider>
-        <PatientsProvider>
-          <SidebarLayout>{page}</SidebarLayout>
-        </PatientsProvider>
-      </SessionProvider>
-    ));
+  const getLayout = Component.getLayout ?? withDefaultLayout;
 
   return getLayout(
     <Component

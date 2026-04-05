@@ -8,8 +8,6 @@ import { IoMdMenu } from "react-icons/io";
 import { LuScanFace } from "react-icons/lu";
 import LogoTitle from "@/components/LogoTitle";
 import SabaiLogo from "@/components/SabaiLogo";
-import { PatientsProvider } from "@/lib/context/PatientsContext";
-import { SessionProvider } from "@/lib/context/SessionContext";
 
 interface SidebarLayoutProps {
   children: ReactNode;
@@ -96,11 +94,3 @@ function SidebarNavButtons() {
     </div>
   );
 }
-
-export const withDefaultLayout = (page: ReactNode) => (
-  <SessionProvider>
-    <PatientsProvider>
-      <SidebarLayout>{page}</SidebarLayout>
-    </PatientsProvider>
-  </SessionProvider>
-);
