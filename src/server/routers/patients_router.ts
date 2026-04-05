@@ -4,7 +4,7 @@ import { uploadToCloudinary } from "@/server/utils/cloudinary";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { patients, genderEnum, Patient } from "@/db/schema";
-import serverEnv from "@/lib/env/server";
+import serverEnv from "@/lib/envVariables";
 import { eq } from "drizzle-orm";
 
 const cloudinaryUrlPrefix = serverEnv.CLOUDINARY_URL_PREFIX;

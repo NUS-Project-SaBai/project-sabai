@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import env from "./lib/env/server";
+import env from "./lib/envVariables";
 
 /**
  * Middleware to refresh Supabase auth session.

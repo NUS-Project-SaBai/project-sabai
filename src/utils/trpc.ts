@@ -8,7 +8,7 @@ import {
 import { createTRPCNext } from "@trpc/next";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import type { AppRouter } from "@/server/routers/_app";
-import env from "@/lib/env/client";
+import env from "@/lib/envVariables";
 import { transformer } from "./transformer";
 
 function getBaseUrl() {

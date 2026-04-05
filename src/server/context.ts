@@ -4,7 +4,7 @@ import {
   parseCookieHeader,
   serializeCookieHeader,
 } from "@supabase/ssr";
-import env from "@/lib/env/server";
+import env from "@/lib/envVariables";
 
 const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
 const supabasePublishableKey = env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
