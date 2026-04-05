@@ -13,7 +13,7 @@ This document explains how tRPC is configured in this project, including authent
 3. [Auth Middleware](#3-auth-middleware)
 4. [Usage Examples](#4-usage-examples)
 5. [Environment Variables](#5-environment-variables)
-6. [API Testing with Postman](#6-api-testing-with-postman)
+6. [API Structure](#6-api-structure)
 7. [Troubleshooting](#7-troubleshooting)
 
 ---
@@ -413,12 +413,11 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key-here
 
 ---
 
-## 6. API Testing with Postman
-### tRPC Endpoint Structure
+## 6. API Structure
 
 All API logic is exposed via [tRPC](https://trpc.io/) under `/api/trpc/`.
 
-#### Queries (GET)
+### Queries (GET)
 
 ```
 GET /api/trpc/<router>.<procedure>?batch=1&input=<URL-encoded JSON>
@@ -460,7 +459,7 @@ Used for mutations that **do not** involve file uploads.
 [{"json": {"id": 1}}]
 ```
 
-#### Mutations — form-data (POST)
+### Mutations — form-data (POST)
 
 Used for mutations that carry **file uploads** (e.g. `patientsRouter.create`, `patientsRouter.update`). Set the body type to `form-data` in Postman — do **not** set `Content-Type` manually, as Postman will add the correct `multipart/form-data` boundary automatically.
 

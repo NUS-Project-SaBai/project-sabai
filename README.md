@@ -146,5 +146,5 @@ Send a `POST` request to obtain a session:
 
 A successful response returns HTTP 200 with the Supabase user object and sets `sb-*` session cookies in Postman's cookie jar. All protected endpoints below will use these cookies automatically.
 
-For additional notes on tRPC endpoint structure [see our tRPC documentation](docs/_docs/04-trpc.md#6-api-testing-with-postman)
+For additional notes on tRPC API endpoint structure [see our tRPC documentation](docs/_docs/04-trpc.md#6-api-structure)
 
