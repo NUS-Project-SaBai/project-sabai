@@ -15,11 +15,11 @@ function getBaseUrl() {
   if (typeof window !== "undefined")
     // browser should use relative path
     return "";
-  if (env.NEXT_PUBLIC_VERCEL_URL)
+  if (env.VERCEL_URL)
     // reference for vercel.com
-    return `https://${env.NEXT_PUBLIC_VERCEL_URL}`;
+    return `https://${env.VERCEL_URL}`;
   // assume localhost
-  return `http://localhost:${env.NEXT_PUBLIC_PORT}`;
+  return `http://localhost:${env.PORT}`;
 }
 
 /**
