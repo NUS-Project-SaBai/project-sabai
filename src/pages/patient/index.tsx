@@ -1,15 +1,16 @@
+import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import { trpc } from "@/utils/trpc";
-import { withSession } from "@/lib/session";
 import Link from "next/link";
-import { PatientPhoto } from "@/lib/components/patient_photo";
+import { PatientPhoto } from "@/components/PatientPhoto";
+import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 
-function PatientsPage() {
+function PatientsBasePage() {
   // 1. Fetch data
   const { data: patients, isLoading } = trpc.patientsRouter.list.useQuery();
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen flex-1 p-8">
+      <div className="w-full mx-auto">
         {/* Navigation / Breadcrumbs */}
         <nav className="flex items-center gap-2 text-sm mb-6">
           <Link
@@ -206,4 +207,7 @@ function getPatientIdWithZeroPadding(id: number, padLength: number) {
   return id.toString().padStart(padLength, "0");
 }
 
-export default withSession(PatientsPage);
+PatientsBasePage.getLayout = (page: React.ReactNode) =>
+  withDefaultLayout(<PatientTopMenuLayout>{page}</PatientTopMenuLayout>);
+
+export default PatientsBasePage;

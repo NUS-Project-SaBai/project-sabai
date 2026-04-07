@@ -17,8 +17,8 @@ export function PatientPhoto({
       src={pictureUrl ?? "/default-profile.webp"}
       unoptimized={true}
       alt="Patient Photo"
-      height={150}
-      width={150}
+      height={100}
+      width={100}
       {...imgProps}
     />
   );

@@ -1,15 +1,13 @@
 import { z } from "zod";
 import { zfd } from "zod-form-data";
-import { uploadToCloudinary } from "../utils/cloudinary";
-import { router, protectedProcedure } from "../trpc";
+import { uploadToCloudinary } from "@/server/utils/cloudinary";
+import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { patients, genderEnum, Patient } from "@/db/schema";
+import serverEnv from "@/lib/envVariables";
 import { eq } from "drizzle-orm";
 
-const cloudinaryUrlPrefix = process.env.CLOUDINARY_URL_PREFIX;
-if (!cloudinaryUrlPrefix) {
-  throw new Error("CLOUDINARY_URL environment variable is not set");
-}
+const cloudinaryUrlPrefix = serverEnv.CLOUDINARY_URL_PREFIX;
 
 /**
  * Transforms a patient object by adding a complete image URL.

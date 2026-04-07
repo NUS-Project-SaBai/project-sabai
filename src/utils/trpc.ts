@@ -7,21 +7,19 @@ import {
 } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
-import type { AppRouter } from "../server/routers/_app";
+import type { AppRouter } from "@/server/routers/_app";
+import env from "@/lib/envVariables";
 import { transformer } from "./transformer";
 
 function getBaseUrl() {
   if (typeof window !== "undefined")
     // browser should use relative path
     return "";
-  if (process.env.VERCEL_URL)
+  if (env.VERCEL_URL)
     // reference for vercel.com
-    return `https://${process.env.VERCEL_URL}`;
-  if (process.env.RENDER_INTERNAL_HOSTNAME)
-    // reference for render.com
-    return `http://${process.env.RENDER_INTERNAL_HOSTNAME}:${process.env.PORT}`;
+    return `https://${env.VERCEL_URL}`;
   // assume localhost
-  return `http://localhost:${process.env.PORT ?? 3000}`;
+  return `http://localhost:${env.PORT}`;
 }
 
 /**

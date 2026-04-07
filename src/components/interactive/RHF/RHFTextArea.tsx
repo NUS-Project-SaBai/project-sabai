@@ -5,7 +5,7 @@ import {
 } from "react";
 import { RegisterOptions, useFormContext } from "react-hook-form";
 import { useRHFRegister } from "./useRHFRegister";
-import { IsRequiredStar } from "./IsRequiredStar";
+import { IsRequiredStar } from "@/components/IsRequiredStar";
 
 type RHFTextAreaProps = {
   name: string;
