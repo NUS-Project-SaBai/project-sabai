@@ -3,6 +3,7 @@ import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import { PatientPhoto } from "@/components/PatientPhoto";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 function PatientsBasePage() {
   // 1. Fetch data
@@ -11,29 +12,9 @@ function PatientsBasePage() {
   return (
     <div className="min-h-screen flex-1 p-8">
       <div className="w-full mx-auto">
-        {/* Navigation / Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-sm mb-6">
-          <Link
-            href="/"
-            className="text-slate-500 hover:text-slate-700 transition-colors"
-          >
-            Home
-          </Link>
-          <svg
-            className="h-4 w-4 text-slate-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M8.25 4.5l7.5 7.5-7.5 7.5"
-            />
-          </svg>
-          <span className="text-slate-900 font-medium">Patients</span>
-        </nav>
+        <Breadcrumbs
+          items={[{ label: "Home", href: "/" }, { label: "Patients" }]}
+        />
 
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
