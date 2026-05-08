@@ -6,10 +6,12 @@ import useDebounce from "@/hooks/useDebounce";
 
 interface PatientTopMenuLayoutProps {
   children: ReactNode;
+  getPatientLink?: (patientId: number) => string;
 }
 
 export default function PatientTopMenuLayout({
   children,
+  getPatientLink,
 }: PatientTopMenuLayoutProps) {
   const [searchText, setSearchText] = useState("");
   const debouncedSearchText = useDebounce(searchText, 300);
@@ -49,6 +51,7 @@ export default function PatientTopMenuLayout({
             isLoading={isLoading}
             isRefetching={isRefetching}
             onSelect={() => setSearchText("")}
+            getPatientLink={getPatientLink}
           />
         </div>
       </div>
