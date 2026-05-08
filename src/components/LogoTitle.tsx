@@ -11,7 +11,12 @@ export default function LogoTitle({
   return (
     <div className={clsx("flex flex-row h-min items-center gap-2", className)}>
       <SabaiLogo />
-      <span className={clsx("text-2xl font-extrabold", textClassName)}>
+      <span
+        className={clsx(
+          "text-2xl font-extrabold text-neutral-100",
+          textClassName,
+        )}
+      >
         Project Sa&apos;bai
       </span>
     </div>
