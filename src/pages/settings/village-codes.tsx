@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { trpc } from "@/utils/trpc";
 import { VillageCode, NewVillageCode } from "@/db/schema";
-import Link from "next/link";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
 const DEFAULT_FORM: NewVillageCode = {

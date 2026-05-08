@@ -1,6 +1,5 @@
 import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import { trpc } from "@/utils/trpc";
-import Link from "next/link";
 import { PatientPhoto } from "@/components/PatientPhoto";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
