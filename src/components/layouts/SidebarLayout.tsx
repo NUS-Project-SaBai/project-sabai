@@ -19,7 +19,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
   return (
     <div className="flex h-screen flex-col sm:flex-row">
       {/* mobile sidebar */}
-      <div className="flex sm:hidden flex-row w-full p-2 justify-between items-center bg-navbar">
+      <div className="flex sm:hidden flex-row w-full p-2 justify-between items-center bg-[var(--color-navbar)]">
         <SabaiLogo />
         <button
           className={`group flex items-center gap-2 p-2 pl-4 rounded-md hover:cursor-pointer`}
@@ -34,7 +34,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
         <SidebarNavButtons />
       </div>
       {/* desktop sidebar */}
-      <div className="hidden sm:flex flex-col min-w-64 p-2 gap-6 bg-navbar">
+      <div className="hidden sm:flex flex-col min-w-64 p-2 gap-6 bg-[var(--color-navbar)]">
         <LogoTitle className="m-2" />
         <SidebarNavButtons />
       </div>
