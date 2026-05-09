@@ -28,8 +28,8 @@
     "postgres": "^3.4.8",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "react-webcam": "^7.2.0",
     "react-hook-form": "^7.71.1",
+    "react-webcam": "^7.2.0",
     "superjson": "^2.2.6",
     "ts-node": "^10.9.2",
     "zod": "^4.3.6",
@@ -58,5 +58,8 @@
       "@types/react": "19.2.11",
       "@types/react-dom": "19.2.3"
     }
+  }  ,
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "eslint --fix"
   }
 }

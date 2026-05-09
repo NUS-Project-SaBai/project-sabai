@@ -115,3 +115,36 @@ To **completely wipe** the database and restart:
 ```bash
 supabase db reset
 ```
+
+---
+
+## 🧪 Testing the Backend API with Postman
+
+### Prerequisites
+- The dev server is running (`pnpm dev`)
+- Postman has **"Automatically follow redirects"** enabled and the **cookie jar** active (on by default). This is required because the login response sets HttpOnly `sb-*` session cookies that Postman must store and replay automatically on all subsequent requests.
+
+---
+
+### 1. Login
+
+Send a `POST` request to obtain a session:
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **URL** | `http://localhost:3000/api/login` |
+| **Content-Type** | `application/json` |
+
+**Body (raw JSON):**
+```json
+{
+    "email": "user@test.com",
+    "password": "password123"
+}
+```
+
+A successful response returns HTTP 200 with the Supabase user object and sets `sb-*` session cookies in Postman's cookie jar. All protected endpoints below will use these cookies automatically.
+
+For additional notes on tRPC API endpoint structure [see our tRPC documentation](docs/_docs/04-trpc.md#6-api-structure)
+

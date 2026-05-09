@@ -1,15 +1,111 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Backgrounds */
+  --color-neutral-50: oklch(0.98 0.005 263);
+  --color-neutral-75: oklch(0.96 0.005 263);
+  --color-neutral-100: oklch(0.92 0.005 263);
+  --color-neutral-125: oklch(0.86 0.005 263);
+
+  --color-secondary-50: oklch(0.95 0.02 268);
+  --color-secondary-75: oklch(0.90 0.04 269);
+  --color-secondary-100: oklch(0.85 0.07 269);
+  --color-secondary-200: oklch(0.75 0.12 268);
+  --color-secondary-300: oklch(0.66 0.17 267);
+  --color-secondary-400: oklch(0.57 0.22 265);
+  --color-secondary-500: oklch(0.51 0.26 264);
+  --color-secondary-600: oklch(0.44 0.23 264);
+  --color-secondary-700: oklch(0.37 0.18 264);
+  --color-secondary-800: oklch(0.3 0.14 264);
+  --color-secondary-900: oklch(0.22 0.1 263);
+  --color-secondary-950: oklch(0.13 0.04 260);
+
+  /* Text */
+  --color-text: oklch(0.15 0 263);
+  --color-text-muted: oklch(0.4 0.1 263);
+  --color-text-on-primary: oklch(0.15 0 85); /* text rendered ON a primary bg */
+  --color-text-on-secondary: oklch(1 0 0); /* text rendered ON a secondary bg */
+
+  /* Borders */
+  --color-border: oklch(0.6 0.02 263);
+  --color-border-muted: oklch(0.7 0.02 263);
+
+  /* Primary */
+  --color-primary: oklch(0.879 0.169 91.605);
+  --color-primary-hover: oklch(0.8 0.169 91.605); /* darker for hover */
+  --color-primary-subtle: oklch(
+    0.95 0.05 91.605
+  ); /* light tint for badges, backgrounds */
+  --color-primary-disabled: oklch(0.879 0.05 91.605);
+
+  /* Secondary */
+  --color-secondary: oklch(0.4 0.14 263);
+  --color-secondary-hover: oklch(0.33 0.14 263);
+  --color-secondary-subtle: oklch(0.92 0.04 263);
+  --color-secondary-disabled: oklch(0.4 0.04 263);
+
+  /* Semantic */
+  --color-danger: oklch(0.5 0.14 30);
+  --color-danger-hover: oklch(0.43 0.14 30);
+  --color-danger-subtle: oklch(0.95 0.04 30);
+
+  --color-warning: oklch(0.5 0.24 70);
+  --color-warning-subtle: oklch(0.95 0.06 70);
+
+  --color-success: oklch(0.5 0.14 160);
+  --color-success-subtle: oklch(0.95 0.04 160);
+
+  --color-info: oklch(0.5 0.14 260);
+  --color-info-subtle: oklch(0.95 0.04 260);
+
+  --color-highlight: oklch(1 0.1 85);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  /* Backgrounds — inverted, dark grays with slight blue tint */
+  --color-bg-dark: oklch(0.14 0.01 263);
+  --color-bg: oklch(0.18 0.01 263);
+  --color-bg-light: oklch(0.24 0.01 263);
+
+  /* Text */
+  --color-text: oklch(0.93 0 263);
+  --color-text-muted: oklch(0.65 0.05 263);
+  --color-text-on-primary: oklch(0.15 0 85);
+  --color-text-on-secondary: oklch(1 0 0);
+
+  /* Borders — subtle, not too contrasty */
+  --color-border: oklch(0.32 0.02 263);
+  --color-border-muted: oklch(0.26 0.02 263);
+
+  /* Primary — slightly brighter to pop on dark bg */
+  --color-primary: oklch(0.82 0.169 91.605);
+  --color-primary-hover: oklch(
+    0.88 0.169 91.605
+  ); /* lighter on hover in dark mode */
+  --color-primary-subtle: oklch(0.24 0.06 91.605);
+  --color-primary-disabled: oklch(0.82 0.05 91.605);
+
+  /* Secondary */
+  --color-secondary: oklch(0.6 0.14 263);
+  --color-secondary-hover: oklch(0.67 0.14 263);
+  --color-secondary-subtle: oklch(0.22 0.05 263);
+  --color-secondary-disabled: oklch(0.6 0.04 263);
+
+  /* Semantic */
+  --color-danger: oklch(0.65 0.18 30);
+  --color-danger-hover: oklch(0.71 0.18 30);
+  --color-danger-subtle: oklch(0.22 0.05 30);
+
+  --color-warning: oklch(0.72 0.2 70);
+  --color-warning-subtle: oklch(0.22 0.06 70);
+
+  --color-success: oklch(0.65 0.16 160);
+  --color-success-subtle: oklch(0.22 0.05 160);
+
+  --color-info: oklch(0.65 0.16 260);
+  --color-info-subtle: oklch(0.22 0.05 260);
+
+  --color-highlight: oklch(0.85 0.12 85);
 }
 
 body {

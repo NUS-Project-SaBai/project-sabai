@@ -1,7 +1,7 @@
 /**
  * This file contains the root router of the tRPC-backend
  */
-import { createCallerFactory, publicProcedure, router } from "../trpc";
+import { createCallerFactory, publicProcedure, router } from "@/server/trpc";
 import { villageCodesRouter } from "./village_codes_router";
 import { patientsRouter } from "./patients_router";
 import { medicationActiveIngredientsRouter } from "./medication_active_ingredient_router";
