@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { zfd } from "zod-form-data";
-import { router, protectedProcedure } from "../trpc";
+import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { eq } from "drizzle-orm";
 import { medicationStatusEnum, medicationStock } from "@/db/schema";

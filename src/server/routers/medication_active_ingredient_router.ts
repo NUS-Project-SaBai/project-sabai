@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { db } from "@/db/drizzle";
-import { router, protectedProcedure } from "../trpc";
+import { router, protectedProcedure } from "@/server/trpc";
 import { medicationActiveIngredients } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
