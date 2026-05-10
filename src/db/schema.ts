@@ -143,7 +143,7 @@ export const medicationStock = pgTable("medication_stock", {
   quantity: integer("quantity").notNull().default(0),
   expiry: timestamp("expiry"),
   location: varchar("location", { length: 255 }),
-  state: medicationStatusEnum("state").default("active"),
+  stockStatus: medicationStatusEnum("state").default("active"),
 });
 
 export type MedicationStock = typeof medicationStock.$inferSelect;

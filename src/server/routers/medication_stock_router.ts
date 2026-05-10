@@ -14,7 +14,7 @@ export const medicationStockRouter = router({
         quantity: medicationStock.quantity,
         expiry: medicationStock.expiry,
         location: medicationStock.location,
-        state: medicationStock.state,
+        state: medicationStock.stockStatus,
       })
       .from(medicationStock);
     return result;
@@ -74,5 +74,5 @@ export const medicationStockRouter = router({
         .returning();
 
       return result ? result : null;
-    })
+    }),
 });
