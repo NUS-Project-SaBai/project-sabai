@@ -11,7 +11,6 @@ import {
 
 // Define enums
 export const genderEnum = pgEnum("gender", ["male", "female"]);
-export const yesNoEnum = pgEnum("yes_no", ["yes", "no"]);
 export const medicationStatusEnum = pgEnum("medication_status", [
   "active",
   "disposed",
