@@ -82,6 +82,13 @@ export const patients = pgTable("patients", {
 export type Patient = typeof patients.$inferSelect;
 export type NewPatient = typeof patients.$inferInsert;
 
+/*
+Medication Active Ingredients Table:
+- id: Primary key, auto-incrementing integer
+- name: Name of the active ingredient (e.g., "Paracetamol 500mg")
+- unitOfMeasurement: Unit used for measuring this ingredient (e.g., "bottles", "tablets")
+- fallBelow: Threshold quantity that triggers low stock alerts
+*/
 export const medicationActiveIngredients = pgTable(
   "medication_active_ingredients",
   {
@@ -99,6 +106,12 @@ export type MedicationActiveIngredient =
 export type NewMedicationActiveIngredient =
   typeof medicationActiveIngredients.$inferInsert;
 
+/*
+Medication Brands Table:
+- id: Primary key, auto-incrementing integer
+- name: Name of the brand (e.g., "Panadol")
+- activeIngredientId: ID of the active ingredient
+*/
 export const medicationBrands = pgTable("medication_brands", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
@@ -109,9 +122,18 @@ export const medicationBrands = pgTable("medication_brands", {
     }),
 });
 
-export type MedicationBrands = typeof medicationBrands.$inferSelect;
-export type NewMedicationBrands = typeof medicationBrands.$inferInsert;
+export type MedicationBrand = typeof medicationBrands.$inferSelect;
+export type NewMedicationBrand = typeof medicationBrands.$inferInsert;
 
+/*
+Medication Stock Table:
+- id: Primary key, auto-incrementing integer
+- medicationBrandId: ID of the brand
+- quantity: Quantity of the medication
+- expiry: Expiry date of the medication
+- location: Location of the medication
+- state: State of the medication (e.g., 'active', 'disposed', 'donated', 'expired')
+*/
 export const medicationStock = pgTable("medication_stock", {
   id: serial("id").primaryKey(),
   medicationBrandId: integer("medication_brand_id")
