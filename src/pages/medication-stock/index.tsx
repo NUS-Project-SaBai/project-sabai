@@ -75,43 +75,43 @@ function MedicationStockBasePage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-slate-200">
-              {stock.map((stock) => (
+              {stock.map((item) => (
                 <tr
-                  key={stock.id}
+                  key={item.id}
                   className="hover:bg-slate-50 transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-sm font-medium text-slate-900">
-                        {stock.id}
+                        {item.id}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-sm font-medium text-slate-900">
-                        {stock.medicationBrandId}
+                        {item.medicationBrandId}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-sm font-medium text-slate-900">
-                        {stock.location}
+                        {item.location}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-sm font-medium text-slate-900">
-                        {stock.quantity}
+                        {item.quantity}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-sm font-medium text-slate-900">
-                        {stock.state}
+                        {item.state}
                       </span>
                     </div>
                   </td>
