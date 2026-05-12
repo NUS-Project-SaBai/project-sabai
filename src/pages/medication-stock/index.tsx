@@ -24,6 +24,17 @@ function MedicationStockBasePage() {
                 <span>Manage Brands</span>
               </Link>
             </button>
+            <button
+              type="submit"
+              className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
+            >
+              <Link
+                href="/medication-active-ingredients"
+                className="group flex items-center gap-2 p-2 rounded-md"
+              >
+                <span>Manage Active Ingredients</span>
+              </Link>
+            </button>
           </div>
         </div>
       </div>
