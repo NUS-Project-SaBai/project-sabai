@@ -1,5 +1,5 @@
-import { Button } from "@/components/interactive/Button/Button";
 import { trpc } from "@/utils/trpc";
+import Link from "next/link";
 
 function MedicationStockBasePage() {
   const { data: stock, isLoading } = trpc.medicationStockRouter.list.useQuery();
@@ -13,8 +13,17 @@ function MedicationStockBasePage() {
               Medication Stock
             </h1>
             <p className="mt-2 text-slate-600">Manage medication stock.</p>
-            <Button title="Manage brands"/>
-            <Button title="Edit Stock"/>
+            <button
+              type="submit"
+              className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
+            >
+              <Link
+                href="/medication-brands"
+                className="group flex items-center gap-2 p-2 rounded-md"
+              >
+                <span>Manage Brands</span>
+              </Link>
+            </button>
           </div>
         </div>
       </div>
