@@ -1,5 +1,5 @@
 {
-  "id": "2a02e6ae-003c-48df-9842-bd8ad0341cd5",
+  "id": "1fdf2d50-2d3c-4849-a2c5-470149a85826",
   "prevId": "f8b8d411-5138-45fe-b6ba-5371dc69b6d5",
   "version": "7",
   "dialect": "postgresql",
@@ -121,8 +121,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "state": {
-          "name": "state",
+        "stock_status": {
+          "name": "stock_status",
           "type": "medication_status",
           "typeSchema": "public",
           "primaryKey": false,
