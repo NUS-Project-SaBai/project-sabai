@@ -18,7 +18,7 @@ CREATE TABLE "medication_stock" (
 	"quantity" integer DEFAULT 0 NOT NULL,
 	"expiry" timestamp,
 	"location" varchar(255),
-	"state" "medication_status" DEFAULT 'active'
+	"stock_status" "medication_status" DEFAULT 'active'
 );
 --> statement-breakpoint
 ALTER TABLE "patients" ALTER COLUMN "has_poor_card" SET NOT NULL;--> statement-breakpoint
