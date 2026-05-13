@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { trpc } from "@/utils/trpc";
 import { VillageCode, NewVillageCode } from "@/db/schema";
-import Link from "next/link";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 const DEFAULT_FORM: NewVillageCode = {
   code: "",
@@ -80,43 +80,13 @@ function VillageCodesPage() {
   return (
     <div className="min-h-screen bg-slate-50 p-8">
       <div className="max-w-5xl mx-auto">
-        {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-sm mb-6">
-          <Link
-            href="/"
-            className="text-slate-500 hover:text-slate-700 transition-colors"
-          >
-            Home
-          </Link>
-          <svg
-            className="h-4 w-4 text-slate-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M8.25 4.5l7.5 7.5-7.5 7.5"
-            />
-          </svg>
-          <span className="text-slate-500">Settings</span>
-          <svg
-            className="h-4 w-4 text-slate-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M8.25 4.5l7.5 7.5-7.5 7.5"
-            />
-          </svg>
-          <span className="text-slate-900 font-medium">Village Codes</span>
-        </nav>
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Settings" },
+            { label: "Village Codes" },
+          ]}
+        />
 
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-slate-900">Village Codes</h1>

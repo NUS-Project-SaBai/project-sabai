@@ -1,6 +1,6 @@
 {
-  "id": "d3c527fc-a6fe-4a0d-b8f7-88e5e8acd92e",
-  "prevId": "885e34ce-b992-4fd5-8cfd-fae5c67cd366",
+  "id": "1fdf2d50-2d3c-4849-a2c5-470149a85826",
+  "prevId": "f8b8d411-5138-45fe-b6ba-5371dc69b6d5",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -121,8 +121,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "state": {
-          "name": "state",
+        "stock_status": {
+          "name": "stock_status",
           "type": "medication_status",
           "typeSchema": "public",
           "primaryKey": false,
@@ -199,24 +199,27 @@
           "primaryKey": false,
           "notNull": true
         },
-        "poor": {
-          "name": "poor",
-          "type": "yes_no",
-          "typeSchema": "public",
+        "has_poor_card": {
+          "name": "has_poor_card",
+          "type": "boolean",
           "primaryKey": false,
           "notNull": true
         },
-        "bs2": {
-          "name": "bs2",
-          "type": "yes_no",
-          "typeSchema": "public",
+        "has_bs2_card": {
+          "name": "has_bs2_card",
+          "type": "boolean",
           "primaryKey": false,
           "notNull": true
         },
-        "sabai_card": {
-          "name": "sabai_card",
-          "type": "yes_no",
-          "typeSchema": "public",
+        "has_sabai_card": {
+          "name": "has_sabai_card",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "patient_image_public_id": {
+          "name": "patient_image_public_id",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         }
@@ -313,14 +316,6 @@
         "disposed",
         "donated",
         "expired"
-      ]
-    },
-    "public.yes_no": {
-      "name": "yes_no",
-      "schema": "public",
-      "values": [
-        "yes",
-        "no"
       ]
     }
   },
