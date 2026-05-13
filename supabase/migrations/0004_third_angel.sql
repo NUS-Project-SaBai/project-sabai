@@ -21,5 +21,8 @@ CREATE TABLE "medication_stock" (
 	"state" "medication_status" DEFAULT 'active'
 );
 --> statement-breakpoint
+ALTER TABLE "patients" ALTER COLUMN "has_poor_card" SET NOT NULL;--> statement-breakpoint
+ALTER TABLE "patients" ALTER COLUMN "has_bs2_card" SET NOT NULL;--> statement-breakpoint
+ALTER TABLE "patients" ALTER COLUMN "has_sabai_card" SET NOT NULL;--> statement-breakpoint
 ALTER TABLE "medication_brands" ADD CONSTRAINT "medication_brands_active_ingredient_id_medication_active_ingredients_id_fk" FOREIGN KEY ("active_ingredient_id") REFERENCES "public"."medication_active_ingredients"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "medication_stock" ADD CONSTRAINT "medication_stock_medication_brand_id_medication_brands_id_fk" FOREIGN KEY ("medication_brand_id") REFERENCES "public"."medication_brands"("id") ON DELETE restrict ON UPDATE no action;
