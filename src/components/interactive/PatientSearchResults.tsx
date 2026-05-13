@@ -7,6 +7,7 @@ interface PatientSearchResultsProps {
   isLoading: boolean;
   isRefetching: boolean;
   onSelect: () => void;
+  getPatientLink?: (patientId: number) => string;
 }
 
 export default function PatientSearchResults({
@@ -15,6 +16,7 @@ export default function PatientSearchResults({
   isLoading,
   isRefetching,
   onSelect,
+  getPatientLink,
 }: PatientSearchResultsProps) {
   // const debouncedSearchText = useDebounce(searchText, 300);
   if (searchText.trim() === "") {
@@ -34,6 +36,7 @@ export default function PatientSearchResults({
               key={patient.id}
               patient={patient}
               onSelect={onSelect}
+              linkPath={getPatientLink?.(patient.id)}
             />
           ))}
         </div>

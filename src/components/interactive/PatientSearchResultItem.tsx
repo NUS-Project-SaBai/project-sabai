@@ -6,15 +6,17 @@ import { PatientsRouterListItem } from "@/utils/trpc-types";
 interface PatientSearchResultItemProps {
   patient: PatientsRouterListItem;
   onSelect: () => void;
+  linkPath?: string;
 }
 
 export default function PatientSearchResultItem({
   patient,
   onSelect,
+  linkPath = `/patient/${patient.id}`,
 }: PatientSearchResultItemProps) {
   return (
     <Link
-      href={`/patient/${patient.id}`}
+      href={linkPath}
       onClick={onSelect}
       className="flex items-center gap-3 text-sm text-neutral-700 px-2 py-2 rounded bg-white border border-neutral-100 hover:bg-neutral-75"
     >
