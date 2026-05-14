@@ -1,3 +1,4 @@
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 
@@ -9,6 +10,12 @@ function MedicationStockBasePage() {
       <div className="w-full mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
+            <Breadcrumbs
+              items={[
+                { label: "Home", href: "/" },
+                { label: "Medication Stock" },
+              ]}
+            />
             <h1 className="text-3xl font-bold text-slate-900">
               Medication Stock
             </h1>

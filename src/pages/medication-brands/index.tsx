@@ -1,4 +1,5 @@
 import { trpc } from "@/utils/trpc";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 function MedicationBrandsBasePage() {
   const { data: brands, isLoading } =
@@ -9,6 +10,13 @@ function MedicationBrandsBasePage() {
       <div className="w-full mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
+            <Breadcrumbs
+              items={[
+                { label: "Home", href: "/" },
+                { label: "Medication Stock", href: "/medication-stock" },
+                { label: "Medication Brands" },
+              ]}
+            />
             <h1 className="text-3xl font-bold text-slate-900">
               Medication Brands
             </h1>
