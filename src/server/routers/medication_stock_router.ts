@@ -14,7 +14,7 @@ export const medicationStockRouter = router({
         quantity: medicationStock.quantity,
         expiry: medicationStock.expiry,
         location: medicationStock.location,
-        stock_status: medicationStock.stockStatus,
+        stockStatus: medicationStock.stockStatus,
       })
       .from(medicationStock);
     return result;
@@ -27,7 +27,7 @@ export const medicationStockRouter = router({
         quantity: zfd.numeric(z.number().int()),
         expiry: zfd.text(z.coerce.date()),
         location: zfd.text(),
-        stock_status: zfd.text(z.enum(medicationStatusEnum.enumValues)),
+        stockStatus: zfd.text(z.enum(medicationStatusEnum.enumValues)),
       }),
     )
     .mutation(async ({ input }) => {
@@ -62,7 +62,7 @@ export const medicationStockRouter = router({
         quantity: zfd.numeric(z.number().int().optional()),
         expiry: zfd.text(z.coerce.date().optional()),
         location: zfd.text(z.string().optional()),
-        stock_status: zfd.text(z.enum(medicationStatusEnum.enumValues).optional()),
+        stockStatus: zfd.text(z.enum(medicationStatusEnum.enumValues).optional()),
       }),
     )
     .mutation(async ({ input }) => {
