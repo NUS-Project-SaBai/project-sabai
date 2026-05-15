@@ -3,7 +3,7 @@ INSERT INTO medication_stock (
     quantity, 
     expiry, 
     location, 
-    state
+    stock_status
 ) VALUES
 (1, 200, '2026-12-31 00:00:00', 'Main Pharmacy Shelf A1', 'active'),
 (1, 150, '2026-06-30 00:00:00', 'Main Pharmacy Shelf A2', 'active'),
