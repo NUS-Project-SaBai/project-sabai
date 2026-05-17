@@ -18,7 +18,7 @@ export async function uploadToCloudinary(image: File) {
       .end(buffer);
   });
 
-  return `v${uploaded.version}/${uploaded.public_id}`;
+  return `image/upload/v${uploaded.version}/${uploaded.public_id}`;
 }
 
 export async function deleteFromCloudinary(publicId: string) {
