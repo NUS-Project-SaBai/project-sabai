@@ -20,7 +20,3 @@ export async function uploadToCloudinary(image: File) {
 
   return `image/upload/v${uploaded.version}/${uploaded.public_id}`;
 }
-
-export async function deleteFromCloudinary(publicId: string) {
-  await cloudinary.uploader.destroy(publicId);
-}
