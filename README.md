@@ -72,14 +72,17 @@ Add the other envars from our project. Reference the [.env.example](./.env.examp
 Seed your database and auth users.
 
 ```bash
-# Seed domain data (patients, etc.)
+# Seed domain data (village codes, patients, etc.)
 pnpm seed:db
 
 # Seed auth users (user@test.com / admin@test.com, password: password123)
 pnpm seed:users
+
+# Seed visits data
+pnpm seed:visits
 ```
 
-**Or run both:**
+**Or run all:**
 ```bash
 pnpm seed:all
 ```
