@@ -129,7 +129,7 @@ function MedicationStockBasePage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-sm font-medium text-slate-900">
-                        {item.state}
+                        {item.stockStatus}
                       </span>
                     </div>
                   </td>
