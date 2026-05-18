@@ -11,7 +11,8 @@
     "prepare": "husky",
     "seed:db": "supabase db reset",
     "seed:users": "ts-node supabase/scripts/seed-users.ts",
-    "seed:all": "npm run seed:db && npm run seed:users"
+    "seed:visits": "ts-node supabase/scripts/seed-visits.ts",
+    "seed:all": "npm run seed:db && npm run seed:users && npm run seed:visits"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
