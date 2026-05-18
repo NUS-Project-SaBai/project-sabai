@@ -75,7 +75,7 @@ export const visitsRouter = router({
       z.object({
         patientId: z.number().int(),
         villageCodeId: z.number().int(),
-        date: z.date().optional(),
+        date: z.coerce.date().optional(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -91,7 +91,7 @@ export const visitsRouter = router({
         id: z.number().int(),
         patientId: z.number().int().optional(),
         villageCodeId: z.number().int().optional(),
-        date: z.date().optional(),
+        date: z.coerce.date().optional(),
       }),
     )
     .mutation(async ({ input }) => {
