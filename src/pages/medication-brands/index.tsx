@@ -51,21 +51,21 @@ function MedicationBrandsBasePage() {
                   className="hover:bg-slate-50 transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-left gap-2">
                       <span className="text-sm font-medium text-slate-900">
                         {brand.id}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-left gap-2">
                       <span className="text-sm font-medium text-slate-900">
                         {brand.name}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-left gap-2">
                       <span className="text-sm font-medium text-slate-900">
                         {brand.activeIngredientId}
                       </span>

@@ -78,35 +78,35 @@ function MedicationStockBasePage() {
                   className="hover:bg-slate-50 transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-left gap-2">
                       <span className="text-sm font-medium text-slate-900">
                         {item.id}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-left gap-2">
                       <span className="text-sm font-medium text-slate-900">
                         {item.medicationBrandId}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-left gap-2">
                       <span className="text-sm font-medium text-slate-900">
                         {item.location}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-left gap-2">
                       <span className="text-sm font-medium text-slate-900">
                         {item.quantity}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-left gap-2">
                       <span className="text-sm font-medium text-slate-900">
                         {item.stockStatus}
                       </span>
