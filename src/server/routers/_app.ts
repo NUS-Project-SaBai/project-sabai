@@ -7,6 +7,7 @@ import { patientsRouter } from "./patients_router";
 import { medicationActiveIngredientsRouter } from "./medication_active_ingredient_router";
 import { medicationBrandRouter } from "./medication_brand_router";
 import { medicationStockRouter } from "./medication_stock_router";
+import { visitsRouter } from "./visits_router";
 
 export const appRouter = router({
   healthcheck: publicProcedure.query(() => "yay!"),
@@ -16,6 +17,7 @@ export const appRouter = router({
   medicationActiveIngredientsRouter: medicationActiveIngredientsRouter,
   medicationBrandRouter: medicationBrandRouter,
   medicationStockRouter: medicationStockRouter,
+  visitsRouter: visitsRouter,
 });
 
 export const createCaller = createCallerFactory(appRouter);

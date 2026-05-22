@@ -149,5 +149,26 @@ export const medicationStock = pgTable("medication_stock", {
 export type MedicationStock = typeof medicationStock.$inferSelect;
 export type NewMedicationStock = typeof medicationStock.$inferInsert;
 
+/*
+Visits Table:
+- id: Primary key, auto-incrementing integer.
+- date: Date and time of the visit.
+- patientId: Foreign key referencing the patient.
+- villageCodeId: Foreign key referencing the village code.
+ */
+export const visits = pgTable("visits", {
+  id: serial("id").primaryKey(),
+  date: timestamp("date", { withTimezone: true }).defaultNow().notNull(),
+  patientId: integer("patient_id")
+    .notNull()
+    .references(() => patients.id),
+  villageCodeId: integer("village_code_id")
+    .notNull()
+    .references(() => villageCodes.id),
+});
+
+export type Visit = typeof visits.$inferSelect;
+export type NewVisit = typeof visits.$inferInsert;
+
 // todo: medication_log table (after users table done)
 // todo: medication_review table (after users table done)
