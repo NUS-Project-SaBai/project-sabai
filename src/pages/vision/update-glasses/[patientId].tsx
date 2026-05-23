@@ -24,9 +24,9 @@ function UpdateGlassesPage() {
     );
 
   // Watch the form field to get selected visit (must be before early returns)
-  const selectedVisitValue = useWatch({ 
-    control: methods.control, 
-    name: "visitSelect" 
+  const selectedVisitValue = useWatch({
+    control: methods.control,
+    name: "visitSelect",
   });
 
   if (patientLoading || visitsLoading) {
@@ -37,13 +37,13 @@ function UpdateGlassesPage() {
     return <div>Patient not found</div>;
   }
 
-  // Get the most recent visit as default
-  const currentVisit = visits?.[0];
-  const selectedVisit =
-    visits?.find((v) => v.id === selectedVisitId) || currentVisit;
+  // Only get selected visit when explicitly chosen from dropdown
+  const selectedVisit = selectedVisitValue
+    ? visits?.find((v) => v.id.toString() === selectedVisitValue)
+    : null;
 
   const formatVisitDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-GB", {
+    return new Date(date).toLocaleString("en-GB", {
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -79,7 +79,7 @@ function UpdateGlassesPage() {
             {visits && visits.length > 0 ? (
               <div className="mb-6">
                 <div className="text-sm text-slate-600 mb-2">
-                  Currently viewing vitals for visit on
+                  Currently viewing vision data for visit on
                 </div>
                 <div className="text-lg font-semibold text-slate-900 mb-2">
                   {selectedVisit
@@ -87,16 +87,14 @@ function UpdateGlassesPage() {
                     : "No visit selected"}
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Select a different visit to compare historical vitals
-                  </label>
                   <RHFDropdown
                     name="visitSelect"
+                    label="Select a different visit to compare historical vision data"
                     dropdownOptions={visits.map((visit) => ({
                       label: formatVisitDate(visit.date),
                       value: visit.id.toString(),
                     }))}
-                  ></RHFDropdown>
+                  />
                 </div>
               </div>
             ) : (
