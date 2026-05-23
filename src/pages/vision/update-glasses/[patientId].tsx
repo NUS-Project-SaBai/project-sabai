@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { useRouter } from "next/router";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
@@ -24,7 +23,11 @@ function UpdateGlassesPage() {
       { enabled: !!patientId },
     );
 
-  const [selectedVisitId, setSelectedVisitId] = useState<number | null>(null);
+  // Watch the form field to get selected visit (must be before early returns)
+  const selectedVisitValue = useWatch({ 
+    control: methods.control, 
+    name: "visitSelect" 
+  });
 
   if (patientLoading || visitsLoading) {
     return <LoadingSpinner message="Loading patient and visits..." />;
