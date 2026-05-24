@@ -179,7 +179,7 @@ Vitals Table:
 - temperature: Body temperature in Celsius (numeric with 2 decimal places).
 - systolic: Systolic blood pressure (integer).
 - diastolic: Diastolic blood pressure (integer).
-- heart_rate: Heart rate presence (yes/no enum).
+- heart_rate: Heart rate measurement in beats per minute (integer).
 - left_eye_degree: Left eye vision degree measurement.
 - right_eye_degree: Right eye vision degree measurement.
 - left_eye_pinhole: Left eye pinhole test result.
