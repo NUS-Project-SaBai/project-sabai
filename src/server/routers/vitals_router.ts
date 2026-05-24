@@ -78,14 +78,15 @@ export const vitalsRouter = router({
       const dbInput = {
         ...input,
         height: input.height?.toString(),
-        weight: input.weight?.toString(), 
+        weight: input.weight?.toString(),
         temperature: input.temperature?.toString(),
+        heartRate: input.heartRate,
         hemocueCount: input.hemocueCount?.toString(),
         bloodGlucoseNonFasting: input.bloodGlucoseNonFasting?.toString(),
         bloodGlucoseFasting: input.bloodGlucoseFasting?.toString(),
         hba1c: input.hba1c?.toString(),
       };
-      
+
       const [vital] = await db.insert(vitals).values(dbInput).returning();
       return vital;
     }),
@@ -129,7 +130,7 @@ export const vitalsRouter = router({
     .input(updateVitalsInput)
     .mutation(async ({ input }) => {
       const { id, ...updateData } = input;
-      
+
       // Convert numeric fields to strings for database storage
       const dbUpdateData = {
         ...updateData,
@@ -141,7 +142,7 @@ export const vitalsRouter = router({
         bloodGlucoseFasting: updateData.bloodGlucoseFasting?.toString(),
         hba1c: updateData.hba1c?.toString(),
       };
-      
+
       const [updatedVital] = await db
         .update(vitals)
         .set(dbUpdateData)
@@ -159,7 +160,7 @@ export const vitalsRouter = router({
     )
     .mutation(async ({ input }) => {
       const { visitId, ...updateData } = input;
-      
+
       // Convert numeric fields to strings for database storage
       const dbUpdateData = {
         ...updateData,
@@ -171,7 +172,7 @@ export const vitalsRouter = router({
         bloodGlucoseFasting: updateData.bloodGlucoseFasting?.toString(),
         hba1c: updateData.hba1c?.toString(),
       };
-      
+
       const [updatedVital] = await db
         .update(vitals)
         .set(dbUpdateData)
