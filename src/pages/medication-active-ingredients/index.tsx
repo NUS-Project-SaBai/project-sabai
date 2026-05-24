@@ -90,7 +90,7 @@ function MedicationActiveIngredientsBasePage() {
         </div>
       ) : (
         <div className="p-12 text-center text-slate-500">
-          No stock found. Seed the database or add a new record.
+          No active ingredient found. Seed the database or add a new record.
         </div>
       )}
     </div>
