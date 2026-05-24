@@ -187,7 +187,7 @@ Vitals Table:
 - left_astigmatism: Left eye astigmatism measurement.
 - right_astigmatism: Right eye astigmatism measurement.
 - hemocue_count: Hemocue count measurement (numeric with 2 decimal places).
-- diabetes_mellitus: Diabetes mellitus presence (yes/no enum).
+- diabetes_mellitus: Diabetes mellitus presence (boolean).
 - urine_test: Urine test results.
 - blood_glucose_non_fasting: Non-fasting blood glucose level (numeric with 2 decimal places).
 - blood_glucose_fasting: Fasting blood glucose level (numeric with 2 decimal places).
