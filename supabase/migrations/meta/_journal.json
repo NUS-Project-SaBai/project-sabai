@@ -43,6 +43,13 @@
       "when": 1778854877821,
       "tag": "0005_spotty_korath",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1779625834405,
+      "tag": "0006_bizarre_skullbuster",
+      "breakpoints": true
     }
   ]
 }
