@@ -18,7 +18,6 @@ export const medicationStatusEnum = pgEnum("medication_status", [
   "donated",
   "expired",
 ]);
-export const yesNoEnum = pgEnum("yes_no", ["yes", "no"]);
 
 // Define tables
 
@@ -203,7 +202,7 @@ export const vitals = pgTable("vitals", {
   temperature: numeric("temperature", { precision: 4, scale: 2 }),
   systolic: integer("systolic"),
   diastolic: integer("diastolic"),
-  heartRate: yesNoEnum("heart_rate"),
+  heartRate: integer("heart_rate"),
   leftEyeDegree: text("left_eye_degree"),
   rightEyeDegree: text("right_eye_degree"),
   leftEyePinhole: text("left_eye_pinhole"),
@@ -211,10 +210,16 @@ export const vitals = pgTable("vitals", {
   leftAstigmatism: text("left_astigmatism"),
   rightAstigmatism: text("right_astigmatism"),
   hemocueCount: numeric("hemocue_count", { precision: 5, scale: 2 }),
-  diabetesMellitus: yesNoEnum("diabetes_mellitus"),
+  diabetesMellitus: boolean("diabetes_mellitus"),
   urineTest: text("urine_test"),
-  bloodGlucoseNonFasting: numeric("blood_glucose_non_fasting", { precision: 5, scale: 2 }),
-  bloodGlucoseFasting: numeric("blood_glucose_fasting", { precision: 5, scale: 2 }),
+  bloodGlucoseNonFasting: numeric("blood_glucose_non_fasting", {
+    precision: 5,
+    scale: 2,
+  }),
+  bloodGlucoseFasting: numeric("blood_glucose_fasting", {
+    precision: 5,
+    scale: 2,
+  }),
   hba1c: numeric("hba1c", { precision: 5, scale: 2 }),
   others: text("others"),
   visitId: integer("visit_id")
