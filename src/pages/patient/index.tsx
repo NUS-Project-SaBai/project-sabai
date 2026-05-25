@@ -4,11 +4,9 @@ import { PatientPhoto } from "@/components/PatientPhoto";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { ReactNode } from "react";
 
-function PatientsBasePage() {
-  // 1. Fetch data
-  const { data: patients, isLoading } = trpc.patientsRouter.list.useQuery();
-
+function Wrapper({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex-1 p-8">
       <div className="w-full mx-auto">
@@ -26,106 +24,124 @@ function PatientsBasePage() {
           </div>
           {/* Placeholder for future "Add Patient" button */}
         </div>
-
-        {/* Table Card */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          {isLoading ? (
-            <LoadingSpinner message="Loading patients..." />
-          ) : patients && patients.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200">
-                <thead className="bg-slate-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      ID / Photo
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      Name
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      Basic Info
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      Status Flags
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      Allergies
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-slate-200">
-                  {patients.map((patient) => (
-                    <tr
-                      key={patient.id}
-                      className="hover:bg-slate-50 transition-colors"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex flex-col items-center gap-2">
-                          <span className="text-sm font-medium text-slate-900">
-                            {getPatientIdWithZeroPadding(patient.id, 4) ||
-                              "No ID"}
-                          </span>
-                          <PatientPhoto
-                            pictureUrl={patient.patientImageUrl}
-                            className="rounded-full border border-slate-200"
-                          />
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium text-slate-900">
-                            {patient.name}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-sm text-slate-700 capitalize">
-                            {patient.gender} •{" "}
-                            {calculateAge(new Date(patient.dateOfBirth))} yrs
-                          </span>
-                          <span className="text-xs text-slate-500">
-                            {patient.contactNo || "-"}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex gap-2">
-                          <Badge
-                            label="Poor"
-                            active={patient.hasPoorCard}
-                            color="orange"
-                          />
-                          <Badge
-                            label="BS2"
-                            active={patient.hasBS2Card}
-                            color="blue"
-                          />
-                          <Badge
-                            label="Sabai"
-                            active={patient.hasSabaiCard}
-                            color="green"
-                          />
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-slate-700 max-w-xs truncate">
-                          {patient.drugAllergy}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="p-12 text-center text-slate-500">
-              No patients found. Seed the database or add a new record.
-            </div>
-          )}
+          {children}
         </div>
       </div>
     </div>
+  );
+}
+
+function PatientsBasePage() {
+  // 1. Fetch data
+  const { data: patients, isLoading } = trpc.patientsRouter.list.useQuery();
+
+  if (isLoading) {
+    return (
+      <Wrapper>
+        <LoadingSpinner message="Loading patients..." />
+      </Wrapper>
+    );
+  }
+
+  if (!patients || patients.length == 0) {
+    return (
+      <Wrapper>
+        <div className="p-12 text-center text-slate-500">
+          No patients found. Seed the database or add a new record.
+        </div>
+      </Wrapper>
+    );
+  }
+
+  return (
+    <Wrapper>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-slate-200">
+          <thead className="bg-slate-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                ID / Photo
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Basic Info
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Status Flags
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Allergies
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-slate-200">
+            {patients.map((patient) => (
+              <tr
+                key={patient.id}
+                className="hover:bg-slate-50 transition-colors"
+              >
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex flex-col items-center gap-2">
+                    <span className="text-sm font-medium text-slate-900">
+                      {getPatientIdWithZeroPadding(patient.id, 4) || "No ID"}
+                    </span>
+                    <PatientPhoto
+                      pictureUrl={patient.patientImageUrl}
+                      className="rounded-full border border-slate-200"
+                    />
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-slate-900">
+                      {patient.name}
+                    </span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm text-slate-700 capitalize">
+                      {patient.gender} •{" "}
+                      {calculateAge(new Date(patient.dateOfBirth))} yrs
+                    </span>
+                    <span className="text-xs text-slate-500">
+                      {patient.contactNo || "-"}
+                    </span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex gap-2">
+                    <Badge
+                      label="Poor"
+                      active={patient.hasPoorCard}
+                      color="orange"
+                    />
+                    <Badge
+                      label="BS2"
+                      active={patient.hasBS2Card}
+                      color="blue"
+                    />
+                    <Badge
+                      label="Sabai"
+                      active={patient.hasSabaiCard}
+                      color="green"
+                    />
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="text-sm text-slate-700 max-w-xs truncate">
+                    {patient.drugAllergy}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Wrapper>
   );
 }
 
