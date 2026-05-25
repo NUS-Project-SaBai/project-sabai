@@ -21,9 +21,8 @@ function Header() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
 
 function MedicationBrandsBasePage() {
   const { data: brands, isLoading } =
@@ -35,7 +34,7 @@ function MedicationBrandsBasePage() {
         <Header />
         <LoadingSpinner message="Loading brands..." />
       </div>
-    )
+    );
   }
 
   if (!brands || brands.length == 0) {
@@ -46,7 +45,7 @@ function MedicationBrandsBasePage() {
           No medication brands found. Seed the database or add a new record.
         </div>
       </div>
-    )
+    );
   }
 
   return (
