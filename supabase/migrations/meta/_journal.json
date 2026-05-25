@@ -43,6 +43,13 @@
       "when": 1778854877821,
       "tag": "0005_spotty_korath",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1779715398981,
+      "tag": "0006_freezing_lady_bullseye",
+      "breakpoints": true
     }
   ]
 }
