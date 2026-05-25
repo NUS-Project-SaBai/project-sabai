@@ -43,13 +43,6 @@
       "when": 1778854877821,
       "tag": "0005_spotty_korath",
       "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1779629101603,
-      "tag": "0006_damp_slapstick",
-      "breakpoints": true
     }
   ]
 }

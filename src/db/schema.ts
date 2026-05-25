@@ -180,12 +180,6 @@ Vitals Table:
 - systolic: Systolic blood pressure (integer).
 - diastolic: Diastolic blood pressure (integer).
 - heart_rate: Heart rate measurement in beats per minute (integer).
-- left_eye_degree: Left eye vision degree measurement.
-- right_eye_degree: Right eye vision degree measurement.
-- left_eye_pinhole: Left eye pinhole test result.
-- right_eye_pinhole: Right eye pinhole test result.
-- left_astigmatism: Left eye astigmatism measurement.
-- right_astigmatism: Right eye astigmatism measurement.
 - hemocue_count: Hemocue count measurement (numeric with 2 decimal places).
 - diabetes_mellitus: Diabetes mellitus presence (boolean).
 - urine_test: Urine test results.
@@ -203,12 +197,6 @@ export const vitals = pgTable("vitals", {
   systolic: integer("systolic"),
   diastolic: integer("diastolic"),
   heartRate: integer("heart_rate"),
-  leftEyeDegree: text("left_eye_degree"),
-  rightEyeDegree: text("right_eye_degree"),
-  leftEyePinhole: text("left_eye_pinhole"),
-  rightEyePinhole: text("right_eye_pinhole"),
-  leftAstigmatism: text("left_astigmatism"),
-  rightAstigmatism: text("right_astigmatism"),
   hemocueCount: numeric("hemocue_count", { precision: 5, scale: 2 }),
   diabetesMellitus: boolean("diabetes_mellitus"),
   urineTest: text("urine_test"),
@@ -232,6 +220,38 @@ export const vitals = pgTable("vitals", {
 
 export type Vital = typeof vitals.$inferSelect;
 export type NewVital = typeof vitals.$inferInsert;
+
+/*
+Eyesight Table:
+- id: Primary key, auto-incrementing integer.
+- visit_id: Foreign key referencing the visit (unique).
+- left_eye_degree: Left eye vision degree measurement.
+- right_eye_degree: Right eye vision degree measurement.
+- left_eye_pinhole: Left eye pinhole test result.
+- right_eye_pinhole: Right eye pinhole test result.
+- left_astigmatism: Left eye astigmatism measurement.
+- right_astigmatism: Right eye astigmatism measurement.
+- comments: Additional comments or observations.
+*/
+export const eyesight = pgTable("eyesight", {
+  id: serial("id").primaryKey(),
+  visitId: integer("visit_id")
+    .notNull()
+    .unique()
+    .references(() => visits.id, {
+      onDelete: "cascade",
+    }),
+  leftEyeDegree: text("left_eye_degree"),
+  rightEyeDegree: text("right_eye_degree"),
+  leftEyePinhole: text("left_eye_pinhole"),
+  rightEyePinhole: text("right_eye_pinhole"),
+  leftAstigmatism: text("left_astigmatism"),
+  rightAstigmatism: text("right_astigmatism"),
+  comments: text("comments"),
+});
+
+export type Eyesight = typeof eyesight.$inferSelect;
+export type NewEyesight = typeof eyesight.$inferInsert;
 
 // todo: medication_log table (after users table done)
 // todo: medication_review table (after users table done)
