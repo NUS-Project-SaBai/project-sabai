@@ -16,12 +16,6 @@ const selectVitalsFields = {
   systolic: vitals.systolic,
   diastolic: vitals.diastolic,
   heartRate: vitals.heartRate,
-  leftEyeDegree: vitals.leftEyeDegree,
-  rightEyeDegree: vitals.rightEyeDegree,
-  leftEyePinhole: vitals.leftEyePinhole,
-  rightEyePinhole: vitals.rightEyePinhole,
-  leftAstigmatism: vitals.leftAstigmatism,
-  rightAstigmatism: vitals.rightAstigmatism,
   hemocueCount: vitals.hemocueCount,
   diabetesMellitus: vitals.diabetesMellitus,
   urineTest: vitals.urineTest,
@@ -43,12 +37,6 @@ const createVitalsInput = z.object({
   systolic: z.number().int().min(60).max(250).optional(), // mmHg, reasonable blood pressure range
   diastolic: z.number().int().min(40).max(150).optional(), // mmHg, reasonable blood pressure range
   heartRate: z.number().int().positive().min(30).max(220).optional(), // bpm, reasonable heart rate range
-  leftEyeDegree: z.string().optional(),
-  rightEyeDegree: z.string().optional(),
-  leftEyePinhole: z.string().optional(),
-  rightEyePinhole: z.string().optional(),
-  leftAstigmatism: z.string().optional(),
-  rightAstigmatism: z.string().optional(),
   hemocueCount: z.number().positive().optional(), // g/dL or similar units
   diabetesMellitus: z.boolean().optional(),
   urineTest: z.string().optional(),
@@ -74,20 +62,7 @@ export const vitalsRouter = router({
   create: protectedProcedure
     .input(createVitalsInput)
     .mutation(async ({ input }) => {
-      // Convert numeric fields to strings for database storage
-      const dbInput = {
-        ...input,
-        height: input.height?.toString(),
-        weight: input.weight?.toString(),
-        temperature: input.temperature?.toString(),
-        heartRate: input.heartRate,
-        hemocueCount: input.hemocueCount?.toString(),
-        bloodGlucoseNonFasting: input.bloodGlucoseNonFasting?.toString(),
-        bloodGlucoseFasting: input.bloodGlucoseFasting?.toString(),
-        hba1c: input.hba1c?.toString(),
-      };
-
-      const [vital] = await db.insert(vitals).values(dbInput).returning();
+      const [vital] = await db.insert(vitals).values(input).returning();
       return vital;
     }),
 
@@ -131,21 +106,9 @@ export const vitalsRouter = router({
     .mutation(async ({ input }) => {
       const { id, ...updateData } = input;
 
-      // Convert numeric fields to strings for database storage
-      const dbUpdateData = {
-        ...updateData,
-        height: updateData.height?.toString(),
-        weight: updateData.weight?.toString(),
-        temperature: updateData.temperature?.toString(),
-        hemocueCount: updateData.hemocueCount?.toString(),
-        bloodGlucoseNonFasting: updateData.bloodGlucoseNonFasting?.toString(),
-        bloodGlucoseFasting: updateData.bloodGlucoseFasting?.toString(),
-        hba1c: updateData.hba1c?.toString(),
-      };
-
       const [updatedVital] = await db
         .update(vitals)
-        .set(dbUpdateData)
+        .set(updateData)
         .where(eq(vitals.id, id))
         .returning();
 
@@ -161,21 +124,9 @@ export const vitalsRouter = router({
     .mutation(async ({ input }) => {
       const { visitId, ...updateData } = input;
 
-      // Convert numeric fields to strings for database storage
-      const dbUpdateData = {
-        ...updateData,
-        height: updateData.height?.toString(),
-        weight: updateData.weight?.toString(),
-        temperature: updateData.temperature?.toString(),
-        hemocueCount: updateData.hemocueCount?.toString(),
-        bloodGlucoseNonFasting: updateData.bloodGlucoseNonFasting?.toString(),
-        bloodGlucoseFasting: updateData.bloodGlucoseFasting?.toString(),
-        hba1c: updateData.hba1c?.toString(),
-      };
-
       const [updatedVital] = await db
         .update(vitals)
-        .set(dbUpdateData)
+        .set(updateData)
         .where(eq(vitals.visitId, visitId))
         .returning();
 
