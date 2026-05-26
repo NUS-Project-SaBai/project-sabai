@@ -28,31 +28,37 @@ const selectVitalsFields = {
 
 /**
  * Input validation schema for creating vitals records.
- * Uses appropriate numeric types with reasonable medical ranges.
+ * Uses z.coerce.string() for PostgreSQL numeric fields.
  */
 const createVitalsInput = z.object({
-  height: z.number().positive().max(300).optional(), // cm, reasonable human height range
-  weight: z.number().positive().max(1000).optional(), // kg, reasonable human weight range
-  temperature: z.number().min(30).max(45).optional(), // °C, reasonable body temperature range
-  systolic: z.number().int().min(60).max(250).optional(), // mmHg, reasonable blood pressure range
-  diastolic: z.number().int().min(40).max(150).optional(), // mmHg, reasonable blood pressure range
-  heartRate: z.number().int().positive().min(30).max(220).optional(), // bpm, reasonable heart rate range
-  hemocueCount: z.number().positive().optional(), // g/dL or similar units
+  height: z.coerce.string().optional(), // cm
+  weight: z.coerce.string().optional(), // kg
+  temperature: z.coerce.string().optional(), // °C
+  systolic: z.number().int().optional(), // mmHg
+  diastolic: z.number().int().optional(), // mmHg
+  heartRate: z.number().int().optional(), // bpm
+  hemocueCount: z.coerce.string().optional(), // g/dL
   diabetesMellitus: z.boolean().optional(),
   urineTest: z.string().optional(),
-  bloodGlucoseNonFasting: z.number().positive().optional(), // mg/dL or mmol/L
-  bloodGlucoseFasting: z.number().positive().optional(), // mg/dL or mmol/L
-  hba1c: z.number().positive().max(20).optional(), // %, reasonable HbA1c range
+  bloodGlucoseNonFasting: z.coerce.string().optional(), // mg/dL or mmol/L
+  bloodGlucoseFasting: z.coerce.string().optional(), // mg/dL or mmol/L
+  hba1c: z.coerce.string().optional(), // %
   others: z.string().optional(),
   visitId: z.number().int().positive(),
 });
 
 /**
  * Input validation schema for updating vitals records.
- * All fields from create are optional for partial updates.
  */
-const updateVitalsInput = createVitalsInput.partial().extend({
+const updateVitalsInput = createVitalsInput.omit({ visitId: true }).partial().extend({
   id: z.number().int().positive(),
+});
+
+/**
+ * Input validation schema for updating vitals records by visit ID.
+ */
+const updateVitalsByVisitIdInput = createVitalsInput.omit({ visitId: true }).partial().extend({
+  visitId: z.number().int().positive(),
 });
 
 export const vitalsRouter = router({
@@ -62,8 +68,11 @@ export const vitalsRouter = router({
   create: protectedProcedure
     .input(createVitalsInput)
     .mutation(async ({ input }) => {
-      const [vital] = await db.insert(vitals).values(input).returning();
-      return vital;
+      const [vitalsRecord] = await db
+        .insert(vitals)
+        .values(input)
+        .returning();
+      return vitalsRecord;
     }),
 
   /**
@@ -72,13 +81,13 @@ export const vitalsRouter = router({
   getById: protectedProcedure
     .input(z.object({ id: z.number().int().positive() }))
     .query(async ({ input }) => {
-      const vital = await db
+      const vitalsRecord = await db
         .select(selectVitalsFields)
         .from(vitals)
         .where(eq(vitals.id, input.id))
         .limit(1);
 
-      return vital[0] ?? null;
+      return vitalsRecord[0] ?? null;
     }),
 
   /**
@@ -88,13 +97,13 @@ export const vitalsRouter = router({
   getByVisitId: protectedProcedure
     .input(z.object({ visitId: z.number().int().positive() }))
     .query(async ({ input }) => {
-      const vital = await db
+      const vitalsRecord = await db
         .select(selectVitalsFields)
         .from(vitals)
         .where(eq(vitals.visitId, input.visitId))
         .limit(1);
 
-      return vital[0] ?? null;
+      return vitalsRecord[0] ?? null;
     }),
 
   /**
@@ -106,31 +115,31 @@ export const vitalsRouter = router({
     .mutation(async ({ input }) => {
       const { id, ...updateData } = input;
 
-      const [updatedVital] = await db
+      const [updatedVitals] = await db
         .update(vitals)
         .set(updateData)
         .where(eq(vitals.id, id))
         .returning();
 
-      return updatedVital;
+      return updatedVitals;
     }),
 
+  /**
+   * Updates a vitals record by visit ID.
+   * Only updates provided fields (partial update).
+   */
   updateByVisitId: protectedProcedure
-    .input(
-      createVitalsInput.partial().extend({
-        visitId: z.number().int().positive(),
-      }),
-    )
+    .input(updateVitalsByVisitIdInput)
     .mutation(async ({ input }) => {
       const { visitId, ...updateData } = input;
 
-      const [updatedVital] = await db
+      const [updatedVitals] = await db
         .update(vitals)
         .set(updateData)
         .where(eq(vitals.visitId, visitId))
         .returning();
 
-      return updatedVital;
+      return updatedVitals;
     }),
 
   /**
@@ -149,3 +158,4 @@ export type Vital = typeof vitals.$inferSelect;
 export type NewVital = typeof vitals.$inferInsert;
 export type CreateVitalsInput = z.infer<typeof createVitalsInput>;
 export type UpdateVitalsInput = z.infer<typeof updateVitalsInput>;
+export type UpdateVitalsByVisitIdInput = z.infer<typeof updateVitalsByVisitIdInput>;
