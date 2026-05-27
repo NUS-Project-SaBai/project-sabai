@@ -8,6 +8,7 @@ import { MdMonitorHeart } from "react-icons/md";
 import { PiSignOutFill } from "react-icons/pi";
 import { IoMdMenu } from "react-icons/io";
 import { LuScanFace } from "react-icons/lu";
+import { GiMedicines } from "react-icons/gi";
 import LogoTitle from "@/components/LogoTitle";
 import SabaiLogo from "@/components/SabaiLogo";
 
@@ -59,6 +60,11 @@ function SidebarNavButtons() {
     { name: "Patient", href: "/patient", icon: AiOutlineUser },
     { name: "Vitals", href: "/vitals", icon: MdMonitorHeart },
     { name: "Vision", href: "/vision", icon: BsEyeglasses },
+    {
+      name: "Medication Stock",
+      href: "/medication-stock",
+      icon: GiMedicines,
+    },
     {
       name: "Settings",
       href: "/settings/village-codes",
