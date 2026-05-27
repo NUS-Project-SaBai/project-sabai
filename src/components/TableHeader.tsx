@@ -11,8 +11,8 @@ interface TableHeaderProps {
  *
  * @example
  * ```tsx
- * <TableHeader 
- *   headers={['Name', 'Age', 'Status']} 
+ * <TableHeader
+ *   headers={['Name', 'Age', 'Status']}
  *   className="border-b"
  * />
  * ```
