@@ -5,6 +5,9 @@ import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { ReactNode } from "react";
+import TableHeader from "@/components/TableHeader";
+import TableRow from "@/components/TableRow";
+import TableCell from "@/components/TableCell";
 
 function Wrapper({ children }: { children: ReactNode }) {
   return (
@@ -58,32 +61,19 @@ function PatientsBasePage() {
     <Wrapper>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200">
-          <thead className="bg-slate-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                ID / Photo
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Basic Info
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Status Flags
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Allergies
-              </th>
-            </tr>
-          </thead>
+          <TableHeader
+            headers={[
+              "ID / Photo",
+              "Name",
+              "Basic Info",
+              "Status Flags",
+              "Allergies",
+            ]}
+          />
           <tbody className="bg-white divide-y divide-slate-200">
             {patients.map((patient) => (
-              <tr
-                key={patient.id}
-                className="hover:bg-slate-50 transition-colors"
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
+              <TableRow key={patient.id}>
+                <TableCell>
                   <div className="flex flex-col items-center gap-2">
                     <span className="text-sm font-medium text-slate-900">
                       {getPatientIdWithZeroPadding(patient.id, 4) || "No ID"}
@@ -93,15 +83,15 @@ function PatientsBasePage() {
                       className="rounded-full border border-slate-200"
                     />
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                </TableCell>
+                <TableCell>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-slate-900">
                       {patient.name}
                     </span>
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                </TableCell>
+                <TableCell>
                   <div className="flex flex-col gap-1">
                     <span className="text-sm text-slate-700 capitalize">
                       {patient.gender} •{" "}
@@ -111,8 +101,8 @@ function PatientsBasePage() {
                       {patient.contactNo || "-"}
                     </span>
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                </TableCell>
+                <TableCell>
                   <div className="flex gap-2">
                     <Badge
                       label="Poor"
@@ -130,13 +120,13 @@ function PatientsBasePage() {
                       color="green"
                     />
                   </div>
-                </td>
-                <td className="px-6 py-4">
+                </TableCell>
+                <TableCell>
                   <div className="text-sm text-slate-700 max-w-xs truncate">
                     {patient.drugAllergy}
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
           </tbody>
         </table>
