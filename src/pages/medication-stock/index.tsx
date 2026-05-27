@@ -56,38 +56,24 @@ function MedicationStockBasePage() {
     isError,
   } = trpc.medicationStockRouter.list.useQuery();
 
-  if (isError) {
-    return (
-      <div className="min-h-screen flex-1 p-8">
-        <Header />
-        <h1 className="text-red-500">An error has occurred!</h1>
-      </div>
-    );
-  }
+  function renderContent() {
+    if (isError) {
+      return <h1 className="text-red-500">An error has occurred!</h1>;
+    }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex-1 p-8">
-        <Header />
-        <LoadingSpinner message="Loading stock..." />
-      </div>
-    );
-  }
+    if (isLoading) {
+      return <LoadingSpinner message="Loading stock..." />;
+    }
 
-  if (!stock || stock.length == 0) {
-    return (
-      <div className="min-h-screen flex-1 p-8">
-        <Header />
+    if (!stock || stock.length == 0) {
+      return (
         <div className="p-12 text-center text-slate-500">
           No stock found. Seed the database or add a new record.
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  return (
-    <div className="min-h-screen flex-1 p-8">
-      <Header />
+    return (
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200">
           <TableHeader
@@ -142,6 +128,13 @@ function MedicationStockBasePage() {
           </tbody>
         </table>
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex-1 p-8">
+      <Header />
+      {renderContent()}
     </div>
   );
 }
