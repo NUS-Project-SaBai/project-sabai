@@ -1,3 +1,13 @@
+/**
+ * A loading spinner component with animated SVG and customizable message.
+ *
+ * @param {string} message - The text message to display below the spinner
+ *
+ * @example
+ * ```tsx
+ * <LoadingSpinner message="Loading patient data..." />
+ * ```
+ */
 export default function LoadingSpinner({ message }: { message: string }) {
   return (
     <div className="p-12 text-center text-slate-500">
