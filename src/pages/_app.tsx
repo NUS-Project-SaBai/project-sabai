@@ -36,10 +36,13 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? withDefaultLayout;
 
   return getLayout(
-    <Component
-      {...pageProps}
-      key={isPatientRoute ? router.asPath : undefined}
-    />,
+    <>
+      <Component
+        {...pageProps}
+        key={isPatientRoute ? router.asPath : undefined}
+      />
+      <div id="modal-root" className="h-screen w-screen fixed" />
+    </>,
   );
 }
 
