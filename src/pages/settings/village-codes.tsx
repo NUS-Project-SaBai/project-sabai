@@ -5,6 +5,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
+import Modal from "@/components/interactive/Modal";
 
 const DEFAULT_FORM: NewVillageCode = {
   code: "",
@@ -113,100 +114,95 @@ function VillageCodesPage() {
           </div>
         </div>
 
-        {/* Form Modal (Simplified as inline for MVP) */}
-        {isEditing && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
-              <h2 className="text-xl font-bold mb-4">
-                {formData.id ? "Edit Village Code" : "New Village Code"}
-              </h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {!formData.id && (
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700">
-                      Code
-                    </label>
-                    <input
-                      required
-                      value={formData.code}
-                      onChange={(e) =>
-                        setFormData({ ...formData, code: e.target.value })
-                      }
-                      className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2"
-                      placeholder="e.g. V001"
-                    />
-                  </div>
-                )}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700">
-                    Name
-                  </label>
-                  <input
-                    required
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2"
-                    placeholder="Central Village"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700">
-                    Color
-                  </label>
-                  <div className="flex gap-2 mt-1">
-                    <input
-                      type="color"
-                      value={formData.colorHex}
-                      onChange={(e) =>
-                        setFormData({ ...formData, colorHex: e.target.value })
-                      }
-                      className="h-10 w-14 rounded cursor-pointer border border-slate-300 p-1"
-                    />
-                    <input
-                      value={formData.colorHex}
-                      readOnly
-                      className="block w-full rounded-md border border-slate-300 px-3 py-2 bg-slate-50 text-slate-500"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                    <input
-                      type="checkbox"
-                      checked={formData.isVisible}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          isVisible: e.target.checked,
-                        })
-                      }
-                      className="rounded border-slate-300"
-                    />
-                    Is Visible?
-                  </label>
-                </div>
-
-                <div className="flex gap-3 mt-6">
-                  <button
-                    type="button"
-                    onClick={closeForm}
-                    className="flex-1 bg-slate-100 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-200"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700"
-                  >
-                    Save
-                  </button>
-                </div>
-              </form>
+        <Modal isOpen={isEditing} setIsOpen={setIsEditing}>
+          <h2 className="text-xl font-bold mb-4">
+            {formData.id ? "Edit Village Code" : "New Village Code"}
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {!formData.id && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700">
+                  Code
+                </label>
+                <input
+                  required
+                  value={formData.code}
+                  onChange={(e) =>
+                    setFormData({ ...formData, code: e.target.value })
+                  }
+                  className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2"
+                  placeholder="e.g. V001"
+                />
+              </div>
+            )}
+            <div>
+              <label className="block text-sm font-medium text-slate-700">
+                Name
+              </label>
+              <input
+                required
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2"
+                placeholder="Central Village"
+              />
             </div>
-          </div>
-        )}
+            <div>
+              <label className="block text-sm font-medium text-slate-700">
+                Color
+              </label>
+              <div className="flex gap-2 mt-1">
+                <input
+                  type="color"
+                  value={formData.colorHex}
+                  onChange={(e) =>
+                    setFormData({ ...formData, colorHex: e.target.value })
+                  }
+                  className="h-10 w-14 rounded cursor-pointer border border-slate-300 p-1"
+                />
+                <input
+                  value={formData.colorHex}
+                  readOnly
+                  className="block w-full rounded-md border border-slate-300 px-3 py-2 bg-slate-50 text-slate-500"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={formData.isVisible}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      isVisible: e.target.checked,
+                    })
+                  }
+                  className="rounded border-slate-300"
+                />
+                Is Visible?
+              </label>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                type="button"
+                onClick={closeForm}
+                className="flex-1 bg-slate-100 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-200"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700"
+              >
+                Save
+              </button>
+            </div>
+          </form>
+        </Modal>
 
         {/* Data Table */}
         <div className="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
