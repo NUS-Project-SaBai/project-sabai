@@ -65,7 +65,6 @@ function MedicationActiveIngredientsBasePage() {
               "Unit of Measurement",
               "Fall Below",
             ]}
-            className="bg-slate-50"
           />
           <tbody className="bg-white divide-y divide-slate-200">
             {ingredients.map((ingredient) => (
