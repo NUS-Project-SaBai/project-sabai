@@ -42,6 +42,11 @@ function UpdateGlassesPage() {
     ? visits?.find((v) => v.id.toString() === selectedVisitValue)
     : null;
 
+  /**
+   * Formats a visit date into a readable string format.
+   * @param {Date} date - The date to format
+   * @returns {string} Formatted date string in GB locale
+   */
   const formatVisitDate = (date: Date) => {
     return new Date(date).toLocaleString("en-GB", {
       day: "numeric",
@@ -78,14 +83,20 @@ function UpdateGlassesPage() {
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
             {visits && visits.length > 0 ? (
               <div className="mb-6">
-                <div className="text-sm text-slate-600 mb-2">
-                  Currently viewing vision data for visit on
-                </div>
-                <div className="text-lg font-semibold text-slate-900 mb-2">
-                  {selectedVisit
-                    ? formatVisitDate(selectedVisit.date)
-                    : "No visit selected"}
-                </div>
+                {selectedVisit ? (
+                  <>
+                    <div className="text-sm text-slate-600 mb-2">
+                      Currently viewing vision data for visit on
+                    </div>
+                    <div className="text-lg font-semibold text-slate-900 mb-2">
+                      {formatVisitDate(selectedVisit.date)}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-lg font-semibold text-slate-900 mb-2">
+                    No visit selected
+                  </div>
+                )}
                 <div className="mb-4">
                   <RHFDropdown
                     name="visitSelect"
