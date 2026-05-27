@@ -43,7 +43,7 @@ function PatientsBasePage() {
     isError,
   } = trpc.patientsRouter.list.useQuery();
 
-  function RenderedContent() {
+  function renderContent() {
     if (isError) {
       return <h1 className="text-red-500">An error has occurred!</h1>;
     }
@@ -136,7 +136,7 @@ function PatientsBasePage() {
     );
   }
 
-  return <Wrapper>{RenderedContent()}</Wrapper>;
+  return <Wrapper>{renderContent()}</Wrapper>;
 }
 
 // Helper components & functions
