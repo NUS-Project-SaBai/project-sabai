@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { ReactNode, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { AiOutlineSetting, AiOutlineUser } from "react-icons/ai";
+import { BsEyeglasses } from "react-icons/bs";
 import { MdMonitorHeart } from "react-icons/md";
 import { PiSignOutFill } from "react-icons/pi";
 import { IoMdMenu } from "react-icons/io";
@@ -58,6 +59,7 @@ function SidebarNavButtons() {
     { name: "Scan Face", href: "/scanFace", icon: LuScanFace },
     { name: "Patient", href: "/patient", icon: AiOutlineUser },
     { name: "Vitals", href: "/vitals", icon: MdMonitorHeart },
+    { name: "Vision", href: "/vision", icon: BsEyeglasses },
     {
       name: "Medication Stock",
       href: "/medication-stock",
