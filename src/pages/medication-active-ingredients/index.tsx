@@ -45,7 +45,7 @@ function MedicationActiveIngredientsBasePage() {
       return <LoadingSpinner message="Loading active ingredients..." />;
     }
 
-    if (!ingredients || ingredients.length == 0) {
+    if (!ingredients || ingredients.length === 0) {
       return (
         <div className="p-12 text-center text-slate-500">
           No active ingredient found. Seed the database or add a new record.

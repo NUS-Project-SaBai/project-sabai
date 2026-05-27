@@ -52,7 +52,7 @@ function PatientsBasePage() {
       return <LoadingSpinner message="Loading patients..." />;
     }
 
-    if (!patients || patients.length == 0) {
+    if (!patients || patients.length === 0) {
       return (
         <div className="p-12 text-center text-slate-500">
           No patients found. Seed the database or add a new record.

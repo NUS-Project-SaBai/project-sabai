@@ -43,7 +43,7 @@ function MedicationBrandsBasePage() {
       return <LoadingSpinner message="Loading brands..." />;
     }
 
-    if (!brands || brands.length == 0) {
+    if (!brands || brands.length === 0) {
       return (
         <div className="p-12 text-center text-slate-500">
           No medication brands found. Seed the database or add a new record.

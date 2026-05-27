@@ -65,7 +65,7 @@ function MedicationStockBasePage() {
       return <LoadingSpinner message="Loading stock..." />;
     }
 
-    if (!stock || stock.length == 0) {
+    if (!stock || stock.length === 0) {
       return (
         <div className="p-12 text-center text-slate-500">
           No stock found. Seed the database or add a new record.
