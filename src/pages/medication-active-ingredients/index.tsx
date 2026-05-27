@@ -30,8 +30,20 @@ function Header() {
 }
 
 function MedicationActiveIngredientsBasePage() {
-  const { data: ingredients, isLoading } =
-    trpc.medicationActiveIngredientsRouter.list.useQuery();
+  const {
+    data: ingredients,
+    isLoading,
+    isError,
+  } = trpc.medicationActiveIngredientsRouter.list.useQuery();
+
+  if (isError) {
+    return (
+      <div className="min-h-screen flex-1 p-8">
+        <Header />
+        <h1 className="text-red-500">An error has occurred!</h1>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

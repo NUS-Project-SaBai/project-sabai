@@ -50,7 +50,20 @@ function Header() {
 }
 
 function MedicationStockBasePage() {
-  const { data: stock, isLoading } = trpc.medicationStockRouter.list.useQuery();
+  const {
+    data: stock,
+    isLoading,
+    isError,
+  } = trpc.medicationStockRouter.list.useQuery();
+
+  if (isError) {
+    return (
+      <div className="min-h-screen flex-1 p-8">
+        <Header />
+        <h1 className="text-red-500">An error has occurred!</h1>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

@@ -37,7 +37,19 @@ function Wrapper({ children }: { children: ReactNode }) {
 
 function PatientsBasePage() {
   // 1. Fetch data
-  const { data: patients, isLoading } = trpc.patientsRouter.list.useQuery();
+  const {
+    data: patients,
+    isLoading,
+    isError,
+  } = trpc.patientsRouter.list.useQuery();
+
+  if (isError) {
+    return (
+      <Wrapper>
+        <h1 className="text-red-500">An error has occurred!</h1>
+      </Wrapper>
+    );
+  }
 
   if (isLoading) {
     return (

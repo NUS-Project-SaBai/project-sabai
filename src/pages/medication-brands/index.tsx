@@ -28,8 +28,20 @@ function Header() {
 }
 
 function MedicationBrandsBasePage() {
-  const { data: brands, isLoading } =
-    trpc.medicationBrandRouter.list.useQuery();
+  const {
+    data: brands,
+    isLoading,
+    isError,
+  } = trpc.medicationBrandRouter.list.useQuery();
+
+  if (isError) {
+    return (
+      <div className="min-h-screen flex-1 p-8">
+        <Header />
+        <h1 className="text-red-500">An error has occurred!</h1>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

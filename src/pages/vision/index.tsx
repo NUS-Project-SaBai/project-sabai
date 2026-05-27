@@ -38,7 +38,11 @@ function Wrapper({ children }: { children: ReactNode }) {
 
 function VisionPage() {
   const router = useRouter();
-  const { data: patients, isLoading } = trpc.patientsRouter.list.useQuery();
+  const {
+    data: patients,
+    isLoading,
+    isError,
+  } = trpc.patientsRouter.list.useQuery();
 
   /**
    * Navigates to the update glasses page for a specific patient.
@@ -47,6 +51,14 @@ function VisionPage() {
   const handleUpdateGlasses = (patientId: number) => {
     router.push(`/vision/update-glasses/${patientId}`);
   };
+
+  if (isError) {
+    return (
+      <Wrapper>
+        <h1 className="text-red-500">An error has occurred!</h1>
+      </Wrapper>
+    );
+  }
 
   if (isLoading) {
     return (
