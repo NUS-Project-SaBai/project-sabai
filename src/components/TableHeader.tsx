@@ -3,6 +3,20 @@ interface TableHeaderProps {
   className?: string;
 }
 
+/**
+ * Table header component rendering a `<thead>` element with header cells.
+ *
+ * @param {string[]} headers - Array of header text strings to display as column headers
+ * @param {string} [className=""] - Additional CSS classes to apply to the thead element
+ *
+ * @example
+ * ```tsx
+ * <TableHeader 
+ *   headers={['Name', 'Age', 'Status']} 
+ *   className="border-b"
+ * />
+ * ```
+ */
 export default function TableHeader({
   headers,
   className = "",
