@@ -43,34 +43,24 @@ function PatientsBasePage() {
     isError,
   } = trpc.patientsRouter.list.useQuery();
 
-  if (isError) {
-    return (
-      <Wrapper>
-        <h1 className="text-red-500">An error has occurred!</h1>
-      </Wrapper>
-    );
-  }
+  function RenderedContent() {
+    if (isError) {
+      return <h1 className="text-red-500">An error has occurred!</h1>;
+    }
 
-  if (isLoading) {
-    return (
-      <Wrapper>
-        <LoadingSpinner message="Loading patients..." />
-      </Wrapper>
-    );
-  }
+    if (isLoading) {
+      return <LoadingSpinner message="Loading patients..." />;
+    }
 
-  if (!patients || patients.length == 0) {
-    return (
-      <Wrapper>
+    if (!patients || patients.length == 0) {
+      return (
         <div className="p-12 text-center text-slate-500">
           No patients found. Seed the database or add a new record.
         </div>
-      </Wrapper>
-    );
-  }
+      );
+    }
 
-  return (
-    <Wrapper>
+    return (
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200">
           <TableHeader
@@ -143,8 +133,10 @@ function PatientsBasePage() {
           </tbody>
         </table>
       </div>
-    </Wrapper>
-  );
+    );
+  }
+
+  return <Wrapper>{RenderedContent()}</Wrapper>;
 }
 
 // Helper components & functions
@@ -184,7 +176,7 @@ function getPatientIdWithZeroPadding(id: number, padLength: number) {
   return id.toString().padStart(padLength, "0");
 }
 
-PatientsBasePage.getLayout = (page: React.ReactNode) =>
+PatientsBasePage.getLayout = (page: ReactNode) =>
   withDefaultLayout(<PatientTopMenuLayout>{page}</PatientTopMenuLayout>);
 
 export default PatientsBasePage;
