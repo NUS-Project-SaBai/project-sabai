@@ -2,6 +2,9 @@ import { useState } from "react";
 import { trpc } from "@/utils/trpc";
 import { VillageCode, NewVillageCode } from "@/db/schema";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import TableHeader from "@/components/TableHeader";
+import TableRow from "@/components/TableRow";
+import TableCell from "@/components/TableCell";
 
 const DEFAULT_FORM: NewVillageCode = {
   code: "",
@@ -211,35 +214,15 @@ function VillageCodesPage() {
             <div className="p-8 text-center text-slate-500">Loading...</div>
           ) : (
             <table className="min-w-full divide-y divide-slate-200">
-              <thead className="bg-slate-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">
-                    Code
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">
-                    Color
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
+              <TableHeader
+                headers={["Code", "Name", "Color", "Status", "actions"]}
+              />
               <tbody className="divide-y divide-slate-200 bg-white">
                 {codes?.map((code: VillageCode) => (
-                  <tr key={code.id} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 text-sm font-medium text-slate-900">
-                      {code.code}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
-                      {code.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm">
+                  <TableRow key={code.id}>
+                    <TableCell>{code.code}</TableCell>
+                    <TableCell>{code.name}</TableCell>
+                    <TableCell>
                       <div className="flex items-center gap-2">
                         <span
                           className="h-4 w-4 rounded-full border border-slate-200 shadow-sm"
@@ -249,8 +232,8 @@ function VillageCodesPage() {
                           {code.colorHex}
                         </span>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm">
+                    </TableCell>
+                    <TableCell>
                       {code.isVisible ? (
                         <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                           Active
@@ -260,8 +243,8 @@ function VillageCodesPage() {
                           Hidden
                         </span>
                       )}
-                    </td>
-                    <td className="px-6 py-4 text-right text-sm">
+                    </TableCell>
+                    <TableCell>
                       <button
                         onClick={() => openEdit(code)}
                         className="text-indigo-600 hover:text-indigo-900 font-medium mr-4"
@@ -274,8 +257,8 @@ function VillageCodesPage() {
                       >
                         Delete
                       </button>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
               </tbody>
             </table>

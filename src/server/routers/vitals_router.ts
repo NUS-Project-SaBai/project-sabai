@@ -50,16 +50,22 @@ const createVitalsInput = z.object({
 /**
  * Input validation schema for updating vitals records.
  */
-const updateVitalsInput = createVitalsInput.omit({ visitId: true }).partial().extend({
-  id: z.number().int().positive(),
-});
+const updateVitalsInput = createVitalsInput
+  .omit({ visitId: true })
+  .partial()
+  .extend({
+    id: z.number().int().positive(),
+  });
 
 /**
  * Input validation schema for updating vitals records by visit ID.
  */
-const updateVitalsByVisitIdInput = createVitalsInput.omit({ visitId: true }).partial().extend({
-  visitId: z.number().int().positive(),
-});
+const updateVitalsByVisitIdInput = createVitalsInput
+  .omit({ visitId: true })
+  .partial()
+  .extend({
+    visitId: z.number().int().positive(),
+  });
 
 export const vitalsRouter = router({
   /**
@@ -68,10 +74,7 @@ export const vitalsRouter = router({
   create: protectedProcedure
     .input(createVitalsInput)
     .mutation(async ({ input }) => {
-      const [vitalsRecord] = await db
-        .insert(vitals)
-        .values(input)
-        .returning();
+      const [vitalsRecord] = await db.insert(vitals).values(input).returning();
       return vitalsRecord;
     }),
 
@@ -158,4 +161,6 @@ export type Vital = typeof vitals.$inferSelect;
 export type NewVital = typeof vitals.$inferInsert;
 export type CreateVitalsInput = z.infer<typeof createVitalsInput>;
 export type UpdateVitalsInput = z.infer<typeof updateVitalsInput>;
-export type UpdateVitalsByVisitIdInput = z.infer<typeof updateVitalsByVisitIdInput>;
+export type UpdateVitalsByVisitIdInput = z.infer<
+  typeof updateVitalsByVisitIdInput
+>;
