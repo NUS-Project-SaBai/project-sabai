@@ -68,32 +68,24 @@ function MedicationActiveIngredientsBasePage() {
             {ingredients.map((ingredient) => (
               <TableRow key={ingredient.id}>
                 <TableCell>
-                  <div className="flex flex-col items-left gap-2">
-                    <span className="text-sm font-medium text-slate-900">
-                      {ingredient.id}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-slate-900">
+                    {ingredient.id}
+                  </span>
                 </TableCell>
                 <TableCell>
-                  <div className="flex flex-col items-left gap-2">
-                    <span className="text-sm font-medium text-slate-900">
-                      {ingredient.name}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-slate-900">
+                    {ingredient.name}
+                  </span>
                 </TableCell>
                 <TableCell>
-                  <div className="flex flex-col items-left gap-2">
-                    <span className="text-sm font-medium text-slate-900">
-                      {ingredient.unitOfMeasurement}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-slate-900">
+                    {ingredient.unitOfMeasurement}
+                  </span>
                 </TableCell>
                 <TableCell>
-                  <div className="flex flex-col items-left gap-2">
-                    <span className="text-sm font-medium text-slate-900">
-                      {ingredient.fallBelow}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-slate-900">
+                    {ingredient.fallBelow}
+                  </span>
                 </TableCell>
               </TableRow>
             ))}

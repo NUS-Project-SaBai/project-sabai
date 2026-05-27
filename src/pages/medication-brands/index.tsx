@@ -59,25 +59,19 @@ function MedicationBrandsBasePage() {
             {brands.map((brand) => (
               <TableRow key={brand.id}>
                 <TableCell>
-                  <div className="flex flex-col items-left gap-2">
-                    <span className="text-sm font-medium text-slate-900">
-                      {brand.id}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-slate-900">
+                    {brand.id}
+                  </span>
                 </TableCell>
                 <TableCell>
-                  <div className="flex flex-col items-left gap-2">
-                    <span className="text-sm font-medium text-slate-900">
-                      {brand.name}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-slate-900">
+                    {brand.name}
+                  </span>
                 </TableCell>
                 <TableCell>
-                  <div className="flex flex-col items-left gap-2">
-                    <span className="text-sm font-medium text-slate-900">
-                      {brand.activeIngredientId}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-slate-900">
+                    {brand.activeIngredientId}
+                  </span>
                 </TableCell>
               </TableRow>
             ))}

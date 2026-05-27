@@ -27,7 +27,7 @@ function Header() {
           >
             <Link
               href="/medication-brands"
-              className="group flex items-center gap-2 p-2 rounded-md"
+              className="group flex items-center p-2 rounded-md"
             >
               <span>Manage Brands</span>
             </Link>
@@ -38,7 +38,7 @@ function Header() {
           >
             <Link
               href="/medication-active-ingredients"
-              className="group flex items-center gap-2 p-2 rounded-md"
+              className="group flex items-center p-2 rounded-md"
             >
               <span>Manage Active Ingredients</span>
             </Link>
@@ -89,39 +89,29 @@ function MedicationStockBasePage() {
             {stock.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>
-                  <div className="flex flex-col items-left gap-2">
-                    <span className="text-sm font-medium text-slate-900">
-                      {item.id}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-slate-900">
+                    {item.id}
+                  </span>
                 </TableCell>
                 <TableCell>
-                  <div className="flex flex-col items-left gap-2">
-                    <span className="text-sm font-medium text-slate-900">
-                      {item.medicationBrandId}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-slate-900">
+                    {item.medicationBrandId}
+                  </span>
                 </TableCell>
                 <TableCell>
-                  <div className="flex flex-col items-left gap-2">
-                    <span className="text-sm font-medium text-slate-900">
-                      {item.location}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-slate-900">
+                    {item.location}
+                  </span>
                 </TableCell>
                 <TableCell>
-                  <div className="flex flex-col items-left gap-2">
-                    <span className="text-sm font-medium text-slate-900">
-                      {item.quantity}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-slate-900">
+                    {item.quantity}
+                  </span>
                 </TableCell>
                 <TableCell>
-                  <div className="flex flex-col items-left gap-2">
-                    <span className="text-sm font-medium text-slate-900">
-                      {item.stockStatus}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-slate-900">
+                    {item.stockStatus}
+                  </span>
                 </TableCell>
               </TableRow>
             ))}
