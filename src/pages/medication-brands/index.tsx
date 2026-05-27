@@ -1,6 +1,9 @@
 import { trpc } from "@/utils/trpc";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import TableHeader from "@/components/TableHeader";
+import TableRow from "@/components/TableRow";
+import TableCell from "@/components/TableCell";
 
 function Header() {
   return (
@@ -53,47 +56,32 @@ function MedicationBrandsBasePage() {
       <Header />
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200">
-          <thead className="bg-slate-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Brand ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Active Ingredient ID
-              </th>
-            </tr>
-          </thead>
+          <TableHeader headers={["Brand ID", "Name", "Active Ingredient ID"]} />
           <tbody className="bg-white divide-y divide-slate-200">
             {brands.map((brand) => (
-              <tr
-                key={brand.id}
-                className="hover:bg-slate-50 transition-colors"
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
+              <TableRow key={brand.id}>
+                <TableCell>
                   <div className="flex flex-col items-left gap-2">
                     <span className="text-sm font-medium text-slate-900">
                       {brand.id}
                     </span>
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                </TableCell>
+                <TableCell>
                   <div className="flex flex-col items-left gap-2">
                     <span className="text-sm font-medium text-slate-900">
                       {brand.name}
                     </span>
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                </TableCell>
+                <TableCell>
                   <div className="flex flex-col items-left gap-2">
                     <span className="text-sm font-medium text-slate-900">
                       {brand.activeIngredientId}
                     </span>
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
           </tbody>
         </table>
