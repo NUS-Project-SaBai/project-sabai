@@ -58,7 +58,15 @@ function MedicationActiveIngredientsBasePage() {
       <Header />
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200">
-          <TableHeader headers={["Active Ingredient ID", "Active Ingredient Name", "Unit of Measurement", "Fall Below"]} className="bg-slate-50" />
+          <TableHeader
+            headers={[
+              "Active Ingredient ID",
+              "Active Ingredient Name",
+              "Unit of Measurement",
+              "Fall Below",
+            ]}
+            className="bg-slate-50"
+          />
           <tbody className="bg-white divide-y divide-slate-200">
             {ingredients.map((ingredient) => (
               <TableRow key={ingredient.id}>
