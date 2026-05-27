@@ -1,5 +1,8 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import TableCell from "@/components/TableCell";
+import TableHeader from "@/components/TableHeader";
+import TableRow from "@/components/TableRow";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 
@@ -74,64 +77,54 @@ function MedicationStockBasePage() {
       <Header />
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200">
-          <thead className="bg-slate-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Stock ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Medication Brand ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Stock Location
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Stock Quantity
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Stock State
-              </th>
-            </tr>
-          </thead>
+          <TableHeader
+            headers={[
+              "Stock ID",
+              "Medication Brand ID",
+              "Stock Location",
+              "Stock Quantity",
+              "Stock State",
+            ]}
+          />
           <tbody className="bg-white divide-y divide-slate-200">
             {stock.map((item) => (
-              <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap">
+              <TableRow key={item.id}>
+                <TableCell>
                   <div className="flex flex-col items-left gap-2">
                     <span className="text-sm font-medium text-slate-900">
                       {item.id}
                     </span>
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                </TableCell>
+                <TableCell>
                   <div className="flex flex-col items-left gap-2">
                     <span className="text-sm font-medium text-slate-900">
                       {item.medicationBrandId}
                     </span>
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                </TableCell>
+                <TableCell>
                   <div className="flex flex-col items-left gap-2">
                     <span className="text-sm font-medium text-slate-900">
                       {item.location}
                     </span>
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                </TableCell>
+                <TableCell>
                   <div className="flex flex-col items-left gap-2">
                     <span className="text-sm font-medium text-slate-900">
                       {item.quantity}
                     </span>
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                </TableCell>
+                <TableCell>
                   <div className="flex flex-col items-left gap-2">
                     <span className="text-sm font-medium text-slate-900">
                       {item.stockStatus}
                     </span>
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
           </tbody>
         </table>
