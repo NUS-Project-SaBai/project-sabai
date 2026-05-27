@@ -10,10 +10,6 @@ import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import { Button } from "@/components/interactive/Button/Button";
 
-/**
- * Main vision page that displays a list of all patients with actions
- * for managing vision prescriptions and eye care records.
- */
 function VisionPage() {
   const router = useRouter();
   const { data: patients, isLoading } = trpc.patientsRouter.list.useQuery();
