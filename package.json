@@ -11,7 +11,12 @@
     "prepare": "husky",
     "seed:db": "supabase db reset",
     "seed:users": "ts-node supabase/scripts/seed-users.ts",
-    "seed:all": "npm run seed:db && npm run seed:users"
+    "seed:all": "npm run seed:db && npm run seed:users",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
@@ -38,21 +43,27 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20",
     "@types/react": "19.2.11",
     "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.53.0",
     "@typescript-eslint/parser": "^8.53.0",
+    "@vitejs/plugin-react": "^6.0.2",
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.8",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "husky": "^9.1.7",
+    "jsdom": "^29.1.1",
     "lint-staged": "^16.2.7",
     "prettier": "^3.8.0",
     "react-icons": "^5.5.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^1.6.1"
   },
   "pnpm": {
     "overrides": {
