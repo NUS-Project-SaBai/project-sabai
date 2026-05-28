@@ -4,8 +4,12 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
+import { useState } from "react";
+import Modal from "@/components/interactive/Modal";
 
 function Header() {
+  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
+
   return (
     <div className="w-full mx-auto">
       <div className="flex justify-between items-center mb-8">
@@ -24,6 +28,17 @@ function Header() {
             Manage medication active ingredients.
           </p>
         </div>
+        <Modal setIsOpen={setModalIsOpen} isOpen={modalIsOpen}>
+          <p>Contents go here</p>
+        </Modal>
+        <button
+          className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700"
+          onClick={() => {
+            setModalIsOpen(true);
+          }}
+        >
+          Add Active Ingredient
+        </button>
       </div>
     </div>
   );
@@ -62,6 +77,7 @@ function MedicationActiveIngredientsBasePage() {
               "Active Ingredient Name",
               "Unit of Measurement",
               "Fall Below",
+              "Actions",
             ]}
           />
           <tbody className="bg-white divide-y divide-slate-200">
@@ -86,6 +102,16 @@ function MedicationActiveIngredientsBasePage() {
                   <span className="text-sm font-medium text-slate-900">
                     {ingredient.fallBelow}
                   </span>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-left gap-2">
+                    <button className="text-sm font-medium text-slate-900">
+                      Edit
+                    </button>
+                    <button className="text-sm font-medium text-slate-900">
+                      Delete
+                    </button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
