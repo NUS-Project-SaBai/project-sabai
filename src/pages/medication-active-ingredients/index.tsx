@@ -105,10 +105,10 @@ function MedicationActiveIngredientsBasePage() {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-left gap-2">
-                    <button className="text-sm font-medium text-slate-900">
+                    <button className="bg-green-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-green-700">
                       Edit
                     </button>
-                    <button className="text-sm font-medium text-slate-900">
+                    <button className="bg-red-700 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800">
                       Delete
                     </button>
                   </div>
