@@ -6,6 +6,7 @@ import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import { useState } from "react";
 import Modal from "@/components/interactive/Modal";
+import { MedicationActiveIngredient } from "@/db/schema";
 
 function Header() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
@@ -41,6 +42,63 @@ function Header() {
         </button>
       </div>
     </div>
+  );
+}
+
+function Row({
+  id,
+  name,
+  unitOfMeasurement,
+  fallBelow,
+}: MedicationActiveIngredient) {
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+
+  return (
+    <TableRow>
+      <TableCell>
+        <span className="text-sm font-medium text-slate-900">{id}</span>
+      </TableCell>
+      <TableCell>
+        <span className="text-sm font-medium text-slate-900">
+          {isEditing ? <input></input> : name}
+        </span>
+      </TableCell>
+      <TableCell>
+        <span className="text-sm font-medium text-slate-900">
+          {isEditing ? <input></input> : unitOfMeasurement}
+        </span>
+      </TableCell>
+      <TableCell>
+        <span className="text-sm font-medium text-slate-900">
+          {isEditing ? <input></input> : fallBelow}
+        </span>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-left gap-2">
+          {isEditing ? (
+            <button
+              className="bg-green-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-green-700"
+              onClick={() => {
+                console.log("save");
+                setIsEditing(!isEditing);
+              }}
+            >
+              Save
+            </button>
+          ) : (
+            <button
+              className="bg-green-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-green-700"
+              onClick={() => setIsEditing(!isEditing)}
+            >
+              Edit
+            </button>
+          )}
+          <button className="bg-red-700 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800">
+            Delete
+          </button>
+        </div>
+      </TableCell>
+    </TableRow>
   );
 }
 
@@ -82,38 +140,7 @@ function MedicationActiveIngredientsBasePage() {
           />
           <tbody className="bg-white divide-y divide-slate-200">
             {ingredients.map((ingredient) => (
-              <TableRow key={ingredient.id}>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {ingredient.id}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {ingredient.name}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {ingredient.unitOfMeasurement}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {ingredient.fallBelow}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-left gap-2">
-                    <button className="bg-green-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-green-700">
-                      Edit
-                    </button>
-                    <button className="bg-red-700 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800">
-                      Delete
-                    </button>
-                  </div>
-                </TableCell>
-              </TableRow>
+              <Row key={ingredient.id} {...ingredient} />
             ))}
           </tbody>
         </table>
