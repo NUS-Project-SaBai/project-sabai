@@ -19,7 +19,7 @@ type FormFields = {
   id: number;
   name: string;
   unitOfMeasurement: string;
-  fallBelow: string;
+  fallBelow: number | undefined;
 };
 
 function Header() {
@@ -71,7 +71,7 @@ function Row({
     defaultValues: {
       name: name,
       unitOfMeasurement: unitOfMeasurement,
-      fallBelow: fallBelow,
+      fallBelow: fallBelow ?? undefined,
     },
   });
 
