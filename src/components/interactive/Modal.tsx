@@ -1,8 +1,7 @@
 "use client";
 
-import { createPortal } from "react-dom";
 import { FaWindowClose } from "react-icons/fa";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 
 export interface ModalProps {
   children: ReactNode;
@@ -17,29 +16,49 @@ export interface ModalProps {
  * @param {React.Dispatch<React.SetStateAction<boolean>>} setIsOpen - The set state function provided by React's useState hook
  */
 export default function Modal({ children, isOpen, setIsOpen }: ModalProps) {
-  if (!isOpen) {
-    return null;
-  }
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
-  return createPortal(
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) {
+      return;
+    }
+
+    if (isOpen) {
+      if (!dialog.open) {
+        dialog.showModal();
+      }
+    } else {
+      if (dialog.open) {
+        dialog.close();
+      }
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
       onClick={() => setIsOpen(false)}
     >
       <dialog
-        open={isOpen}
-        className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative flex min-h-60 flex-col justify-between"
+        ref={dialogRef}
+        onCancel={(e) => {
+          e.preventDefault();
+          setIsOpen(false);
+        }}
+        className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative flex min-h-60 flex-col justify-between self-center justify-self-center"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={() => setIsOpen(false)}
           className="absolute top-4 right-4"
         >
-          <FaWindowClose className="text-red-500" />
+          <FaWindowClose className="text-red-500 text-2xl hover:text-red-700" />
         </button>
         {children}
       </dialog>
-    </div>,
-    document.getElementById("modal-root")!,
+    </div>
   );
 }

@@ -41,7 +41,6 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
         {...pageProps}
         key={isPatientRoute ? router.asPath : undefined}
       />
-      <div id="modal-root" className="h-screen w-screen fixed" />
     </>,
   );
 }
