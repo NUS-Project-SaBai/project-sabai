@@ -55,7 +55,7 @@ export default function Modal({ children, isOpen, setIsOpen }: ModalProps) {
           onClick={() => setIsOpen(false)}
           className="absolute top-4 right-4"
         >
-          <FaWindowClose className="text-red-500" />
+          <FaWindowClose className="text-red-500 text-2xl hover:text-red-700" />
         </button>
         {children}
       </dialog>
