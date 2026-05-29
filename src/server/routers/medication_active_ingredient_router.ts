@@ -14,7 +14,8 @@ export const medicationActiveIngredientsRouter = router({
         unitOfMeasurement: medicationActiveIngredients.unitOfMeasurement,
         fallBelow: medicationActiveIngredients.fallBelow,
       })
-      .from(medicationActiveIngredients);
+      .from(medicationActiveIngredients)
+      .orderBy(medicationActiveIngredients.id);
     return result;
   }),
 
