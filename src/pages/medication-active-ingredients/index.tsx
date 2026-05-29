@@ -7,6 +7,20 @@ import TableCell from "@/components/TableCell";
 import { useState } from "react";
 import Modal from "@/components/interactive/Modal";
 import { MedicationActiveIngredient } from "@/db/schema";
+import {
+  FormProvider,
+  useForm,
+  useWatch,
+  SubmitHandler,
+} from "react-hook-form";
+import { RHFInput } from "@/components/interactive/RHF/RHFInput";
+
+type FormFields = {
+  id: number;
+  name: string;
+  unitOfMeasurement: string;
+  fallBelow: string;
+};
 
 function Header() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
@@ -53,51 +67,123 @@ function Row({
 }: MedicationActiveIngredient) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
+  const form = useForm<FormFields>({
+    defaultValues: {
+      name: name,
+      unitOfMeasurement: unitOfMeasurement,
+      fallBelow: fallBelow,
+    },
+  });
+
+  const utils = trpc.useUtils();
+  const updateMutation =
+    trpc.medicationActiveIngredientsRouter.update.useMutation({
+      onSuccess: () => {
+        console.log("Success");
+        utils.medicationActiveIngredientsRouter.list.invalidate();
+      },
+      onError: () => {
+        console.log("error!");
+        form.reset();
+      },
+    });
+
+  const watched = form.watch();
+
+  const isSubmitting = form.formState.isSubmitting;
+  const errors = form.formState.errors;
+
+  const handleSubmit: SubmitHandler<FormFields> = async (data) => {
+    //console.log(data);
+    // smulate writing to db
+    // await new Promise((resolve) => setTimeout(resolve, 5000));
+    updateMutation.mutate({
+      id: id,
+      name: form.getValues().name,
+      unitOfMeasurement: form.getValues().unitOfMeasurement,
+      fallBelow: form.getValues().fallBelow,
+    });
+
+    setIsEditing(!isEditing);
+  };
+
   return (
     <TableRow>
-      <TableCell>
-        <span className="text-sm font-medium text-slate-900">{id}</span>
-      </TableCell>
-      <TableCell>
-        <span className="text-sm font-medium text-slate-900">
-          {isEditing ? <input></input> : name}
-        </span>
-      </TableCell>
-      <TableCell>
-        <span className="text-sm font-medium text-slate-900">
-          {isEditing ? <input></input> : unitOfMeasurement}
-        </span>
-      </TableCell>
-      <TableCell>
-        <span className="text-sm font-medium text-slate-900">
-          {isEditing ? <input></input> : fallBelow}
-        </span>
-      </TableCell>
-      <TableCell>
-        <div className="flex items-left gap-2">
-          {isEditing ? (
-            <button
-              className="bg-green-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-green-700"
-              onClick={() => {
-                console.log("save");
-                setIsEditing(!isEditing);
-              }}
-            >
-              Save
-            </button>
-          ) : (
-            <button
-              className="bg-green-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-green-700"
-              onClick={() => setIsEditing(!isEditing)}
-            >
-              Edit
-            </button>
-          )}
-          <button className="bg-red-700 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800">
-            Delete
-          </button>
-        </div>
-      </TableCell>
+      <FormProvider {...form}>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">{id}</span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {isEditing ? (
+              <RHFInput type="text" name="name" label="" />
+            ) : (
+              watched.name
+            )}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {isEditing ? (
+              <RHFInput type="text" name="unitOfMeasurement" label="" />
+            ) : (
+              watched.unitOfMeasurement
+            )}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {isEditing ? (
+              <RHFInput type="text" name="fallBelow" label="" />
+            ) : (
+              watched.fallBelow
+            )}
+          </span>
+        </TableCell>
+        <TableCell>
+          <div className="flex items-left gap-2">
+            {isEditing ? (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  form.handleSubmit(handleSubmit)(e);
+                }}
+              >
+                <button
+                  className={`bg-green-600 text-white px-4 py-1 rounded-lg font-medium ${isSubmitting ? "bg-neutral-600" : "bg-green-600 hover:bg-green-700"}`}
+                  disabled={isSubmitting}
+                  type="submit"
+                >
+                  {isSubmitting ? "Saving..." : "Save"}
+                </button>
+              </form>
+            ) : (
+              <button
+                className="bg-green-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-green-700"
+                onClick={() => setIsEditing(!isEditing)}
+              >
+                Edit
+              </button>
+            )}
+
+            {isEditing ? (
+              <button
+                className="bg-red-700 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
+                onClick={() => {
+                  form.reset();
+                  setIsEditing(false);
+                }}
+              >
+                Cancel
+              </button>
+            ) : (
+              <button className="bg-red-700 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800">
+                Delete
+              </button>
+            )}
+          </div>
+        </TableCell>
+      </FormProvider>
     </TableRow>
   );
 }
