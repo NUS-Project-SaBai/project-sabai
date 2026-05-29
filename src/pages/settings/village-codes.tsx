@@ -115,7 +115,16 @@ function VillageCodesPage() {
         </div>
 
         {isEditing && (
-          <Modal isOpen={isEditing} setIsOpen={setIsEditing}>
+          <Modal
+            isOpen={isEditing}
+            setIsOpen={(open) => {
+              if (!open) {
+                closeForm();
+              } else {
+                setIsEditing(true);
+              }
+            }}
+          >
             <h2 className="text-xl font-bold mb-4">
               {formData.id ? "Edit Village Code" : "New Village Code"}
             </h2>
