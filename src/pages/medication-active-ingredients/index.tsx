@@ -208,20 +208,41 @@ function Row({
 
             {isDeleting && (
               <Modal isOpen={isDeleting} setIsOpen={setIsDeleting}>
-                <h2>Confirm Deletion?</h2>
-                <p>Active Ingredient: {name}</p>
-                <p>Unit: {unitOfMeasurement}</p>
-                <p>Fall below: {fallBelow}</p>
-                <div className="flex flex-row">
+                <h2 className="text-xl font-bold tracking-tight text-slate-900">
+                  Confirm Deletion?
+                </h2>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>Active Ingredient:</td>
+                      <td>{name}</td>
+                    </tr>
+                    <tr>
+                      <td>Unit:</td>
+                      <td>{unitOfMeasurement}</td>
+                    </tr>
+                    <tr>
+                      <td>Fall Below:</td>
+                      <td>{fallBelow}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div className="flex flex-row gap-2">
                   <button
                     onClick={(e) => {
                       console.log("confirm button clicked");
                       handleDelete(); //note that this will be blocked if cascade needed, since no specified behaviour goes to default => on delete restrict
                     }}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700"
                   >
                     Confirm
                   </button>
-                  <button onClick={() => setIsDeleting(false)}>Cancel</button>
+                  <button
+                    onClick={() => setIsDeleting(false)}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700"
+                  >
+                    Cancel
+                  </button>
                 </div>
               </Modal>
             )}
