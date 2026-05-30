@@ -5,6 +5,7 @@ import type { ReactElement, ReactNode } from "react";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
+import { Toaster } from "react-hot-toast";
 
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -36,10 +37,13 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? withDefaultLayout;
 
   return getLayout(
-    <Component
-      {...pageProps}
-      key={isPatientRoute ? router.asPath : undefined}
-    />,
+    <>
+      <Component
+        {...pageProps}
+        key={isPatientRoute ? router.asPath : undefined}
+      />
+      <Toaster />
+    </>,
   );
 }
 
