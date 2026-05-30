@@ -66,6 +66,7 @@ function Row({
   fallBelow,
 }: MedicationActiveIngredient) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const form = useForm<FormFields>({
     defaultValues: {
@@ -88,6 +89,17 @@ function Row({
       },
     });
 
+  const deleteMutation =
+    trpc.medicationActiveIngredientsRouter.delete.useMutation({
+      onSuccess: () => {
+        console.log("deleted");
+        utils.medicationActiveIngredientsRouter.list.invalidate();
+      },
+      onError: () => {
+        console.log("error!");
+      },
+    });
+
   const watched = form.watch();
 
   const isSubmitting = form.formState.isSubmitting;
@@ -105,6 +117,13 @@ function Row({
     });
 
     setIsEditing(!isEditing);
+  };
+
+  const handleDelete = async () => {
+    console.log("being deleted");
+    deleteMutation.mutate({
+      id: id,
+    });
   };
 
   return (
@@ -177,9 +196,34 @@ function Row({
                 Cancel
               </button>
             ) : (
-              <button className="bg-red-700 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800">
+              <button
+                className="bg-red-700 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
+                onClick={() => {
+                  setIsDeleting(true);
+                }}
+              >
                 Delete
               </button>
+            )}
+
+            {isDeleting && (
+              <Modal isOpen={isDeleting} setIsOpen={setIsDeleting}>
+                <h2>Confirm Deletion?</h2>
+                <p>Active Ingredient: {name}</p>
+                <p>Unit: {unitOfMeasurement}</p>
+                <p>Fall below: {fallBelow}</p>
+                <div className="flex flex-row">
+                  <button
+                    onClick={(e) => {
+                      console.log("confirm button clicked");
+                      handleDelete(); //note that this will be blocked if cascade needed, since no specified behaviour goes to default => on delete restrict
+                    }}
+                  >
+                    Confirm
+                  </button>
+                  <button onClick={() => setIsDeleting(false)}>Cancel</button>
+                </div>
+              </Modal>
             )}
           </div>
         </TableCell>
