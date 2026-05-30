@@ -15,7 +15,7 @@ import {
 } from "react-hook-form";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 
-type FormFields = {
+type EditFormFields = {
   id: number;
   name: string;
   unitOfMeasurement: string;
@@ -135,7 +135,7 @@ function Row({
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
-  const form = useForm<FormFields>({
+  const form = useForm<EditFormFields>({
     defaultValues: {
       name: name,
       unitOfMeasurement: unitOfMeasurement,
@@ -174,7 +174,7 @@ function Row({
 
   const isSubmitting = form.formState.isSubmitting;
 
-  const handleSubmit: SubmitHandler<FormFields> = async (data) => {
+  const handleSubmit: SubmitHandler<EditFormFields> = async (data) => {
     updateMutation.mutate({
       id: id,
       name: form.getValues().name,
