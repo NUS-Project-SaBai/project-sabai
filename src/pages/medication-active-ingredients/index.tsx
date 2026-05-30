@@ -7,12 +7,7 @@ import TableCell from "@/components/TableCell";
 import { useState } from "react";
 import Modal from "@/components/interactive/Modal";
 import { MedicationActiveIngredient } from "@/db/schema";
-import {
-  FormProvider,
-  useForm,
-  useWatch,
-  SubmitHandler,
-} from "react-hook-form";
+import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 
 type EditFormFields = {
@@ -50,11 +45,7 @@ function Header() {
     });
 
   const handleSubmit: SubmitHandler<AddFormFields> = async (data) => {
-    createMutation.mutate({
-      name: form.getValues().name,
-      unitOfMeasurement: form.getValues().unitOfMeasurement,
-      fallBelow: form.getValues().fallBelow,
-    });
+    createMutation.mutate(data);
   };
 
   return (
