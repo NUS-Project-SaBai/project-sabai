@@ -22,8 +22,40 @@ type FormFields = {
   fallBelow: number | undefined;
 };
 
+type AddFormFields = {
+  name: string;
+  unitOfMeasurement: string;
+  fallBelow: number | undefined;
+};
+
 function Header() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
+
+  const form = useForm<AddFormFields>();
+
+  const utils = trpc.useUtils();
+
+  const createMutation =
+    trpc.medicationActiveIngredientsRouter.create.useMutation({
+      onSuccess: () => {
+        console.log("Success");
+        utils.medicationActiveIngredientsRouter.list.invalidate();
+        form.reset();
+        setModalIsOpen(false);
+      },
+      onError: (e) => {
+        console.log("error!");
+        form.reset();
+      },
+    });
+
+  const handleSubmit: SubmitHandler<AddFormFields> = async (data) => {
+    createMutation.mutate({
+      name: form.getValues().name,
+      unitOfMeasurement: form.getValues().unitOfMeasurement,
+      fallBelow: form.getValues().fallBelow,
+    });
+  };
 
   return (
     <div className="w-full mx-auto">
@@ -44,7 +76,42 @@ function Header() {
           </p>
         </div>
         <Modal setIsOpen={setModalIsOpen} isOpen={modalIsOpen}>
-          <p>Contents go here</p>
+          <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-4">
+            Add New Active Ingredient
+          </h2>
+          <FormProvider {...form}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                form.handleSubmit(handleSubmit)(e);
+              }}
+            >
+              <RHFInput name="name" label="Name" type="text" />
+              <RHFInput
+                name="unitOfMeasurement"
+                label="Unit of Measurement"
+                type="text"
+              />
+              <RHFInput name="fallBelow" label="Fall below" type="number" />
+              <div className="flex flex-row gap-2">
+                <button
+                  className="bg-green-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-green-700"
+                  type="submit"
+                >
+                  Save
+                </button>
+                <button
+                  className="bg-red-700 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
+                  onClick={() => {
+                    form.reset();
+                    setModalIsOpen(false);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </FormProvider>
         </Modal>
         <button
           className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700"
