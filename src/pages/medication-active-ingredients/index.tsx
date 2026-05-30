@@ -203,7 +203,7 @@ function Row({
         <TableCell>
           <span className="text-sm font-medium text-slate-900">
             {isEditing ? (
-              <RHFInput type="text" name="fallBelow" label="" />
+              <RHFInput type="number" name="fallBelow" label="" />
             ) : (
               watched.fallBelow
             )}
