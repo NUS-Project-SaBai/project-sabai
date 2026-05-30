@@ -80,7 +80,7 @@ function Row({
   const updateMutation =
     trpc.medicationActiveIngredientsRouter.update.useMutation({
       onSuccess: () => {
-        console.log("Success");
+        console.log("Success"); // todo: Replace all console.logs in this page with something like a toast
         utils.medicationActiveIngredientsRouter.list.invalidate();
       },
       onError: () => {
@@ -96,19 +96,18 @@ function Row({
         utils.medicationActiveIngredientsRouter.list.invalidate();
       },
       onError: () => {
-        console.log("error!");
+        console.log(
+          "error! Check that there are no brands that depend on this active ingredient.",
+        );
+        setIsDeleting(false);
       },
     });
 
   const watched = form.watch();
 
   const isSubmitting = form.formState.isSubmitting;
-  const errors = form.formState.errors;
 
   const handleSubmit: SubmitHandler<FormFields> = async (data) => {
-    //console.log(data);
-    // smulate writing to db
-    // await new Promise((resolve) => setTimeout(resolve, 5000));
     updateMutation.mutate({
       id: id,
       name: form.getValues().name,
@@ -117,13 +116,6 @@ function Row({
     });
 
     setIsEditing(!isEditing);
-  };
-
-  const handleDelete = async () => {
-    console.log("being deleted");
-    deleteMutation.mutate({
-      id: id,
-    });
   };
 
   return (
@@ -229,10 +221,7 @@ function Row({
                 </table>
                 <div className="flex flex-row gap-2">
                   <button
-                    onClick={(e) => {
-                      console.log("confirm button clicked");
-                      handleDelete(); //note that this will be blocked if cascade needed, since no specified behaviour goes to default => on delete restrict
-                    }}
+                    onClick={() => deleteMutation.mutate({ id: id })}
                     className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700"
                   >
                     Confirm
