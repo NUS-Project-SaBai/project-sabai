@@ -115,12 +115,7 @@ function VillageCodesPage() {
         </div>
 
         {isEditing && (
-          <Modal
-            onClose={() => {
-              closeForm();
-              setIsEditing(false);
-            }}
-          >
+          <Modal onClose={closeForm}>
             <h2 className="text-xl font-bold mb-4">
               {formData.id ? "Edit Village Code" : "New Village Code"}
             </h2>
@@ -195,10 +190,7 @@ function VillageCodesPage() {
               <div className="flex gap-3 mt-6">
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsEditing(false);
-                    closeForm();
-                  }}
+                  onClick={closeForm}
                   className="flex-1 bg-slate-100 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-200"
                 >
                   Cancel
