@@ -116,13 +116,9 @@ function VillageCodesPage() {
 
         {isEditing && (
           <Modal
-            isOpen={isEditing}
-            setIsOpen={(open) => {
-              if (!open) {
-                closeForm();
-              } else {
-                setIsEditing(true);
-              }
+            onClose={() => {
+              closeForm();
+              setIsEditing(false);
             }}
           >
             <h2 className="text-xl font-bold mb-4">
@@ -199,7 +195,10 @@ function VillageCodesPage() {
               <div className="flex gap-3 mt-6">
                 <button
                   type="button"
-                  onClick={closeForm}
+                  onClick={() => {
+                    setIsEditing(false);
+                    closeForm();
+                  }}
                   className="flex-1 bg-slate-100 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-200"
                 >
                   Cancel
