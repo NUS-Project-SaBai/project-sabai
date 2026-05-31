@@ -5,58 +5,44 @@ import { ReactNode, useEffect, useRef } from "react";
 
 export interface ModalProps {
   children: ReactNode;
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onClose: () => void;
 }
 
 /**
  * A modal component. This component mounts into `#modal-root`.
  * @param {ReactNode} children - The contents of the modal
- * @param {boolean} isOpen - Whether the modal is open or closed
- * @param {React.Dispatch<React.SetStateAction<boolean>>} setIsOpen - The set state function provided by React's useState hook
+ * @param {() => void} onClose - The function that runs when the Modal is closed
  */
-export default function Modal({ children, isOpen, setIsOpen }: ModalProps) {
+export default function Modal({ children, onClose }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
-    if (!dialog) {
-      return;
-    }
-
-    if (isOpen && !dialog.open) {
-      dialog.showModal();
-    }
-
-    if (!isOpen && dialog.open) {
-      dialog.close();
-    }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
+    requestAnimationFrame(() => {
+      dialog!.showModal();
+    });
+  }, []);
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
-      onClick={() => setIsOpen(false)}
+    <dialog
+      ref={dialogRef}
+      onCancel={(e) => {
+        e.preventDefault();
+        onClose();
+      }}
+      onClose={onClose}
+      className="inset-0 bg-white rounded-xl shadow-xl p-6 w-full max-w-md fixed flex min-h-60 flex-col justify-between self-center justify-self-center backdrop:fixed backdrop:inset-0 backdrop:bg-black/50"
+      onClick={(e) => e.stopPropagation()}
     >
-      <dialog
-        ref={dialogRef}
-        onCancel={(e) => {
-          e.preventDefault();
-          setIsOpen(false);
+      <button
+        onClick={() => {
+          onClose();
         }}
-        className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative flex min-h-60 flex-col justify-between self-center justify-self-center"
-        onClick={(e) => e.stopPropagation()}
+        className="absolute top-4 right-4"
       >
-        <button
-          onClick={() => setIsOpen(false)}
-          className="absolute top-4 right-4"
-        >
-          <FaWindowClose className="text-red-500 text-2xl hover:text-red-700" />
-        </button>
-        {children}
-      </dialog>
-    </div>
+        <FaWindowClose className="text-red-500 text-2xl hover:text-red-700" />
+      </button>
+      {children}
+    </dialog>
   );
 }
