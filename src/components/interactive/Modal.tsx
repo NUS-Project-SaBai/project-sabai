@@ -24,14 +24,12 @@ export default function Modal({ children, isOpen, setIsOpen }: ModalProps) {
       return;
     }
 
-    if (isOpen) {
-      if (!dialog.open) {
-        dialog.showModal();
-      }
-    } else {
-      if (dialog.open) {
-        dialog.close();
-      }
+    if (isOpen && !dialog.open) {
+      dialog.showModal();
+    }
+
+    if (!isOpen && dialog.open) {
+      dialog.close();
     }
   }, [isOpen]);
 
