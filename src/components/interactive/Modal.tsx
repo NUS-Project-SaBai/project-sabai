@@ -5,15 +5,15 @@ import { ReactNode, useEffect, useRef } from "react";
 
 export interface ModalProps {
   children: ReactNode;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 /**
  * A modal dialog that renders a centred modal with a backdrop. Contains a close button on the top right of the modal.
  * @param {ReactNode} children - The contents of the modal
- * @param {() => void} onClose - The function that runs when the Modal is closed or cancelled
+ * @param {() => void} [onClose=()=>{}] - The function that runs when the Modal is closed or cancelled
  */
-export default function Modal({ children, onClose }: ModalProps) {
+export default function Modal({ children, onClose = () => {} }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
