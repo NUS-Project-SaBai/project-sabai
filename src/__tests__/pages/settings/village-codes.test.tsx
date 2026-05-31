@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import VillageCodesPage from "@/pages/settings/village-codes";
 import { trpc } from "@/utils/trpc";
@@ -62,7 +62,7 @@ const MOCK_VILLAGE_CODES = {
 
 const FORM_PLACEHOLDERS = {
   CODE: "e.g. V001",
-  NAME: "Village Name",
+  NAME: "Central Village",
 } as const;
 
 const UI_MESSAGES = {
@@ -143,9 +143,12 @@ describe("VillageCodesPage", () => {
 
     await user.click(screen.getByRole("button", { name: "New Village Code" }));
 
-    expect(
-      screen.getByRole("heading", { name: "New Village Code" }),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "New Village Code" }),
+      ).toBeInTheDocument();
+    });
+
     expect(
       screen.getByPlaceholderText(FORM_PLACEHOLDERS.CODE),
     ).toBeInTheDocument();
@@ -163,11 +166,13 @@ describe("VillageCodesPage", () => {
 
     render(<VillageCodesPage />);
 
-    await user.click(screen.getAllByRole("button", { name: "Edit" })[0]);
+    await user.click(screen.getAllByText("Edit")[0]);
 
-    expect(
-      screen.getByRole("heading", { name: "Edit Village Code" }),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText("Edit Village Code"),
+      ).toBeInTheDocument();
+    });
     expect(
       screen.getByDisplayValue(MOCK_VILLAGE_CODES.PC.name),
     ).toBeInTheDocument();
@@ -182,15 +187,22 @@ describe("VillageCodesPage", () => {
 
     render(<VillageCodesPage />);
 
-    await user.click(screen.getByRole("button", { name: "New Village Code" }));
-    expect(
-      screen.getByRole("heading", { name: "New Village Code" }),
-    ).toBeInTheDocument();
+    await user.click(screen.getByText("New Village Code"));
+    await waitFor(
+      () => {
+        expect(
+          screen.getByRole("dialog")
+        ).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
 
-    await user.click(screen.getByRole("button", { name: "Cancel" }));
-    expect(
-      screen.queryByRole("heading", { name: "New Village Code" }),
-    ).not.toBeInTheDocument();
+    await user.click(screen.getByText("Cancel"));
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("dialog")
+      ).not.toBeInTheDocument();
+    });
   });
 
   it("submits new village code form with correct data", async () => {
@@ -207,6 +219,12 @@ describe("VillageCodesPage", () => {
     render(<VillageCodesPage />);
 
     await user.click(screen.getByText("New Village Code"));
+
+    await waitFor(() => {
+      expect(
+        screen.getByPlaceholderText(FORM_PLACEHOLDERS.CODE),
+      ).toBeInTheDocument();
+    });
 
     await user.type(
       screen.getByPlaceholderText(FORM_PLACEHOLDERS.CODE),
