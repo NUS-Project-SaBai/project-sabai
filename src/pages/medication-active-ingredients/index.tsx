@@ -66,44 +66,47 @@ function Header() {
             Manage medication active ingredients.
           </p>
         </div>
-        <Modal setIsOpen={setModalIsOpen} isOpen={modalIsOpen}>
-          <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-4">
-            Add New Active Ingredient
-          </h2>
-          <FormProvider {...form}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                form.handleSubmit(handleSubmit)(e);
-              }}
-            >
-              <RHFInput name="name" label="Name" type="text" />
-              <RHFInput
-                name="unitOfMeasurement"
-                label="Unit of Measurement"
-                type="text"
-              />
-              <RHFInput name="fallBelow" label="Fall below" type="number" />
-              <div className="flex flex-row gap-2">
-                <button
-                  className="bg-green-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-green-700"
-                  type="submit"
-                >
-                  Save
-                </button>
-                <button
-                  className="bg-red-700 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
-                  onClick={() => {
-                    form.reset();
-                    setModalIsOpen(false);
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </FormProvider>
-        </Modal>
+        {modalIsOpen && (
+          <Modal onClose={() => setModalIsOpen(false)}>
+            <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-4">
+              Add New Active Ingredient
+            </h2>
+            <FormProvider {...form}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  form.handleSubmit(handleSubmit)(e);
+                }}
+              >
+                <RHFInput name="name" label="Name" type="text" />
+                <RHFInput
+                  name="unitOfMeasurement"
+                  label="Unit of Measurement"
+                  type="text"
+                />
+                <RHFInput name="fallBelow" label="Fall below" type="number" />
+                <div className="flex flex-row gap-2">
+                  <button
+                    className="bg-green-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-green-700"
+                    type="submit"
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="bg-red-700 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
+                    onClick={() => {
+                      form.reset();
+                      setModalIsOpen(false);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </FormProvider>
+          </Modal>
+        )}
+
         <button
           className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700"
           onClick={() => {
@@ -257,7 +260,7 @@ function Row({
             )}
 
             {isDeleting && (
-              <Modal isOpen={isDeleting} setIsOpen={setIsDeleting}>
+              <Modal onClose={() => setIsDeleting(false)}>
                 <h2 className="text-xl font-bold tracking-tight text-slate-900">
                   Confirm Deletion?
                 </h2>
