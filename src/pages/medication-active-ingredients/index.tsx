@@ -165,8 +165,6 @@ function Row({
       },
     });
 
-  const watched = form.watch();
-
   const isSubmitting = form.formState.isSubmitting;
 
   const handleSubmit: SubmitHandler<EditFormFields> = async (data) => {
@@ -191,7 +189,7 @@ function Row({
             {isEditing ? (
               <RHFInput type="text" name="name" label="" />
             ) : (
-              watched.name
+              form.getValues().name
             )}
           </span>
         </TableCell>
@@ -200,7 +198,7 @@ function Row({
             {isEditing ? (
               <RHFInput type="text" name="unitOfMeasurement" label="" />
             ) : (
-              watched.unitOfMeasurement
+              form.getValues().unitOfMeasurement
             )}
           </span>
         </TableCell>
@@ -209,7 +207,7 @@ function Row({
             {isEditing ? (
               <RHFInput type="number" name="fallBelow" label="" />
             ) : (
-              watched.fallBelow
+              form.getValues().fallBelow
             )}
           </span>
         </TableCell>
