@@ -39,7 +39,7 @@ function Header() {
         form.reset();
         setModalIsOpen(false);
       },
-      onError: (e) => {
+      onError: () => {
         toast.error("An error has occurred.");
         form.reset();
       },
@@ -170,10 +170,8 @@ function Row({
 
   const handleSubmit: SubmitHandler<EditFormFields> = async (data) => {
     updateMutation.mutate({
+      ...data,
       id: id,
-      name: form.getValues().name,
-      unitOfMeasurement: form.getValues().unitOfMeasurement,
-      fallBelow: form.getValues().fallBelow,
     });
 
     setIsEditing(!isEditing);
