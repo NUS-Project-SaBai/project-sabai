@@ -13,10 +13,14 @@ export function useSaveOnWrite<T extends object>(
   dependencies: unknown[] = [],
   debounceMs = 1000,
 ): [T, React.Dispatch<React.SetStateAction<T>>, () => void] {
-  const storageKey =
-    dependencies.length > 0
+
+  function buildStorageKey(name: string, dependencies: unknown[]): string {
+    return dependencies.length > 0
       ? `${name}_${dependencies.map((dep, index) => `dep${index + 1}=${dep}`).join("_")}`
       : name;
+  }
+
+  const storageKey = buildStorageKey(name, dependencies);
 
   const [value, setValue] = useState<T>(() => {
     if (typeof window === "undefined") {
