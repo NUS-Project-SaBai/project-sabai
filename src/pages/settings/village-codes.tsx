@@ -23,7 +23,6 @@ function VillageCodesPage() {
     "village-codes-form",
     DEFAULT_FORM,
     [], // No dependencies
-    500, // 500ms debounce
   );
 
   // 2. Data Fetching
