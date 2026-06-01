@@ -88,10 +88,11 @@ function Header() {
                 <RHFInput name="fallBelow" label="Fall below" type="number" />
                 <div className="flex flex-row gap-2">
                   <button
-                    className="bg-green-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-green-700"
+                    className={`bg-green-600 text-white px-4 py-1 rounded-lg font-medium ${form.formState.isSubmitting ? "bg-neutral-600" : "bg-green-600 hover:bg-green-700"}`}
+                    disabled={form.formState.isSubmitting}
                     type="submit"
                   >
-                    Save
+                    {form.formState.isSubmitting ? "Saving..." : "Save"}
                   </button>
                   <button
                     className="bg-red-700 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
