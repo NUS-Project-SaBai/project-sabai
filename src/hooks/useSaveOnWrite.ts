@@ -7,13 +7,27 @@ import {
 } from "react";
 import useDebounce from "./useDebounce";
 
+/**
+ * Hook that manages state with automatic debounced localStorage persistence.
+ * @param name Storage key name
+ * @param initialValue Initial state value
+ * @param dependencies Optional dependencies for unique storage keys
+ * @param debounceMs Debounce delay in ms (default is 1000ms which is 1 second)
+ * @returns [value, setValue, clear]
+ */
 export function useSaveOnWrite<T extends object>(
   name: string,
   initialValue: T,
   dependencies: unknown[] = [],
   debounceMs = 1000,
 ): [T, React.Dispatch<React.SetStateAction<T>>, () => void] {
-
+  /**
+   * Builds a unique storage key by combining the base name with dependency values.
+   *
+   * @param name - The base storage key name
+   * @param dependencies - Array of dependency values to include in the key
+   * @returns The complete storage key string
+   */
   function buildStorageKey(name: string, dependencies: unknown[]): string {
     return dependencies.length > 0
       ? `${name}_${dependencies.map((dep, index) => `dep${index + 1}=${dep}`).join("_")}`
@@ -46,6 +60,9 @@ export function useSaveOnWrite<T extends object>(
 
   const initialValueRef = useRef(initialValue);
 
+  /**
+   * Clears the stored value from localStorage and resets the state to the initial value.
+   */
   const clear = useCallback(() => {
     localStorage.removeItem(storageKey);
     setValue(initialValueRef.current);
