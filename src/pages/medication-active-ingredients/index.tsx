@@ -9,6 +9,7 @@ import Modal from "@/components/interactive/Modal";
 import { MedicationActiveIngredient } from "@/db/schema";
 import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
+import toast from "react-hot-toast";
 
 type EditFormFields = {
   id: number;
@@ -33,13 +34,13 @@ function Header() {
   const createMutation =
     trpc.medicationActiveIngredientsRouter.create.useMutation({
       onSuccess: () => {
-        console.log("Success");
+        toast.success("Successfully created!");
         utils.medicationActiveIngredientsRouter.list.invalidate();
         form.reset();
         setModalIsOpen(false);
       },
       onError: (e) => {
-        console.log("error!");
+        toast.error("An error has occurred.");
         form.reset();
       },
     });
@@ -141,11 +142,11 @@ function Row({
   const updateMutation =
     trpc.medicationActiveIngredientsRouter.update.useMutation({
       onSuccess: () => {
-        console.log("Success"); // todo: Replace all console.logs in this page with something like a toast
+        toast.success("Successfully updated!");
         utils.medicationActiveIngredientsRouter.list.invalidate();
       },
       onError: () => {
-        console.log("error!");
+        toast.error("An error has occurred.");
         form.reset();
       },
     });
@@ -153,12 +154,12 @@ function Row({
   const deleteMutation =
     trpc.medicationActiveIngredientsRouter.delete.useMutation({
       onSuccess: () => {
-        console.log("deleted");
+        toast.success("Successfully deleted.");
         utils.medicationActiveIngredientsRouter.list.invalidate();
       },
       onError: () => {
-        console.log(
-          "error! Check that there are no brands that depend on this active ingredient.",
+        toast.error(
+          "Error! Check that there are no brands that depend on this active ingredient.",
         );
         setIsDeleting(false);
       },
