@@ -61,7 +61,7 @@
     "react-icons": "^5.5.0",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^1.6.1"
+    "vitest": "^4.0.4"
   },
   "pnpm": {
     "overrides": {
