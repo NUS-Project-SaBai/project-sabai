@@ -13,10 +13,8 @@
     "seed:users": "ts-node supabase/scripts/seed-users.ts",
     "seed:all": "npm run seed:db && npm run seed:users",
     "test": "vitest",
-    "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "test:watch": "vitest --watch",
-    "test:coverage": "vitest run --coverage"
+    "test:watch": "vitest --watch"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
