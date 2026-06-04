@@ -12,6 +12,9 @@ import { WebcamInput } from "@/components/interactive/inputs/WebcamInput";
 import { trpc } from "@/utils/trpc";
 import { useState } from "react";
 import { toBytes } from "@/lib/utils/facialRecognition";
+import { FormProvider, useForm, SubmitHandler } from 'react-hook-form';
+import { RHFInput } from "@/components/interactive/RHF/RHFInput";
+import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 
 type PatientForm = {
   name: string;
@@ -109,6 +112,8 @@ function ScanFacePage() {
     setImgDetails(picture);
   }
 
+  const form = useForm();
+
   return (
     <div className="min-h-screen bg-slate-50 p-8">
       <div className="max-w-7xl mx-auto">
@@ -123,181 +128,99 @@ function ScanFacePage() {
           />
         </div>
         {/* Create Patient Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name Field */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Name
-            </label>
-            <input
-              required
-              value={patientFormData.name}
-              onChange={(e) =>
-                setPatientFormData({ ...patientFormData, name: e.target.value })
-              }
-              className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2"
-              placeholder="Marcus Darcus"
-            />
-          </div>
+        <FormProvider {...form}>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <RHFInput name="name" label="Name" type="text" />
+            <RHFInput name="identificationNumber" label="Identification Number" type="text" />
+            <RHFInput name="contactNo" label="Contact Number" type="text" />
+            <RHFDropdown name="Gender" label="Gender" dropdownOptions={[{ label: "Male", value: "Male" }, { label: "Female", value: "Female" }]} />
+            <RHFInput name="drugAllergy" label="Drug Allergy" type="text" />
 
-          {/* Identification Number Field */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Identification Number
-            </label>
-            <input
-              value={patientFormData.identificationNumber}
-              onChange={(e) =>
-                setPatientFormData({
-                  ...patientFormData,
-                  identificationNumber: e.target.value,
-                })
-              }
-              className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2"
-            />
-          </div>
-
-          {/* Contact Number Field */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Contact Number
-            </label>
-            <input
-              value={patientFormData.contactNo}
-              onChange={(e) =>
-                setPatientFormData({
-                  ...patientFormData,
-                  contactNo: e.target.value,
-                })
-              }
-              className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2"
-            />
-          </div>
-
-          {/* Gender Field */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Gender
-            </label>
-            <select
-              required
-              value={patientFormData.gender}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value !== "male" && value !== "female") {
-                  return;
-                }
-                setPatientFormData({ ...patientFormData, gender: value });
-              }}
-              className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2"
-            >
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-            </select>
-          </div>
-
-          {/* Drug Allergy Field */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Drug Allergy
-            </label>
-            <input
-              required
-              value={patientFormData.drugAllergy}
-              onChange={(e) =>
-                setPatientFormData({
-                  ...patientFormData,
-                  drugAllergy: e.target.value,
-                })
-              }
-              className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2"
-            />
-          </div>
-
-          {/* Date of Birth Field */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Date of Birth
-            </label>
-            <input
-              required
-              type="date"
-              value={patientFormData.dateOfBirth.toISOString().split("T")[0]}
-              onChange={(e) =>
-                setPatientFormData({
-                  ...patientFormData,
-                  dateOfBirth: new Date(e.target.value),
-                })
-              }
-              className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2"
-            />
-          </div>
-
-          {/* POOR Card Field */}
-          <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+            {/* Date of Birth Field */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700">
+                Date of Birth
+              </label>
               <input
-                type="checkbox"
-                checked={patientFormData.hasPoorCard}
+                required
+                type="date"
+                value={patientFormData.dateOfBirth.toISOString().split("T")[0]}
                 onChange={(e) =>
                   setPatientFormData({
                     ...patientFormData,
-                    hasPoorCard: e.target.checked,
+                    dateOfBirth: new Date(e.target.value),
                   })
                 }
-                className="rounded border-slate-300"
+                className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2"
               />
-              Has POOR Card?
-            </label>
-          </div>
+            </div>
 
-          {/* BS2 Card Field */}
-          <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-              <input
-                type="checkbox"
-                checked={patientFormData.hasBS2Card}
-                onChange={(e) =>
-                  setPatientFormData({
-                    ...patientFormData,
-                    hasBS2Card: e.target.checked,
-                  })
-                }
-                className="rounded border-slate-300"
-              />
-              Has BS2 Card?
-            </label>
-          </div>
+            {/* POOR Card Field */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={patientFormData.hasPoorCard}
+                  onChange={(e) =>
+                    setPatientFormData({
+                      ...patientFormData,
+                      hasPoorCard: e.target.checked,
+                    })
+                  }
+                  className="rounded border-slate-300"
+                />
+                Has POOR Card?
+              </label>
+            </div>
 
-          {/* Sabai Card Field */}
-          <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-              <input
-                type="checkbox"
-                checked={patientFormData.hasSabaiCard}
-                onChange={(e) =>
-                  setPatientFormData({
-                    ...patientFormData,
-                    hasSabaiCard: e.target.checked,
-                  })
-                }
-                className="rounded border-slate-300"
-              />
-              Has Sabai Card?
-            </label>
-          </div>
+            {/* BS2 Card Field */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={patientFormData.hasBS2Card}
+                  onChange={(e) =>
+                    setPatientFormData({
+                      ...patientFormData,
+                      hasBS2Card: e.target.checked,
+                    })
+                  }
+                  className="rounded border-slate-300"
+                />
+                Has BS2 Card?
+              </label>
+            </div>
 
-          {/* Submit Button */}
-          <div className="flex gap-3 mt-6">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`flex-1 px-4 py-2 rounded-lg font-medium ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 text-white hover:bg-indigo-700 hover:cursor-pointer"}`}
-            >
-              Create New Patient
-            </button>
-          </div>
-        </form>
+            {/* Sabai Card Field */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={patientFormData.hasSabaiCard}
+                  onChange={(e) =>
+                    setPatientFormData({
+                      ...patientFormData,
+                      hasSabaiCard: e.target.checked,
+                    })
+                  }
+                  className="rounded border-slate-300"
+                />
+                Has Sabai Card?
+              </label>
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex gap-3 mt-6">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`flex-1 px-4 py-2 rounded-lg font-medium ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 text-white hover:bg-indigo-700 hover:cursor-pointer"}`}
+              >
+                Create New Patient
+              </button>
+            </div>
+          </form>
+        </FormProvider>
       </div>
     </div>
   );
