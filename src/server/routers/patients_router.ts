@@ -39,6 +39,7 @@ export const patientsRouter = router({
         drugAllergy: patients.drugAllergy,
         hasSabaiCard: patients.hasSabaiCard,
         patientImagePublicId: patients.patientImagePublicId,
+        faceEncoding: patients.faceEncoding,
       })
       .from(patients);
 
