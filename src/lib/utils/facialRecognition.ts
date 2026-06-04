@@ -49,8 +49,23 @@ export async function searchFaceprint(str: string) {
 }
 
 /**
- * Returns an AWS Rekognition Image form of a base64 encoded string.
+ * Returns the byte representation of a base64 encoded string.
  */
-function toImage(str: string) {
-  return { Bytes: Uint8Array.fromBase64(str) };
+export function toBytes(str: string): Uint8Array<ArrayBuffer> {
+  const binary = atob(str);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+/**
+ *
+ * @param str Base64 representation
+ * @returns the AWS Rekognition Image of a base64 encoded string.
+ */
+function toImage(str: string): Image {
+  const bytes = toBytes(str);
+  return { Bytes: bytes };
 }
