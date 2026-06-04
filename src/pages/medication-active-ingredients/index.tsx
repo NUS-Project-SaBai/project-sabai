@@ -41,7 +41,6 @@ function Header() {
       },
       onError: () => {
         toast.error("An error has occurred.");
-        form.reset();
       },
     });
 
