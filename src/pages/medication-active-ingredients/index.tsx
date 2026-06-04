@@ -18,11 +18,7 @@ type EditFormFields = {
   fallBelow: number | undefined;
 };
 
-type AddFormFields = {
-  name: string;
-  unitOfMeasurement: string;
-  fallBelow: number | undefined;
-};
+type AddFormFields = Omit<EditFormFields, "id">;
 
 function Header() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
