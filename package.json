@@ -14,6 +14,7 @@
     "seed:all": "npm run seed:db && npm run seed:users"
   },
   "dependencies": {
+    "@aws-sdk/client-rekognition": "^3.1060.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.91.1",
     "@tanstack/react-query": "^5.90.20",
