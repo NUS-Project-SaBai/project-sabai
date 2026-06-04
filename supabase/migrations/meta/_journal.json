@@ -50,6 +50,13 @@
       "when": 1779715398981,
       "tag": "0006_freezing_lady_bullseye",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1780554399999,
+      "tag": "0007_violet_deadpool",
+      "breakpoints": true
     }
   ]
 }
