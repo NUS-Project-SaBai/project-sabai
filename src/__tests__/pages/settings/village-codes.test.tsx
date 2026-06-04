@@ -46,13 +46,13 @@ const MOCK_VILLAGE_CODES = {
     code: "CA",
     name: "CA Village",
     colorHex: "#3498DB",
-    isVisible: false,
+    isVisible: true,
   },
   TK: {
     code: "TK",
     name: "TK Village",
     colorHex: "#2ECC71",
-    isVisible: true,
+    isVisible: false,
   },
   SC: {
     code: "SC",
@@ -89,14 +89,18 @@ describe("VillageCodesPage", () => {
     mockTrpc.villageCodesRouter.delete.useMutation.mockReturnValue({
       mutate: vi.fn(),
     });
+
+    mockTrpc.villageCodesRouter.list.useQuery.mockImplementation(
+      ({ includeHidden = false }: { includeHidden?: boolean } = {}) => ({
+        data: includeHidden
+          ? mockVillageCodes
+          : mockVillageCodes.filter((vc) => vc.isVisible),
+        isLoading: false,
+      }),
+    );
   });
 
   it("renders page title and breadcrumbs", () => {
-    mockTrpc.villageCodesRouter.list.useQuery.mockReturnValue({
-      data: mockVillageCodes,
-      isLoading: false,
-    });
-
     render(<VillageCodesPage />);
 
     expect(
@@ -309,5 +313,71 @@ describe("VillageCodesPage", () => {
 
     expect(window.confirm).toHaveBeenCalled();
     expect(mockDelete).not.toHaveBeenCalled();
+  });
+
+  it("shows only visible village codes by default (hidden checkbox unchecked)", () => {
+    render(<VillageCodesPage />);
+
+    // Should show visible village codes (PC and CA)
+    expect(screen.getByText(MOCK_VILLAGE_CODES.PC.code)).toBeInTheDocument();
+    expect(screen.getByText(MOCK_VILLAGE_CODES.PC.name)).toBeInTheDocument();
+    expect(screen.getByText(MOCK_VILLAGE_CODES.CA.code)).toBeInTheDocument();
+    expect(screen.getByText(MOCK_VILLAGE_CODES.CA.name)).toBeInTheDocument();
+
+    // Should NOT show hidden village code (TK)
+    expect(
+      screen.queryByText(MOCK_VILLAGE_CODES.TK.code),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(MOCK_VILLAGE_CODES.TK.name),
+    ).not.toBeInTheDocument();
+  });
+
+  // IncludeHidden = true
+  it("shows all village codes when hidden checkbox is checked", async () => {
+    const user = userEvent.setup();
+
+    render(<VillageCodesPage />);
+
+    const showHiddenCheckbox = screen.getByLabelText("Show Hidden");
+    await user.click(showHiddenCheckbox);
+
+    await waitFor(() => {
+      // Should show all village codes including hidden ones
+      expect(screen.getByText(MOCK_VILLAGE_CODES.PC.code)).toBeInTheDocument();
+      expect(screen.getByText(MOCK_VILLAGE_CODES.PC.name)).toBeInTheDocument();
+      expect(screen.getByText(MOCK_VILLAGE_CODES.CA.code)).toBeInTheDocument();
+      expect(screen.getByText(MOCK_VILLAGE_CODES.CA.name)).toBeInTheDocument();
+      expect(screen.getByText(MOCK_VILLAGE_CODES.TK.code)).toBeInTheDocument();
+      expect(screen.getByText(MOCK_VILLAGE_CODES.TK.name)).toBeInTheDocument();
+    });
+  });
+
+  // IncludeHidden = false
+  it("hides village codes again when hidden checkbox is unchecked", async () => {
+    const user = userEvent.setup();
+
+    render(<VillageCodesPage />);
+
+    const showHiddenCheckbox = screen.getByLabelText("Show Hidden");
+
+    await user.click(showHiddenCheckbox);
+    await waitFor(() => {
+      expect(screen.getByText(MOCK_VILLAGE_CODES.TK.code)).toBeInTheDocument();
+    });
+
+    await user.click(showHiddenCheckbox);
+    await waitFor(() => {
+      expect(
+        screen.queryByText(MOCK_VILLAGE_CODES.TK.code),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(MOCK_VILLAGE_CODES.TK.name),
+      ).not.toBeInTheDocument();
+    });
+
+    // Visible ones should still be there
+    expect(screen.getByText(MOCK_VILLAGE_CODES.PC.code)).toBeInTheDocument();
+    expect(screen.getByText(MOCK_VILLAGE_CODES.CA.code)).toBeInTheDocument();
   });
 });
