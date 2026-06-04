@@ -61,6 +61,7 @@ Patients Table:
 - has_bs2_card: Indicates if the patient has a BS2 card or not.
 - has_sabai_card: Indicates if the patient has a Sabai card or not.
 - patientImagePublicId: Cloudinary public ID of the patient's image.
+- face_encoding: Face encoding for facial recognition.
 */
 export const patients = pgTable("patients", {
   id: serial("id").primaryKey(),
@@ -77,6 +78,7 @@ export const patients = pgTable("patients", {
   hasBS2Card: boolean("has_bs2_card").notNull(),
   hasSabaiCard: boolean("has_sabai_card").notNull(),
   patientImagePublicId: text("patient_image_public_id").notNull(),
+  faceEncoding: text("face_encoding"),
 });
 
 export type Patient = typeof patients.$inferSelect;
