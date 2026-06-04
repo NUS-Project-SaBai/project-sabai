@@ -11,6 +11,7 @@ TO BE REFACTORED LATER:
 import { WebcamInput } from "@/components/interactive/inputs/WebcamInput";
 import { trpc } from "@/utils/trpc";
 import { useState } from "react";
+import { toBytes } from "@/lib/utils/facialRecognition";
 
 type PatientForm = {
   name: string;
@@ -50,11 +51,7 @@ function ScanFacePage() {
   function dataUrlToFile(dataUrl: string, filename: string): File {
     const [header, base64] = dataUrl.split(",");
     const mimeType = header.match(/:(.*?);/)?.[1] ?? "image/jpeg";
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
+    const bytes = toBytes(base64);
     return new File([bytes], filename, { type: mimeType });
   }
 
