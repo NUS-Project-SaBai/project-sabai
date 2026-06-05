@@ -98,6 +98,7 @@ export const patientsRouter = router({
         hasBS2Card: z.boolean(),
         hasSabaiCard: z.boolean(),
         patientImage: z.string(),
+        contactNo: z.string(),
       }),
     )
     .mutation(async ({ input }) => {
