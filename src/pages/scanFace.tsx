@@ -12,6 +12,7 @@ import RegistrationForm from "@/components/RegistrationForm";
 import { trpc } from "@/utils/trpc";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 export type PatientForm = {
   name: string;
@@ -41,7 +42,7 @@ function ScanFacePage() {
     setIsSubmitting(true);
 
     if (!imgDetails) {
-      alert("Please capture a face image before submitting.");
+      toast.error("Please capture a face image before submitting.");
       setIsSubmitting(false);
       return;
     }
@@ -55,14 +56,14 @@ function ScanFacePage() {
     createMutation.mutate(toMutate, {
       onSuccess() {
         setIsSubmitting(false);
-        alert("Patient created successfully!");
+        toast.success("Patient created successfully!");
         setImgDetails(null);
         form.reset();
       },
       onError(error) {
         setIsSubmitting(false);
         console.error("Error creating patient:", error);
-        alert("Failed to create patient. Please try again.");
+        toast.error("Failed to create patient. Please try again.");
       },
     });
   };
