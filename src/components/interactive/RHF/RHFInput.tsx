@@ -12,7 +12,7 @@ type RHFInputProps = {
     HTMLDivElement
   >["className"];
   registerOptions?: RegisterOptions;
-  type: "text" | "email" | "password" | "number" | "date";
+  type: "text" | "email" | "password" | "number" | "date" | "checkbox";
 } & DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 /**
@@ -29,7 +29,7 @@ type RHFInputProps = {
  * @param {boolean} [isRequired=false] - Whether the field is required for form submission
  * @param {string} [className=""] - Additional CSS classes to apply to the wrapper div
  * @param {RegisterOptions} [registerOptions={}] - Additional React Hook Form register options
- * @param {"text" | "email" | "password" | "number" | "date"} type - The HTML input type, use RHFRadio for radio input, and Button type="submit" for submit buttons
+ * @param {"text" | "email" | "password" | "number" | "date" | "checkbox"} type - The HTML input type, use RHFRadio for radio input, and Button type="submit" for submit buttons
  * @param {HTMLInputElement} [props] - Additional HTML input element attributes
  *
  * @example
