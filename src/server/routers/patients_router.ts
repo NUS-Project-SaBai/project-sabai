@@ -6,7 +6,7 @@ import { db } from "@/db/drizzle";
 import { patients, genderEnum, Patient } from "@/db/schema";
 import serverEnv from "@/lib/envVariables";
 import { eq } from "drizzle-orm";
-import { toBytes } from "@/lib/utils/facialRecognition";
+import { searchFaceprint, toBytes } from "@/lib/utils/facialRecognition";
 
 const cloudinaryUrlPrefix = serverEnv.CLOUDINARY_URL_PREFIX;
 
@@ -165,5 +165,18 @@ export const patientsRouter = router({
         .returning({ id: patients.id });
 
       return { success: !!result };
+    }),
+
+  // find all matches
+  findFaceMatches: protectedProcedure
+    .input(z.object({ picture: z.string() }))
+    .mutation(async ({ input }) => {
+      try {
+        const res = await searchFaceprint(input.picture);
+        console.log("result", res);
+        return { data: res };
+      } catch (err) {
+        console.error(err);
+      }
     }),
 });
