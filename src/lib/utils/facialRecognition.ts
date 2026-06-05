@@ -52,7 +52,8 @@ export async function searchFaceprint(str: string) {
  * Returns the byte representation of a base64 encoded string.
  */
 export function toBytes(str: string): Uint8Array<ArrayBuffer> {
-  const binary = atob(str);
+  const base64data = str.includes(",") ? str.split(",")[1] : str;
+  const binary = atob(base64data);
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) {
     bytes[i] = binary.charCodeAt(i);
