@@ -8,64 +8,22 @@ TO BE REFACTORED LATER:
 */
 
 import { WebcamInput } from "@/components/interactive/inputs/WebcamInput";
-import RegistrationForm from "@/components/RegistrationForm";
-import { trpc } from "@/utils/trpc";
+import Manual from "@/components/Manual";
+import MatchingPatients from "@/components/MatchingPatients";
+import RegistrationPage from "@/components/RegistrationPage";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-
-export type PatientForm = {
-  name: string;
-  identificationNumber: string;
-  contactNo: string;
-  gender: "male" | "female";
-  drugAllergy: string;
-  dateOfBirth: Date;
-  hasPoorCard: boolean;
-  hasBS2Card: boolean;
-  hasSabaiCard: boolean;
-};
-
-type PatientFormWithImage = PatientForm & {
-  patientImage: string;
-};
+enum Mode {
+  REGISTERING = "registering",
+  MANUAL = "manual",
+  MATCHING = "matching",
+  BLANK = "",
+}
 
 function ScanFacePage() {
   const [, setCameraIsOpen] = useState(false);
   const [imgDetails, setImgDetails] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const form = useForm<PatientForm>();
 
-  const createMutation = trpc.patientsRouter.create.useMutation();
-
-  const handleSubmit = async (data: PatientForm) => {
-    setIsSubmitting(true);
-
-    if (!imgDetails) {
-      toast.error("Please capture a face image before submitting.");
-      setIsSubmitting(false);
-      return;
-    }
-
-    const toMutate: PatientFormWithImage = {
-      ...data,
-      patientImage: imgDetails,
-    };
-
-    createMutation.mutate(toMutate, {
-      onSuccess() {
-        setIsSubmitting(false);
-        toast.success("Patient created successfully!");
-        setImgDetails(null);
-        form.reset();
-      },
-      onError(error) {
-        setIsSubmitting(false);
-        console.error("Error creating patient:", error);
-        toast.error("Failed to create patient. Please try again.");
-      },
-    });
-  };
+  const [mode, setMode] = useState<Mode>(Mode.REGISTERING);
 
   return (
     <div className="min-h-screen bg-slate-50 p-8">
@@ -80,11 +38,17 @@ function ScanFacePage() {
             height={500}
           />
         </div>
-        <RegistrationForm
-          form={form}
-          handleSubmit={handleSubmit}
-          isSubmitting={isSubmitting}
-        />
+
+        {mode === Mode.REGISTERING && (
+          <RegistrationPage
+            imgDetails={imgDetails}
+            setImgDetails={setImgDetails}
+          />
+        )}
+
+        {mode === Mode.MATCHING && <MatchingPatients />}
+
+        {mode === Mode.MANUAL && <Manual />}
       </div>
     </div>
   );
