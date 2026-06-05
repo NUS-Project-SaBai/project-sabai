@@ -40,7 +40,7 @@ function ScanFacePage() {
 
   const createMutation = trpc.patientsRouter.create.useMutation();
 
-  const handleSubmit = async (data: PatientFormWithImage) => {
+  const handleSubmit = async (data: PatientForm) => {
     setIsSubmitting(true);
 
     if (!imgDetails) {
