@@ -22,13 +22,19 @@ export default function RegistrationForm({
           }}
           className="space-y-4"
         >
-          <RHFInput name="name" label="Name" type="text" />
+          <RHFInput name="name" label="Name" type="text" isRequired />
           <RHFInput
             name="identificationNumber"
             label="Identification Number"
             type="text"
+            isRequired
           />
-          <RHFInput name="contactNo" label="Contact Number" type="text" />
+          <RHFInput
+            name="contactNo"
+            label="Contact Number"
+            type="text"
+            isRequired
+          />
           <RHFDropdown
             name="gender"
             label="Gender"
@@ -36,9 +42,20 @@ export default function RegistrationForm({
               { label: "Male", value: "male" },
               { label: "Female", value: "female" },
             ]}
+            isRequired
           />
-          <RHFInput name="drugAllergy" label="Drug Allergy" type="text" />
-          <RHFInput name="dateOfBirth" label="Date of Birth" type="date" />
+          <RHFInput
+            name="drugAllergy"
+            label="Drug Allergy"
+            type="text"
+            isRequired
+          />
+          <RHFInput
+            name="dateOfBirth"
+            label="Date of Birth"
+            type="date"
+            isRequired
+          />
           <RHFInput
             name="hasPoorCard"
             label="Has POOR Card?"
