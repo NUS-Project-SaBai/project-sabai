@@ -71,6 +71,7 @@ export const patientsRouter = router({
           hasBS2Card: patients.hasBS2Card,
           hasSabaiCard: patients.hasSabaiCard,
           patientImagePublicId: patients.patientImagePublicId,
+          faceEncoding: patients.faceEncoding,
         })
         .from(patients)
         .where(eq(patients.id, input.id))
@@ -128,31 +129,20 @@ export const patientsRouter = router({
         gender: zfd.text(z.enum(genderEnum.enumValues).optional()),
         dateOfBirth: zfd.text(z.coerce.date().optional()),
         drugAllergy: zfd.text(z.string().optional()),
-        hasPoorCard: zfd.text(
-          z
-            .enum(["true", "false"])
-            .transform((val) => val === "true")
-            .optional(),
-        ),
-        hasBS2Card: zfd.text(
-          z
-            .enum(["true", "false"])
-            .transform((val) => val === "true")
-            .optional(),
-        ),
-        hasSabaiCard: zfd.text(
-          z
-            .enum(["true", "false"])
-            .transform((val) => val === "true")
-            .optional(),
-        ),
-        patientImage: zfd.file(z.instanceof(File).optional()),
+        hasPoorCard: z.boolean().optional(),
+        hasBS2Card: z.boolean().optional(),
+        hasSabaiCard: z.boolean().optional(),
+        patientImage: z.string().optional(),
       }),
     )
     .mutation(async ({ input }) => {
       const { id, patientImage, ...updateData } = input;
       let patientImagePublicId;
       if (patientImage) {
+        const patientImage: File = dataUrlToFile(
+          input.patientImage!, // Temporarily add non-null operator until later refactoring
+          `${input.name}.jpg`,
+        );
         patientImagePublicId = await uploadToCloudinary(patientImage);
       }
       const [result] = await db
