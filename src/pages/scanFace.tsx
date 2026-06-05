@@ -11,8 +11,8 @@ TO BE REFACTORED LATER:
 import { WebcamInput } from "@/components/interactive/inputs/WebcamInput";
 import { trpc } from "@/utils/trpc";
 import { useState } from "react";
-import { toBytes } from "@/lib/utils/facialRecognition";
-import { FormProvider, useForm, SubmitHandler } from 'react-hook-form';
+
+import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 
@@ -26,40 +26,21 @@ type PatientForm = {
   hasPoorCard: boolean;
   hasBS2Card: boolean;
   hasSabaiCard: boolean;
-  patientImage: File;
+};
+
+type PatientFormWithImage = PatientForm & {
+  patientImage: string;
 };
 
 function ScanFacePage() {
-  const [cameraIsOpen, setCameraIsOpen] = useState(false);
+  const [, setCameraIsOpen] = useState(false);
   const [imgDetails, setImgDetails] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const DEFAULT_FORM: PatientForm = {
-    name: "",
-    identificationNumber: "",
-    contactNo: "",
-    gender: "male",
-    drugAllergy: "",
-    dateOfBirth: new Date(),
-    hasPoorCard: false,
-    hasBS2Card: false,
-    hasSabaiCard: false,
-    patientImage: new File([], ""), // Initialize with an empty File object
-  };
-  const [patientFormData, setPatientFormData] =
-    useState<PatientForm>(DEFAULT_FORM);
+  const form = useForm<PatientForm>();
 
   const createMutation = trpc.patientsRouter.create.useMutation();
 
-  function dataUrlToFile(dataUrl: string, filename: string): File {
-    const [header, base64] = dataUrl.split(",");
-    const mimeType = header.match(/:(.*?);/)?.[1] ?? "image/jpeg";
-    const bytes = toBytes(base64);
-    return new File([bytes], filename, { type: mimeType });
-  }
-
-  const handleSubmit = async (e: React.SubmitEvent) => {
-    e.preventDefault(); // ← move this to the top
+  const handleSubmit = async (data: PatientFormWithImage) => {
     setIsSubmitting(true);
 
     if (!imgDetails) {
@@ -68,32 +49,16 @@ function ScanFacePage() {
       return;
     }
 
-    const patientImage = dataUrlToFile(
-      imgDetails,
-      `${patientFormData.name}.jpg`,
-    );
+    const toMutate: PatientFormWithImage = {
+      ...data,
+      dateOfBirth: data.dateOfBirth,
+      patientImage: imgDetails,
+    };
 
-    // ✅ Build FormData instead of a plain object
-    const formData = new FormData();
-    formData.append("name", patientFormData.name);
-    formData.append(
-      "identificationNumber",
-      patientFormData.identificationNumber,
-    );
-    formData.append("contactNo", patientFormData.contactNo);
-    formData.append("gender", patientFormData.gender);
-    formData.append("drugAllergy", patientFormData.drugAllergy);
-    formData.append("dateOfBirth", patientFormData.dateOfBirth.toISOString());
-    formData.append("hasPoorCard", patientFormData.hasPoorCard.toString());
-    formData.append("hasBS2Card", patientFormData.hasBS2Card.toString());
-    formData.append("hasSabaiCard", patientFormData.hasSabaiCard.toString());
-    formData.append("patientImage", patientImage); // ← File goes in last
-
-    createMutation.mutate(formData, {
+    createMutation.mutate(toMutate, {
       onSuccess() {
         setIsSubmitting(false);
         alert("Patient created successfully!");
-        setPatientFormData(DEFAULT_FORM);
         setImgDetails(null);
       },
       onError(error) {
@@ -112,8 +77,6 @@ function ScanFacePage() {
     setImgDetails(picture);
   }
 
-  const form = useForm();
-
   return (
     <div className="min-h-screen bg-slate-50 p-8">
       <div className="max-w-7xl mx-auto">
@@ -129,85 +92,48 @@ function ScanFacePage() {
         </div>
         {/* Create Patient Form */}
         <FormProvider {...form}>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit(handleSubmit)(e);
+            }}
+            className="space-y-4"
+          >
             <RHFInput name="name" label="Name" type="text" />
-            <RHFInput name="identificationNumber" label="Identification Number" type="text" />
+            <RHFInput
+              name="identificationNumber"
+              label="Identification Number"
+              type="text"
+            />
             <RHFInput name="contactNo" label="Contact Number" type="text" />
-            <RHFDropdown name="Gender" label="Gender" dropdownOptions={[{ label: "Male", value: "Male" }, { label: "Female", value: "Female" }]} />
+            <RHFDropdown
+              name="gender"
+              label="Gender"
+              dropdownOptions={[
+                { label: "Male", value: "male" },
+                { label: "Female", value: "female" },
+              ]}
+            />
             <RHFInput name="drugAllergy" label="Drug Allergy" type="text" />
-
-            {/* Date of Birth Field */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700">
-                Date of Birth
-              </label>
-              <input
-                required
-                type="date"
-                value={patientFormData.dateOfBirth.toISOString().split("T")[0]}
-                onChange={(e) =>
-                  setPatientFormData({
-                    ...patientFormData,
-                    dateOfBirth: new Date(e.target.value),
-                  })
-                }
-                className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2"
-              />
-            </div>
-
-            {/* POOR Card Field */}
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={patientFormData.hasPoorCard}
-                  onChange={(e) =>
-                    setPatientFormData({
-                      ...patientFormData,
-                      hasPoorCard: e.target.checked,
-                    })
-                  }
-                  className="rounded border-slate-300"
-                />
-                Has POOR Card?
-              </label>
-            </div>
-
-            {/* BS2 Card Field */}
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={patientFormData.hasBS2Card}
-                  onChange={(e) =>
-                    setPatientFormData({
-                      ...patientFormData,
-                      hasBS2Card: e.target.checked,
-                    })
-                  }
-                  className="rounded border-slate-300"
-                />
-                Has BS2 Card?
-              </label>
-            </div>
-
-            {/* Sabai Card Field */}
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={patientFormData.hasSabaiCard}
-                  onChange={(e) =>
-                    setPatientFormData({
-                      ...patientFormData,
-                      hasSabaiCard: e.target.checked,
-                    })
-                  }
-                  className="rounded border-slate-300"
-                />
-                Has Sabai Card?
-              </label>
-            </div>
+            <RHFInput name="dateOfBirth" label="Date of Birth" type="date" />
+            <RHFInput
+              name="hasPoorCard"
+              label="Has POOR Card?"
+              type="checkbox"
+              className="flex flex-row-reverse"
+            />
+            <RHFInput
+              name="hasBS2Card"
+              label="Has BS2 Card?"
+              type="checkbox"
+              className="flex flex-row-reverse"
+            />
+            <RHFInput
+              name="hasSabaiCard"
+              label="Has Sabai Card?"
+              type="checkbox"
+              className="flex flex-row-reverse"
+            />
 
             {/* Submit Button */}
             <div className="flex gap-3 mt-6">
