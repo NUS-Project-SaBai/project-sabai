@@ -16,8 +16,8 @@ export default function MatchingPatients({
 }: {
   imgDetails: string | null;
 }) {
-  const matchMutation = trpc.patientsRouter.findFaceMatches.useMutation();
-  const matchingPatientsMutation =
+  const findFaceMatchMutation = trpc.patientsRouter.findFaceMatches.useMutation();
+  const findMatchingPatientsMutation =
     trpc.patientsRouter.listMatchingPatients.useMutation();
 
   const [matchingPatients, setMatchingPatients] = useState<PatientWithImage[]>(
@@ -25,12 +25,12 @@ export default function MatchingPatients({
   );
 
   useEffect(() => {
-    matchMutation.mutate(
+    findFaceMatchMutation.mutate(
       { picture: imgDetails! },
       {
         onSuccess(test) {
           const matches: FaceMatch[] = test.data!;
-          matchingPatientsMutation.mutate(
+          findMatchingPatientsMutation.mutate(
             { matches: matches },
             {
               onSuccess(result) {
@@ -82,7 +82,7 @@ export default function MatchingPatients({
           </table>
         </div>
       ) : (
-          <h2 className="text-xl font-bold mb-4">No matches found</h2>
+        <h2 className="text-xl font-bold mb-4">No matches found</h2>
       )}
     </>
   );
