@@ -4,7 +4,7 @@ import MatchingPatients from "@/components/scanFace/MatchingPatients";
 import RegistrationPage from "@/components/scanFace/RegistrationPage";
 import { useState } from "react";
 
-enum Mode {
+export enum Mode {
   REGISTERING = "registering",
   MANUAL = "manual",
   MATCHING = "matching",
@@ -44,7 +44,11 @@ function ScanFacePage() {
         )}
 
         {mode === Mode.MATCHING && imgDetails && (
-          <MatchingPatients key={imgDetails} imgDetails={imgDetails} />
+          <MatchingPatients
+            key={imgDetails}
+            imgDetails={imgDetails}
+            setMode={setMode}
+          />
         )}
 
         {mode === Mode.MANUAL && imgDetails && <Manual />}

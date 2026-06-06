@@ -8,6 +8,7 @@ import TableCell from "@/components/TableCell";
 import { PatientPhoto } from "@/components/PatientPhoto";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import toast from "react-hot-toast";
+import { Mode } from "@/pages/scanFace";
 
 type PatientWithImage = Patient & {
   patientImageUrl: string | null;
@@ -15,8 +16,10 @@ type PatientWithImage = Patient & {
 
 export default function MatchingPatients({
   imgDetails,
+  setMode,
 }: {
   imgDetails: string | null;
+  setMode: React.Dispatch<React.SetStateAction<Mode>>;
 }) {
   const findFaceMatchMutation = trpc.patientsRouter.findFaceMatches.useMutation(
     {
@@ -90,6 +93,13 @@ export default function MatchingPatients({
           ))}
         </tbody>
       </table>
+      <button
+        onClick={() => setMode(Mode.REGISTERING)}
+        className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
+      >
+        {" "}
+        Register{" "}
+      </button>
     </div>
   );
 }
