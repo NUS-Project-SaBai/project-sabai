@@ -7,6 +7,7 @@ import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import { PatientPhoto } from "@/components/PatientPhoto";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import toast from "react-hot-toast";
 
 type PatientWithImage = Patient & {
   patientImageUrl: string | null;
@@ -40,12 +41,14 @@ export default function MatchingPatients({
               },
               onError(err) {
                 console.error(err);
+                toast.error("Error: Unable to find matching patients.");
               },
             },
           );
         },
         onError(error) {
           console.error(error);
+          toast.error("Error: Unable to find matching face.");
         },
       },
     );
