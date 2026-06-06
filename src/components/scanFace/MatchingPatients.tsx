@@ -18,40 +18,35 @@ export default function MatchingPatients({
 }: {
   imgDetails: string | null;
 }) {
-  const findFaceMatchMutation =
-    trpc.patientsRouter.findFaceMatches.useMutation();
+  const findFaceMatchMutation = trpc.patientsRouter.findFaceMatches.useMutation(
+    {
+      onSuccess(test) {
+        const matches: FaceMatch[] = test.data!;
+        findMatchingPatientsMutation.mutate({ matches: matches });
+      },
+      onError(error) {
+        console.error(error);
+        toast.error("Error: Unable to find matching face.");
+      },
+    },
+  );
   const findMatchingPatientsMutation =
-    trpc.patientsRouter.listMatchingPatients.useMutation();
+    trpc.patientsRouter.listMatchingPatients.useMutation({
+      onSuccess(result) {
+        setMatchingPatients(result);
+      },
+      onError(err) {
+        console.error(err);
+        toast.error("Error: Unable to find matching patients.");
+      },
+    });
 
   const [matchingPatients, setMatchingPatients] = useState<PatientWithImage[]>(
     [],
   );
 
   useEffect(() => {
-    findFaceMatchMutation.mutate(
-      { picture: imgDetails! },
-      {
-        onSuccess(test) {
-          const matches: FaceMatch[] = test.data!;
-          findMatchingPatientsMutation.mutate(
-            { matches: matches },
-            {
-              onSuccess(result) {
-                setMatchingPatients(result);
-              },
-              onError(err) {
-                console.error(err);
-                toast.error("Error: Unable to find matching patients.");
-              },
-            },
-          );
-        },
-        onError(error) {
-          console.error(error);
-          toast.error("Error: Unable to find matching face.");
-        },
-      },
-    );
+    findFaceMatchMutation.mutate({ picture: imgDetails! });
   }, []);
 
   if (findFaceMatchMutation.isPending) {
