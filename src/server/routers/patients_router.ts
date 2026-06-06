@@ -1,12 +1,13 @@
-import { z } from "zod";
+import { array, z } from "zod";
 import { zfd } from "zod-form-data";
 import { uploadToCloudinary } from "@/server/utils/cloudinary";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { patients, genderEnum, Patient } from "@/db/schema";
 import serverEnv from "@/lib/envVariables";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { searchFaceprint, toBytes } from "@/lib/utils/facialRecognition";
+import { FaceMatch } from "@aws-sdk/client-rekognition";
 
 const cloudinaryUrlPrefix = serverEnv.CLOUDINARY_URL_PREFIX;
 
@@ -177,6 +178,52 @@ export const patientsRouter = router({
         return { data: res };
       } catch (err) {
         console.error(err);
+        return { data: [] };
       }
+    }),
+
+  listMatchingPatients: protectedProcedure
+    .input(
+      z.object({
+        matches: z.array(
+          z.object({
+            Face: z.object({
+              FaceId: z.string(),
+              BoundingBox: z.any(),
+              ImageId: z.string(),
+              Confidence: z.number(),
+              IndexFacesModelVersion: z.string(),
+            }),
+            Similarity: z.number(),
+          }),
+        ),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      if (input.matches.length === 0) return [];
+
+      const faceIds = input.matches.map((item) => item.Face.FaceId);
+
+      const result = await db
+        .select({
+          id: patients.id,
+          name: patients.name,
+          identificationNumber: patients.identificationNumber,
+          contactNo: patients.contactNo,
+          gender: patients.gender,
+          dateOfBirth: patients.dateOfBirth,
+          hasPoorCard: patients.hasPoorCard,
+          hasBS2Card: patients.hasBS2Card,
+          drugAllergy: patients.drugAllergy,
+          hasSabaiCard: patients.hasSabaiCard,
+          patientImagePublicId: patients.patientImagePublicId,
+          faceEncoding: patients.faceEncoding,
+        })
+        .from(patients)
+        .where(inArray(patients.faceEncoding, faceIds));
+
+      console.log("result from db", result);
+
+      return result.map(getPatientWithImageUrl);
     }),
 });
