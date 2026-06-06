@@ -10,6 +10,11 @@ import {
 } from "@aws-sdk/client-rekognition";
 import env from "@/lib/envVariables";
 
+/**
+ * Indexes faces in the AWS Collection.
+ * @param str Base64 encoded string of an image
+ * @returns Status code of the request. // TODO: Return the face encoding so db can store
+ */
 export async function generateFaceprint(str: string) {
   const image: Image = toImage(str);
   const input: IndexFacesCommandInput = {
@@ -22,6 +27,7 @@ export async function generateFaceprint(str: string) {
 
   try {
     const results: IndexFacesCommandOutput = await client.send(command);
+    console.log(results);
 
     return results.$metadata.httpStatusCode; // Hopefully this is only 200 for true successes lol to check
   } catch (err) {
@@ -29,6 +35,11 @@ export async function generateFaceprint(str: string) {
   }
 }
 
+/**
+ * Searches existing faceprints for possible matches.
+ * @param str Base64 encoded representation of an image.
+ * @returns An array of FaceMatches.
+ */
 export async function searchFaceprint(str: string) {
   const image: Image = toImage(str);
   const input: SearchFacesByImageCommandInput = {
@@ -49,7 +60,7 @@ export async function searchFaceprint(str: string) {
 }
 
 /**
- * Returns the byte representation of a base64 encoded string.
+ * Converts a base64 encoded string to bytes.
  */
 export function toBytes(str: string): Uint8Array<ArrayBuffer> {
   const base64data = str.includes(",") ? str.split(",")[1] : str;
@@ -62,7 +73,7 @@ export function toBytes(str: string): Uint8Array<ArrayBuffer> {
 }
 
 /**
- *
+ * Helper function to convert a Base64 encoded string to an AWS Rekognition Image.
  * @param str Base64 representation
  * @returns the AWS Rekognition Image of a base64 encoded string.
  */
