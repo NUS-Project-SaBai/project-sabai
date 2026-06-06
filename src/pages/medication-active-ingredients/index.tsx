@@ -276,13 +276,13 @@ function Row({
                 <div className="flex flex-row gap-2">
                   <button
                     onClick={() => deleteMutation.mutate({ id: id })}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700"
+                    className="bg-green-600 flex-1 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700"
                   >
                     Confirm
                   </button>
                   <button
                     onClick={() => setIsDeleting(false)}
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700"
+                    className="bg-red-600 flex-1 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700"
                   >
                     Cancel
                   </button>
