@@ -1,4 +1,4 @@
-import { array, z } from "zod";
+import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { uploadToCloudinary } from "@/server/utils/cloudinary";
 import { router, protectedProcedure } from "@/server/trpc";
@@ -6,8 +6,11 @@ import { db } from "@/db/drizzle";
 import { patients, genderEnum, Patient } from "@/db/schema";
 import serverEnv from "@/lib/envVariables";
 import { eq, inArray } from "drizzle-orm";
-import { searchFaceprint, toBytes } from "@/lib/utils/facialRecognition";
-import { FaceMatch } from "@aws-sdk/client-rekognition";
+import {
+  generateFaceprint,
+  searchFaceprint,
+  toBytes,
+} from "@/lib/utils/facialRecognition";
 
 const cloudinaryUrlPrefix = serverEnv.CLOUDINARY_URL_PREFIX;
 
@@ -110,8 +113,9 @@ export const patientsRouter = router({
 
       // Upload image to Cloudinary and get the public ID
       const patientImagePublicId = await uploadToCloudinary(patientImage);
+      const faceEncoding = await generateFaceprint(input.patientImage);
 
-      const newPatientInput = { ...input, patientImagePublicId };
+      const newPatientInput = { ...input, patientImagePublicId, faceEncoding };
 
       const [newPatient] = await db
         .insert(patients)

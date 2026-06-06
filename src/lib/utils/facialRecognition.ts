@@ -13,7 +13,7 @@ import env from "@/lib/envVariables";
 /**
  * Indexes faces in the AWS Collection.
  * @param str Base64 encoded string of an image
- * @returns Status code of the request. // TODO: Return the face encoding so db can store
+ * @returns The FaceId of the faceprint.
  */
 export async function generateFaceprint(str: string) {
   const image: Image = toImage(str);
@@ -27,9 +27,7 @@ export async function generateFaceprint(str: string) {
 
   try {
     const results: IndexFacesCommandOutput = await client.send(command);
-    console.log(results);
-
-    return results.$metadata.httpStatusCode; // Hopefully this is only 200 for true successes lol to check
+    return results.FaceRecords![0].Face?.FaceId;
   } catch (err) {
     console.error(err);
   }
