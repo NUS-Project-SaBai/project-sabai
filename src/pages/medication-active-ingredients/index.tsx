@@ -164,6 +164,11 @@ function Row({
   const isSubmitting = form.formState.isSubmitting;
 
   const handleSubmit: SubmitHandler<EditFormFields> = async (data) => {
+    if (!form.formState.isDirty) {
+      toast.error("No form field changed!");
+      return;
+    }
+
     updateMutation.mutate({
       ...data,
       id: id,
