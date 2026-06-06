@@ -53,7 +53,7 @@ export default function MatchingPatients({
     <>
       {matchingPatients.length > 0 ? (
         <div>
-          <h1>Found matches</h1>
+          <h2 className="text-xl font-bold mb-4">Found matches:</h2>
           <table className="min-w-full divide-y divide-slate-200">
             <TableHeader headers={["ID", "Photo", "Full Name", "Actions"]} />
             <tbody className="bg-white divide-y divide-slate-200">
@@ -82,7 +82,7 @@ export default function MatchingPatients({
           </table>
         </div>
       ) : (
-        <h1>No matches</h1>
+          <h2 className="text-xl font-bold mb-4">No matches found</h2>
       )}
     </>
   );
