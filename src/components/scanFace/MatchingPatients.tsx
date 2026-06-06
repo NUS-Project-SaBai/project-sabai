@@ -16,7 +16,8 @@ export default function MatchingPatients({
 }: {
   imgDetails: string | null;
 }) {
-  const findFaceMatchMutation = trpc.patientsRouter.findFaceMatches.useMutation();
+  const findFaceMatchMutation =
+    trpc.patientsRouter.findFaceMatches.useMutation();
   const findMatchingPatientsMutation =
     trpc.patientsRouter.listMatchingPatients.useMutation();
 
@@ -49,41 +50,41 @@ export default function MatchingPatients({
     );
   }, []);
 
+  if (matchingPatients.length === 0) {
+    return (
+      <h2 className="text-xl font-bold mb-4">No matches found</h2>
+    );
+  }
+
   return (
-    <>
-      {matchingPatients.length > 0 ? (
-        <div>
-          <h2 className="text-xl font-bold mb-4">Found matches:</h2>
-          <table className="min-w-full divide-y divide-slate-200">
-            <TableHeader headers={["ID", "Photo", "Full Name", "Actions"]} />
-            <tbody className="bg-white divide-y divide-slate-200">
-              {matchingPatients.map((patient) => (
-                <TableRow key={patient.id}>
-                  <TableCell>
-                    <div className="text-sm font-medium text-slate-900">
-                      {patient.id.toString().padStart(4, "0")}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <PatientPhoto
-                      pictureUrl={patient.patientImageUrl}
-                      className="rounded-full border border-slate-200"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm font-medium text-slate-900">
-                      {patient.name}
-                    </div>
-                  </TableCell>
-                  <TableCell>test</TableCell>
-                </TableRow>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <h2 className="text-xl font-bold mb-4">No matches found</h2>
-      )}
-    </>
+    <div>
+      <h2 className="text-xl font-bold mb-4">Found matches:</h2>
+      <table className="min-w-full divide-y divide-slate-200">
+        <TableHeader headers={["ID", "Photo", "Full Name", "Actions"]} />
+        <tbody className="bg-white divide-y divide-slate-200">
+          {matchingPatients.map((patient) => (
+            <TableRow key={patient.id}>
+              <TableCell>
+                <div className="text-sm font-medium text-slate-900">
+                  {patient.id.toString().padStart(4, "0")}
+                </div>
+              </TableCell>
+              <TableCell>
+                <PatientPhoto
+                  pictureUrl={patient.patientImageUrl}
+                  className="rounded-full border border-slate-200"
+                />
+              </TableCell>
+              <TableCell>
+                <div className="text-sm font-medium text-slate-900">
+                  {patient.name}
+                </div>
+              </TableCell>
+              <TableCell>placeholder actions</TableCell>
+            </TableRow>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
