@@ -191,14 +191,23 @@ export const patientsRouter = router({
       z.object({
         matches: z.array(
           z.object({
-            Face: z.object({
-              FaceId: z.string(),
-              BoundingBox: z.any(),
-              ImageId: z.string(),
-              Confidence: z.number(),
-              IndexFacesModelVersion: z.string(),
-            }),
-            Similarity: z.number(),
+            Face: z
+              .object({
+                FaceId: z.string(),
+                BoundingBox: z
+                  .object({
+                    Width: z.number().optional(),
+                    Height: z.number().optional(),
+                    Left: z.number().optional(),
+                    Top: z.number().optional(),
+                  })
+                  .optional(),
+                ImageId: z.string(),
+                Confidence: z.number().optional(),
+                IndexFacesModelVersion: z.string().optional(),
+              })
+              .optional(),
+            Similarity: z.number().optional(),
           }),
         ),
       }),
@@ -206,7 +215,7 @@ export const patientsRouter = router({
     .mutation(async ({ input }) => {
       if (input.matches.length === 0) return [];
 
-      const faceIds = input.matches.map((item) => item.Face.FaceId);
+      const faceIds = input.matches.map((item) => item.Face!.FaceId);
 
       const result = await db
         .select({
@@ -225,8 +234,6 @@ export const patientsRouter = router({
         })
         .from(patients)
         .where(inArray(patients.faceEncoding, faceIds));
-
-      console.log("result from db", result);
 
       return result.map(getPatientWithImageUrl);
     }),
