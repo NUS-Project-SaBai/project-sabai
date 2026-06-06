@@ -95,10 +95,9 @@ export default function MatchingPatients({
       </table>
       <button
         onClick={() => setMode(Mode.REGISTERING)}
-        className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
+        className="flex-1 px-4 py-2 rounded-lg font-medium bg-red-300"
       >
-        {" "}
-        Register{" "}
+        Register new patient
       </button>
     </div>
   );

@@ -40,6 +40,7 @@ function ScanFacePage() {
           <RegistrationPage
             imgDetails={imgDetails}
             setImgDetails={setImgDetails}
+            setMode={setMode}
           />
         )}
 
