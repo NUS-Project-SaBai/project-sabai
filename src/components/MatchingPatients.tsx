@@ -19,13 +19,12 @@ export default function MatchingPatients({
       { picture: imgDetails! },
       {
         onSuccess(test) {
-          console.log(test);
           const matches: FaceMatch[] = test.data!;
           matchingPatientsMutation.mutate(
             { matches: matches },
             {
               onSuccess(result) {
-                console.log(result);
+                setMatchingPatients(result);
               },
               onError(err) {
                 console.error(err);
@@ -34,7 +33,7 @@ export default function MatchingPatients({
           );
         },
         onError(error) {
-          console.log(error);
+          console.error(error);
         },
       },
     );
@@ -43,7 +42,17 @@ export default function MatchingPatients({
   return (
     <>
       {matchingPatients.length > 0 ? (
-        <h1>Found matches</h1>
+        <div>
+          <h1>Found matches</h1>
+          {matchingPatients.map((patient) => (
+            <div key={patient.id}>
+              <p>{patient.id}</p>
+              <p>{patient.name}</p>
+              <p>{patient.contactNo}</p>
+              <p>{patient.faceEncoding}</p>
+            </div>
+          ))}
+        </div>
       ) : (
         <h1>No matches</h1>
       )}
