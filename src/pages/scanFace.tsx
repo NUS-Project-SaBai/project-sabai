@@ -1,17 +1,9 @@
-/* 
-THIS PAGE WAS WRITTEN TO TEST THE CLOUDINARY UPLOAD FUNCTIONALITY. 
-IT IS NOT MEANT TO BE PRODUCTION-READY AND MAY CONTAIN SIMPLIFICATIONS OR HARDCODED VALUES FOR TESTING PURPOSES.
-
-TO BE REFACTORED LATER:
-- Error handling and user feedback are minimal and should be enhanced for a better UX.
-- The page currently does not handle optional fields or validation beyond basic HTML5 constraints.
-*/
-
 import { WebcamInput } from "@/components/interactive/inputs/WebcamInput";
 import Manual from "@/components/Manual";
 import MatchingPatients from "@/components/MatchingPatients";
 import RegistrationPage from "@/components/RegistrationPage";
 import { useState } from "react";
+
 enum Mode {
   REGISTERING = "registering",
   MANUAL = "manual",
@@ -23,7 +15,12 @@ function ScanFacePage() {
   const [, setCameraIsOpen] = useState(false);
   const [imgDetails, setImgDetails] = useState<string | null>(null);
 
-  const [mode, setMode] = useState<Mode>(Mode.REGISTERING);
+  const [mode, setMode] = useState<Mode>(Mode.MATCHING); //should be mode.matching by default
+
+  function handlePictureCapture(picture: string | null) {
+    setImgDetails(picture);
+    console.log("new pic!");
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 p-8">
@@ -32,23 +29,25 @@ function ScanFacePage() {
         <div className="flex flex-col space-y-2">
           <WebcamInput
             imageDetails={imgDetails}
-            setImageDetails={(picture) => setImgDetails(picture)}
+            setImageDetails={handlePictureCapture}
             cameraIsOpenCallback={(isOpen) => setCameraIsOpen(isOpen)}
             width={500}
             height={500}
           />
         </div>
 
-        {mode === Mode.REGISTERING && (
+        {mode === Mode.REGISTERING && imgDetails && (
           <RegistrationPage
             imgDetails={imgDetails}
             setImgDetails={setImgDetails}
           />
         )}
 
-        {mode === Mode.MATCHING && <MatchingPatients />}
+        {mode === Mode.MATCHING && imgDetails && (
+          <MatchingPatients key={imgDetails} imgDetails={imgDetails} />
+        )}
 
-        {mode === Mode.MANUAL && <Manual />}
+        {mode === Mode.MANUAL && imgDetails && <Manual />}
       </div>
     </div>
   );
