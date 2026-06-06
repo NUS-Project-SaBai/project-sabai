@@ -6,6 +6,7 @@ import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import { PatientPhoto } from "@/components/PatientPhoto";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 type PatientWithImage = Patient & {
   patientImageUrl: string | null;
@@ -50,10 +51,16 @@ export default function MatchingPatients({
     );
   }, []);
 
+  if (findFaceMatchMutation.isPending) {
+    return <LoadingSpinner message="Finding face matches..." />;
+  }
+
+  if (findMatchingPatientsMutation.isPending) {
+    return <LoadingSpinner message="Finding matching patients..." />;
+  }
+
   if (matchingPatients.length === 0) {
-    return (
-      <h2 className="text-xl font-bold mb-4">No matches found</h2>
-    );
+    return <h2 className="text-xl font-bold mb-4">No matches found</h2>;
   }
 
   return (
