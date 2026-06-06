@@ -1,7 +1,7 @@
 import { WebcamInput } from "@/components/interactive/inputs/WebcamInput";
 import Manual from "@/components/Manual";
-import MatchingPatients from "@/components/MatchingPatients";
-import RegistrationPage from "@/components/RegistrationPage";
+import MatchingPatients from "@/components/scanFace/MatchingPatients";
+import RegistrationPage from "@/components/scanFace/RegistrationPage";
 import { useState } from "react";
 
 enum Mode {
