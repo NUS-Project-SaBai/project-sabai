@@ -191,7 +191,7 @@ describe("VillageCodesPage", () => {
 
     render(<VillageCodesPage />);
 
-    await user.click(screen.getByText("New Village Code"));
+    await user.click(screen.getByRole("button", { name: "New Village Code" }));
     await waitFor(
       () => {
         expect(
@@ -201,7 +201,7 @@ describe("VillageCodesPage", () => {
       { timeout: 3000 }
     );
 
-    await user.click(screen.getByText("Cancel"));
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
     await waitFor(() => {
       expect(
         screen.queryByRole("dialog")
@@ -222,7 +222,7 @@ describe("VillageCodesPage", () => {
 
     render(<VillageCodesPage />);
 
-    await user.click(screen.getByText("New Village Code"));
+    await user.click(screen.getByRole("button", { name: "New Village Code" }));
 
     await waitFor(() => {
       expect(
@@ -239,7 +239,7 @@ describe("VillageCodesPage", () => {
       MOCK_VILLAGE_CODES.SC.name,
     );
 
-    await user.click(screen.getByText("Save"));
+    await user.click(screen.getByRole("button", { name: "Save" }));
 
     expect(mockCreate).toHaveBeenCalledWith({
       code: MOCK_VILLAGE_CODES.SC.code,
