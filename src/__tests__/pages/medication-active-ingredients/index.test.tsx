@@ -5,11 +5,13 @@ import { trpc } from "@/utils/trpc";
 import {
   assertBreadcrumbs,
   assertLoadingSpinner,
+  assertTableContents,
 } from "@/__tests__/helper-functions";
 
 const MOCK_ACTIVE_INGREDIENTS = {
   Paracetamol: {
     id: 1,
+    name: "Paracetamol",
     unitOfMeasurement: "mg",
     fallBelow: 3000,
   },
@@ -82,10 +84,6 @@ describe("MedicationActiveIngredientsPage", () => {
     expect(
       screen.getByRole("heading", { name: "Medication Active Ingredient" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Home" })).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: "Medication Stock" }),
-    ).toBeInTheDocument();
 
     assertBreadcrumbs([
       "Home",
@@ -105,7 +103,29 @@ describe("MedicationActiveIngredientsPage", () => {
     assertLoadingSpinner("Loading active ingredients...");
   });
 
-  it("displays active ingredients in table", () => {});
+  it("displays active ingredients in table", async () => {
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: mockActiveIngredients,
+      isLoading: false,
+    });
+
+    render(<MedicationActiveIngredientsBasePage />);
+
+    await waitFor(() => {
+      const table = screen.getByRole("table");
+      expect(table).toBeInTheDocument();
+      assertTableContents(table, [
+        [
+          "Active Ingredient ID",
+          "Active Ingredient Name",
+          "Unit of Measurement",
+          "Fall Below",
+          "Actions",
+        ],
+        ["1", "Paracetamol", "mg", "3000", "EditDelete"],
+      ]);
+    });
+  });
 
   it("changes EditableCell to edit state for the correct ingredient when the Edit button is clicked", () => {});
 

@@ -31,3 +31,27 @@ export function assertBreadcrumbs(crumbs: string[]) {
   const lastChild = nav.lastChild;
   expect(lastChild?.textContent).toEqual(crumbs[crumbs.length - 1]);
 }
+
+/**
+ * Verifies that the visual layout, row and col length, and text contents of a table matches an array representation.
+ * @param table The HTML element of the table element.
+ * @param rowContents A 2D array representing rows and columns of a table.
+ */
+export function assertTableContents(
+  table: HTMLElement,
+  rowContents: string[][],
+) {
+  expect(table).toBeInTheDocument();
+  const rows = within(table).getAllByRole("row");
+
+  expect(rows).toHaveLength(rowContents.length);
+
+  for (let rowNum = 0; rowNum < rows.length; rowNum++) {
+    const cells = rows[rowNum].querySelectorAll("th, td");
+    expect(cells).toHaveLength(rowContents[0].length);
+
+    for (let colNum = 0; colNum < rowContents[rowNum].length; colNum++) {
+      expect(cells[colNum]).toHaveTextContent(rowContents[rowNum][colNum]);
+    }
+  }
+}
