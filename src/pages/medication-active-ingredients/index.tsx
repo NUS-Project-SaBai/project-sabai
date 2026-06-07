@@ -11,6 +11,7 @@ import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import toast from "react-hot-toast";
 import clsx from "clsx";
+import EditableCell from "@/components/interactive/EditableCell";
 
 type EditFormFields = {
   id: number;
@@ -238,29 +239,35 @@ function Row(ingredient: MedicationActiveIngredient) {
         </TableCell>
         <TableCell>
           <span className="text-sm font-medium text-slate-900">
-            {isEditing ? (
-              <RHFInput type="text" name="name" label="" />
-            ) : (
-              form.getValues().name
-            )}
+            <EditableCell
+              isEditing={isEditing}
+              name="name"
+              type="text"
+              value={form.getValues().name}
+              label=""
+            />
           </span>
         </TableCell>
         <TableCell>
           <span className="text-sm font-medium text-slate-900">
-            {isEditing ? (
-              <RHFInput type="text" name="unitOfMeasurement" label="" />
-            ) : (
-              form.getValues().unitOfMeasurement
-            )}
+            <EditableCell
+              isEditing={isEditing}
+              name="unitOfMeasurement"
+              type="text"
+              value={form.getValues().unitOfMeasurement}
+              label=""
+            />
           </span>
         </TableCell>
         <TableCell>
           <span className="text-sm font-medium text-slate-900">
-            {isEditing ? (
-              <RHFInput type="number" name="fallBelow" label="" />
-            ) : (
-              form.getValues().fallBelow
-            )}
+            <EditableCell
+              isEditing={isEditing}
+              name="fallBelow"
+              type="number"
+              value={form.getValues().fallBelow}
+              label=""
+            />
           </span>
         </TableCell>
         <TableCell>
