@@ -13,8 +13,8 @@ export function assertLoadingSpinner(text: string) {
 }
 
 /**
- * Asserts that the breadcrumbs are rendered with the correct length
- * @param crumbs
+ * Asserts that the breadcrumbs are rendered with the correct length and matches the text content of the params in the same order.
+ * @param crumbs An array of strings matching the textcontent of each element in the BreadCrumb.
  */
 export function assertBreadcrumbs(crumbs: string[]) {
   const nav = screen.getByRole("navigation");
