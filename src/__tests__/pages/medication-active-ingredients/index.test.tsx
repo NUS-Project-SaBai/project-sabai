@@ -2,7 +2,10 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import MedicationActiveIngredientsBasePage from "@/pages/medication-active-ingredients";
 import { trpc } from "@/utils/trpc";
-import { assertLoadingSpinner } from "@/__tests__/helper-functions";
+import {
+  assertBreadcrumbs,
+  assertLoadingSpinner,
+} from "@/__tests__/helper-functions";
 
 const MOCK_ACTIVE_INGREDIENTS = {
   Paracetamol: {
@@ -83,6 +86,12 @@ describe("MedicationActiveIngredientsPage", () => {
     expect(
       screen.getByRole("link", { name: "Medication Stock" }),
     ).toBeInTheDocument();
+
+    assertBreadcrumbs([
+      "Home",
+      "Medication Stock",
+      "Medication Active Ingredients",
+    ]);
   });
 
   it("displays loading state", () => {
