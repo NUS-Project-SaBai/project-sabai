@@ -108,6 +108,8 @@ describe("MedicationActiveIngredientsPage", () => {
 
   it("displays a toast rejecting edits if an 'e' is entered into fallBelow EditableCell and saved", () => {});
 
+  it("only accepts positive integers in the fallBelow EditableCell when a save is attempted", () => {});
+
   it("displays a success toast when a valid edit is made", () => {});
 
   it("displays a modal with the information of ingredient to be deleted when the Delete button is clicked", () => {});
@@ -125,4 +127,6 @@ describe("MedicationActiveIngredientsPage", () => {
   it("closes the add new active ingredient modal when the cross button or the cancel button is clicked", () => {});
 
   it("closes the add new active ingredient modal, displays a success toast, and refreshes the list when a valid new ingredient is added", () => {});
+
+  it("only accepts positive integers in the fallBelow field in the add new ingredient modal when a save is attempted", () => {});
 });
