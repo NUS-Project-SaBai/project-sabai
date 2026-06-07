@@ -10,6 +10,7 @@ import { MedicationActiveIngredient } from "@/db/schema";
 import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import toast from "react-hot-toast";
+import clsx from "clsx";
 
 type EditFormFields = {
   id: number;
@@ -84,7 +85,12 @@ function Header() {
                 <RHFInput name="fallBelow" label="Fall below" type="number" />
                 <div className="flex flex-row gap-2">
                   <button
-                    className={`bg-green-600 flex-1 text-white px-4 py-1 rounded-lg font-medium ${form.formState.isSubmitting ? "bg-neutral-600" : "bg-green-600 hover:bg-green-700"}`}
+                    className={clsx(
+                      "flex-1 text-white px-4 py-1 rounded-lg font-medium",
+                      form.formState.isSubmitting
+                        ? "bg-neutral-600"
+                        : "bg-green-600 hover:bg-green-700",
+                    )}
                     disabled={form.formState.isSubmitting}
                     type="submit"
                   >
@@ -267,7 +273,12 @@ function Row(ingredient: MedicationActiveIngredient) {
                 }}
               >
                 <button
-                  className={`bg-green-600 text-white px-4 py-1 rounded-lg font-medium ${isSubmitting ? "bg-neutral-600" : "bg-green-600 hover:bg-green-700"}`}
+                  className={clsx(
+                    "flex-1 text-white px-4 py-1 rounded-lg font-medium",
+                    form.formState.isSubmitting
+                      ? "bg-neutral-600"
+                      : "bg-green-600 hover:bg-green-700",
+                  )}
                   disabled={isSubmitting}
                   type="submit"
                 >
