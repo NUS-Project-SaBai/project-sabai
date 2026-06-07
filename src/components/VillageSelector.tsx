@@ -3,7 +3,6 @@ import { useVillageCode } from "@/lib/context/VillageCodeContext";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { HiChevronDown } from "react-icons/hi2";
 import { clsx } from "clsx";
-import LoadingSpinner from "./LoadingSpinner";
 
 export default function VillageSelector() {
   const {
@@ -22,17 +21,20 @@ export default function VillageSelector() {
 
   if (isLoading) {
     return (
-      <div className="w-52 flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-slate-200">
-        <LoadingSpinner message="" />
-        <span className="text-sm text-slate-600">Loading villages...</span>
+      <div className="relative w-52 min-w-52 max-w-52">
+        <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-slate-200">
+          <span className="text-sm text-slate-600">Loading...</span>
+        </div>
       </div>
     );
   }
 
   if (!villageCodes || villageCodes.length === 0) {
     return (
-      <div className="w-52 px-3 py-2 bg-amber-50 text-amber-700 rounded-lg border border-amber-200 text-sm">
-        No villages available
+      <div className="relative w-52 min-w-52 max-w-52">
+        <div className="px-3 py-2 bg-amber-50 text-amber-700 rounded-lg border border-amber-200 text-sm">
+          No villages available
+        </div>
       </div>
     );
   }
@@ -43,7 +45,7 @@ export default function VillageSelector() {
   };
 
   return (
-    <div className="relative w-52" ref={dropdownRef}>
+    <div className="relative w-52 min-w-52 max-w-52" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
@@ -64,7 +66,7 @@ export default function VillageSelector() {
         <HiChevronDown
           className={clsx(
             "w-4 h-4 text-slate-500 transition-transform ml-auto",
-            isOpen && "rotate-180"
+            isOpen && "rotate-180",
           )}
         />
       </button>
@@ -77,7 +79,7 @@ export default function VillageSelector() {
               onClick={() => handleVillageSelect(village.id)}
               className={clsx(
                 "w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-50",
-                selectedVillageCodeId === village.id && "bg-slate-50"
+                selectedVillageCodeId === village.id && "bg-slate-50",
               )}
             >
               <div
