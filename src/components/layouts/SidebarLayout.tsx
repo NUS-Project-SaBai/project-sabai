@@ -11,6 +11,7 @@ import { LuScanFace } from "react-icons/lu";
 import { GiMedicines } from "react-icons/gi";
 import LogoTitle from "@/components/LogoTitle";
 import SabaiLogo from "@/components/SabaiLogo";
+import VillageSelector from "@/components/VillageSelector";
 
 interface SidebarLayoutProps {
   children: ReactNode;
@@ -30,6 +31,15 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
         >
           <IoMdMenu className="h-7 w-7 text-white" />
         </button>
+        <div className="flex items-center gap-2">
+          <VillageSelector />
+          <button
+            className={`group flex items-center gap-2 p-2 pl-4 rounded-md hover:cursor-pointer`}
+            onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+          >
+            <IoMdMenu className="h-7 w-7 text-gray-800" />
+          </button>
+        </div>
       </div>
       <div
         className={`${mobileSidebarOpen ? "flex" : "hidden"} flex-col absolute z-2 w-full p-2 top-15 bg-neutral-50 shadow-2xl`}
@@ -39,6 +49,9 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
       {/* desktop sidebar */}
       <div className="hidden sm:flex flex-col min-w-64 p-2 gap-6 bg-[var(--color-navbar)]">
         <LogoTitle className="m-2" />
+        <div className="px-2">
+          <VillageSelector />
+        </div>
         <SidebarNavButtons />
       </div>
       {/* Main Content */}
