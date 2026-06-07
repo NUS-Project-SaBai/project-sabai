@@ -28,6 +28,12 @@ export default function PatientPage() {
     { enabled: !!patientId },
   );
 
+  const { data: visits, isLoading: visitsLoading } =
+    trpc.visitsRouter.getByPatientId.useQuery(
+      { patientId: patientId ?? 0 },
+      { enabled: !!patientId },
+    );
+
   if (!router.isReady || !patientId || isLoading || isRefetching) {
     return <PatientDetailSkeleton />;
   }
@@ -104,6 +110,53 @@ export default function PatientPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Visits Section */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mt-2">
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">
+            Visit History
+          </h2>
+
+          {visitsLoading ? (
+            <div className="text-center py-4">
+              <p className="text-slate-500">Loading visits...</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {visits?.map((visit, index) => (
+                <div
+                  key={visit.id}
+                  className="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50"
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="rounded-full"
+                      style={{ backgroundColor: visit.villageCodeColor }}
+                      title={`Village: ${visit.villageCodeName}`}
+                    />
+                    <div>
+                      <p className="font-medium text-slate-900">
+                        Visit #{visits.length - index}
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        {visit.villageCodeName}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-slate-900">
+                      {new Date(visit.date).toLocaleDateString()}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {new Date(visit.date).toLocaleTimeString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
