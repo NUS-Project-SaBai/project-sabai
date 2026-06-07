@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import MedicationActiveIngredientsBasePage from "@/pages/medication-active-ingredients";
 import { trpc } from "@/utils/trpc";
+import { assertLoadingSpinner } from "@/__tests__/helper-functions";
 
 const MOCK_ACTIVE_INGREDIENTS = {
   Paracetamol: {
@@ -91,9 +92,8 @@ describe("MedicationActiveIngredientsPage", () => {
     });
 
     render(<MedicationActiveIngredientsBasePage />);
-    expect(
-      screen.getByText("Loading active ingredients..."),
-    ).toBeInTheDocument();
+
+    assertLoadingSpinner("Loading active ingredients...");
   });
 
   it("displays active ingredients in table", () => {});
