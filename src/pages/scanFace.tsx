@@ -11,6 +11,7 @@ TO BE REFACTORED LATER:
 import { WebcamInput } from "@/components/interactive/inputs/WebcamInput";
 import { trpc } from "@/utils/trpc";
 import { useState } from "react";
+import { useVillageCode } from "@/lib/context/VillageCodeContext";
 
 type PatientForm = {
   name: string;
@@ -29,6 +30,7 @@ function ScanFacePage() {
   const [cameraIsOpen, setCameraIsOpen] = useState(false);
   const [imgDetails, setImgDetails] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { selectedVillageCodeId } = useVillageCode();
 
   const DEFAULT_FORM: PatientForm = {
     name: "",
@@ -87,6 +89,7 @@ function ScanFacePage() {
     formData.append("hasPoorCard", patientFormData.hasPoorCard.toString());
     formData.append("hasBS2Card", patientFormData.hasBS2Card.toString());
     formData.append("hasSabaiCard", patientFormData.hasSabaiCard.toString());
+    formData.append("villageCodeId", selectedVillageCodeId?.toString() ?? "");
     formData.append("patientImage", patientImage); // ← File goes in last
 
     createMutation.mutate(formData, {
@@ -98,7 +101,6 @@ function ScanFacePage() {
       },
       onError(error) {
         setIsSubmitting(false);
-        console.error("Error creating patient:", error);
         alert("Failed to create patient. Please try again.");
       },
     });
