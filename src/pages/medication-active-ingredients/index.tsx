@@ -117,20 +117,63 @@ function Header() {
   );
 }
 
-function Row({
-  id,
-  name,
-  unitOfMeasurement,
-  fallBelow,
-}: MedicationActiveIngredient) {
+function DeleteConfirmModal({
+  ingredient,
+  onConfirm,
+  onCancel,
+}: {
+  ingredient: MedicationActiveIngredient;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <Modal onClose={onCancel}>
+      <h2 className="text-xl font-bold tracking-tight text-slate-900">
+        Confirm Deletion?
+      </h2>
+      <table>
+        <tbody>
+          <tr>
+            <td>Active Ingredient:</td>
+            <td>{ingredient.name}</td>
+          </tr>
+          <tr>
+            <td>Unit:</td>
+            <td>{ingredient.unitOfMeasurement}</td>
+          </tr>
+          <tr>
+            <td>Fall Below:</td>
+            <td>{ingredient.fallBelow}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div className="flex flex-row gap-2">
+        <button
+          onClick={onConfirm}
+          className="bg-green-600 flex-1 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700"
+        >
+          Confirm
+        </button>
+        <button
+          onClick={onCancel}
+          className="bg-red-600 flex-1 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700"
+        >
+          Cancel
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
+function Row(ingredient: MedicationActiveIngredient) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const form = useForm<EditFormFields>({
     defaultValues: {
-      name: name,
-      unitOfMeasurement: unitOfMeasurement,
-      fallBelow: fallBelow ?? undefined,
+      name: ingredient.name,
+      unitOfMeasurement: ingredient.unitOfMeasurement,
+      fallBelow: ingredient.fallBelow ?? undefined,
     },
   });
 
@@ -171,7 +214,7 @@ function Row({
 
     updateMutation.mutate({
       ...data,
-      id: id,
+      id: ingredient.id,
     });
 
     setIsEditing(!isEditing);
@@ -181,7 +224,9 @@ function Row({
     <TableRow>
       <FormProvider {...form}>
         <TableCell>
-          <span className="text-sm font-medium text-slate-900">{id}</span>
+          <span className="text-sm font-medium text-slate-900">
+            {ingredient.id}
+          </span>
         </TableCell>
         <TableCell>
           <span className="text-sm font-medium text-slate-900">
@@ -258,41 +303,11 @@ function Row({
             )}
 
             {isDeleting && (
-              <Modal onClose={() => setIsDeleting(false)}>
-                <h2 className="text-xl font-bold tracking-tight text-slate-900">
-                  Confirm Deletion?
-                </h2>
-                <table>
-                  <tbody>
-                    <tr>
-                      <td>Active Ingredient:</td>
-                      <td>{name}</td>
-                    </tr>
-                    <tr>
-                      <td>Unit:</td>
-                      <td>{unitOfMeasurement}</td>
-                    </tr>
-                    <tr>
-                      <td>Fall Below:</td>
-                      <td>{fallBelow}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div className="flex flex-row gap-2">
-                  <button
-                    onClick={() => deleteMutation.mutate({ id: id })}
-                    className="bg-green-600 flex-1 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700"
-                  >
-                    Confirm
-                  </button>
-                  <button
-                    onClick={() => setIsDeleting(false)}
-                    className="bg-red-600 flex-1 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </Modal>
+              <DeleteConfirmModal
+                onCancel={() => setIsDeleting(false)}
+                onConfirm={() => deleteMutation.mutate({ id: ingredient.id })}
+                ingredient={ingredient}
+              />
             )}
           </div>
         </TableCell>
