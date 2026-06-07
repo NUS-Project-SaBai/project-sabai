@@ -35,7 +35,8 @@ function Header() {
         form.reset();
         setModalIsOpen(false);
       },
-      onError: () => {
+      onError: (err) => {
+        console.error(err);
         toast.error("An error has occurred.");
       },
     });
@@ -184,8 +185,9 @@ function Row(ingredient: MedicationActiveIngredient) {
         toast.success("Successfully updated!");
         utils.medicationActiveIngredientsRouter.list.invalidate();
       },
-      onError: () => {
+      onError: (err) => {
         toast.error("An error has occurred.");
+        console.error(err);
         form.reset();
       },
     });
