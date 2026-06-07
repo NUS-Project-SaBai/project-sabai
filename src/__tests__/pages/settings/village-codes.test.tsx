@@ -173,9 +173,7 @@ describe("VillageCodesPage", () => {
     await user.click(screen.getAllByText("Edit")[0]);
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Edit Village Code"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Edit Village Code")).toBeInTheDocument();
     });
     expect(
       screen.getByDisplayValue(MOCK_VILLAGE_CODES.PC.name),
@@ -194,18 +192,14 @@ describe("VillageCodesPage", () => {
     await user.click(screen.getByRole("button", { name: "New Village Code" }));
     await waitFor(
       () => {
-        expect(
-          screen.getByRole("dialog")
-        ).toBeInTheDocument();
+        expect(screen.getByRole("dialog")).toBeInTheDocument();
       },
-      { timeout: 3000 }
+      { timeout: 3000 },
     );
 
     await user.click(screen.getByRole("button", { name: "Cancel" }));
     await waitFor(() => {
-      expect(
-        screen.queryByRole("dialog")
-      ).not.toBeInTheDocument();
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
   });
 
