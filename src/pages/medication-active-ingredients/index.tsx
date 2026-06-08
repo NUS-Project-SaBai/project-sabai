@@ -178,7 +178,8 @@ function Row(ingredient: MedicationActiveIngredient) {
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const form = useForm<EditFormFields>({
-    defaultValues: {
+    values: {
+      id: ingredient.id,
       name: ingredient.name,
       unitOfMeasurement: ingredient.unitOfMeasurement,
       fallBelow: ingredient.fallBelow,
@@ -216,8 +217,13 @@ function Row(ingredient: MedicationActiveIngredient) {
   const isSubmitting = form.formState.isSubmitting;
 
   const handleSubmit: SubmitHandler<EditFormFields> = async (data) => {
-    if (!form.formState.isDirty) {
+    if (Object.keys(form.formState.dirtyFields).length === 0) {
       toast.error("No form field changed!");
+      return;
+    }
+
+    if (form.getValues().fallBelow <= 0) {
+      toast.error("Please input only positive values.");
       return;
     }
 
