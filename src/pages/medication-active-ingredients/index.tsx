@@ -221,8 +221,6 @@ function Row(ingredient: MedicationActiveIngredient) {
   const isSubmitting = form.formState.isSubmitting;
 
   const handleSubmit: SubmitHandler<EditFormFields> = async (data) => {
-    console.log("SUBMIT CALLED stack:", new Error().stack);
-    await Promise.resolve(); // force async boundary to capture full trace
     const hasChanged =
       data.name !== ingredient.name ||
       data.unitOfMeasurement !== ingredient.unitOfMeasurement ||
