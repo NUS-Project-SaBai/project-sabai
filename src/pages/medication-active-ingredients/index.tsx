@@ -222,11 +222,6 @@ function Row(ingredient: MedicationActiveIngredient) {
       return;
     }
 
-    if (form.getValues().fallBelow <= 0) {
-      toast.error("Please input only positive values.");
-      return;
-    }
-
     updateMutation.mutate({
       ...data,
       id: ingredient.id,
@@ -273,6 +268,14 @@ function Row(ingredient: MedicationActiveIngredient) {
               type="number"
               value={form.getValues().fallBelow}
               label=""
+              registerOptions={{
+                valueAsNumber: true,
+                min: {
+                  value: 1,
+                  message: "Please input only positive values.",
+                },
+                required: true,
+              }}
             />
           </span>
         </TableCell>
