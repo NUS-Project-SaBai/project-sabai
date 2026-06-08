@@ -7,7 +7,7 @@ import {
   assertLoadingSpinner,
   assertTableContents,
 } from "@/__tests__/helper-functions";
-import { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import { fireEvent } from "@testing-library/react";
 
 const MOCK_ACTIVE_INGREDIENTS = {
@@ -54,6 +54,7 @@ const mockTrpc = trpc as any;
 describe("MedicationActiveIngredientsPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    toast.dismissAll();
 
     // Mock the mutations with default implementations
     mockTrpc.medicationActiveIngredientsRouter.create.useMutation.mockReturnValue(
@@ -273,10 +274,6 @@ describe("MedicationActiveIngredientsPage", () => {
       isLoading: false,
     });
 
-    console.log(
-      "toasts after mock implementation",
-      screen.queryAllByRole("status").map((t) => t.textContent),
-    );
     render(
       <>
         <MedicationActiveIngredientsBasePage />
@@ -284,50 +281,26 @@ describe("MedicationActiveIngredientsPage", () => {
       </>,
     );
 
-    console.log(
-      "toasts after render",
-      screen.queryAllByRole("status").map((t) => t.textContent),
-    ); // <--- WOTTTTT??????????????
+    expect(screen.getByText("3000")).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(screen.getByText("3000")).toBeInTheDocument();
-    });
-
-    console.log(
-      "toasts BEFORE edit button:",
-      screen.queryAllByRole("status").map((t) => t.textContent),
-    );
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
-    console.log(
-      "toasts immediately:",
-      screen.queryAllByRole("status").map((t) => t.textContent),
-    );
-
-    await waitFor(() => {
-      expect(screen.getByRole("spinbutton")).toBeInTheDocument();
-    });
+    expect(screen.getByRole("spinbutton")).toBeInTheDocument();
 
     const fallBelowInput = screen.getByRole("spinbutton");
     fireEvent.change(fallBelowInput, {
       target: { value: "70000", valueAsNumber: 70000 },
     });
 
-    await waitFor(() => {
-      expect((fallBelowInput as HTMLInputElement).valueAsNumber).toBe(70000);
-    });
+    expect((fallBelowInput as HTMLInputElement).valueAsNumber).toBe(70000);
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 
-    // load bearing timeout: 3000. LOL im losing it
-    await waitFor(
-      () => {
-        expect(screen.getByRole("status")).toHaveTextContent(
-          "Successfully updated!",
-        );
-      },
-      { timeout: 3000 },
-    );
+    await waitFor(() => {
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Successfully updated!",
+      );
+    });
   });
 
   it("only accepts positive integers in the fallBelow EditableCell when a save is attempted", () => {});
