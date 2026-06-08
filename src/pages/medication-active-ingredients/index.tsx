@@ -103,6 +103,7 @@ function Header() {
                       form.reset();
                       setModalIsOpen(false);
                     }}
+                    type="button"
                   >
                     Cancel
                   </button>
@@ -117,6 +118,7 @@ function Header() {
           onClick={() => {
             setModalIsOpen(true);
           }}
+          type="button"
         >
           Add Active Ingredient
         </button>
@@ -159,12 +161,14 @@ function DeleteConfirmModal({
         <button
           onClick={onConfirm}
           className="bg-green-600 flex-1 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700"
+          type="button"
         >
           Confirm
         </button>
         <button
           onClick={onCancel}
           className="bg-red-600 flex-1 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700"
+          type="button"
         >
           Cancel
         </button>
@@ -217,7 +221,14 @@ function Row(ingredient: MedicationActiveIngredient) {
   const isSubmitting = form.formState.isSubmitting;
 
   const handleSubmit: SubmitHandler<EditFormFields> = async (data) => {
-    if (Object.keys(form.formState.dirtyFields).length === 0) {
+    console.log("SUBMIT CALLED stack:", new Error().stack);
+    await Promise.resolve(); // force async boundary to capture full trace
+    const hasChanged =
+      data.name !== ingredient.name ||
+      data.unitOfMeasurement !== ingredient.unitOfMeasurement ||
+      data.fallBelow !== ingredient.fallBelow;
+
+    if (!hasChanged) {
       toast.error("No form field changed!");
       return;
     }
@@ -282,29 +293,24 @@ function Row(ingredient: MedicationActiveIngredient) {
         <TableCell>
           <div className="flex items-left gap-2">
             {isEditing ? (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  form.handleSubmit(handleSubmit)(e);
-                }}
+              <button
+                className={clsx(
+                  "flex-1 text-white px-4 py-1 rounded-lg font-medium",
+                  form.formState.isSubmitting
+                    ? "bg-neutral-600"
+                    : "bg-green-600 hover:bg-green-700",
+                )}
+                disabled={isSubmitting}
+                onClick={() => form.handleSubmit(handleSubmit)()}
+                type="button"
               >
-                <button
-                  className={clsx(
-                    "flex-1 text-white px-4 py-1 rounded-lg font-medium",
-                    form.formState.isSubmitting
-                      ? "bg-neutral-600"
-                      : "bg-green-600 hover:bg-green-700",
-                  )}
-                  disabled={isSubmitting}
-                  type="submit"
-                >
-                  {isSubmitting ? "Saving..." : "Save"}
-                </button>
-              </form>
+                {isSubmitting ? "Saving..." : "Save"}
+              </button>
             ) : (
               <button
                 className="bg-green-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-green-700"
                 onClick={() => setIsEditing(!isEditing)}
+                type="button"
               >
                 Edit
               </button>
@@ -317,6 +323,7 @@ function Row(ingredient: MedicationActiveIngredient) {
                   form.reset();
                   setIsEditing(false);
                 }}
+                type="button"
               >
                 Cancel
               </button>
@@ -326,6 +333,7 @@ function Row(ingredient: MedicationActiveIngredient) {
                 onClick={() => {
                   setIsDeleting(true);
                 }}
+                type="button"
               >
                 Delete
               </button>
