@@ -103,6 +103,21 @@ describe("MedicationActiveIngredientsPage", () => {
     assertLoadingSpinner("Loading active ingredients...");
   });
 
+  it("displays a message that there is no active ingredient if there is no data", () => {
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+    });
+
+    render(<MedicationActiveIngredientsBasePage />);
+
+    expect(
+      screen.getByText(
+        "No active ingredient found. Seed the database or add a new record.",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("displays active ingredients in table", async () => {
     mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
       data: mockActiveIngredients,
@@ -127,35 +142,103 @@ describe("MedicationActiveIngredientsPage", () => {
     });
   });
 
-  it("changes EditableCell to edit state for the correct ingredient when the Edit button is clicked", () => {});
+  it("changes EditableCell to edit state for the correct ingredient when the Edit button is clicked", async () => {
+    const user = userEvent.setup();
 
-  it("changes back the EditableCell to normal state when the cancel button is clicked after being in edit state", () => {});
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: mockActiveIngredients,
+      isLoading: false,
+    });
 
-  it("displays a toast rejecting edits if no form field is dirty", () => {});
+    const { container } = render(<MedicationActiveIngredientsBasePage />);
 
-  it("rejects entering alphabets other than 'e' in the fallbelow EditableCell", () => {});
+    await waitFor(() => {
+      expect(screen.getByText("Paracetamol")).toContainHTML('<span class="text-sm font-medium text-slate-900">Paracetamol</span>')
+      const nameInput = container.querySelector('input[name="name"]');
+      expect(nameInput).not.toBeInTheDocument();
+      const unitInput = container.querySelector('input[name="unitOfMeasurement');
+      expect(unitInput).not.toBeInTheDocument();
+      const fallBelowInput = container.querySelector('input[name="fallBelow');
+      expect(fallBelowInput).not.toBeInTheDocument();
+      const editButton = screen.getByRole("button", { name: "Edit"});
+      const deleteButton = screen.getByRole("button", { name: "Delete"});
+      
+      expect(editButton).toBeInTheDocument()
+      expect(deleteButton).toBeInTheDocument();
+      
+    })
 
-  it("displays a toast rejecting edits if an 'e' is entered into fallBelow EditableCell and saved", () => {});
+    await user.click(screen.getByRole("button", { name: "Edit" }));
 
-  it("only accepts positive integers in the fallBelow EditableCell when a save is attempted", () => {});
+    await waitFor(() => {
+      // todo: our RHF forms aren't accessible directly by react testing library, need use html selectors
+      const nameInput = container.querySelector('input[name="name"]');
+      expect(nameInput).toBeInTheDocument();
+      const unitInput = container.querySelector('input[name="unitOfMeasurement');
+      expect(unitInput).toBeInTheDocument();
+      const fallBelowInput = container.querySelector('input[name="fallBelow');
+      expect(fallBelowInput).toBeInTheDocument();
 
-  it("displays a success toast when a valid edit is made", () => {});
+      const saveButton = screen.getByRole("button", { name: "Save" });
+      const cancelButton = screen.getByRole("button", { name: "Cancel" });
 
-  it("displays a modal with the information of ingredient to be deleted when the Delete button is clicked", () => {});
+      expect(saveButton).toBeInTheDocument()
+      expect(cancelButton).toBeInTheDocument();
 
-  it("closes the deletion confirmation modal when the cross button or the cancel button is clicked", () => {});
+    })
 
-  it("rejects deletion of active ingredients that are in use by medication brands with a toast and closes the modal", () => {});
+  });
 
-  it("displays a toast confirmation if an active ingredient has been deleted", () => {});
+  it("changes back the EditableCell to normal state when the cancel button is clicked after being in edit state", async () => { 
+    const user = userEvent.setup();
 
-  it("opens a modal to add new active ingredients when the Add Active Ingredient button is clicked", () => {});
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: mockActiveIngredients,
+      isLoading: false,
+    });
 
-  it("displays a popup when 'e' is entered into the Fall below input field and save button is clicked", () => {});
+    render(<MedicationActiveIngredientsBasePage />);
 
-  it("closes the add new active ingredient modal when the cross button or the cancel button is clicked", () => {});
+    await waitFor(() => {
+      expect(screen.getByText("Paracetamol")).toBeInTheDocument();
+    })
 
-  it("closes the add new active ingredient modal, displays a success toast, and refreshes the list when a valid new ingredient is added", () => {});
+    await user.click(screen.getByRole("button", { name: "Edit" }));
 
-  it("only accepts positive integers in the fallBelow field in the add new ingredient modal when a save is attempted", () => {});
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Paracetamol")).toBeInTheDocument();
+      expect(screen.queryAllByRole("textbox", { name: "" }).length).toBe(0);
+
+    })
+  });
+
+  it("displays a toast rejecting edits if no form field is dirty", () => { });
+
+  it("rejects entering alphabets other than 'e' in the fallbelow EditableCell", () => { });
+
+  it("displays a toast rejecting edits if an 'e' is entered into fallBelow EditableCell and saved", () => { });
+
+  it("only accepts positive integers in the fallBelow EditableCell when a save is attempted", () => { });
+
+  it("displays a success toast when a valid edit is made", () => { });
+
+  it("displays a modal with the information of ingredient to be deleted when the Delete button is clicked", () => { });
+
+  it("closes the deletion confirmation modal when the cross button or the cancel button is clicked", () => { });
+
+  it("rejects deletion of active ingredients that are in use by medication brands with a toast and closes the modal", () => { });
+
+  it("displays a toast confirmation if an active ingredient has been deleted", () => { });
+
+  it("opens a modal to add new active ingredients when the Add Active Ingredient button is clicked", () => { });
+
+  it("displays a popup when 'e' is entered into the Fall below input field and save button is clicked", () => { });
+
+  it("closes the add new active ingredient modal when the cross button or the cancel button is clicked", () => { });
+
+  it("closes the add new active ingredient modal, displays a success toast, and refreshes the list when a valid new ingredient is added", () => { });
+
+  it("only accepts positive integers in the fallBelow field in the add new ingredient modal when a save is attempted", () => { });
 });
