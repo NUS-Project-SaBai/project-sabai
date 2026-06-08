@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import MedicationActiveIngredientsBasePage from "@/pages/medication-active-ingredients";
 import { trpc } from "@/utils/trpc";
@@ -8,6 +8,7 @@ import {
   assertTableContents,
 } from "@/__tests__/helper-functions";
 import { Toaster } from "react-hot-toast";
+import { fireEvent } from "@testing-library/react";
 
 const MOCK_ACTIVE_INGREDIENTS = {
   Paracetamol: {
@@ -77,6 +78,10 @@ describe("MedicationActiveIngredientsPage", () => {
         isLoading: false,
       }),
     );
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   it("renders page title and breadcrumbs", () => {
@@ -245,7 +250,85 @@ describe("MedicationActiveIngredientsPage", () => {
     expect(toast.textContent).toBe("No form field changed!");
   });
 
-  it("only allows positive numeric inputs in fallbelow EditableCell", async () => {});
+  it("only allows positive numeric inputs in fallbelow EditableCell", async () => {
+    const user = userEvent.setup();
+
+    const mockMutate = vi.fn(() => true);
+    let capturedOnSuccess: (() => void) | undefined;
+
+    mockTrpc.medicationActiveIngredientsRouter.update.useMutation.mockImplementation(
+      ({ onSuccess }) => {
+        capturedOnSuccess = onSuccess;
+        return {
+          mutate: vi.fn(() => {
+            onSuccess?.(); // call it immediately when mutate is called
+          }),
+          isLoading: false,
+        };
+      },
+    );
+
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: mockActiveIngredients,
+      isLoading: false,
+    });
+
+    console.log(
+      "toasts after mock implementation",
+      screen.queryAllByRole("status").map((t) => t.textContent),
+    );
+    render(
+      <>
+        <MedicationActiveIngredientsBasePage />
+        <Toaster toastOptions={{ duration: 100 }} />
+      </>,
+    );
+
+    console.log(
+      "toasts after render",
+      screen.queryAllByRole("status").map((t) => t.textContent),
+    ); // <--- WOTTTTT??????????????
+
+    await waitFor(() => {
+      expect(screen.getByText("3000")).toBeInTheDocument();
+    });
+
+    console.log(
+      "toasts BEFORE edit button:",
+      screen.queryAllByRole("status").map((t) => t.textContent),
+    );
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+
+    console.log(
+      "toasts immediately:",
+      screen.queryAllByRole("status").map((t) => t.textContent),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("spinbutton")).toBeInTheDocument();
+    });
+
+    const fallBelowInput = screen.getByRole("spinbutton");
+    fireEvent.change(fallBelowInput, {
+      target: { value: "70000", valueAsNumber: 70000 },
+    });
+
+    await waitFor(() => {
+      expect((fallBelowInput as HTMLInputElement).valueAsNumber).toBe(70000);
+    });
+
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    // load bearing timeout: 3000. LOL im losing it
+    await waitFor(
+      () => {
+        expect(screen.getByRole("status")).toHaveTextContent(
+          "Successfully updated!",
+        );
+      },
+      { timeout: 3000 },
+    );
+  });
 
   it("only accepts positive integers in the fallBelow EditableCell when a save is attempted", () => {});
 
