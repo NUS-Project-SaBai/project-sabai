@@ -17,7 +17,7 @@ type EditFormFields = {
   id: number;
   name: string;
   unitOfMeasurement: string;
-  fallBelow: number | undefined;
+  fallBelow: number;
 };
 
 type AddFormFields = Omit<EditFormFields, "id">;
@@ -181,7 +181,7 @@ function Row(ingredient: MedicationActiveIngredient) {
     defaultValues: {
       name: ingredient.name,
       unitOfMeasurement: ingredient.unitOfMeasurement,
-      fallBelow: ingredient.fallBelow ?? undefined,
+      fallBelow: ingredient.fallBelow,
     },
   });
 
