@@ -28,7 +28,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
           className={`group flex items-center gap-2 p-2 pl-4 rounded-md hover:cursor-pointer`}
           onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
         >
-          <IoMdMenu className="h-7 w-7 text-gray-800" />
+          <IoMdMenu className="h-6 w-6 text-white" />
         </button>
       </div>
       <div
