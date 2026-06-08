@@ -245,9 +245,7 @@ describe("MedicationActiveIngredientsPage", () => {
     expect(toast.textContent).toBe("No form field changed!");
   });
 
-  it("rejects entering alphabets other than 'e' in the fallbelow EditableCell", () => {});
-
-  it("displays a toast rejecting edits if an 'e' is entered into fallBelow EditableCell and saved", () => {});
+  it("only allows positive numeric inputs in fallbelow EditableCell", async () => {});
 
   it("only accepts positive integers in the fallBelow EditableCell when a save is attempted", () => {});
 
@@ -263,11 +261,9 @@ describe("MedicationActiveIngredientsPage", () => {
 
   it("opens a modal to add new active ingredients when the Add Active Ingredient button is clicked", () => {});
 
-  it("displays a popup when 'e' is entered into the Fall below input field and save button is clicked", () => {});
+  it("only allows positive numeric inputs in fallbelow field in add new active ingredient modal", async () => {});
 
   it("closes the add new active ingredient modal when the cross button or the cancel button is clicked", () => {});
 
   it("closes the add new active ingredient modal, displays a success toast, and refreshes the list when a valid new ingredient is added", () => {});
-
-  it("only accepts positive integers in the fallBelow field in the add new ingredient modal when a save is attempted", () => {});
 });
