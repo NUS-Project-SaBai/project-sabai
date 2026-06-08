@@ -97,7 +97,7 @@ export const medicationActiveIngredients = pgTable(
     unitOfMeasurement: varchar("unit_of_measurement", {
       length: 255,
     }).notNull(),
-    fallBelow: integer("fall_below"),
+    fallBelow: integer("fall_below").notNull(),
   },
 );
 
