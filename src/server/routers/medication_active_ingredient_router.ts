@@ -24,7 +24,7 @@ export const medicationActiveIngredientsRouter = router({
       zfd.formData({
         name: zfd.text().nonoptional(),
         unitOfMeasurement: zfd.text().nonoptional(),
-        fallBelow: zfd.numeric(z.number().int()).optional(),
+        fallBelow: zfd.numeric(z.number().int().positive()).nonoptional(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -41,7 +41,7 @@ export const medicationActiveIngredientsRouter = router({
         id: zfd.numeric(z.number().int()),
         name: zfd.text().nonoptional(),
         unitOfMeasurement: zfd.text().nonoptional(),
-        fallBelow: zfd.numeric(z.number().int()).optional(),
+        fallBelow: zfd.numeric(z.number().int().positive()).nonoptional(),
       }),
     )
     .mutation(async ({ input }) => {
