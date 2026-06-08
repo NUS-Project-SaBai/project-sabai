@@ -1,4 +1,5 @@
 import { RHFInput } from "./RHF/RHFInput";
+import { RegisterOptions } from "react-hook-form";
 
 interface EditableCellProps {
   value: string | number | undefined;
@@ -6,6 +7,7 @@ interface EditableCellProps {
   label?: string;
   type: "text" | "number";
   isEditing: boolean;
+  registerOptions?: RegisterOptions;
 }
 
 export default function EditableCell({
@@ -14,10 +16,20 @@ export default function EditableCell({
   label = "",
   type,
   isEditing,
+  registerOptions = {},
 }: EditableCellProps) {
   return (
     <>
-      {isEditing ? <RHFInput type={type} name={name} label={label} /> : value}
+      {isEditing ? (
+        <RHFInput
+          type={type}
+          name={name}
+          label={label}
+          registerOptions={registerOptions}
+        />
+      ) : (
+        value
+      )}
     </>
   );
 }
