@@ -1,4 +1,10 @@
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import MedicationActiveIngredientsBasePage from "@/pages/medication-active-ingredients";
 import { trpc } from "@/utils/trpc";
@@ -8,7 +14,6 @@ import {
   assertTableContents,
 } from "@/__tests__/helper-functions";
 import { Toaster, toast } from "react-hot-toast";
-
 
 const MOCK_ACTIVE_INGREDIENTS = {
   Paracetamol: {
@@ -320,7 +325,7 @@ describe("MedicationActiveIngredientsPage", () => {
       data: mockActiveIngredients,
       isLoading: false,
     });
-    
+
     render(<MedicationActiveIngredientsBasePage />);
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
@@ -333,8 +338,9 @@ describe("MedicationActiveIngredientsPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 
-    expect(screen.getByText("Please input only positive values.")).toBeInTheDocument();
-
+    expect(
+      screen.getByText("Please input only positive values."),
+    ).toBeInTheDocument();
   });
 
   it("displays a modal with the information of ingredient to be deleted when the Delete button is clicked", async () => {
@@ -344,36 +350,350 @@ describe("MedicationActiveIngredientsPage", () => {
       data: mockActiveIngredients,
       isLoading: false,
     });
-    
+
     render(<MedicationActiveIngredientsBasePage />);
 
     await user.click(screen.getByRole("button", { name: "Delete" }));
-    const dialog = await screen.findByRole("dialog")
+    const dialog = await screen.findByRole("dialog");
 
     await waitFor(async () => {
-      const fallBelowText = await within(dialog).findByText(mockActiveIngredients[0].fallBelow)
-      const nameText = await within(dialog).findByText(mockActiveIngredients[0].name)
-      const unitText = await within(dialog).findByText(mockActiveIngredients[0].unitOfMeasurement)
+      const fallBelowText = await within(dialog).findByText(
+        mockActiveIngredients[0].fallBelow,
+      );
+      const nameText = await within(dialog).findByText(
+        mockActiveIngredients[0].name,
+      );
+      const unitText = await within(dialog).findByText(
+        mockActiveIngredients[0].unitOfMeasurement,
+      );
 
       expect(fallBelowText).toBeInTheDocument();
       expect(nameText).toBeInTheDocument();
       expect(unitText).toBeInTheDocument();
-
-    })
-
+    });
   });
 
-  it("closes the deletion confirmation modal when the cross button or the cancel button is clicked", () => {});
+  it("closes the deletion confirmation modal when the cross button or the cancel button is clicked", async () => {
+    const user = userEvent.setup();
 
-  it("rejects deletion of active ingredients that are in use by medication brands with a toast and closes the modal", () => {});
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: mockActiveIngredients,
+      isLoading: false,
+    });
 
-  it("displays a toast confirmation if an active ingredient has been deleted", () => {});
+    render(<MedicationActiveIngredientsBasePage />);
 
-  it("opens a modal to add new active ingredients when the Add Active Ingredient button is clicked", () => {});
+    // test cancel button
+    await user.click(screen.getByRole("button", { name: "Delete" }));
+    const dialog = await screen.findByRole("dialog");
 
-  it("only allows positive numeric inputs in fallbelow field in add new active ingredient modal", async () => {});
+    await waitFor(async () => {
+      const cancelButton = await within(dialog).findByRole("button", {
+        name: "Cancel",
+      });
+      await user.click(cancelButton);
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
 
-  it("closes the add new active ingredient modal when the cross button or the cancel button is clicked", () => {});
+    // test cross button
+    await user.click(screen.getByRole("button", { name: "Delete" }));
+    const dialogSecond = await screen.findByRole("dialog");
 
-  it("closes the add new active ingredient modal, displays a success toast, and refreshes the list when a valid new ingredient is added", () => {});
+    await waitFor(async () => {
+      const crossButton = await within(dialogSecond).findByRole("button", {
+        name: "",
+      });
+      await user.click(crossButton);
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+  });
+
+  it("rejects deletion of active ingredients that are in use by medication brands with a toast and closes the modal", async () => {
+    const user = userEvent.setup();
+    const mockMutate = vi.fn(() => true);
+    let capturedOnError: (() => void) | undefined;
+
+    const mockDBError = new Error(
+      "Error! Check that there are no brands that depend on this active ingredient.",
+    );
+
+    mockTrpc.medicationActiveIngredientsRouter.delete.useMutation.mockImplementation(
+      ({ onError }) => {
+        capturedOnError = onError;
+        return {
+          mutate: vi.fn(() => {
+            onError?.(mockDBError);
+          }),
+          isLoading: false,
+        };
+      },
+    );
+
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: mockActiveIngredients,
+      isLoading: false,
+    });
+
+    render(
+      <>
+        <MedicationActiveIngredientsBasePage />
+        <Toaster toastOptions={{ duration: 100 }} />
+      </>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Delete" }));
+
+    waitFor(async () => {
+      const dialog = screen.getByRole("dialog");
+      const confirmButton = within(dialog).getByRole("button", {
+        name: "Confirm",
+      });
+      await user.click(confirmButton);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Error! Check that there are no brands that depend on this active ingredient.",
+      );
+    });
+
+    waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+  });
+
+  it("displays a toast confirmation if an active ingredient has been deleted", async () => {
+    const user = userEvent.setup();
+    let capturedOnSuccess: (() => void) | undefined;
+
+    mockTrpc.medicationActiveIngredientsRouter.delete.useMutation.mockImplementation(
+      ({ onSuccess }) => {
+        capturedOnSuccess = onSuccess;
+        return {
+          mutate: vi.fn(() => {
+            onSuccess?.();
+          }),
+          isLoading: false,
+        };
+      },
+    );
+
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: mockActiveIngredients,
+      isLoading: false,
+    });
+
+    render(
+      <>
+        <MedicationActiveIngredientsBasePage />
+        <Toaster toastOptions={{ duration: 100 }} />
+      </>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Delete" }));
+
+    waitFor(async () => {
+      const dialog = screen.getByRole("dialog");
+      const confirmButton = within(dialog).getByRole("button", {
+        name: "Confirm",
+      });
+      await user.click(confirmButton);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Successfully deleted.",
+      );
+    });
+  });
+
+  it("opens a modal to add new active ingredients when the Add Active Ingredient button is clicked", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: mockActiveIngredients,
+      isLoading: false,
+    });
+
+    render(
+      <>
+        <MedicationActiveIngredientsBasePage />
+      </>,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Add Active Ingredient" }),
+    );
+
+    waitFor(() => {
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).toBeInTheDocument();
+    });
+  });
+
+  it("only allows positive numeric inputs in fallbelow field in add new active ingredient modal", async () => {
+    const user = userEvent.setup();
+    let capturedOnSuccess: (() => void) | undefined;
+
+    mockTrpc.medicationActiveIngredientsRouter.delete.useMutation.mockImplementation(
+      ({ onSuccess }) => {
+        capturedOnSuccess = onSuccess;
+        return {
+          mutate: vi.fn(() => {
+            onSuccess?.();
+          }),
+          isLoading: false,
+        };
+      },
+    );
+
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: mockActiveIngredients,
+      isLoading: false,
+    });
+
+    render(
+      <>
+        <MedicationActiveIngredientsBasePage />
+        <Toaster toastOptions={{ duration: 100 }} />
+      </>,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Add Active Ingredient" }),
+    );
+
+    waitFor(async () => {
+      const dialog = screen.getByRole("dialog");
+      const nameInput = dialog.querySelector('input[name="name"]');
+      const unitInput = dialog.querySelector('input[name="unitOfMeasurement"]');
+      const fallBelowInput = dialog.querySelector('input[name="fallBelow"]');
+      const saveButton = within(dialog).getByRole("button", { name: "Save" });
+
+      expect(nameInput).toBeInTheDocument();
+      expect(unitInput).toBeInTheDocument();
+      expect(fallBelowInput).toBeInTheDocument();
+      await user.clear(nameInput!);
+      await user.type(nameInput!, "valid name");
+
+      await user.clear(unitInput!);
+      await user.type(unitInput!, "valid units");
+
+      // test negative
+      await user.clear(fallBelowInput!);
+      await user.type(fallBelowInput!, "-1");
+      await user.click(saveButton);
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "An error has occurred.",
+      );
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+      // test 0
+      await user.clear(fallBelowInput!);
+      await user.type(fallBelowInput!, "0");
+      await user.click(saveButton);
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "An error has occurred.",
+      );
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+  });
+
+  it("closes the add new active ingredient modal when the cross button or the cancel button is clicked", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: mockActiveIngredients,
+      isLoading: false,
+    });
+
+    render(<MedicationActiveIngredientsBasePage />);
+
+    // test cancel button
+    await user.click(
+      screen.getByRole("button", { name: "Add Active Ingredient" }),
+    );
+    const dialog = await screen.findByRole("dialog");
+
+    await waitFor(async () => {
+      const cancelButton = await within(dialog).findByRole("button", {
+        name: "Cancel",
+      });
+      await user.click(cancelButton);
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+
+    // test cross button
+    await user.click(screen.getByRole("button", { name: "Delete" }));
+    const dialogSecond = await screen.findByRole("dialog");
+
+    await waitFor(async () => {
+      const crossButton = await within(dialogSecond).findByRole("button", {
+        name: "",
+      });
+      await user.click(crossButton);
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+  });
+
+  it("closes the add new active ingredient modal, displays a success toast, and refreshes the list when a valid new ingredient is added", async () => {
+    const user = userEvent.setup();
+    let capturedOnSuccess: (() => void) | undefined;
+
+    mockTrpc.medicationActiveIngredientsRouter.delete.useMutation.mockImplementation(
+      ({ onSuccess }) => {
+        capturedOnSuccess = onSuccess;
+        return {
+          mutate: vi.fn(() => {
+            onSuccess?.();
+          }),
+          isLoading: false,
+        };
+      },
+    );
+
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: mockActiveIngredients,
+      isLoading: false,
+    });
+
+    render(
+      <>
+        <MedicationActiveIngredientsBasePage />
+        <Toaster toastOptions={{ duration: 100 }} />
+      </>,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Add Active Ingredient" }),
+    );
+
+    waitFor(async () => {
+      const dialog = screen.getByRole("dialog");
+      const nameInput = dialog.querySelector('input[name="name"]');
+      const unitInput = dialog.querySelector('input[name="unitOfMeasurement"]');
+      const fallBelowInput = dialog.querySelector('input[name="fallBelow"]');
+      const saveButton = within(dialog).getByRole("button", { name: "Save" });
+
+      expect(nameInput).toBeInTheDocument();
+      expect(unitInput).toBeInTheDocument();
+      expect(fallBelowInput).toBeInTheDocument();
+      await user.clear(nameInput!);
+      await user.type(nameInput!, "valid name");
+
+      await user.clear(unitInput!);
+      await user.type(unitInput!, "valid units");
+
+      await user.clear(fallBelowInput!);
+      await user.type(fallBelowInput!, "1");
+      await user.click(saveButton);
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Successfully created!",
+      );
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      expect(screen.getByText("valid name")).toBeInTheDocument();
+      expect(screen.getByText("valid units")).toBeInTheDocument();
+      expect(screen.getByText("1")).toBeInTheDocument();
+    });
+  });
 });
