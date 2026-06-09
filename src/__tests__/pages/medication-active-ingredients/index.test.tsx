@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import MedicationActiveIngredientsBasePage from "@/pages/medication-active-ingredients";
 import { trpc } from "@/utils/trpc";
@@ -8,7 +8,7 @@ import {
   assertTableContents,
 } from "@/__tests__/helper-functions";
 import { Toaster, toast } from "react-hot-toast";
-import { fireEvent } from "@testing-library/react";
+
 
 const MOCK_ACTIVE_INGREDIENTS = {
   Paracetamol: {
@@ -251,7 +251,7 @@ describe("MedicationActiveIngredientsPage", () => {
     expect(toast.textContent).toBe("No form field changed!");
   });
 
-  it("only allows positive numeric inputs in fallbelow EditableCell", async () => {
+  it("displays a success toast when a valid edit is made", async () => {
     const user = userEvent.setup();
 
     const mockMutate = vi.fn(() => true);
@@ -288,11 +288,21 @@ describe("MedicationActiveIngredientsPage", () => {
     expect(screen.getByRole("spinbutton")).toBeInTheDocument();
 
     const fallBelowInput = screen.getByRole("spinbutton");
-    fireEvent.change(fallBelowInput, {
-      target: { value: "70000", valueAsNumber: 70000 },
-    });
+    const nameInput = document.getElementById("name");
+    const unitInput = document.getElementById("unitOfMeasurement");
+
+    await user.clear(fallBelowInput);
+    await user.type(fallBelowInput, "70000");
+
+    await user.clear(nameInput!);
+    await user.type(nameInput!, "valid medication name");
+
+    await user.clear(unitInput!);
+    await user.type(unitInput!, "bottles");
 
     expect((fallBelowInput as HTMLInputElement).valueAsNumber).toBe(70000);
+    expect(nameInput?.value).toBe("valid medication name");
+    expect(unitInput?.value).toBe("bottles");
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 
@@ -303,11 +313,55 @@ describe("MedicationActiveIngredientsPage", () => {
     });
   });
 
-  it("only accepts positive integers in the fallBelow EditableCell when a save is attempted", () => {});
+  it("shows an error message for negative integers and zero in the fallBelow EditableCell when a save is attempted", async () => {
+    const user = userEvent.setup();
 
-  it("displays a success toast when a valid edit is made", () => {});
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: mockActiveIngredients,
+      isLoading: false,
+    });
+    
+    render(<MedicationActiveIngredientsBasePage />);
 
-  it("displays a modal with the information of ingredient to be deleted when the Delete button is clicked", () => {});
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+
+    const fallBelowInput = screen.getByRole("spinbutton");
+
+    await user.clear(fallBelowInput);
+
+    await user.type(fallBelowInput, "-1");
+
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    expect(screen.getByText("Please input only positive values.")).toBeInTheDocument();
+
+  });
+
+  it("displays a modal with the information of ingredient to be deleted when the Delete button is clicked", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: mockActiveIngredients,
+      isLoading: false,
+    });
+    
+    render(<MedicationActiveIngredientsBasePage />);
+
+    await user.click(screen.getByRole("button", { name: "Delete" }));
+    const dialog = await screen.findByRole("dialog")
+
+    await waitFor(async () => {
+      const fallBelowText = await within(dialog).findByText(mockActiveIngredients[0].fallBelow)
+      const nameText = await within(dialog).findByText(mockActiveIngredients[0].name)
+      const unitText = await within(dialog).findByText(mockActiveIngredients[0].unitOfMeasurement)
+
+      expect(fallBelowText).toBeInTheDocument();
+      expect(nameText).toBeInTheDocument();
+      expect(unitText).toBeInTheDocument();
+
+    })
+
+  });
 
   it("closes the deletion confirmation modal when the cross button or the cancel button is clicked", () => {});
 
