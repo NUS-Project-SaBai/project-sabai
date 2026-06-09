@@ -383,25 +383,27 @@ describe("MedicationActiveIngredientsPage", () => {
     await user.click(screen.getByRole("button", { name: "Delete" }));
     const dialog = await screen.findByRole("dialog");
 
+    let cancelButton;
     await waitFor(async () => {
-      const cancelButton = await within(dialog).findByRole("button", {
+      cancelButton = await within(dialog).findByRole("button", {
         name: "Cancel",
       });
-      await user.click(cancelButton);
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
+    await user.click(cancelButton!);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
     // test cross button
     await user.click(screen.getByRole("button", { name: "Delete" }));
     const dialogSecond = await screen.findByRole("dialog");
 
+    let crossButton;
     await waitFor(async () => {
-      const crossButton = await within(dialogSecond).findByRole("button", {
+      crossButton = await within(dialogSecond).findByRole("button", {
         name: "",
       });
-      await user.click(crossButton);
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
+    await user.click(crossButton!);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("rejects deletion of active ingredients that are in use by medication brands with a toast and closes the modal", async () => {
@@ -436,13 +438,14 @@ describe("MedicationActiveIngredientsPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Delete" }));
 
-    waitFor(async () => {
+    let confirmButton;
+    await waitFor(async () => {
       const dialog = screen.getByRole("dialog");
-      const confirmButton = within(dialog).getByRole("button", {
+      confirmButton = within(dialog).getByRole("button", {
         name: "Confirm",
       });
-      await user.click(confirmButton);
     });
+    await user.click(confirmButton!);
 
     await waitFor(() => {
       expect(screen.getByRole("status")).toHaveTextContent(
@@ -450,7 +453,7 @@ describe("MedicationActiveIngredientsPage", () => {
       );
     });
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
   });
@@ -483,13 +486,14 @@ describe("MedicationActiveIngredientsPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Delete" }));
 
-    waitFor(async () => {
+    let confirmButton;
+    await waitFor(async () => {
       const dialog = screen.getByRole("dialog");
-      const confirmButton = within(dialog).getByRole("button", {
+      confirmButton = within(dialog).getByRole("button", {
         name: "Confirm",
       });
-      await user.click(confirmButton);
     });
+    await user.click(confirmButton!);
 
     await waitFor(() => {
       expect(screen.getByRole("status")).toHaveTextContent(
@@ -516,7 +520,7 @@ describe("MedicationActiveIngredientsPage", () => {
       screen.getByRole("button", { name: "Add Active Ingredient" }),
     );
 
-    waitFor(() => {
+    await waitFor(() => {
       const dialog = screen.getByRole("dialog");
       expect(dialog).toBeInTheDocument();
       expect(
@@ -527,12 +531,13 @@ describe("MedicationActiveIngredientsPage", () => {
 
   it("only allows positive numeric inputs in fallbelow field in add new active ingredient modal", async () => {
     const user = userEvent.setup();
+    const mockTooSmallError = new Error("An error has occurred.");
 
     mockTrpc.medicationActiveIngredientsRouter.create.useMutation.mockImplementation(
-      ({ onSuccess }) => {
+      ({ onError }) => {
         return {
           mutate: vi.fn(() => {
-            onSuccess?.();
+            onError?.(mockTooSmallError);
           }),
           isLoading: false,
         };
@@ -555,35 +560,46 @@ describe("MedicationActiveIngredientsPage", () => {
       screen.getByRole("button", { name: "Add Active Ingredient" }),
     );
 
-    waitFor(async () => {
+    let nameInput;
+    let unitInput;
+    let fallBelowInput;
+    let saveButton;
+
+    await waitFor(() => {
       const dialog = screen.getByRole("dialog");
-      const nameInput = dialog.querySelector('input[name="name"]');
-      const unitInput = dialog.querySelector('input[name="unitOfMeasurement"]');
-      const fallBelowInput = dialog.querySelector('input[name="fallBelow"]');
-      const saveButton = within(dialog).getByRole("button", { name: "Save" });
+      nameInput = dialog.querySelector('input[name="name"]');
+      unitInput = dialog.querySelector('input[name="unitOfMeasurement"]');
+      fallBelowInput = dialog.querySelector('input[name="fallBelow"]');
+      saveButton = within(dialog).getByRole("button", { name: "Save" });
 
       expect(nameInput).toBeInTheDocument();
       expect(unitInput).toBeInTheDocument();
       expect(fallBelowInput).toBeInTheDocument();
-      await user.clear(nameInput!);
-      await user.type(nameInput!, "valid name");
+    });
 
-      await user.clear(unitInput!);
-      await user.type(unitInput!, "valid units");
+    await user.clear(nameInput!);
+    await user.type(nameInput!, "valid name");
 
-      // test negative
-      await user.clear(fallBelowInput!);
-      await user.type(fallBelowInput!, "-1");
-      await user.click(saveButton);
+    await user.clear(unitInput!);
+    await user.type(unitInput!, "valid units");
+
+    // test negative
+    await user.clear(fallBelowInput!);
+    await user.type(fallBelowInput!, "-1");
+    await user.click(saveButton!);
+
+    await waitFor(() => {
       expect(screen.getByRole("status")).toHaveTextContent(
         "An error has occurred.",
       );
       expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
 
-      // test 0
-      await user.clear(fallBelowInput!);
-      await user.type(fallBelowInput!, "0");
-      await user.click(saveButton);
+    // test 0
+    await user.clear(fallBelowInput!);
+    await user.type(fallBelowInput!, "0");
+    await user.click(saveButton!);
+    await waitFor(async () => {
       expect(screen.getByRole("status")).toHaveTextContent(
         "An error has occurred.",
       );
@@ -607,13 +623,14 @@ describe("MedicationActiveIngredientsPage", () => {
     );
     const dialog = await screen.findByRole("dialog");
 
+    let cancelButton;
     await waitFor(async () => {
-      const cancelButton = await within(dialog).findByRole("button", {
+      cancelButton = await within(dialog).findByRole("button", {
         name: "Cancel",
       });
-      await user.click(cancelButton);
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
+    await user.click(cancelButton!);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
     // test cross button
     await user.click(screen.getByRole("button", { name: "Delete" }));
@@ -631,21 +648,35 @@ describe("MedicationActiveIngredientsPage", () => {
   it("closes the add new active ingredient modal, displays a success toast, and refreshes the list when a valid new ingredient is added", async () => {
     const user = userEvent.setup();
 
+    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
+      data: mockActiveIngredients,
+      isLoading: false,
+    });
+
     mockTrpc.medicationActiveIngredientsRouter.create.useMutation.mockImplementation(
       ({ onSuccess }) => {
         return {
           mutate: vi.fn(() => {
+            mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue(
+              {
+                data: [
+                  ...mockActiveIngredients,
+                  {
+                    id: 2,
+                    name: "valid name",
+                    unitOfMeasurement: "valid units",
+                    fallBelow: 1,
+                  },
+                ],
+                isLoading: false,
+              },
+            );
             onSuccess?.();
           }),
           isLoading: false,
         };
       },
     );
-
-    mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
-      data: mockActiveIngredients,
-      isLoading: false,
-    });
 
     render(
       <>
@@ -658,29 +689,42 @@ describe("MedicationActiveIngredientsPage", () => {
       screen.getByRole("button", { name: "Add Active Ingredient" }),
     );
 
-    waitFor(async () => {
-      const dialog = screen.getByRole("dialog");
-      const nameInput = dialog.querySelector('input[name="name"]');
-      const unitInput = dialog.querySelector('input[name="unitOfMeasurement"]');
-      const fallBelowInput = dialog.querySelector('input[name="fallBelow"]');
-      const saveButton = within(dialog).getByRole("button", { name: "Save" });
+    let dialog;
+    let nameInput;
+    let unitInput;
+    let fallBelowInput;
+    let saveButton;
+
+    await waitFor(async () => {
+      dialog = screen.getByRole("dialog");
+      nameInput = dialog.querySelector('input[name="name"]');
+      unitInput = dialog.querySelector('input[name="unitOfMeasurement"]');
+      fallBelowInput = dialog.querySelector('input[name="fallBelow"]');
+      saveButton = within(dialog).getByRole("button", { name: "Save" });
 
       expect(nameInput).toBeInTheDocument();
       expect(unitInput).toBeInTheDocument();
       expect(fallBelowInput).toBeInTheDocument();
-      await user.clear(nameInput!);
-      await user.type(nameInput!, "valid name");
+    });
 
-      await user.clear(unitInput!);
-      await user.type(unitInput!, "valid units");
+    await user.clear(nameInput!);
+    await user.type(nameInput!, "valid name");
 
-      await user.clear(fallBelowInput!);
-      await user.type(fallBelowInput!, "1");
-      await user.click(saveButton);
+    await user.clear(unitInput!);
+    await user.type(unitInput!, "valid units");
+
+    await user.clear(fallBelowInput!);
+    await user.type(fallBelowInput!, "1");
+    await user.click(saveButton!);
+
+    await waitFor(() => {
       expect(screen.getByRole("status")).toHaveTextContent(
         "Successfully created!",
       );
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+
+    await waitFor(() => {
       expect(screen.getByText("valid name")).toBeInTheDocument();
       expect(screen.getByText("valid units")).toBeInTheDocument();
       expect(screen.getByText("1")).toBeInTheDocument();
