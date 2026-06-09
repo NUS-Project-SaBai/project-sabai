@@ -259,12 +259,8 @@ describe("MedicationActiveIngredientsPage", () => {
   it("displays a success toast when a valid edit is made", async () => {
     const user = userEvent.setup();
 
-    const mockMutate = vi.fn(() => true);
-    let capturedOnSuccess: (() => void) | undefined;
-
     mockTrpc.medicationActiveIngredientsRouter.update.useMutation.mockImplementation(
       ({ onSuccess }) => {
-        capturedOnSuccess = onSuccess;
         return {
           mutate: vi.fn(() => {
             onSuccess?.(); // call it immediately when mutate is called
@@ -410,8 +406,6 @@ describe("MedicationActiveIngredientsPage", () => {
 
   it("rejects deletion of active ingredients that are in use by medication brands with a toast and closes the modal", async () => {
     const user = userEvent.setup();
-    const mockMutate = vi.fn(() => true);
-    let capturedOnError: (() => void) | undefined;
 
     const mockDBError = new Error(
       "Error! Check that there are no brands that depend on this active ingredient.",
@@ -419,7 +413,6 @@ describe("MedicationActiveIngredientsPage", () => {
 
     mockTrpc.medicationActiveIngredientsRouter.delete.useMutation.mockImplementation(
       ({ onError }) => {
-        capturedOnError = onError;
         return {
           mutate: vi.fn(() => {
             onError?.(mockDBError);
@@ -464,11 +457,9 @@ describe("MedicationActiveIngredientsPage", () => {
 
   it("displays a toast confirmation if an active ingredient has been deleted", async () => {
     const user = userEvent.setup();
-    let capturedOnSuccess: (() => void) | undefined;
 
     mockTrpc.medicationActiveIngredientsRouter.delete.useMutation.mockImplementation(
       ({ onSuccess }) => {
-        capturedOnSuccess = onSuccess;
         return {
           mutate: vi.fn(() => {
             onSuccess?.();
@@ -528,16 +519,17 @@ describe("MedicationActiveIngredientsPage", () => {
     waitFor(() => {
       const dialog = screen.getByRole("dialog");
       expect(dialog).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Add New Active Ingredient" }),
+      ).toBeInTheDocument();
     });
   });
 
   it("only allows positive numeric inputs in fallbelow field in add new active ingredient modal", async () => {
     const user = userEvent.setup();
-    let capturedOnSuccess: (() => void) | undefined;
 
-    mockTrpc.medicationActiveIngredientsRouter.delete.useMutation.mockImplementation(
+    mockTrpc.medicationActiveIngredientsRouter.create.useMutation.mockImplementation(
       ({ onSuccess }) => {
-        capturedOnSuccess = onSuccess;
         return {
           mutate: vi.fn(() => {
             onSuccess?.();
@@ -638,11 +630,9 @@ describe("MedicationActiveIngredientsPage", () => {
 
   it("closes the add new active ingredient modal, displays a success toast, and refreshes the list when a valid new ingredient is added", async () => {
     const user = userEvent.setup();
-    let capturedOnSuccess: (() => void) | undefined;
 
-    mockTrpc.medicationActiveIngredientsRouter.delete.useMutation.mockImplementation(
+    mockTrpc.medicationActiveIngredientsRouter.create.useMutation.mockImplementation(
       ({ onSuccess }) => {
-        capturedOnSuccess = onSuccess;
         return {
           mutate: vi.fn(() => {
             onSuccess?.();
