@@ -46,6 +46,9 @@ export default function VillageSelector() {
 
   return (
     <div className="relative w-52 min-w-52 max-w-52" ref={dropdownRef}>
+      <div className="text-xs text-slate-500 mb-3 px-1 text-white">
+        Village for new patients & visits
+      </div>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
