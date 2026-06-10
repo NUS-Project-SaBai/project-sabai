@@ -215,7 +215,14 @@ export const patientsRouter = router({
     .mutation(async ({ input }) => {
       if (input.matches.length === 0) return [];
 
-      const faceIds = input.matches.map((item) => item.Face!.FaceId);
+      // use typescript typeguard filter to avoid inArray type errors
+      const faceIds = input.matches
+        .map((item) => item.Face?.FaceId)
+        .filter((id): id is string => typeof id === "string");
+
+      if (faceIds.length === 0) {
+        return [];
+      }
 
       const result = await db
         .select({
