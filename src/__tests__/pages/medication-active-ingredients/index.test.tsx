@@ -177,8 +177,8 @@ describe("MedicationActiveIngredientsPage", () => {
 
     // todo: our RHF forms aren't accessible directly by react testing library, need use html selectors
     nameInput = container.querySelector('input[name="name"]');
-    unitInput = container.querySelector('input[name="unitOfMeasurement');
-    fallBelowInput = container.querySelector('input[name="fallBelow');
+    unitInput = container.querySelector('input[name="unitOfMeasurement"]');
+    fallBelowInput = container.querySelector('input[name="fallBelow"]');
 
     expect(nameInput).toBeInTheDocument();
     expect(unitInput).toBeInTheDocument();
