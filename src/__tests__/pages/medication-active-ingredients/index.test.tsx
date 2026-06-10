@@ -160,8 +160,8 @@ describe("MedicationActiveIngredientsPage", () => {
       '<span class="text-sm font-medium text-slate-900">Paracetamol</span>',
     );
     let nameInput = container.querySelector('input[name="name"]');
-    let unitInput = container.querySelector('input[name="unitOfMeasurement');
-    let fallBelowInput = container.querySelector('input[name="fallBelow');
+    let unitInput = container.querySelector('input[name="unitOfMeasurement]"');
+    let fallBelowInput = container.querySelector('input[name="fallBelow]"');
 
     expect(unitInput).not.toBeInTheDocument();
     expect(fallBelowInput).not.toBeInTheDocument();
@@ -255,7 +255,7 @@ describe("MedicationActiveIngredientsPage", () => {
       isLoading: false,
     });
 
-    render(
+    const { container } = render(
       <>
         <MedicationActiveIngredientsBasePage />
         <Toaster toastOptions={{ duration: 100 }} />
@@ -268,8 +268,8 @@ describe("MedicationActiveIngredientsPage", () => {
     expect(screen.getByRole("spinbutton")).toBeInTheDocument();
 
     const fallBelowInput = screen.getByRole("spinbutton");
-    const nameInput = document.getElementById("name");
-    const unitInput = document.getElementById("unitOfMeasurement");
+    const nameInput = container.querySelector("#name");
+    const unitInput = container.querySelector("#unitOfMeasurement");
 
     await user.clear(fallBelowInput);
     await user.type(fallBelowInput, "70000");
@@ -572,8 +572,9 @@ describe("MedicationActiveIngredientsPage", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
     // test cross button
-    const deleteButton = screen.getByRole("button", { name: "Delete" });
-    await user.click(deleteButton);
+    await user.click(
+      screen.getByRole("button", { name: "Add Active Ingredient" }),
+    );
     const dialogSecond = await screen.findByRole("dialog");
 
     const crossButton = within(dialogSecond).getByRole("button", {
