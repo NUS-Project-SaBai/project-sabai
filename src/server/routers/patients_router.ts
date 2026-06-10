@@ -193,7 +193,7 @@ export const patientsRouter = router({
           z.object({
             Face: z
               .object({
-                FaceId: z.string(),
+                FaceId: z.string().optional(),
                 BoundingBox: z
                   .object({
                     Width: z.number().optional(),
@@ -202,7 +202,7 @@ export const patientsRouter = router({
                     Top: z.number().optional(),
                   })
                   .optional(),
-                ImageId: z.string(),
+                ImageId: z.string().optional(),
                 Confidence: z.number().optional(),
                 IndexFacesModelVersion: z.string().optional(),
               })
