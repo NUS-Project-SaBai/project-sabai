@@ -83,7 +83,19 @@ function Header() {
                   label="Unit of Measurement"
                   type="text"
                 />
-                <RHFInput name="fallBelow" label="Fall below" type="number" />
+                <RHFInput
+                  name="fallBelow"
+                  label="Fall below"
+                  type="number"
+                  registerOptions={{
+                    valueAsNumber: true,
+                    min: {
+                      value: 1,
+                      message: "Please input only positive values.",
+                    },
+                    required: true,
+                  }}
+                />
                 <div className="flex flex-row gap-2">
                   <button
                     className={clsx(

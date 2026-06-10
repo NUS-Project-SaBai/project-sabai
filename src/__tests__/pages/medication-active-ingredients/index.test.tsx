@@ -484,18 +484,6 @@ describe("MedicationActiveIngredientsPage", () => {
 
   it("only allows positive numeric inputs in fallbelow field in add new active ingredient modal", async () => {
     const user = userEvent.setup();
-    const mockTooSmallError = new Error("An error has occurred.");
-
-    mockTrpc.medicationActiveIngredientsRouter.create.useMutation.mockImplementation(
-      ({ onError }) => {
-        return {
-          mutate: vi.fn(() => {
-            onError?.(mockTooSmallError);
-          }),
-          isLoading: false,
-        };
-      },
-    );
 
     mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue({
       data: mockActiveIngredients,
@@ -534,19 +522,13 @@ describe("MedicationActiveIngredientsPage", () => {
     await user.type(fallBelowInput!, "-1");
     await user.click(saveButton!);
 
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "An error has occurred.",
-    );
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(await screen.findByText("Please input only positive values."));
 
     // test 0
     await user.clear(fallBelowInput!);
     await user.type(fallBelowInput!, "0");
     await user.click(saveButton!);
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "An error has occurred.",
-    );
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(await screen.findByText("Please input only positive values."));
   });
 
   it("closes the add new active ingredient modal when the cross button or the cancel button is clicked", async () => {
