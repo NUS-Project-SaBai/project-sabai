@@ -1,5 +1,7 @@
 packages:
   - .
+allowBuilds:
+  esbuild: false
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
