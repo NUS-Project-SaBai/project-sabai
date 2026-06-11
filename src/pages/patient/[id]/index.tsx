@@ -122,16 +122,20 @@ export default function PatientPage() {
             <div className="text-center py-4">
               <p className="text-slate-500">Loading visits...</p>
             </div>
+          ) : !visits || visits.length === 0 ? (
+            <p className="text-slate-500 py-4">
+              No visits recorded for this patient.
+            </p>
           ) : (
             <div className="space-y-3">
-              {visits?.map((visit, index) => (
+              {visits.map((visit, index) => (
                 <div
                   key={visit.id}
                   className="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50"
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className="rounded-full"
+                      className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: visit.villageCodeColor }}
                       title={`Village: ${visit.villageCodeName}`}
                     />
