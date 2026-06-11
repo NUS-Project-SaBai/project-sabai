@@ -99,18 +99,8 @@ export const patientsRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      // Upload image to Cloudinary and get the public ID
-      const patientImagePublicId = await uploadToCloudinary(input.patientImage);
-
       const { villageCodeId, ...patientData } = input;
-      const newPatientInput = { ...patientData, patientImagePublicId };
 
-      const [newPatient] = await db
-        .insert(patients)
-        .values(newPatientInput)
-        .returning();
-
-      // Automatically create a visit for the new patient
       if (!villageCodeId) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -118,14 +108,21 @@ export const patientsRouter = router({
         });
       }
 
-      const [newVisit] = await db
-        .insert(visits)
-        .values({
-          patientId: newPatient.id,
-          villageCodeId: villageCodeId,
-          date: new Date(),
-        })
+      // Upload image to Cloudinary and get the public ID
+      const patientImagePublicId = await uploadToCloudinary(input.patientImage);
+      const newPatientInput = { ...patientData, patientImagePublicId };
+
+      const [newPatient] = await db
+        .insert(patients)
+        .values(newPatientInput)
         .returning();
+
+      // Automatically create the patient's first visit
+      await db.insert(visits).values({
+        patientId: newPatient.id,
+        villageCodeId: villageCodeId,
+        date: new Date(),
+      });
 
       return newPatient;
     }),
