@@ -79,7 +79,6 @@ function VillageCodesPage() {
 
   const closeForm = () => {
     setIsEditing(false);
-    setFormData(DEFAULT_FORM);
   };
 
   const handleDelete = (id: number) => {
