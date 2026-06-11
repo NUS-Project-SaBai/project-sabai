@@ -35,6 +35,7 @@ function VillageCodesPage() {
   const createMutation = trpc.villageCodesRouter.create.useMutation({
     onSuccess: () => {
       utils.villageCodesRouter.list.invalidate();
+      clearFormData();
       closeForm();
     },
   });
@@ -42,6 +43,7 @@ function VillageCodesPage() {
   const updateMutation = trpc.villageCodesRouter.update.useMutation({
     onSuccess: () => {
       utils.villageCodesRouter.list.invalidate();
+      clearFormData();
       closeForm();
     },
   });
@@ -77,7 +79,7 @@ function VillageCodesPage() {
 
   const closeForm = () => {
     setIsEditing(false);
-    clearFormData();
+    setFormData(DEFAULT_FORM);
   };
 
   const handleDelete = (id: number) => {
