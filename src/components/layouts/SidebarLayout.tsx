@@ -25,19 +25,13 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
       {/* mobile sidebar */}
       <div className="flex sm:hidden flex-row w-full p-2 justify-between items-center bg-[var(--color-navbar)]">
         <SabaiLogo />
-        <button
-          className={`group flex items-center gap-2 p-2 pl-4 rounded-md hover:cursor-pointer`}
-          onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-        >
-          <IoMdMenu className="h-7 w-7 text-white" />
-        </button>
         <div className="flex items-center gap-2">
           <VillageSelector />
           <button
             className={`group flex items-center gap-2 p-2 pl-4 rounded-md hover:cursor-pointer`}
             onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
           >
-            <IoMdMenu className="h-7 w-7 text-gray-800" />
+            <IoMdMenu className="h-7 w-7 text-white" />
           </button>
         </div>
       </div>
