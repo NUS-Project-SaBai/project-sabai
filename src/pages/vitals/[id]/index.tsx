@@ -156,9 +156,8 @@ PatientVitalsPage.getLayout = (page: React.ReactNode) =>
     </PatientTopMenuLayout>,
   );
 
-
-  //dropdown listing all the visits of that patient by id
-  //on selecting that particular visit, get the vitals of that visit
-  //show the vitals in a from
-  //special cases: no visits found -> create a visit? Need to clarify route, for now just show that no visit found
-  //special case only one visit found -> auto display for that
+//dropdown listing all the visits of that patient by id
+//on selecting that particular visit, get the vitals of that visit
+//show the vitals in a from
+//special cases: no visits found -> create a visit? Need to clarify route, for now just show that no visit found
+//special case only one visit found -> auto display for that
