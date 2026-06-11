@@ -6,7 +6,7 @@ import {
   assertBreadcrumbs,
   assertLoadingSpinner,
   assertTableContents,
-} from "@/__tests__/helper-functions";
+} from "@/__tests__/utils/helper-functions";
 import { Toaster, toast } from "react-hot-toast";
 
 const MOCK_ACTIVE_INGREDIENTS = {
