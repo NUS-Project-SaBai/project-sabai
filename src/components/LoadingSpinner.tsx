@@ -10,7 +10,7 @@
  */
 export default function LoadingSpinner({ message }: { message: string }) {
   return (
-    <div className="p-12 text-center text-slate-500">
+    <div className="p-12 text-center text-slate-500" data-testid="loading-spinner">
       <svg
         className="animate-spin h-8 w-8 text-slate-400 mx-auto mb-4"
         xmlns="http://www.w3.org/2000/svg"
