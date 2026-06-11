@@ -1,4 +1,10 @@
-import { createContext, useContext, ReactNode, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useCallback,
+  useEffect,
+} from "react";
 import { trpc } from "@/utils/trpc";
 import { useSaveOnWrite } from "@/hooks/useSaveOnWrite";
 import type { VillageCode } from "@/db/schema";
@@ -28,7 +34,7 @@ export function VillageCodeProvider({ children }: { children: ReactNode }) {
 
   const [villageState, setVillageState] = useSaveOnWrite<{
     selectedVillageCodeId: number | null;
-  }>("villageCodeState", { selectedVillageCodeId: null });
+  }>("villageCodeState", { selectedVillageCodeId: null }, [], 0);
 
   const selectedVillageCodeId = villageState.selectedVillageCodeId;
 
@@ -38,6 +44,17 @@ export function VillageCodeProvider({ children }: { children: ReactNode }) {
     },
     [setVillageState],
   );
+
+  // A hidden/deleted village drops out of the (visible-only) list, so clear it from storage
+  useEffect(() => {
+    if (
+      villageCodes &&
+      selectedVillageCodeId !== null &&
+      !villageCodes.some((v) => v.id === selectedVillageCodeId)
+    ) {
+      setSelectedVillageCodeId(null);
+    }
+  }, [villageCodes, selectedVillageCodeId, setSelectedVillageCodeId]);
 
   return (
     <VillageCodeContext.Provider
