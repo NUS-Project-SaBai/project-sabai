@@ -174,7 +174,7 @@ export function RHFDropdown({
         {label}
         <IsRequiredStar isRequired={isRequired} />
       </label>
-      <div ref={dropdownRef} className="relative">
+      <div ref={dropdownRef} className="relative my-4">
         <Controller
           name={name}
           control={control}
