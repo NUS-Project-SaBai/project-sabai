@@ -5,6 +5,7 @@ import { trpc } from "@/utils/trpc";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { Mode } from "@/pages/scanFace";
+import { useVillageCode } from "@/lib/context/VillageCodeContext";
 
 export type PatientForm = {
   name: string;
@@ -32,6 +33,7 @@ export default function RegistrationPage({
 
   const createMutation = trpc.patientsRouter.create.useMutation();
 
+  const { selectedVillageCodeId } = useVillageCode();
   const handleSubmit = async (data: PatientForm) => {
     setIsSubmitting(true);
 
@@ -41,11 +43,19 @@ export default function RegistrationPage({
       return;
     }
 
+    if (!selectedVillageCodeId) {
+      toast.error("Please select a village code before submitting.");
+      setIsSubmitting(false);
+      return;
+    }
+
     const toMutate: PatientForm & {
       patientImage: string;
+      villageCodeId: number;
     } = {
       ...data,
       patientImage: imgDetails,
+      villageCodeId: selectedVillageCodeId,
     };
 
     createMutation.mutate(toMutate, {
