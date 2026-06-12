@@ -93,7 +93,10 @@ export function WebcamInput({
             <OldButton
               colour="orange"
               text="Retake Photo"
-              onClick={toggleCameraOpen}
+              onClick={() => {
+                toggleCameraOpen();
+                setImageDetails(null);
+              }}
             />
           )
         ) : (
