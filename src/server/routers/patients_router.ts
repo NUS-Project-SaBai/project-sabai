@@ -125,7 +125,11 @@ export const patientsRouter = router({
       // Upload image to Cloudinary and get the public ID
       const patientImagePublicId = await uploadToCloudinary(patientImage);
       const faceEncoding = await generateFaceprint(input.patientImage);
-      const newPatientInput = { ...patientData, patientImagePublicId, faceEncoding };
+      const newPatientInput = {
+        ...patientData,
+        patientImagePublicId,
+        faceEncoding,
+      };
 
       const [newPatient] = await db
         .insert(patients)
