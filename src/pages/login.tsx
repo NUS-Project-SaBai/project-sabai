@@ -14,12 +14,16 @@ export default function Login() {
     setLoading(true);
     setError(null);
 
+    console.log(email)
+    console.log(password)
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
+      console.log(error)
       setError(error.message);
       setLoading(false);
     } else {

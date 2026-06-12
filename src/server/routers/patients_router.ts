@@ -3,8 +3,9 @@ import { zfd } from "zod-form-data";
 import { uploadToCloudinary } from "@/server/utils/cloudinary";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { patients, genderEnum, Patient } from "@/db/schema";
+import { patients, genderEnum, Patient, visits } from "@/db/schema";
 import serverEnv from "@/lib/envVariables";
+import { TRPCError } from "@trpc/server";
 import { eq, inArray } from "drizzle-orm";
 import {
   generateFaceprint,
@@ -103,9 +104,19 @@ export const patientsRouter = router({
         hasSabaiCard: z.boolean(),
         patientImage: z.string(),
         contactNo: z.string(),
+        villageCodeId: zfd.text(z.coerce.number().int().optional()),
       }),
     )
     .mutation(async ({ input }) => {
+      const { villageCodeId, ...patientData } = input;
+
+      if (!villageCodeId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Village code is required for patient registration",
+        });
+      }
+
       const patientImage: File = dataUrlToFile(
         input.patientImage,
         `${input.name}.jpg`,
@@ -114,13 +125,19 @@ export const patientsRouter = router({
       // Upload image to Cloudinary and get the public ID
       const patientImagePublicId = await uploadToCloudinary(patientImage);
       const faceEncoding = await generateFaceprint(input.patientImage);
-
-      const newPatientInput = { ...input, patientImagePublicId, faceEncoding };
+      const newPatientInput = { ...patientData, patientImagePublicId, faceEncoding };
 
       const [newPatient] = await db
         .insert(patients)
         .values(newPatientInput)
         .returning();
+
+      // Automatically create the patient's first visit
+      await db.insert(visits).values({
+        patientId: newPatient.id,
+        villageCodeId: villageCodeId,
+        date: new Date(),
+      });
 
       return newPatient;
     }),

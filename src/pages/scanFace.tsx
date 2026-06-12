@@ -3,6 +3,7 @@ import Manual from "@/components/Manual";
 import MatchingPatients from "@/components/scanFace/MatchingPatients";
 import RegistrationPage from "@/components/scanFace/RegistrationPage";
 import { useState } from "react";
+import { useVillageCode } from "@/lib/context/VillageCodeContext";
 
 export enum Mode {
   REGISTERING = "registering",
@@ -16,6 +17,8 @@ function ScanFacePage() {
   const [imgDetails, setImgDetails] = useState<string | null>(null);
 
   const [mode, setMode] = useState<Mode>(Mode.MATCHING); //should be mode.matching by default
+  const { selectedVillageCodeId } = useVillageCode();
+
 
   function handlePictureCapture(picture: string | null) {
     setImgDetails(picture);

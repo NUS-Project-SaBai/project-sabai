@@ -1,0 +1,1 @@
+ALTER TABLE "medication_active_ingredients" ALTER COLUMN "fall_below" SET NOT NULL;

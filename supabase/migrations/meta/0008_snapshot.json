@@ -1,6 +1,6 @@
 {
-  "id": "68dc13e7-460b-4472-a2cc-5b0554a65438",
-  "prevId": "d72cc7e3-7511-47fd-ad6c-247d71e89232",
+  "id": "069eed5c-76e7-4fb0-af79-f85cb4b06876",
+  "prevId": "68dc13e7-460b-4472-a2cc-5b0554a65438",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -311,6 +311,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "face_encoding": {
+          "name": "face_encoding",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
