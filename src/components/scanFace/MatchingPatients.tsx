@@ -61,7 +61,17 @@ export default function MatchingPatients({
   }
 
   if (matchingPatients.length === 0) {
-    return <h2 className="text-xl font-bold mb-4">No matches found</h2>;
+    return (
+      <>
+        <h2 className="text-xl font-bold mb-4">No matches found</h2>;
+        <button
+          onClick={() => setMode(Mode.REGISTERING)}
+          className="flex-1 px-4 py-2 rounded-lg font-medium bg-red-300"
+        >
+          Register New Patient
+        </button>
+      </>
+    );
   }
 
   return (
