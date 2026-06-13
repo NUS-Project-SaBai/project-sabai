@@ -15,11 +15,10 @@ function ScanFacePage() {
   const [, setCameraIsOpen] = useState(false);
   const [imgDetails, setImgDetails] = useState<string | null>(null);
 
-  const [mode, setMode] = useState<Mode>(Mode.REGISTERING); //should be mode.matching by default
+  const [mode, setMode] = useState<Mode>(Mode.MATCHING);
 
   function handlePictureCapture(picture: string | null) {
     setImgDetails(picture);
-    console.log("new pic!");
   }
 
   return (
