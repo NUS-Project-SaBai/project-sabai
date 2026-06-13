@@ -98,17 +98,22 @@ export default function MatchingPatients({
                   {patient.name}
                 </div>
               </TableCell>
-              <TableCell>placeholder actions</TableCell>
+              <TableCell>
+                {/* Placeholder for 'create new visit' button */}
+                Create visit
+              </TableCell>
             </TableRow>
           ))}
         </tbody>
       </table>
-      <button
-        onClick={() => setMode(Mode.REGISTERING)}
-        className="flex-1 px-4 py-2 rounded-lg font-medium bg-red-300"
-      >
-        Register new patient
-      </button>
+      <div className="flex gap-3 mt-6">
+        <button
+          onClick={() => setMode(Mode.REGISTERING)}
+          className="flex-1 px-4 py-2 rounded-lg font-medium bg-indigo-700 text-white"
+        >
+          Register New Patient Instead
+        </button>
+      </div>
     </div>
   );
 }

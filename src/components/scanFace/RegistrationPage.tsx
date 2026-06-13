@@ -6,6 +6,7 @@ import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { Mode } from "@/pages/scanFace";
 import { useVillageCode } from "@/lib/context/VillageCodeContext";
+import clsx from "clsx";
 
 export type PatientForm = {
   name: string;
@@ -141,19 +142,26 @@ export default function RegistrationPage({
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`flex-1 px-4 py-2 rounded-lg font-medium ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 text-white hover:bg-indigo-700 hover:cursor-pointer"}`}
+              className={clsx(
+                "flex-1 px-4 py-2 rounded-lg font-medium text-white",
+                isSubmitting
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700",
+              )}
             >
               Create New Patient
             </button>
           </div>
         </form>
       </FormProvider>
-      <button
-        onClick={() => setMode(Mode.MATCHING)}
-        className="flex-1 px-4 py-2 rounded-lg font-medium bg-red-300"
-      >
-        Find matches
-      </button>
+      <div className="flex gap-3 mt-6">
+        <button
+          onClick={() => setMode(Mode.MATCHING)}
+          className="flex-1 px-4 py-2 rounded-lg font-medium bg-indigo-700 text-white"
+        >
+          Match Instead
+        </button>
+      </div>
     </>
   );
 }
