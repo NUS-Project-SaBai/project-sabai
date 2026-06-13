@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { FormProvider, useForm, useWatch, useFormContext } from "react-hook-form";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
@@ -7,22 +7,26 @@ import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { vitals } from "@/db/schema";
+import { useEffect } from "react";
+import { format } from "path";
 
 export default function PatientVitalsPage() {
   const router = useRouter();
-  const { id: patientId } = router.query;
+  const { id } = router.query;
   const methods = useForm();
 
+  //fetch patient
   const { data: patient, isLoading: patientLoading } =
     trpc.patientsRouter.getById.useQuery(
-      { id: Number(patientId) },
-      { enabled: !!patientId },
+      { id: Number(id) },
+      { enabled: !!id },
     );
 
+  //fetch visits
   const { data: visits, isLoading: visitsLoading } =
     trpc.visitsRouter.getByPatientId.useQuery(
-      { patientId: Number(patientId) },
-      { enabled: !!patientId },
+      { patientId: Number(id) },
+      { enabled: !!id },
     );
 
   // Watch the form field to get selected visit (must be before early returns)
@@ -31,6 +35,13 @@ export default function PatientVitalsPage() {
     name: "visitSelect",
   });
 
+  //Automatically select visit if only got one
+  useEffect(() => {
+    if(visits && visits.length == 1) {
+      methods.setValue("visitSelect", visits[0].id.toString);
+    }
+  },[visits, methods]);
+
   // 1. Ensure the router is fully initialized and patientId exists
   if (!router.isReady || patientLoading || visitsLoading) {
     return <LoadingSpinner message="Loading patient and visits..." />;
@@ -38,7 +49,7 @@ export default function PatientVitalsPage() {
 
   // 2. Only check if patient is missing AFTER we are certain the query ran
   if (!patient) {
-    return <div>Patient not found</div>;
+    return <div className="p-8 text-center font-semibold text-red-500">Patient not found</div>;
   }
 
   // Only get selected visit when explicitly chosen from dropdown
@@ -46,11 +57,6 @@ export default function PatientVitalsPage() {
     ? visits?.find((v) => v.id.toString() === selectedVisitValue)
     : null;
 
-  /**
-   * Formats a visit date into a readable string format.
-   * @param {Date} date - The date to format
-   * @returns {string} Formatted date string in GB locale
-   */
   const formatVisitDate = (date: Date) => {
     return new Date(date).toLocaleString("en-GB", {
       day: "numeric",
@@ -62,8 +68,8 @@ export default function PatientVitalsPage() {
   };
 
   return (
-    <div className="min-h-screen flex-1 p-8">
-      <div className="w-full mx-auto">
+   <div className="min-h-screen flex-1 p-8 bg-slate-50">
+      <div className="w-full mx-auto max-w-5xl">
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },
@@ -71,65 +77,56 @@ export default function PatientVitalsPage() {
             { label: `Vitals for - ${patient.name}` },
           ]}
         />
-        <div className="flex-1 overflow-y-auto p-6">
-          <h1 className="text-2xl font-bold mb-4">
-            Patient Vitals - ID: {patientId}
-          </h1>
-          <p className="text-gray-600 mb-6">
-            Vital signs for patient {patientId}.
-          </p>
 
-          <div className="bg-white rounded-lg shadow p-4">
-            {selectedVisitValue ? (
-              <VitalsForm visitId={selectedVisitValue} />
-            ) : (
-              <div>No Visits Found</div>
-            )}
-            <p className="text-gray-500">
-              <FormProvider {...methods}>
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                  {visits && visits.length > 0 ? (
-                    <div className="mb-6">
-                      {selectedVisit ? (
-                        <>
-                          <div className="text-sm text-slate-600 mb-2">
-                            Currently viewing vision data for visit on
-                          </div>
-                          <div className="text-lg font-semibold text-slate-900 mb-2">
-                            {formatVisitDate(selectedVisit.date)}
-                          </div>
-                        </>
-                      ) : (
-                        <div className="text-lg font-semibold text-slate-900 mb-2">
-                          No visit selected
-                        </div>
-                      )}
-                      <div className="mb-4">
-                        <RHFDropdown
-                          name="visitSelect"
-                          label="Select a different visit to compare historical vitals data"
-                          dropdownOptions={visits.map((visit) => ({
-                            label: formatVisitDate(visit.date),
-                            value: visit.id.toString(),
-                          }))}
-                        />
-                      </div>
+        <div className="flex flex-col mb-8">
+          <h1 className="text-3xl font-bold text-slate-900">
+            Patient Vitals Matrix — {patient.name}
+          </h1>
+        </div>
+        <div className="flex-1 overflow-y-auto p-6">
+
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <FormProvider {...methods}>
+              <div className="p-6 border-b border-slate-100 bg-slate-50/50">
+                {
+                  visits && visits.length > 0 ? (
+                    <div className="max-w-md">
+                      <RHFDropdown
+                    name="visitSelect"
+                    label="Active Clinical Visit Instance"
+                    dropdownOptions={visits.map((visit) => ({
+                      label: formatVisitDate(visit.date),
+                      value: visit.id.toString(),
+                    }))}
+                  />
                     </div>
                   ) : (
-                    <div className="p-4 mb-4 bg-amber-50 border border-amber-200 rounded-md">
-                      <p className="text-amber-700">
-                        No visits found for this patient. Please create a visit
-                        first to update glasses prescription.
-                      </p>
+                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-700">
+                      No visits found for patient.
                     </div>
-                  )}
+                  )  
+                }
+              </div>
 
-                  <div className="text-slate-500">
-                    Vision prescription form will be implemented here...
+              <div className="p-6">
+                {selectedVisit ? (
+                <div className="mb-6 p-4 bg-blue-50/50 rounded-lg border border-blue-100">
+                    <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider block mb-1">
+                    Filling up vitals form for visit on {formatVisitDate(selectedVisit.date)}
+                    </span> 
+
+                    <VitalsForm visitId={selectedVisit.id} />
                   </div>
-                </div>
-              </FormProvider>
-            </p>
+                    ) : (
+                  visits && visits.length > 0 && (
+                    <div className="text-center py-12 text-slate-400 font-medium border-2 border-dashed border-slate-200 rounded-xl">
+                      Please choose a visit to view vitals.
+                    </div>
+                  )
+                )}
+              </div>
+
+            </FormProvider>
           </div>
         </div>
       </div>
@@ -137,7 +134,9 @@ export default function PatientVitalsPage() {
   );
 }
 
-function VitalsForm({ visitId }: { visitId: number }) {
+
+function VitalsForm({ visitId }: {visitId:number}) {
+
   const { data: vitals, isLoading: vitalsLoading } =
     trpc.vitalsRouter.getByVisitId.useQuery(
       { visitId: visitId },
