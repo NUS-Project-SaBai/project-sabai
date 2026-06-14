@@ -123,8 +123,7 @@ function ScanFacePage() {
             imageDetails={imgDetails}
             setImageDetails={setScannedFace}
             cameraIsOpenCallback={cameraToggleCallback}
-            width={500}
-            height={500}
+            size={400}
           />
         </div>
         {/* Create Patient Form */}
