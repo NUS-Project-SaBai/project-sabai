@@ -23,7 +23,6 @@ export function WebcamInput({
   setImageDetails,
   cameraIsOpenCallback,
   width = 250,
-  height = 250,
 }: {
   imageDetails: string | null;
   setImageDetails: (picture: string | null) => void;
@@ -58,8 +57,8 @@ export function WebcamInput({
       </label>
       {!cameraIsOpen && (
         <div
-          className="relative flex items-center justify-center bg-gray-400"
-          style={{ width, height }}
+          className="relative flex items-center justify-center bg-gray-400 w-full aspect-square"
+          style={{ maxWidth: width }}
         >
           {imageDetails != null && (
             <Image src={imageDetails} alt="" fill={true} unoptimized={true} />
@@ -68,11 +67,10 @@ export function WebcamInput({
       )}
 
       {cameraIsOpen && (
-        <div className="flex flex-col items-center justify-center space-y-2">
+        <div className="flex flex-col items-center justify-center space-y-2 w-full" style={{ maxWidth: width }}>
           <Webcam
             audio={false}
-            width={width}
-            height={height}
+            width="100%"
             ref={webcamRef}
             screenshotFormat="image/jpeg"
             screenshotQuality={1}
