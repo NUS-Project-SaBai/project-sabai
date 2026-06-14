@@ -23,10 +23,12 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
   return (
     <div className="flex h-screen flex-col sm:flex-row">
       {/* mobile sidebar */}
-      <div className="flex sm:hidden flex-row w-full p-2 justify-between items-center bg-[var(--color-navbar)]">
+      <div className="grid sm:hidden grid-cols-3 w-full p-2 items-center bg-[var(--color-navbar)]">
         <SabaiLogo />
-        <div className="flex items-center gap-2">
+        <div className="flex justify-center">
           <VillageSelector />
+        </div>
+        <div className="flex justify-end">
           <button
             className={`group flex items-center gap-2 p-2 pl-4 rounded-md hover:cursor-pointer`}
             onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
