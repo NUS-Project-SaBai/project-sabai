@@ -45,7 +45,7 @@ export const patientsRouter = router({
         drugAllergy: patients.drugAllergy,
         hasSabaiCard: patients.hasSabaiCard,
         patientImagePublicId: patients.patientImagePublicId,
-        faceEncoding: patients.faceEncoding,
+        rekognitionFaceId: patients.rekognitionFaceId,
       })
       .from(patients);
 
@@ -69,7 +69,7 @@ export const patientsRouter = router({
           hasBS2Card: patients.hasBS2Card,
           hasSabaiCard: patients.hasSabaiCard,
           patientImagePublicId: patients.patientImagePublicId,
-          faceEncoding: patients.faceEncoding,
+          rekognitionFaceId: patients.rekognitionFaceId,
         })
         .from(patients)
         .where(eq(patients.id, input.id))
@@ -122,7 +122,7 @@ export const patientsRouter = router({
         `${input.name}.jpg`,
       );
 
-      const [patientImagePublicId, faceEncoding] = await Promise.all([
+      const [patientImagePublicId, rekognitionFaceId] = await Promise.all([
         uploadToCloudinary(patientImage),
         generateFaceprint(input.patientImage),
       ]);
@@ -130,7 +130,7 @@ export const patientsRouter = router({
       const newPatientInput = {
         ...patientData,
         patientImagePublicId,
-        faceEncoding,
+        rekognitionFaceId,
       };
 
       const [newPatient] = await db
@@ -260,10 +260,10 @@ export const patientsRouter = router({
           drugAllergy: patients.drugAllergy,
           hasSabaiCard: patients.hasSabaiCard,
           patientImagePublicId: patients.patientImagePublicId,
-          faceEncoding: patients.faceEncoding,
+          rekognitionFaceId: patients.rekognitionFaceId,
         })
         .from(patients)
-        .where(inArray(patients.faceEncoding, faceIds));
+        .where(inArray(patients.rekognitionFaceId, faceIds));
 
       return result.map(getPatientWithImageUrl);
     }),
