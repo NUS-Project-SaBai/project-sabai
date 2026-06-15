@@ -62,15 +62,17 @@ export default function MatchingPatients({
 
   if (matchingPatients.length === 0) {
     return (
-      <>
-        <h2 className="text-xl font-bold mb-4">No matches found</h2>
+      <div className="flex-col">
+        <h2 className="text-xl font-bold mb-4 text-center py-10">
+          No matches found
+        </h2>
         <button
           onClick={() => setMode(Mode.REGISTERING)}
-          className="flex-1 px-4 py-2 rounded-lg font-medium bg-red-300"
+          className="flex-1 px-4 py-2 rounded-lg font-medium bg-indigo-700 text-white"
         >
           Register New Patient
         </button>
-      </>
+      </div>
     );
   }
 
