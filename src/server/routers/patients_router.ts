@@ -122,9 +122,11 @@ export const patientsRouter = router({
         `${input.name}.jpg`,
       );
 
-      // Upload image to Cloudinary and get the public ID
-      const patientImagePublicId = await uploadToCloudinary(patientImage);
-      const faceEncoding = await generateFaceprint(input.patientImage);
+      const [patientImagePublicId, faceEncoding] = await Promise.all([
+        uploadToCloudinary(patientImage),
+        generateFaceprint(input.patientImage),
+      ]);
+
       const newPatientInput = {
         ...patientData,
         patientImagePublicId,
