@@ -78,7 +78,7 @@ export const patients = pgTable("patients", {
   hasBS2Card: boolean("has_bs2_card").notNull(),
   hasSabaiCard: boolean("has_sabai_card").notNull(),
   patientImagePublicId: text("patient_image_public_id").notNull(),
-  faceEncoding: text("face_encoding"),
+  rekognitionFaceId: text("rekognition_face_id"),
 });
 
 export type Patient = typeof patients.$inferSelect;

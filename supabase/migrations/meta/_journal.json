@@ -57,6 +57,13 @@
       "when": 1780896239764,
       "tag": "0007_dazzling_ironclad",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1781540125999,
+      "tag": "0008_sweet_elektra",
+      "breakpoints": true
     }
   ]
 }

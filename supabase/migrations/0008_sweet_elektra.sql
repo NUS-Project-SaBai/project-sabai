@@ -1,0 +1,1 @@
+ALTER TABLE "patients" ADD COLUMN "rekognition_face_id" text;
