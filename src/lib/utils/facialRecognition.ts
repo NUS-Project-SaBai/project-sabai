@@ -27,7 +27,7 @@ export async function generateFaceprint(str: string) {
 
   try {
     const results: IndexFacesCommandOutput = await client.send(command);
-    return results.FaceRecords![0].Face?.FaceId;
+    return results.FaceRecords?.[0]?.Face?.FaceId;
   } catch (err) {
     console.error(err);
   }
