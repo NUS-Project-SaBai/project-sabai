@@ -79,3 +79,10 @@ function toImage(str: string): Image {
   const bytes = toBytes(str);
   return { Bytes: bytes };
 }
+
+export function dataUrlToFile(dataUrl: string, filename: string): File {
+  const [header, base64] = dataUrl.split(",");
+  const mimeType = header.match(/:(.*?);/)?.[1] ?? "image/jpeg";
+  const bytes = toBytes(base64);
+  return new File([bytes], filename, { type: mimeType });
+}

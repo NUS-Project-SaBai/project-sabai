@@ -10,7 +10,7 @@ import { eq, inArray } from "drizzle-orm";
 import {
   generateFaceprint,
   searchFaceprint,
-  toBytes,
+  dataUrlToFile,
 } from "@/lib/utils/facialRecognition";
 
 const cloudinaryUrlPrefix = serverEnv.CLOUDINARY_URL_PREFIX;
@@ -28,13 +28,6 @@ const getPatientWithImageUrl = (patient: Patient) => ({
     ? `${cloudinaryUrlPrefix}/${patient.patientImagePublicId}`
     : null,
 });
-
-function dataUrlToFile(dataUrl: string, filename: string): File {
-  const [header, base64] = dataUrl.split(",");
-  const mimeType = header.match(/:(.*?);/)?.[1] ?? "image/jpeg";
-  const bytes = toBytes(base64);
-  return new File([bytes], filename, { type: mimeType });
-}
 
 export const patientsRouter = router({
   // List all patients with village details
