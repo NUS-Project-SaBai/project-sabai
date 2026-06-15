@@ -110,6 +110,13 @@ export const patientsRouter = router({
         });
       }
 
+      if (!input.patientImage) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Patient image is required for patient registration",
+        });
+      }
+
       const patientImage: File = dataUrlToFile(
         input.patientImage,
         `${input.name}.jpg`,
