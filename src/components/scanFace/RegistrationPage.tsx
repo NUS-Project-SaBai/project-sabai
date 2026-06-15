@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { trpc } from "@/utils/trpc";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
-import { Mode } from "@/pages/scanFace";
+import { Mode } from "@/types/scan";
 import { useVillageCode } from "@/lib/context/VillageCodeContext";
 import clsx from "clsx";
 

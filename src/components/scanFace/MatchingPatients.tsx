@@ -8,7 +8,7 @@ import TableCell from "@/components/TableCell";
 import { PatientPhoto } from "@/components/PatientPhoto";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import toast from "react-hot-toast";
-import { Mode } from "@/pages/scanFace";
+import { Mode } from "@/types/scan";
 
 type PatientWithImage = Patient & {
   patientImageUrl: string | null;

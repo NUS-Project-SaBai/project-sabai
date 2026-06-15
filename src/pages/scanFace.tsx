@@ -3,13 +3,7 @@ import Manual from "@/components/Manual";
 import MatchingPatients from "@/components/scanFace/MatchingPatients";
 import RegistrationPage from "@/components/scanFace/RegistrationPage";
 import { useState } from "react";
-
-export enum Mode {
-  REGISTERING = "registering",
-  MANUAL = "manual",
-  MATCHING = "matching",
-  BLANK = "",
-}
+import { Mode } from "@/types/scan";
 
 function ScanFacePage() {
   const [, setCameraIsOpen] = useState(false);
