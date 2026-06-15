@@ -57,13 +57,6 @@
       "when": 1780896239764,
       "tag": "0007_dazzling_ironclad",
       "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1781279954282,
-      "tag": "0008_light_madripoor",
-      "breakpoints": true
     }
   ]
 }
