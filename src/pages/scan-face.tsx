@@ -4,6 +4,7 @@ import MatchingPatients from "@/components/scanFace/MatchingPatients";
 import RegistrationPage from "@/components/scanFace/RegistrationPage";
 import { useState } from "react";
 import { Mode } from "@/types/scan";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 function ScanFacePage() {
   const [, setCameraIsOpen] = useState(false);
@@ -17,6 +18,12 @@ function ScanFacePage() {
 
   return (
     <div className="min-h-screen bg-slate-50 p-8">
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Scan Face", href: "/scan-face" },
+        ]}
+      />
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-slate-900">Scan Face</h1>
         <div className="flex flex-col space-y-2">
