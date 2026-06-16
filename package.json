@@ -54,8 +54,8 @@
     "@typescript-eslint/eslint-plugin": "^8.53.0",
     "@typescript-eslint/parser": "^8.53.0",
     "@vitejs/plugin-react": "^6.0.2",
-    "@vitest/coverage-v8": "4.0.4",
-    "@vitest/ui": "4.0.4",
+    "@vitest/coverage-v8": "4.1.9",
+    "@vitest/ui": "4.1.9",
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.8",
     "eslint": "^9",
@@ -67,7 +67,7 @@
     "react-icons": "^5.5.0",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^4.0.4"
+    "vitest": "^4.1.9"
   },
   "pnpm": {
     "overrides": {
