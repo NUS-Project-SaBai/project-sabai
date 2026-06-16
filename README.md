@@ -4,7 +4,7 @@ This is a local-first monorepo for "Project Sa'bai". This guide focuses on getti
 
 ---
 
-## 🛠 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have the following installed:
 
@@ -23,7 +23,7 @@ Before you begin, ensure you have the following installed:
 
 ---
 
-## 🚀 Quick Start (Local Development)
+## Quick Start (Local Development)
 
 Follow these steps in order to start developing.
 
@@ -93,7 +93,7 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 🔐 Local Development Accounts
+## Local Development Accounts
 
 Sign in using the app's login page on your local development server (http://localhost:3000).
 
@@ -104,7 +104,7 @@ Sign in using the app's login page on your local development server (http://loca
 
 ---
 
-## 🛑 Stopping & Resetting
+## Stopping & Resetting
 
 To stop the Supabase containers to save battery/memory:
 ```bash
@@ -118,7 +118,7 @@ supabase db reset
 
 ---
 
-## 🧪 Testing the Backend API with Postman
+## Testing the Backend API with Postman
 
 ### Prerequisites
 - The dev server is running (`pnpm dev`)
@@ -148,3 +148,45 @@ A successful response returns HTTP 200 with the Supabase user object and sets `s
 
 For additional notes on tRPC API endpoint structure [see our tRPC documentation](docs/_docs/04-trpc.md#6-api-structure)
 
+## Testing
+
+This project uses Vitest with React Testing Library for unit and integration testing.
+
+### Test Commands
+
+```bash
+# Run tests in watch mode (interactive)
+pnpm test
+
+# Run tests once      
+pnpm test:run
+
+# Run tests with UI interface
+pnpm test:ui
+
+# Run tests with coverage report    
+pnpm test:coverage
+```
+
+### Testing Setup
+
+- **Test Framework**: Vitest with jsdom environment
+- **Testing Library**: React Testing Library with Jest DOM matchers
+- **Test Files**: Located in `src/**/__tests__/**/*.{test,spec}.{ts,tsx}` or alongside components
+- **Setup**: Global test configuration in `vitest.config.mjs` with setup file `src/test-setup.ts`
+
+### Writing Tests
+
+Tests use standard React Testing Library patterns with Vitest syntax:
+
+```tsx
+import { render, screen } from "@testing-library/react";
+import DummyComponent from "@/components/DummyComponent";
+
+describe("DummyComponent", () => {
+  it("renders correctly", () => {
+    render(<DummyComponent />);
+    expect(screen.getByText("Expected Text")).toBeInTheDocument();
+  });
+});
+```

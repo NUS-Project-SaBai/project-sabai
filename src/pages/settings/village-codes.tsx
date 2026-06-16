@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { trpc } from "@/utils/trpc";
+import { useSaveOnWrite } from "@/hooks/useSaveOnWrite";
 import { VillageCode, NewVillageCode } from "@/db/schema";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import TableHeader from "@/components/TableHeader";
@@ -18,7 +19,11 @@ function VillageCodesPage() {
   // 1. Local State
   const [showHidden, setShowHidden] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<NewVillageCode>(DEFAULT_FORM);
+  const [formData, setFormData, clearFormData] = useSaveOnWrite<NewVillageCode>(
+    "village-codes-form",
+    DEFAULT_FORM,
+    [], // No dependencies
+  );
 
   // 2. Data Fetching
   const utils = trpc.useUtils();
@@ -30,6 +35,7 @@ function VillageCodesPage() {
   const createMutation = trpc.villageCodesRouter.create.useMutation({
     onSuccess: () => {
       utils.villageCodesRouter.list.invalidate();
+      clearFormData();
       closeForm();
     },
   });
@@ -37,6 +43,7 @@ function VillageCodesPage() {
   const updateMutation = trpc.villageCodesRouter.update.useMutation({
     onSuccess: () => {
       utils.villageCodesRouter.list.invalidate();
+      clearFormData();
       closeForm();
     },
   });
@@ -72,7 +79,6 @@ function VillageCodesPage() {
 
   const closeForm = () => {
     setIsEditing(false);
-    setFormData(DEFAULT_FORM);
   };
 
   const handleDelete = (id: number) => {
