@@ -63,7 +63,7 @@ function SidebarNavButtons() {
   };
 
   const navigation = [
-    { name: "Scan Face", href: "/scanFace", icon: LuScanFace },
+    { name: "Scan Face", href: "/scan-face", icon: LuScanFace },
     { name: "Patient", href: "/patient", icon: AiOutlineUser },
     { name: "Vitals", href: "/vitals", icon: MdMonitorHeart },
     { name: "Vision", href: "/vision", icon: BsEyeglasses },
