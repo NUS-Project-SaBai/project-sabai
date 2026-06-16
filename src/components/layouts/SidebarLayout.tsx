@@ -12,6 +12,7 @@ import { GiMedicines } from "react-icons/gi";
 import LogoTitle from "@/components/LogoTitle";
 import SabaiLogo from "@/components/SabaiLogo";
 import VillageSelector from "@/components/VillageSelector";
+import { useClickOutside } from "@/hooks/useClickOutside";
 
 interface SidebarLayoutProps {
   children: ReactNode;
@@ -19,11 +20,14 @@ interface SidebarLayoutProps {
 
 export default function SidebarLayout({ children }: SidebarLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const dropdownRef = useClickOutside<HTMLDivElement>(() =>
+    setMobileSidebarOpen(false),
+  );
 
   return (
     <div className="flex h-screen flex-col sm:flex-row">
       {/* mobile sidebar */}
-      <div className="sm:hidden relative">
+      <div className="sm:hidden relative" ref={dropdownRef}>
         <div className="grid grid-cols-3 w-full p-2 items-center bg-[var(--color-navbar)]">
           <SabaiLogo />
           <div className="flex justify-center">
