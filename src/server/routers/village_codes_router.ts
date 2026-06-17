@@ -54,6 +54,7 @@ export const villageCodesRouter = router({
         id: z.number(),
         // Partial updates
         name: z.string().optional(),
+        code: z.string().optional(),
         colorHex: z
           .string()
           .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)
