@@ -16,6 +16,7 @@ import {
 import { Toaster, toast } from "react-hot-toast";
 import ScanFacePage from "@/pages/scan-face";
 import Webcam from "react-webcam";
+import { AssertionError } from "assert";
 
 // Mock tRPC
 vi.mock("@/utils/trpc", () => ({
@@ -112,7 +113,28 @@ describe("ScanFacePage", () => {
     expect(retakeButton).toBeInTheDocument();
   });
 
-  it("changes the image element to a video element when the 'Retake Photo' button is clicked", () => {});
+  it("changes the image element to a video element when the 'Retake Photo' button is clicked", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<ScanFacePage />);
+    const captureButton = screen.getByRole("button", { name: "Capture" });
+
+    expect(
+      container.querySelector(
+        'img[src="data:image/jpeg;base64,mock-string-data"]',
+      ),
+    ).not.toBeInTheDocument();
+    expect(document.getElementById("webcam")).toBeInTheDocument();
+
+    user.click(captureButton);
+
+    await waitFor(() => {
+      const capturedImg = container.querySelector(
+        'img[src="data:image/jpeg;base64,mock-string-data"]',
+      );
+      expect(capturedImg).toBeInTheDocument();
+      expect(document.getElementById("webcam")).not.toBeInTheDocument();
+    });
+  });
 
   it("displays a loading spinner while locating face matches", async () => {
     const user = userEvent.setup();
