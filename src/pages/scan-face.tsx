@@ -31,8 +31,7 @@ function ScanFacePage() {
             imageDetails={imgDetails}
             setImageDetails={handlePictureCapture}
             cameraIsOpenCallback={(isOpen) => setCameraIsOpen(isOpen)}
-            width={500}
-            height={500}
+            size={400}
           />
         </div>
 

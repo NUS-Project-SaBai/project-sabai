@@ -12,6 +12,7 @@ import { GiMedicines } from "react-icons/gi";
 import LogoTitle from "@/components/LogoTitle";
 import SabaiLogo from "@/components/SabaiLogo";
 import VillageSelector from "@/components/VillageSelector";
+import { useClickOutside } from "@/hooks/useClickOutside";
 
 interface SidebarLayoutProps {
   children: ReactNode;
@@ -19,26 +20,33 @@ interface SidebarLayoutProps {
 
 export default function SidebarLayout({ children }: SidebarLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const dropdownRef = useClickOutside<HTMLDivElement>(() =>
+    setMobileSidebarOpen(false),
+  );
 
   return (
     <div className="flex h-screen flex-col sm:flex-row">
       {/* mobile sidebar */}
-      <div className="flex sm:hidden flex-row w-full p-2 justify-between items-center bg-[var(--color-navbar)]">
-        <SabaiLogo />
-        <div className="flex items-center gap-2">
-          <VillageSelector />
-          <button
-            className={`group flex items-center gap-2 p-2 pl-4 rounded-md hover:cursor-pointer`}
-            onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-          >
-            <IoMdMenu className="h-7 w-7 text-white" />
-          </button>
+      <div className="sm:hidden relative" ref={dropdownRef}>
+        <div className="grid grid-cols-3 w-full p-2 items-center bg-[var(--color-navbar)]">
+          <SabaiLogo />
+          <div className="flex justify-center">
+            <VillageSelector />
+          </div>
+          <div className="flex justify-end">
+            <button
+              className={`group flex items-center gap-2 p-2 pl-4 rounded-md hover:cursor-pointer`}
+              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+            >
+              <IoMdMenu className="h-7 w-7 text-white" />
+            </button>
+          </div>
         </div>
-      </div>
-      <div
-        className={`${mobileSidebarOpen ? "flex" : "hidden"} flex-col absolute z-2 w-full p-2 top-15 bg-neutral-50 shadow-2xl`}
-      >
-        <SidebarNavButtons />
+        <div
+          className={`${mobileSidebarOpen ? "flex" : "hidden"} flex-col absolute z-2 w-full p-2 top-full bg-neutral-50 shadow-2xl`}
+        >
+          <SidebarNavButtons />
+        </div>
       </div>
       {/* desktop sidebar */}
       <div className="hidden sm:flex flex-col min-w-64 p-2 gap-6 bg-[var(--color-navbar)]">
