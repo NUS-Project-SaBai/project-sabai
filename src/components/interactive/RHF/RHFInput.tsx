@@ -2,6 +2,7 @@ import { DetailedHTMLProps, HTMLAttributes, InputHTMLAttributes } from "react";
 import { RegisterOptions, useFormContext } from "react-hook-form";
 import { useRHFRegister } from "./useRHFRegister";
 import { IsRequiredStar } from "@/components/IsRequiredStar";
+import clsx from "clsx";
 
 type RHFInputProps = {
   name: string;
@@ -12,7 +13,7 @@ type RHFInputProps = {
     HTMLDivElement
   >["className"];
   registerOptions?: RegisterOptions;
-  type: "text" | "email" | "password" | "number" | "date";
+  type: "text" | "email" | "password" | "number" | "date" | "color";
 } & DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 /**
@@ -72,9 +73,12 @@ export function RHFInput({
         type={type}
         {...registerProps}
         {...props}
-        className={
-          fieldError ? "border-red-400 border-l-8 border-2" : "border-2"
-        }
+        className={clsx(
+          "border-2",
+          fieldError != undefined && "border-red-400 border-l-8",
+          type === "color" &&
+            "h-10 w-14 rounded cursor-pointer border border-slate-300 p-1",
+        )}
       />
       <p className="min-h-6 text-red-400">
         {fieldError ? fieldError.message?.toString() : ""}
