@@ -7,6 +7,8 @@ import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import Modal from "@/components/interactive/Modal";
+import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
+import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 
 const DEFAULT_FORM: NewVillageCode = {
   code: "",
@@ -14,6 +16,147 @@ const DEFAULT_FORM: NewVillageCode = {
   colorHex: "#3b82f6", // Default blue
   isVisible: true,
 };
+
+type FormFields = {
+  id: number | undefined;
+  name: string;
+  code: string;
+  colorHex: string;
+  isVisible: boolean | undefined;
+};
+
+function ChangeModal({
+  activeForm,
+  onClose,
+  mutateSavedForm,
+  clearSavedForm,
+}: {
+  activeForm: FormFields;
+  onClose: () => void;
+  mutateSavedForm: (data: FormFields) => void;
+  clearSavedForm: () => void;
+}) {
+  const form = useForm<FormFields>();
+  const utils = trpc.useUtils();
+
+  if (activeForm.id) {
+    form.setValue("id", activeForm.id);
+  }
+  form.setValue("name", activeForm.name);
+  form.setValue("code", activeForm.code);
+  form.setValue("colorHex", activeForm.colorHex);
+
+  const createMutation = trpc.villageCodesRouter.create.useMutation({
+    onSuccess: () => {
+      utils.villageCodesRouter.list.invalidate();
+      form.reset();
+      clearSavedForm();
+      onClose();
+    },
+  });
+
+  const updateMutation = trpc.villageCodesRouter.update.useMutation({
+    onSuccess: () => {
+      utils.villageCodesRouter.list.invalidate();
+      form.reset();
+      clearSavedForm();
+      onClose();
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
+  const handleSubmit: SubmitHandler<FormFields> = async (data) => {
+    // mutation here
+    console.log(data);
+    if (activeForm.id) {
+      updateMutation.mutate({
+        ...data,
+        id: activeForm.id,
+      });
+    } else {
+      createMutation.mutate(data);
+    }
+
+    form.reset();
+  };
+
+  return (
+    <Modal
+      onClose={() => {
+        mutateSavedForm(form.getValues());
+        onClose();
+      }}
+    >
+      <h2 className="text-xl font-bold mb-4">
+        {activeForm.id ? "Edit Village" : "New Village Code"}
+      </h2>
+      <FormProvider {...form}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit(handleSubmit)(e);
+          }}
+        >
+          <RHFInput
+            name="code"
+            label="Code"
+            type="text"
+            placeholder="e.g. V001"
+            defaultValue={DEFAULT_FORM.code}
+          />
+          <RHFInput
+            name="name"
+            label="Name"
+            type="text"
+            placeholder="e.g. Central Village"
+            defaultValue={DEFAULT_FORM.name}
+          />
+          <div className="flex gap-2 mt-1 items-center">
+            <RHFInput
+              name="colorHex"
+              label="Color"
+              type="color"
+              className="w-full"
+              defaultValue={DEFAULT_FORM.colorHex}
+            />
+            <input
+              defaultValue={DEFAULT_FORM.colorHex}
+              id="color-value"
+              readOnly
+              className="h-10 block w-full rounded-md border border-slate-300 px-3 bg-slate-50 text-slate-500"
+            />
+          </div>
+          <RHFInput
+            name="isVisible"
+            label="Is Visible?"
+            type="checkbox"
+            className="flex flex-row-reverse"
+          />
+          <div className="flex gap-3 mt-6">
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                mutateSavedForm(form.getValues());
+              }}
+              className="flex-1 bg-slate-100 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-200"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </FormProvider>
+    </Modal>
+  );
+}
 
 function VillageCodesPage() {
   // 1. Local State
@@ -25,60 +168,23 @@ function VillageCodesPage() {
     [], // No dependencies
   );
 
-  // 2. Data Fetching
-  const utils = trpc.useUtils();
+  const closeForm = () => {
+    setIsEditing(false);
+  };
+
   const { data: codes, isLoading } = trpc.villageCodesRouter.list.useQuery({
     includeHidden: showHidden,
   });
 
-  // 3. Mutations
-  const createMutation = trpc.villageCodesRouter.create.useMutation({
-    onSuccess: () => {
-      utils.villageCodesRouter.list.invalidate();
-      clearFormData();
-      closeForm();
-    },
-  });
-
-  const updateMutation = trpc.villageCodesRouter.update.useMutation({
-    onSuccess: () => {
-      utils.villageCodesRouter.list.invalidate();
-      clearFormData();
-      closeForm();
-    },
-  });
+  const utils = trpc.useUtils();
 
   const deleteMutation = trpc.villageCodesRouter.delete.useMutation({
     onSuccess: () => utils.villageCodesRouter.list.invalidate(),
   });
 
-  // 4. Handlers
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.id) {
-      updateMutation.mutate({
-        id: formData.id,
-        name: formData.name,
-        colorHex: formData.colorHex,
-        isVisible: formData.isVisible,
-      });
-    } else {
-      createMutation.mutate({
-        code: formData.code,
-        name: formData.name,
-        colorHex: formData.colorHex,
-        isVisible: formData.isVisible,
-      });
-    }
-  };
-
   const openEdit = (code: VillageCode) => {
     setFormData(code);
     setIsEditing(true);
-  };
-
-  const closeForm = () => {
-    setIsEditing(false);
   };
 
   const handleDelete = (id: number) => {
@@ -114,7 +220,6 @@ function VillageCodesPage() {
             <button
               onClick={() => {
                 setIsEditing(true);
-                clearFormData();
               }}
               className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700"
             >
@@ -124,95 +229,18 @@ function VillageCodesPage() {
         </div>
 
         {isEditing && (
-          <Modal onClose={closeForm}>
-            <h2 className="text-xl font-bold mb-4">
-              {formData.id ? "Edit Village Code" : "New Village Code"}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {!formData.id && (
-                <div>
-                  <label className="block text-sm font-medium text-slate-700">
-                    Code
-                  </label>
-                  <input
-                    required
-                    value={formData.code}
-                    onChange={(e) =>
-                      setFormData({ ...formData, code: e.target.value })
-                    }
-                    className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2"
-                    placeholder="e.g. V001"
-                  />
-                </div>
-              )}
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Name
-                </label>
-                <input
-                  required
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2"
-                  placeholder="Central Village"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Color
-                </label>
-                <div className="flex gap-2 mt-1">
-                  <input
-                    type="color"
-                    value={formData.colorHex}
-                    onChange={(e) =>
-                      setFormData({ ...formData, colorHex: e.target.value })
-                    }
-                    className="h-10 w-14 rounded cursor-pointer border border-slate-300 p-1"
-                  />
-                  <input
-                    value={formData.colorHex}
-                    readOnly
-                    className="block w-full rounded-md border border-slate-300 px-3 py-2 bg-slate-50 text-slate-500"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                  <input
-                    type="checkbox"
-                    checked={formData.isVisible}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        isVisible: e.target.checked,
-                      })
-                    }
-                    className="rounded border-slate-300"
-                  />
-                  Is Visible?
-                </label>
-              </div>
-
-              <div className="flex gap-3 mt-6">
-                <button
-                  type="button"
-                  onClick={closeForm}
-                  className="flex-1 bg-slate-100 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
-          </Modal>
+          <ChangeModal
+            onClose={closeForm}
+            activeForm={{
+              id: formData.id,
+              name: formData.name,
+              colorHex: formData.colorHex,
+              isVisible: formData.isVisible,
+              code: formData.code,
+            }}
+            mutateSavedForm={(data) => setFormData(data)}
+            clearSavedForm={clearFormData}
+          />
         )}
 
         {/* Data Table */}
