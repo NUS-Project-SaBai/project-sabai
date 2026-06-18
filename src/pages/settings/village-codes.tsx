@@ -9,6 +9,7 @@ import TableCell from "@/components/TableCell";
 import Modal from "@/components/interactive/Modal";
 import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
+import { toast } from "react-hot-toast";
 
 const DEFAULT_FORM: NewVillageCode = {
   code: "",
@@ -80,6 +81,7 @@ function ChangeModal({
       form.reset();
       clearFormData();
       onClose();
+      toast.success("Village code created!");
     },
   });
 
@@ -88,6 +90,7 @@ function ChangeModal({
       utils.villageCodesRouter.list.invalidate();
       form.reset();
       onClose();
+      toast.success("Village code updated!");
     },
     onError: (err) => {
       console.log(err);
@@ -283,7 +286,10 @@ function RowContent({
   const utils = trpc.useUtils();
 
   const deleteMutation = trpc.villageCodesRouter.delete.useMutation({
-    onSuccess: () => utils.villageCodesRouter.list.invalidate(),
+    onSuccess: () => {
+      utils.villageCodesRouter.list.invalidate();
+      toast.success("Village code deleted!");
+    },
   });
 
   const handleDelete = (id: number) => {
