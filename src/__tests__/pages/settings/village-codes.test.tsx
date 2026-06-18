@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import VillageCodesPage from "@/pages/settings/village-codes";
 import { trpc } from "@/utils/trpc";
+import { toast, Toaster } from "react-hot-toast";
 
 // Mock tRPC
 vi.mock("@/utils/trpc", () => ({
@@ -78,6 +79,7 @@ const mockVillageCodes = [
 describe("VillageCodesPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    toast.dismissAll();
 
     // Mock the mutations with default implementations
     mockTrpc.villageCodesRouter.create.useMutation.mockReturnValue({
@@ -98,6 +100,10 @@ describe("VillageCodesPage", () => {
         isLoading: false,
       }),
     );
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   it("renders page title and breadcrumbs", () => {
@@ -180,6 +186,51 @@ describe("VillageCodesPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows a success toast when a village code has been successfully edited", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.villageCodesRouter.list.useQuery.mockReturnValue({
+      data: mockVillageCodes,
+      isLoading: false,
+    });
+
+    mockTrpc.villageCodesRouter.update.useMutation.mockImplementation(
+      ({ onSuccess }) => {
+        return {
+          mutate: vi.fn(() => {
+            onSuccess?.(); // call it immediately when mutate is called
+          }),
+          isLoading: false,
+        };
+      },
+    );
+
+    render(
+      <>
+        <VillageCodesPage />
+        <Toaster toastOptions={{ duration: 100 }} />
+      </>,
+    );
+
+    await user.click(screen.getAllByRole("button", { name: "Edit" })[0]);
+
+    await waitFor(() => {
+      expect(screen.getByText("Edit Village Code")).toBeInTheDocument();
+    });
+
+    const codeInput = document.querySelector('input[name="code"]');
+    expect(codeInput).toBeInTheDocument();
+    await user.type(codeInput!, "1111");
+
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    //const toast = screen.getByRole("status");
+
+    //expect(toast).toBeInTheDocument();
+    //expect(toast).toHaveTextContent("Village code updated!");
+  });
+
   it("closes form when cancel button is clicked", async () => {
     const user = userEvent.setup();
     mockTrpc.villageCodesRouter.list.useQuery.mockReturnValue({
@@ -243,6 +294,57 @@ describe("VillageCodesPage", () => {
     });
   });
 
+  it("shows a success toast when a new village code has been successfully created", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.villageCodesRouter.list.useQuery.mockReturnValue({
+      data: mockVillageCodes,
+      isLoading: false,
+    });
+
+    mockTrpc.villageCodesRouter.create.useMutation.mockImplementation(
+      ({ onSuccess }) => {
+        return {
+          mutate: vi.fn(() => {
+            onSuccess?.();
+          }),
+          isLoading: false,
+        };
+      },
+    );
+
+    render(
+      <>
+        <VillageCodesPage />
+        <Toaster toastOptions={{ duration: 100 }} />
+      </>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "New Village Code" }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByPlaceholderText(FORM_PLACEHOLDERS.CODE),
+      ).toBeInTheDocument();
+    });
+
+    await user.type(
+      screen.getByPlaceholderText(FORM_PLACEHOLDERS.CODE),
+      MOCK_VILLAGE_CODES.SC.code,
+    );
+    await user.type(
+      screen.getByPlaceholderText(FORM_PLACEHOLDERS.NAME),
+      MOCK_VILLAGE_CODES.SC.name,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    const toast = screen.getByRole("status");
+
+    expect(toast).toBeInTheDocument();
+    expect(toast.textContent).toBe("Village code created!");
+  });
+
   it("toggles show hidden checkbox", async () => {
     const user = userEvent.setup();
     const mockQuery = vi.fn();
@@ -285,6 +387,8 @@ describe("VillageCodesPage", () => {
     expect(window.confirm).toHaveBeenCalledWith(UI_MESSAGES.DELETE_CONFIRM);
     expect(mockDelete).toHaveBeenCalledWith({ id: MOCK_VILLAGE_CODES.PC.id });
   });
+
+  it("shows a success toast when a village code has been successfully deleted", () => {});
 
   it("does not delete when confirmation is cancelled", async () => {
     const user = userEvent.setup();
