@@ -112,7 +112,7 @@ function ChangeModal({
   return (
     <Modal onClose={onClose}>
       <h2 className="text-xl font-bold mb-4">
-        {activeForm?.id ? "Edit Village" : "New Village Code"}
+        {activeForm?.id ? "Edit Village Code" : "New Village Code"}
       </h2>
       <FormProvider {...form}>
         <form
@@ -132,7 +132,7 @@ function ChangeModal({
             name="name"
             label="Name"
             type="text"
-            placeholder="e.g. Central Village"
+            placeholder="Central Village"
             defaultValue={DEFAULT_FORM.name}
           />
           <div className="flex gap-2 mt-1 items-center">
