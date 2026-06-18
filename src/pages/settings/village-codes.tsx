@@ -106,8 +106,6 @@ function ChangeModal({
     } else {
       createMutation.mutate(data);
     }
-
-    form.reset();
   };
 
   return (
