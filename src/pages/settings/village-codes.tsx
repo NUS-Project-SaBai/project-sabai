@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/utils/trpc";
 import { useSaveOnWrite } from "@/hooks/useSaveOnWrite";
 import { VillageCode, NewVillageCode } from "@/db/schema";
@@ -18,7 +18,7 @@ const DEFAULT_FORM: NewVillageCode = {
 };
 
 type FormFields = {
-  id: number | undefined;
+  id?: number;
   name: string;
   code: string;
   colorHex: string;
@@ -26,31 +26,59 @@ type FormFields = {
 };
 
 function ChangeModal({
-  activeForm,
   onClose,
-  mutateSavedForm,
-  clearSavedForm,
+  activeForm,
 }: {
-  activeForm: FormFields;
   onClose: () => void;
-  mutateSavedForm: (data: FormFields) => void;
-  clearSavedForm: () => void;
+  activeForm: FormFields | null;
 }) {
-  const form = useForm<FormFields>();
   const utils = trpc.useUtils();
+  const [formData, setFormData, clearFormData] = useSaveOnWrite<NewVillageCode>(
+    "village-codes-form",
+    DEFAULT_FORM,
+    [], // No dependencies
+  );
 
-  if (activeForm.id) {
-    form.setValue("id", activeForm.id);
-  }
-  form.setValue("name", activeForm.name);
-  form.setValue("code", activeForm.code);
-  form.setValue("colorHex", activeForm.colorHex);
+  const isEditing = !!(activeForm && activeForm.id);
+
+  // only use the saved data when creating a village code
+  const currentValues = isEditing
+    ? activeForm
+    : {
+        name: formData.name,
+        code: formData.code,
+        colorHex: formData.colorHex,
+        isVisible: formData.isVisible,
+      };
+
+  const form = useForm<FormFields>({
+    values: currentValues,
+  });
+
+  // Useful link for subscription mechanism: https://react-hook-form.com/docs/useform/subscribe
+  useEffect(() => {
+    if (isEditing) return;
+
+    return form.subscribe({
+      formState: {
+        values: true,
+      },
+      callback: ({ values }) => {
+        setFormData({
+          name: values?.name ?? DEFAULT_FORM.name,
+          code: values?.code ?? DEFAULT_FORM.code,
+          colorHex: values?.colorHex ?? DEFAULT_FORM.colorHex,
+          isVisible: values?.isVisible ?? DEFAULT_FORM.isVisible,
+        });
+      },
+    });
+  }, [form, isEditing, setFormData]);
 
   const createMutation = trpc.villageCodesRouter.create.useMutation({
     onSuccess: () => {
       utils.villageCodesRouter.list.invalidate();
       form.reset();
-      clearSavedForm();
+      clearFormData();
       onClose();
     },
   });
@@ -59,7 +87,6 @@ function ChangeModal({
     onSuccess: () => {
       utils.villageCodesRouter.list.invalidate();
       form.reset();
-      clearSavedForm();
       onClose();
     },
     onError: (err) => {
@@ -70,7 +97,7 @@ function ChangeModal({
   const handleSubmit: SubmitHandler<FormFields> = async (data) => {
     // mutation here
     console.log(data);
-    if (activeForm.id) {
+    if (activeForm && activeForm.id) {
       updateMutation.mutate({
         ...data,
         id: activeForm.id,
@@ -83,14 +110,9 @@ function ChangeModal({
   };
 
   return (
-    <Modal
-      onClose={() => {
-        mutateSavedForm(form.getValues());
-        onClose();
-      }}
-    >
+    <Modal onClose={onClose}>
       <h2 className="text-xl font-bold mb-4">
-        {activeForm.id ? "Edit Village" : "New Village Code"}
+        {activeForm?.id ? "Edit Village" : "New Village Code"}
       </h2>
       <FormProvider {...form}>
         <form
@@ -137,10 +159,7 @@ function ChangeModal({
           <div className="flex gap-3 mt-6">
             <button
               type="button"
-              onClick={() => {
-                onClose();
-                mutateSavedForm(form.getValues());
-              }}
+              onClick={onClose}
               className="flex-1 bg-slate-100 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-200"
             >
               Cancel
@@ -162,14 +181,11 @@ function VillageCodesPage() {
   // 1. Local State
   const [showHidden, setShowHidden] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData, clearFormData] = useSaveOnWrite<NewVillageCode>(
-    "village-codes-form",
-    DEFAULT_FORM,
-    [], // No dependencies
-  );
+  const [activeForm, setActiveForm] = useState<FormFields | null>(null);
 
   const closeForm = () => {
     setIsEditing(false);
+    setActiveForm(null);
   };
 
   const { data: codes, isLoading } = trpc.villageCodesRouter.list.useQuery({
@@ -183,8 +199,8 @@ function VillageCodesPage() {
   });
 
   const openEdit = (code: VillageCode) => {
-    setFormData(code);
     setIsEditing(true);
+    setActiveForm(code);
   };
 
   const handleDelete = (id: number) => {
@@ -229,18 +245,7 @@ function VillageCodesPage() {
         </div>
 
         {isEditing && (
-          <ChangeModal
-            onClose={closeForm}
-            activeForm={{
-              id: formData.id,
-              name: formData.name,
-              colorHex: formData.colorHex,
-              isVisible: formData.isVisible,
-              code: formData.code,
-            }}
-            mutateSavedForm={(data) => setFormData(data)}
-            clearSavedForm={clearFormData}
-          />
+          <ChangeModal onClose={closeForm} activeForm={activeForm} />
         )}
 
         {/* Data Table */}
@@ -281,7 +286,9 @@ function VillageCodesPage() {
                     </TableCell>
                     <TableCell>
                       <button
-                        onClick={() => openEdit(code)}
+                        onClick={() => {
+                          openEdit(code);
+                        }}
                         className="text-indigo-600 hover:text-indigo-900 font-medium mr-4"
                       >
                         Edit
