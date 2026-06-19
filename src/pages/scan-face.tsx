@@ -32,7 +32,7 @@ function ScanFacePage() {
           />
         </div>
 
-        {mode === Mode.REGISTERING && imgDetails && (
+        {mode === Mode.REGISTERING && (
           <RegistrationPage
             imgDetails={imgDetails}
             setImgDetails={setImgDetails}
