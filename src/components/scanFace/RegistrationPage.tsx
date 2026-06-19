@@ -34,7 +34,6 @@ export default function RegistrationPage({
 
   const { selectedVillageCodeId } = useVillageCode();
   const handleSubmit = async (data: PatientForm) => {
-
     if (!imgDetails) {
       toast.error("Please capture a face image before submitting.");
       return;
@@ -142,7 +141,9 @@ export default function RegistrationPage({
                   : "bg-green-600 hover:bg-green-700",
               )}
             >
-              Create New Patient
+              {createMutation.isPending
+                ? "Creating new patient..."
+                : "Create New Patient"}
             </button>
           </div>
         </form>
