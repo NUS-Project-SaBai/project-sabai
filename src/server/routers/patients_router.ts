@@ -3,10 +3,10 @@ import { zfd } from "zod-form-data";
 import { uploadToCloudinary } from "@/server/utils/cloudinary";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { patients, genderEnum, Patient, visits } from "@/db/schema";
+import { patients, genderEnum, visits, villageCodes } from "@/db/schema";
 import serverEnv from "@/lib/envVariables";
 import { TRPCError } from "@trpc/server";
-import { eq, inArray } from "drizzle-orm";
+import { eq, desc, inArray } from "drizzle-orm";
 import {
   generateFaceprint,
   searchFaceprint,
@@ -22,7 +22,11 @@ const cloudinaryUrlPrefix = serverEnv.CLOUDINARY_URL_PREFIX;
  * @returns A new patient object with the `patientImageUrl` property added. If the patient has a `patientImagePublicId`,
  *          the URL is constructed as `{cloudinaryUrl}/{patientImagePublicId}`. Otherwise, `patientImageUrl` is `null`.
  */
-const getPatientWithImageUrl = (patient: Patient) => ({
+const getPatientWithImageUrl = <
+  T extends { patientImagePublicId: string | null },
+>(
+  patient: T,
+) => ({
   ...patient,
   patientImageUrl: patient.patientImagePublicId
     ? `${cloudinaryUrlPrefix}/${patient.patientImagePublicId}`
@@ -32,6 +36,16 @@ const getPatientWithImageUrl = (patient: Patient) => ({
 export const patientsRouter = router({
   // List all patients with village details
   list: protectedProcedure.query(async () => {
+    // A patient's village is taken from their most recent visit. DISTINCT ON keeps one row per patient, the latest by visit date.
+    const latestVisit = db
+      .selectDistinctOn([visits.patientId], {
+        patientId: visits.patientId,
+        villageCodeId: visits.villageCodeId,
+      })
+      .from(visits)
+      .orderBy(visits.patientId, desc(visits.date))
+      .as("latest_visit");
+
     const result = await db
       .select({
         id: patients.id,
@@ -46,8 +60,12 @@ export const patientsRouter = router({
         hasSabaiCard: patients.hasSabaiCard,
         patientImagePublicId: patients.patientImagePublicId,
         rekognitionFaceId: patients.rekognitionFaceId,
+        villageCode: villageCodes.code,
+        villageColorHex: villageCodes.colorHex,
       })
-      .from(patients);
+      .from(patients)
+      .leftJoin(latestVisit, eq(latestVisit.patientId, patients.id))
+      .leftJoin(villageCodes, eq(villageCodes.id, latestVisit.villageCodeId));
 
     return result.map(getPatientWithImageUrl);
   }),
