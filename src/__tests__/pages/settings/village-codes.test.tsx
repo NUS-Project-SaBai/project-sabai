@@ -78,8 +78,9 @@ const mockVillageCodes = [
 
 describe("VillageCodesPage", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    toast.dismissAll();
+    vi.resetAllMocks();
+    toast.remove(); // remove actually removes everything immediately.
+    //dismiss might cause conflicts if multiple testcases are using toasts.
 
     // Mock the mutations with default implementations
     mockTrpc.villageCodesRouter.create.useMutation.mockReturnValue({
@@ -225,10 +226,10 @@ describe("VillageCodesPage", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Save" }));
 
-    //const toast = screen.getByRole("status");
+    const toast = screen.getByRole("status");
 
-    //expect(toast).toBeInTheDocument();
-    //expect(toast).toHaveTextContent("Village code updated!");
+    expect(toast).toBeInTheDocument();
+    expect(toast).toHaveTextContent("Village code updated!");
   });
 
   it("closes form when cancel button is clicked", async () => {
@@ -388,7 +389,28 @@ describe("VillageCodesPage", () => {
     expect(mockDelete).toHaveBeenCalledWith({ id: MOCK_VILLAGE_CODES.PC.id });
   });
 
-  it("shows a success toast when a village code has been successfully deleted", () => {});
+  it("shows a success toast when a village code has been successfully deleted", async () => {
+    const user = userEvent.setup();
+    const mockQuery = vi.fn();
+    mockTrpc.villageCodesRouter.list.useQuery.mockImplementation(mockQuery);
+    mockQuery.mockReturnValue({
+      data: mockVillageCodes,
+      isLoading: false,
+    });
+
+    render(<VillageCodesPage />);
+
+    const deleteButtons = screen.getAllByRole("button", { name: "Delete" });
+
+    await user.click(deleteButtons[0]);
+
+    // user click ok => TODO again after refactoring to use a confirmation modal instead of window.confirm
+
+    // assert toast shows up
+    //const toast = screen.getByRole("status");
+    //expect(toast).toBeInTheDocument();
+    //expect(toast).toHaveTextContent("Village code deleted!");
+  });
 
   it("does not delete when confirmation is cancelled", async () => {
     const user = userEvent.setup();
