@@ -8,6 +8,7 @@ import { ReactNode } from "react";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
+import { formatPatientId } from "@/lib/utils/patient";
 
 function Wrapper({ children }: { children: ReactNode }) {
   return (
@@ -78,7 +79,7 @@ function PatientsBasePage() {
                 <TableCell>
                   <div className="flex flex-col items-center gap-2">
                     <span className="text-sm font-medium text-slate-900">
-                      {getPatientIdWithZeroPadding(patient.id, 4) || "No ID"}
+                      {formatPatientId(patient.id) || "No ID"}
                     </span>
                     <PatientPhoto
                       pictureUrl={patient.patientImageUrl}
@@ -170,10 +171,6 @@ function calculateAge(birthDate: Date) {
   const diff = Date.now() - birthDate.getTime();
   const ageDate = new Date(diff);
   return Math.abs(ageDate.getUTCFullYear() - 1970);
-}
-
-function getPatientIdWithZeroPadding(id: number, padLength: number) {
-  return id.toString().padStart(padLength, "0");
 }
 
 PatientsBasePage.getLayout = (page: ReactNode) =>
