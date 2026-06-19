@@ -162,9 +162,11 @@ function VitalsForm({ visitId }: { visitId: number }) {
 
   useEffect(() => {
     if (vitalData) {
-      reset(vitalData);
+      reset({
+        ...vitalData,
+        visitSelect: visitId.toString(), // Keeps the dropdown populated with the active data
+      });
     } else if (!vitalsLoading) {
-      // Reset sheet contents to blank if no existing record row matches this visitId row index
       reset({
         height: "",
         weight: "",
@@ -179,13 +181,16 @@ function VitalsForm({ visitId }: { visitId: number }) {
         bloodGlucoseFasting: "",
         hba1c: "",
         others: "",
+        visitSelect: visitId.toString(), // Keeps the dropdown populated for new records
       });
     }
-  }, [vitalData, vitalsLoading, reset]);
+  }, [vitalData, vitalsLoading, reset, visitId]);
 
   if (vitalsLoading) return <LoadingSpinner message="Loading Vitals" />;
 
-  const onSubmit = (data: CreateVitalsInput) => {
+  type VitalsFormValues = Omit<CreateVitalsInput, "visitId">;
+
+  const onSubmit = (data: VitalsFormValues) => {
     updateVitalsMutation.mutate({
       visitId: visitId,
       height: data.height || undefined,
@@ -196,9 +201,9 @@ function VitalsForm({ visitId }: { visitId: number }) {
       heartRate: data.heartRate ? Number(data.heartRate) : undefined,
       hemocueCount: data.hemocueCount || undefined,
       diabetesMellitus:
-        data.diabetesMellitus === "true"
+        data.diabetesMellitus === true
           ? true
-          : data.diabetesMellitus === "false"
+          : data.diabetesMellitus === false
             ? false
             : undefined,
       urineTest: data.urineTest || undefined,
