@@ -16,7 +16,8 @@ import {
 import { Toaster, toast } from "react-hot-toast";
 import ScanFacePage from "@/pages/scan-face";
 import Webcam from "react-webcam";
-import { AssertionError } from "assert";
+import { VillageCodeProvider } from "@/lib/context/VillageCodeContext";
+import { useState } from "react";
 
 // Mock tRPC
 vi.mock("@/utils/trpc", () => ({
@@ -40,6 +41,16 @@ vi.mock("@/utils/trpc", () => ({
         useMutation: vi.fn(),
       },
     },
+    villageCodesRouter: {
+      list: {
+        useQuery: vi.fn(),
+      },
+    },
+    useSaveOnWrite: vi.fn((key, initialValue) => {
+      // mocking localstorage probably not required for this.
+      const [state, setState] = useState(initialValue);
+      return [state, setState];
+    }),
   },
 }));
 
@@ -86,11 +97,169 @@ describe("ScanFacePage", () => {
     assertBreadcrumbs(["Home", "Scan Face"]);
   });
 
-  it("displays a webcam and a form in registration mode", () => {});
+  it("displays a webcam and a form in registration mode", async () => {
+    const user = userEvent.setup();
 
-  it("displays an error if a village code is not selected while creating a patient", () => {});
+    mockTrpc.villageCodesRouter.list.useQuery.mockReturnValue({
+      data: [
+        { id: "AA", name: "Village Alpha", colorHex: "", isVisible: true },
+        { id: "BB", name: "Village Beta", colorHex: "", isVisible: true },
+      ],
+      isLoading: false,
+    });
 
-  it("displays an error if the registration form's button is clicked while an image is not captured", () => {});
+    const { container } = render(
+      <VillageCodeProvider>
+        <ScanFacePage />
+      </VillageCodeProvider>,
+    );
+    const captureButton = screen.getByRole("button", { name: "Capture" });
+
+    user.click(captureButton);
+
+    await screen.findByText("No matches found");
+
+    await user.click(
+      screen.getByRole("button", { name: "Register New Patient" }),
+    );
+
+    const nameInput = container.querySelector('input[name="name"]');
+    const identificationNumberInput = container.querySelector(
+      'input[name="identificationNumber"]',
+    );
+    const contactNoInput = container.querySelector('input[name="contactNo"]');
+    const drugAllergyInput = container.querySelector('input[name="drugAllergy"]');
+
+    expect(nameInput).toBeInTheDocument();
+    expect(identificationNumberInput).toBeInTheDocument();
+    expect(contactNoInput).toBeInTheDocument();
+    expect(drugAllergyInput).toBeInTheDocument();
+
+    expect(screen.getByText("Has POOR Card?")).toBeInTheDocument();
+    expect(screen.getByText("Has BS2 Card?")).toBeInTheDocument();
+    expect(screen.getByText("Has Sabai Card?")).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("button", { name: "Create New Patient" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Match Instead" }),
+    ).toBeInTheDocument();
+  });
+
+  it("displays an error if a village code is not selected while creating a patient", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.villageCodesRouter.list.useQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+    });
+
+    const { container } = render(
+      <VillageCodeProvider>
+        <ScanFacePage />
+        <Toaster />
+      </VillageCodeProvider>,
+    );
+    const captureButton = screen.getByRole("button", { name: "Capture" });
+
+    user.click(captureButton);
+
+    await screen.findByText("No matches found");
+
+    await user.click(
+      screen.getByRole("button", { name: "Register New Patient" }),
+    );
+
+    const nameInput = container.querySelector('input[name="name"]');
+    const identificationNumberInput = container.querySelector(
+      'input[name="identificationNumber"]',
+    );
+    const contactNoInput = container.querySelector('input[name="contactNo"]');
+    const drugAllergyInput = container.querySelector('input[name="drugAllergy"]');
+    const dobInput = container.querySelector('input[name="dateOfBirth"]');
+    const dropdownButton = container.querySelector(
+      'button[name="gender-dropdown-button"]',
+    );
+
+    await user.type(nameInput!, "Valid name");
+    await user.type(identificationNumberInput!, "Valid id");
+    await user.type(contactNoInput!, "1234567");
+    await user.type(drugAllergyInput!, "drug allergies");
+    await user.type(dobInput!, "2000-10-10");
+    await user.click(dropdownButton!);
+    const dropdownButtonMale = container.querySelector(
+      'button[name="gender-male-dropdown-option"]',
+    );
+    await user.click(dropdownButtonMale!);
+
+    const createButton = screen.getByRole("button", {
+      name: "Create New Patient",
+    });
+    await user.click(createButton);
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Please select a village code before submitting.",
+    );
+  });
+
+  it("displays an error if the registration form's button is clicked while an image is not captured", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.villageCodesRouter.list.useQuery.mockReturnValue({
+      data: [{ id: "1", name: "Village Alpha", colorHex: "", isVisible: true }],
+      isLoading: false,
+    });
+
+    const { container } = render(
+      <VillageCodeProvider>
+        <ScanFacePage />
+        <Toaster />
+      </VillageCodeProvider>,
+    );
+    const captureButton = screen.getByRole("button", { name: "Capture" });
+
+    user.click(captureButton);
+
+    await screen.findByText("No matches found");
+
+    await user.click(
+      screen.getByRole("button", { name: "Register New Patient" }),
+    );
+
+    const nameInput = container.querySelector('input[name="name"]');
+    const identificationNumberInput = container.querySelector(
+      'input[name="identificationNumber"]',
+    );
+    const contactNoInput = container.querySelector('input[name="contactNo"]');
+    const drugAllergyInput = container.querySelector('input[name="drugAllergy"]');
+    const dobInput = container.querySelector('input[name="dateOfBirth"]');
+    const dropdownButton = container.querySelector(
+      'button[name="gender-dropdown-button"]',
+    );
+
+    await user.type(nameInput!, "Valid name");
+    await user.type(identificationNumberInput!, "Valid id");
+    await user.type(contactNoInput!, "1234567");
+    await user.type(drugAllergyInput!, "drug allergies");
+    await user.type(dobInput!, "2000-10-10");
+    await user.click(dropdownButton!);
+    const dropdownButtonMale = container.querySelector(
+      'button[name="gender-male-dropdown-option"]',
+    );
+    await user.click(dropdownButtonMale!);
+
+    const createButton = screen.getByRole("button", {
+      name: "Create New Patient",
+    });
+
+    await user.click(screen.getByRole("button", { name: "Retake Photo" }));
+    await user.click(createButton);
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Please capture a face image before submitting.",
+    );
+  });
 
   it("displays a webcam and a capture button upon entering the page", async () => {
     render(<ScanFacePage />);
@@ -216,5 +385,63 @@ describe("ScanFacePage", () => {
     });
   });
   it("displays a list of patients with high similarity score when face is scanned, if exists in database", () => {});
-  it("disables the registration button and displays a loading spinner while registering patients", () => {});
+  it("disables the registration button and displays a loading message while registering patients", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.villageCodesRouter.list.useQuery.mockReturnValue({
+      data: [{ id: "1", name: "Village Alpha", colorHex: "", isVisible: true }],
+      isLoading: false,
+    });
+
+    const { container } = render(
+      <VillageCodeProvider>
+        <ScanFacePage />
+        <Toaster />
+      </VillageCodeProvider>,
+    );
+    const captureButton = screen.getByRole("button", { name: "Capture" });
+
+    user.click(captureButton);
+
+    await screen.findByText("No matches found");
+
+    await user.click(
+      screen.getByRole("button", { name: "Register New Patient" }),
+    );
+
+    const nameInput = container.querySelector('input[name="name"]');
+    const identificationNumberInput = container.querySelector(
+      'input[name="identificationNumber"]',
+    );
+    const contactNoInput = container.querySelector('input[name="contactNo"]');
+    const drugAllergyInput = container.querySelector('input[name="drugAllergy"]');
+    const dobInput = container.querySelector('input[name="dateOfBirth"]');
+    const dropdownButton = container.querySelector(
+      'button[name="gender-dropdown-button"]',
+    );
+
+    await user.type(nameInput!, "Valid name");
+    await user.type(identificationNumberInput!, "Valid id");
+    await user.type(contactNoInput!, "1234567");
+    await user.type(drugAllergyInput!, "drug allergies");
+    await user.type(dobInput!, "2000-10-10");
+    await user.click(dropdownButton!);
+    const dropdownButtonMale = container.querySelector(
+      'button[name="gender-male-dropdown-option"]',
+    );
+    await user.click(dropdownButtonMale!);
+
+    const createButton = screen.getByRole("button", {
+      name: "Create New Patient",
+    });
+
+    mockTrpc.patientsRouter.create.useMutation.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: true,
+    });
+
+    await user.click(createButton);
+    expect(createButton).toBeDisabled();
+    expect(createButton).toHaveTextContent("Creating new patient...");
+  });
 });
