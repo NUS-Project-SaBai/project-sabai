@@ -23,8 +23,8 @@ export default function MatchingPatients({
 }) {
   const findFaceMatchMutation = trpc.patientsRouter.findFaceMatches.useMutation(
     {
-      onSuccess(test) {
-        const matches: FaceMatch[] = test.data!;
+      onSuccess(response) {
+        const matches: FaceMatch[] = response.data!;
         findMatchingPatientsMutation.mutate({ matches: matches });
       },
       onError(error) {
