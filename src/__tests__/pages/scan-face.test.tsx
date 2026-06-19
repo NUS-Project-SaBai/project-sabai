@@ -1,12 +1,4 @@
-import {
-  cleanup,
-  render,
-  screen,
-  waitFor,
-  within,
-  fireEvent,
-  act,
-} from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { trpc } from "@/utils/trpc";
 import {
@@ -46,11 +38,6 @@ vi.mock("@/utils/trpc", () => ({
         useQuery: vi.fn(),
       },
     },
-    useSaveOnWrite: vi.fn((key, initialValue) => {
-      // mocking localstorage probably not required for this.
-      const [state, setState] = useState(initialValue);
-      return [state, setState];
-    }),
   },
 }));
 
@@ -390,7 +377,7 @@ describe("ScanFacePage", () => {
       expect(screen.getByText("No matches found")).toBeInTheDocument();
     });
   });
-  it("displays a list of patients with high similarity score when face is scanned, if exists in database", () => {});
+
   it("disables the registration button and displays a loading message while registering patients", async () => {
     const user = userEvent.setup();
 
