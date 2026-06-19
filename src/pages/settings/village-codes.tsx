@@ -83,6 +83,10 @@ function ChangeModal({
       onClose();
       toast.success("Village code created!");
     },
+    onError: (err) => {
+      console.error(err);
+      toast.error("Unable to create village code.");
+    },
   });
 
   const updateMutation = trpc.villageCodesRouter.update.useMutation({
@@ -94,6 +98,7 @@ function ChangeModal({
     },
     onError: (err) => {
       console.log(err);
+      toast.error("Unable to update village code.");
     },
   });
 
@@ -287,6 +292,12 @@ function RowContent({
     onSuccess: () => {
       utils.villageCodesRouter.list.invalidate();
       toast.success("Village code deleted!");
+    },
+    onError: (err) => {
+      console.error(err);
+      toast.error(
+        "Unable to delete village code. Check that there are no visits with this village code before deleting.",
+      );
     },
   });
 
