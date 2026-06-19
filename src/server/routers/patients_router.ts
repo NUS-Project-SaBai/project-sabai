@@ -201,7 +201,6 @@ export const patientsRouter = router({
     .mutation(async ({ input }) => {
       try {
         const res = await searchFaceprint(input.picture);
-        console.log("result", res);
         return { data: res };
       } catch (err) {
         console.error(err);
