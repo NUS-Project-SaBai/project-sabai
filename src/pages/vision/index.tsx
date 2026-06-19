@@ -56,8 +56,7 @@ function UpdateGlassesButton({ onClick }: { onClick: () => void }) {
 }
 
 /**
- * Stacked patient card used on small screens, where a 4-column table would
- * clip or overlap. Photo on the left; code, name and action stacked beside it.
+ * Stacked patient card used on small screens (e.g mobile)
  */
 function PatientCard({
   patient,
@@ -89,7 +88,7 @@ function PatientCard({
 }
 
 /**
- * Full patient table shown on md+ screens, where all four columns fit.
+ * Full patient table shown on tablet and desktop screens.
  */
 function PatientTable({
   patients,
@@ -191,7 +190,7 @@ function VisionPage() {
 
     return (
       <>
-        {/* Small screens: stacked cards (a 4-column table clips at this width) */}
+        {/* Mobile screens: stacked cards */}
         <div className="divide-y divide-slate-200 md:hidden">
           {patients.map((patient) => (
             <PatientCard
@@ -202,7 +201,7 @@ function VisionPage() {
           ))}
         </div>
 
-        {/* tablet and desktop: full table */}
+        {/* Tablet and desktop screens: full table */}
         <PatientTable
           patients={patients}
           onUpdateGlasses={handleUpdateGlasses}
