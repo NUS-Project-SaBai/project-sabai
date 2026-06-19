@@ -128,7 +128,9 @@ describe("ScanFacePage", () => {
       'input[name="identificationNumber"]',
     );
     const contactNoInput = container.querySelector('input[name="contactNo"]');
-    const drugAllergyInput = container.querySelector('input[name="drugAllergy"]');
+    const drugAllergyInput = container.querySelector(
+      'input[name="drugAllergy"]',
+    );
 
     expect(nameInput).toBeInTheDocument();
     expect(identificationNumberInput).toBeInTheDocument();
@@ -176,7 +178,9 @@ describe("ScanFacePage", () => {
       'input[name="identificationNumber"]',
     );
     const contactNoInput = container.querySelector('input[name="contactNo"]');
-    const drugAllergyInput = container.querySelector('input[name="drugAllergy"]');
+    const drugAllergyInput = container.querySelector(
+      'input[name="drugAllergy"]',
+    );
     const dobInput = container.querySelector('input[name="dateOfBirth"]');
     const dropdownButton = container.querySelector(
       'button[name="gender-dropdown-button"]',
@@ -232,7 +236,9 @@ describe("ScanFacePage", () => {
       'input[name="identificationNumber"]',
     );
     const contactNoInput = container.querySelector('input[name="contactNo"]');
-    const drugAllergyInput = container.querySelector('input[name="drugAllergy"]');
+    const drugAllergyInput = container.querySelector(
+      'input[name="drugAllergy"]',
+    );
     const dobInput = container.querySelector('input[name="dateOfBirth"]');
     const dropdownButton = container.querySelector(
       'button[name="gender-dropdown-button"]',
@@ -414,7 +420,9 @@ describe("ScanFacePage", () => {
       'input[name="identificationNumber"]',
     );
     const contactNoInput = container.querySelector('input[name="contactNo"]');
-    const drugAllergyInput = container.querySelector('input[name="drugAllergy"]');
+    const drugAllergyInput = container.querySelector(
+      'input[name="drugAllergy"]',
+    );
     const dobInput = container.querySelector('input[name="dateOfBirth"]');
     const dropdownButton = container.querySelector(
       'button[name="gender-dropdown-button"]',
