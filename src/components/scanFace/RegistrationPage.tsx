@@ -1,5 +1,4 @@
 import { useForm, FormProvider } from "react-hook-form";
-import { useState } from "react";
 import toast from "react-hot-toast";
 import { trpc } from "@/utils/trpc";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
@@ -29,24 +28,20 @@ export default function RegistrationPage({
   setImgDetails: React.Dispatch<React.SetStateAction<string | null>>;
   setMode: React.Dispatch<React.SetStateAction<Mode>>;
 }) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const form = useForm<PatientForm>();
 
   const createMutation = trpc.patientsRouter.create.useMutation();
 
   const { selectedVillageCodeId } = useVillageCode();
   const handleSubmit = async (data: PatientForm) => {
-    setIsSubmitting(true);
 
     if (!imgDetails) {
       toast.error("Please capture a face image before submitting.");
-      setIsSubmitting(false);
       return;
     }
 
     if (!selectedVillageCodeId) {
       toast.error("Please select a village code before submitting.");
-      setIsSubmitting(false);
       return;
     }
 
@@ -61,13 +56,11 @@ export default function RegistrationPage({
 
     createMutation.mutate(toMutate, {
       onSuccess() {
-        setIsSubmitting(false);
         toast.success("Patient created successfully!");
         setImgDetails(null);
         form.reset();
       },
       onError(error) {
-        setIsSubmitting(false);
         console.error("Error creating patient:", error);
         toast.error("Failed to create patient. Please try again.");
       },
@@ -141,10 +134,10 @@ export default function RegistrationPage({
           <div className="flex gap-3 mt-6">
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={createMutation.isPending}
               className={clsx(
                 "flex-1 px-4 py-2 rounded-lg font-medium text-white",
-                isSubmitting
+                createMutation.isPending
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-green-600 hover:bg-green-700",
               )}
