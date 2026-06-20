@@ -57,10 +57,11 @@ Patients Table:
 - gender: Gender of the patient.
 - drugAllergy: Drug allergy information of the patient.
 - dateOfBirth: Date of birth of the patient.
-- has_poor_card: Indicates if the patient has a POOR card or not.
-- has_bs2_card: Indicates if the patient has a BS2 card or not.
-- has_sabai_card: Indicates if the patient has a Sabai card or not.
+- hasPoorCard Indicates if the patient has a POOR card or not.
+- hasBS2Card: Indicates if the patient has a BS2 card or not.
+- hasSabaiCard: Indicates if the patient has a Sabai card or not.
 - patientImagePublicId: Cloudinary public ID of the patient's image.
+- rekognitionFaceId: Rekognition Face ID for facial recognition.
 */
 export const patients = pgTable("patients", {
   id: serial("id").primaryKey(),
@@ -77,6 +78,7 @@ export const patients = pgTable("patients", {
   hasBS2Card: boolean("has_bs2_card").notNull(),
   hasSabaiCard: boolean("has_sabai_card").notNull(),
   patientImagePublicId: text("patient_image_public_id").notNull(),
+  rekognitionFaceId: text("rekognition_face_id"),
 });
 
 export type Patient = typeof patients.$inferSelect;

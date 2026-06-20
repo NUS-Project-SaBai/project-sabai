@@ -16,6 +16,7 @@ interface RHFDropdownButtonProps {
   isOpen: boolean;
   onClick: () => void;
   hasError: boolean;
+  name: string;
 }
 
 interface RHFDropdownMenuProps {
@@ -23,6 +24,7 @@ interface RHFDropdownMenuProps {
   selectedValue: string;
   onSelect: (value: string) => void;
   onClose: () => void;
+  name: string;
 }
 
 /**
@@ -39,6 +41,7 @@ function RHFDropdownButton({
   isOpen,
   onClick,
   hasError,
+  name,
 }: RHFDropdownButtonProps) {
   return (
     <button
@@ -51,6 +54,7 @@ function RHFDropdownButton({
           : "border-gray-300 hover:border-gray-400 focus:border-blue-500",
         isOpen && "border-blue-500",
       ])}
+      name={`${name}-dropdown-button`}
     >
       <span
         className={clsx([
@@ -82,6 +86,7 @@ function RHFDropdownMenu({
   selectedValue,
   onSelect,
   onClose,
+  name,
 }: RHFDropdownMenuProps) {
   const handleSelect = (value: string) => {
     onSelect(value);
@@ -99,6 +104,7 @@ function RHFDropdownMenu({
             "w-full px-4 py-2 text-left hover:bg-gray-100 focus:bg-gray-100 focus:outline-none first:rounded-t-lg last:rounded-b-lg text-gray-800 hover:text-gray-900",
             option.value === selectedValue && "bg-blue-50 text-blue-700",
           ])}
+          name={`${name}-${option.value}-dropdown-option`}
         >
           {option.label}
         </button>
@@ -195,6 +201,7 @@ export function RHFDropdown({
                   isOpen={isOpen}
                   onClick={() => setIsOpen(!isOpen)}
                   hasError={!!fieldError}
+                  name={name}
                 />
 
                 {isOpen && (
@@ -203,6 +210,7 @@ export function RHFDropdown({
                     selectedValue={value}
                     onSelect={onChange}
                     onClose={() => setIsOpen(false)}
+                    name={name}
                   />
                 )}
               </>
