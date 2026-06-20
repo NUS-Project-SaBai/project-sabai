@@ -128,7 +128,7 @@ export const vitalsRouter = router({
     }),
 
   /**
-   * Updates a vitals record by visit ID, or creates a new one if it does not exist.
+   * Updates a vitals record by visit ID.
    * Only updates provided fields (partial update).
    */
   updateByVisitId: protectedProcedure
@@ -137,15 +137,9 @@ export const vitalsRouter = router({
       const { visitId, ...updateData } = input;
 
       const [updatedVitals] = await db
-        .insert(vitals)
-        .values({
-          visitId,
-          ...updateData,
-        })
-        .onConflictDoUpdate({
-          target: vitals.visitId,
-          set: updateData,
-        })
+        .update(vitals)
+        .set(updateData)
+        .where(eq(vitals.visitId, visitId))
         .returning();
 
       return updatedVitals;

@@ -17,6 +17,7 @@ import { RHFRadio } from "@/components/interactive/RHF/RHFRadio";
 import { RHFTextArea } from "@/components/interactive/RHF/RHFTextArea";
 import { Button } from "@/components/interactive/Button/Button";
 import { CreateVitalsInput } from "@/server/routers/vitals_router";
+import toast from "react-hot-toast";
 
 export default function PatientVitalsPage() {
   const router = useRouter();
@@ -151,12 +152,23 @@ function VitalsForm({ visitId }: { visitId: number }) {
 
   const utils = trpc.useUtils();
 
+  const createVitalsMutation = trpc.vitalsRouter.create.useMutation({
+    onSuccess: () => {
+      utils.vitalsRouter.getByVisitId.invalidate({ visitId });
+      toast.success("Vitals Uploaded successfully");
+    },
+    onError: () => {
+      alert("Database update operation failure");
+      toast.error("Failed to upload vitals :(");
+    },
+  });
+
   const updateVitalsMutation = trpc.vitalsRouter.updateByVisitId.useMutation({
     onSuccess: () => {
       utils.vitalsRouter.getByVisitId.invalidate({ visitId });
     },
     onError: () => {
-      alert("Database update operation failure: ${error.message}");
+      alert("Database update operation failure");
     },
   });
 
@@ -191,7 +203,7 @@ function VitalsForm({ visitId }: { visitId: number }) {
   type VitalsFormValues = Omit<CreateVitalsInput, "visitId">;
 
   const onSubmit = (data: VitalsFormValues) => {
-    updateVitalsMutation.mutate({
+    const payload = {
       visitId: visitId,
       height: data.height || undefined,
       weight: data.weight || undefined,
@@ -211,7 +223,13 @@ function VitalsForm({ visitId }: { visitId: number }) {
       bloodGlucoseFasting: data.bloodGlucoseFasting || undefined,
       hba1c: data.hba1c || undefined,
       others: data.others || undefined,
-    });
+    };
+
+    if (!vitalData) {
+      createVitalsMutation.mutate(payload);
+    } else {
+      updateVitalsMutation.mutate(payload);
+    }
   };
 
   return (
