@@ -83,14 +83,14 @@ export default function PatientVitalsPage() {
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },
-            { label: "Vitals", href: "/Vitals" },
+            { label: "Vitals", href: "/vitals" },
             { label: `Vitals for - ${patient.name}` },
           ]}
         />
 
         <div className="flex flex-col mb-8">
           <h1 className="text-3xl font-bold text-slate-900">
-            Patient Vitals Matrix — {patient.name}
+            Patient Vitals — {patient.name}
           </h1>
         </div>
         <div className="flex-1 overflow-y-auto p-6">
@@ -252,7 +252,7 @@ function VitalsForm({ visitId }: { visitId: number }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <RHFInput
             name="systolic"
-            label="Systiolic Blood Pressure (mmHg)"
+            label="Systolic Blood Pressure (mmHg)"
             type="number"
           />
           <RHFInput
@@ -286,10 +286,10 @@ function VitalsForm({ visitId }: { visitId: number }) {
         <div className="mt-4">
           <RHFRadio
             name="diabetesMellitus"
-            label="Diabetes Metiitus History Status Flag"
+            label="Diabetes Mellitus History Status Flag"
             radioOptions={[
-              { label: "Positive", value: "true" },
-              { label: "Negative", value: "false" },
+              { label: "Positive", value: true },
+              { label: "Negative", value: false },
             ]}
           />
         </div>
@@ -315,7 +315,7 @@ function VitalsForm({ visitId }: { visitId: number }) {
           <Button
             type="submit"
             title="Save Records"
-            colour="white"
+            colour="emerald"
             variant="filled"
             loading={updateVitalsMutation.isPending}
           />

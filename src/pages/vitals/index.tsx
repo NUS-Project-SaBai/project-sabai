@@ -15,12 +15,13 @@ export default function VitalsPage() {
   const router = useRouter();
 
   /**
-   * Navigates to the update glasses page for a specific patient.
-   * @param {number} patientId - The ID of the patient to update glasses for
+   * Navigates to the uvitals form page for a specific patient.
+   * @param {number} id - The ID of the patient to update vitals for
    */
-  const handlePatientVitals = (patientId: number) => {
-    router.push(`/vitals/${patientId}`);
+  const handlePatientVitals = (id: number) => {
+    router.push(`/vitals/${id}`);
   };
+
   //Fetch list of patients
   const {
     data: patients,
@@ -28,7 +29,7 @@ export default function VitalsPage() {
     isError,
   } = trpc.patientsRouter.list.useQuery();
 
-  function renderListOfPatients() {
+  function renderContent() {
     if (isError) {
       return <h1 className="text-red-500">An error has occurred!</h1>;
     }
@@ -53,26 +54,20 @@ export default function VitalsPage() {
             {patients.map((patient) => (
               <TableRow key={patient.id}>
                 <TableCell>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-slate-900">
-                      {patient.id || "No id found"}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-slate-900">
+                    {patient.id || "No id found"}
+                  </span>
                 </TableCell>
                 <TableCell>
-                  <div className="flex flex-col">
-                    <PatientPhoto
-                      pictureUrl={patient.patientImageUrl}
-                      className="rounded-full border border-slate-200"
-                    />
-                  </div>
+                  <PatientPhoto
+                    pictureUrl={patient.patientImageUrl}
+                    className="rounded-full border border-slate-200"
+                  />
                 </TableCell>
                 <TableCell>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-slate-900">
-                      {patient.name}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-slate-900">
+                    {patient.name}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <Button
@@ -108,7 +103,7 @@ export default function VitalsPage() {
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          {renderListOfPatients()}
+          {renderContent()}
         </div>
       </div>
     </div>
