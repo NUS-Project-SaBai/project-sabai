@@ -16,8 +16,24 @@ import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFRadio } from "@/components/interactive/RHF/RHFRadio";
 import { RHFTextArea } from "@/components/interactive/RHF/RHFTextArea";
 import { Button } from "@/components/interactive/Button/Button";
-import { CreateVitalsInput } from "@/server/routers/vitals_router";
 import toast from "react-hot-toast";
+
+type VitalsFormValues = {
+  height?: string | null;
+  weight?: string | null;
+  temperature?: string | null;
+  systolic?: string | number | null;
+  diastolic?: string | number | null;
+  heartRate?: string | number | null;
+  hemocueCount?: string | null;
+  diabetesMellitus: string;
+  urineTest?: string | null;
+  bloodGlucoseNonFasting?: string | null;
+  bloodGlucoseFasting?: string | null;
+  hba1c?: string | null;
+  others?: string | null;
+  visitSelect: string;
+};
 
 export default function PatientVitalsPage() {
   const router = useRouter();
@@ -142,7 +158,7 @@ export default function PatientVitalsPage() {
 }
 
 function VitalsForm({ visitId }: { visitId: number }) {
-  const { reset, handleSubmit } = useFormContext();
+  const { reset, handleSubmit } = useFormContext<VitalsFormValues>();
 
   const { data: vitalData, isLoading: vitalsLoading } =
     trpc.vitalsRouter.getByVisitId.useQuery(
@@ -205,13 +221,6 @@ function VitalsForm({ visitId }: { visitId: number }) {
   }, [vitalData, vitalsLoading, reset, visitId]);
 
   if (vitalsLoading) return <LoadingSpinner message="Loading Vitals" />;
-
-  type VitalsFormValues = Omit<
-    CreateVitalsInput,
-    "visitId" | "diabetesMellitus"
-  > & {
-    diabetesMellitus: string;
-  };
 
   const onSubmit = (data: VitalsFormValues) => {
     const payload = {
