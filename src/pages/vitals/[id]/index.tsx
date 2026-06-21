@@ -213,9 +213,9 @@ function VitalsForm({ visitId }: { visitId: number }) {
       heartRate: data.heartRate ? Number(data.heartRate) : undefined,
       hemocueCount: data.hemocueCount || undefined,
       diabetesMellitus:
-        data.diabetesMellitus === true
+        data.diabetesMellitus === "true"
           ? true
-          : data.diabetesMellitus === false
+          : data.diabetesMellitus === "false"
             ? false
             : undefined,
       urineTest: data.urineTest || undefined,
@@ -288,8 +288,8 @@ function VitalsForm({ visitId }: { visitId: number }) {
             name="diabetesMellitus"
             label="Diabetes Mellitus History Status Flag"
             radioOptions={[
-              { label: "Positive", value: true },
-              { label: "Negative", value: false },
+              { label: "Positive", value: "true" },
+              { label: "Negative", value: "false" },
             ]}
           />
         </div>
