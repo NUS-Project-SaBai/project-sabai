@@ -38,7 +38,7 @@ const createVitalsInput = z.object({
   diastolic: z.number().int().optional(), // mmHg
   heartRate: z.number().int().optional(), // bpm
   hemocueCount: z.coerce.string().optional(), // g/dL
-  diabetesMellitus: z.string().optional(),
+  diabetesMellitus: z.boolean().optional(),
   urineTest: z.string().optional(),
   bloodGlucoseNonFasting: z.coerce.string().optional(), // mg/dL or mmol/L
   bloodGlucoseFasting: z.coerce.string().optional(), // mg/dL or mmol/L

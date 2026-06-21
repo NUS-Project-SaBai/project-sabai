@@ -176,6 +176,12 @@ function VitalsForm({ visitId }: { visitId: number }) {
     if (vitalData) {
       reset({
         ...vitalData,
+        diabetesMellitus:
+          vitalData.diabetesMellitus === true
+            ? "true"
+            : vitalData.diabetesMellitus === false
+              ? "false"
+              : "",
         visitSelect: visitId.toString(), // Keeps the dropdown populated with the active data
       });
     } else if (!vitalsLoading) {
@@ -200,7 +206,12 @@ function VitalsForm({ visitId }: { visitId: number }) {
 
   if (vitalsLoading) return <LoadingSpinner message="Loading Vitals" />;
 
-  type VitalsFormValues = Omit<CreateVitalsInput, "visitId">;
+  type VitalsFormValues = Omit<
+    CreateVitalsInput,
+    "visitId" | "diabetesMellitus"
+  > & {
+    diabetesMellitus: string;
+  };
 
   const onSubmit = (data: VitalsFormValues) => {
     const payload = {
