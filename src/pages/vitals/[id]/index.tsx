@@ -17,6 +17,7 @@ import { RHFRadio } from "@/components/interactive/RHF/RHFRadio";
 import { RHFTextArea } from "@/components/interactive/RHF/RHFTextArea";
 import { Button } from "@/components/interactive/Button/Button";
 import toast from "react-hot-toast";
+import { formatVisitDate } from "@/lib/utils/visit";
 
 type VitalsFormValues = {
   height?: string | null;
@@ -82,16 +83,6 @@ export default function PatientVitalsPage() {
   const selectedVisit = selectedVisitValue
     ? visits?.find((v) => v.id.toString() === selectedVisitValue)
     : null;
-
-  const formatVisitDate = (date: Date) => {
-    return new Date(date).toLocaleString("en-GB", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
 
   return (
     <div className="min-h-screen flex-1 p-8 bg-slate-50">
