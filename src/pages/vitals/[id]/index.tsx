@@ -40,11 +40,11 @@ export default function PatientVitalsPage() {
   const { id } = router.query;
   const methods = useForm();
 
-  //fetch patient
+  // Fetch patient
   const { data: patient, isLoading: patientLoading } =
     trpc.patientsRouter.getById.useQuery({ id: Number(id) }, { enabled: !!id });
 
-  //fetch visits
+  // Fetch visits
   const { data: visits, isLoading: visitsLoading } =
     trpc.visitsRouter.getByPatientId.useQuery(
       { patientId: Number(id) },
@@ -57,19 +57,19 @@ export default function PatientVitalsPage() {
     name: "visitSelect",
   });
 
-  //Automatically select visit if only got one
+  // Automatically select visit if only got one
   useEffect(() => {
     if (visits && visits.length == 1) {
       methods.setValue("visitSelect", visits[0].id.toString());
     }
   }, [visits, methods]);
 
-  // 1. Ensure the router is fully initialized and patientId exists
+  // Ensure the router is fully initialized and patientId exists
   if (!router.isReady || patientLoading || visitsLoading) {
     return <LoadingSpinner message="Loading patient and visits..." />;
   }
 
-  // 2. Only check if patient is missing AFTER we are certain the query ran
+  // Only check if patient is missing AFTER we are certain the query ran
   if (!patient) {
     return (
       <div className="p-8 text-center font-semibold text-red-500">
