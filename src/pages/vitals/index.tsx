@@ -22,7 +22,7 @@ export default function VitalsPage() {
     router.push(`/vitals/${id}`);
   };
 
-  //Fetch list of patients
+  // Fetch list of patients
   const {
     data: patients,
     isLoading,
