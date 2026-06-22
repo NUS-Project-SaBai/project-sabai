@@ -15,7 +15,7 @@ export default function VitalsPage() {
   const router = useRouter();
 
   /**
-   * Navigates to the uvitals form page for a specific patient.
+   * Navigates to the vitals form page for a specific patient.
    * @param {number} id - The ID of the patient to update vitals for
    */
   const handlePatientVitals = (id: number) => {
