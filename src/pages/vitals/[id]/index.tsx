@@ -175,20 +175,20 @@ function VitalsForm({ visitId }: { visitId: number }) {
   const createVitalsMutation = trpc.vitalsRouter.create.useMutation({
     onSuccess: () => {
       utils.vitalsRouter.getByVisitId.invalidate({ visitId });
-      toast.success("Vitals saved successfully");
+      toast.success("Vitals saved successfully!");
     },
     onError: () => {
-      toast.error("Failed to save vitals");
+      toast.error("Failed to save vitals.");
     },
   });
 
   const updateVitalsMutation = trpc.vitalsRouter.updateByVisitId.useMutation({
     onSuccess: () => {
       utils.vitalsRouter.getByVisitId.invalidate({ visitId });
-      toast.success("Vitals saved successfully");
+      toast.success("Vitals saved successfully!");
     },
     onError: () => {
-      toast.error("Failed to save vitals");
+      toast.error("Failed to save vitals.");
     },
   });
 
