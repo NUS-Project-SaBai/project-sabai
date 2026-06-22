@@ -18,6 +18,8 @@ const selectEyesightFields = {
   leftAstigmatism: eyesight.leftAstigmatism,
   rightAstigmatism: eyesight.rightAstigmatism,
   comments: eyesight.comments,
+  leftPrescribedGlassesDegree: eyesight.leftPrescribedGlassesDegree,
+  rightPrescribedGlassesDegree: eyesight.rightPrescribedGlassesDegree,
 };
 
 /**
@@ -32,6 +34,8 @@ const createEyesightInput = z.object({
   leftAstigmatism: z.string().optional(),
   rightAstigmatism: z.string().optional(),
   comments: z.string().optional(),
+  leftPrescribedGlassesDegree: z.string().optional(),
+  rightPrescribedGlassesDegree: z.string().optional(),
 });
 
 /**
