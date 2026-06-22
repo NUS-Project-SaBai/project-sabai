@@ -158,7 +158,11 @@ export default function PatientVitalsPage() {
 }
 
 function VitalsForm({ visitId }: { visitId: number }) {
-  const { reset, handleSubmit } = useFormContext<VitalsFormValues>();
+  const {
+    reset,
+    handleSubmit,
+    formState: { isDirty },
+  } = useFormContext<VitalsFormValues>();
 
   const { data: vitalData, isLoading: vitalsLoading } =
     trpc.vitalsRouter.getByVisitId.useQuery(
@@ -223,6 +227,11 @@ function VitalsForm({ visitId }: { visitId: number }) {
   if (vitalsLoading) return <LoadingSpinner message="Loading Vitals" />;
 
   const onSubmit = (data: VitalsFormValues) => {
+    if (!isDirty) {
+      toast.error("No form field changed!");
+      return;
+    }
+
     const payload = {
       visitId: visitId,
       height: data.height || undefined,
