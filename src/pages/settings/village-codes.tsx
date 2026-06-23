@@ -104,10 +104,17 @@ function ChangeModal({
 
   const handleSubmit: SubmitHandler<FormFields> = async (data) => {
     if (activeForm && activeForm.id) {
-      updateMutation.mutate({
-        ...data,
-        id: activeForm.id,
-      });
+      if (form.formState.isDirty) {
+        updateMutation.mutate({
+          ...data,
+          id: activeForm.id,
+        });
+      }
+
+      if (!(Object.keys(form.formState.dirtyFields).length > 0)) {
+        toast.error("Fields not changed!");
+        return;
+      }
     } else {
       createMutation.mutate(data);
     }
