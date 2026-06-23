@@ -1,8 +1,4 @@
-import {
-  DetailedHTMLProps,
-  HTMLAttributes,
-  InputHTMLAttributes,
-} from "react";
+import { DetailedHTMLProps, HTMLAttributes, InputHTMLAttributes } from "react";
 import { RegisterOptions, useFormContext } from "react-hook-form";
 import { useRHFRegister } from "./useRHFRegister";
 import { IsRequiredStar } from "@/components/IsRequiredStar";
@@ -17,10 +13,7 @@ type RHFInputProps = {
   >["className"];
   registerOptions?: RegisterOptions;
   type: "text" | "email" | "password" | "number" | "date" | "checkbox";
-} & DetailedHTMLProps<
-  InputHTMLAttributes<HTMLInputElement>,
-  HTMLInputElement
->;
+} & DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 export function RHFInput({
   name,
@@ -35,7 +28,7 @@ export function RHFInput({
     name,
     label,
     isRequired,
-    registerOptions
+    registerOptions,
   );
 
   const { formState } = useFormContext();
