@@ -48,10 +48,10 @@ function RHFDropdownButton({
       type="button"
       onClick={onClick}
       className={clsx([
-        "w-full flex items-center justify-between px-4 py-2 border rounded bg-white transition",
+        "w-full flex items-center justify-between px-4 py-2 border border-gray-300 rounded bg-white transition focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400",
         hasError
-          ? "border-red-400"
-          : "border-gray-300 hover:border-gray-400 focus:border-blue-500",
+          ? "border-red-400 focus:ring-red-300 focus:border-red-400"
+          : "hover:border-gray-400",
         isOpen && "border-blue-500",
       ])}
       name={`${name}-dropdown-button`}
@@ -94,7 +94,7 @@ function RHFDropdownMenu({
   };
 
   return (
-    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-900 rounded-lg shadow-lg max-h-60 overflow-y-auto">
       {options.map((option) => (
         <button
           key={option.value}
@@ -175,12 +175,12 @@ export function RHFDropdown({
   const dropdownRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
 
   return (
-    <div className={className}>
+    <div className={clsx("flex flex-col gap-2", className)}>
       <label htmlFor={name}>
         {label}
         <IsRequiredStar isRequired={isRequired} />
       </label>
-      <div ref={dropdownRef} className="relative my-4">
+      <div ref={dropdownRef} className="relative">
         <Controller
           name={name}
           control={control}
@@ -219,8 +219,8 @@ export function RHFDropdown({
         />
       </div>
       {fieldError && (
-        <p className="text-sm text-red-500 mt-1">
-          {fieldError.message?.toString()}
+        <p className="min-h-6 text-red-400">
+          {fieldError ? fieldError.message?.toString() : ""}
         </p>
       )}
     </div>
