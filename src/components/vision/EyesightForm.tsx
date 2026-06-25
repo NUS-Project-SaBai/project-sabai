@@ -17,10 +17,8 @@ export type EyesightFormValues = {
   leftPrescribedGlassesDegree?: string | null;
   rightPrescribedGlassesDegree?: string | null;
   comments?: string | null;
-  visitSelect: string;
 };
 
-/** Empty form state used as the baseline for a visit with no record yet. */
 const BLANK_EYESIGHT: EyesightFormValues = {
   leftEyeDegree: "",
   rightEyeDegree: "",
@@ -31,12 +29,8 @@ const BLANK_EYESIGHT: EyesightFormValues = {
   leftPrescribedGlassesDegree: "",
   rightPrescribedGlassesDegree: "",
   comments: "",
-  visitSelect: "",
 };
 
-/**
- * Left/right input groups rendered in the prescription form, declared once here.
- */
 const EYE_SECTIONS: {
   title: string;
   fields: { name: keyof EyesightFormValues; label: string }[];
@@ -77,20 +71,17 @@ const EYE_SECTIONS: {
   },
 ];
 
-/**
- * Prescription form for a single visit. Loads any existing eyesight record and
- * upserts (create or insert) on save (create when none exists, otherwise will update by visit).
- */
 export function EyesightForm({ visitId }: { visitId: number }) {
   const {
     reset,
+    getValues,
     handleSubmit,
     formState: { isDirty },
-  } = useFormContext<EyesightFormValues>();
+  } = useFormContext<EyesightFormValues & { visitSelect: string }>();
 
   const { data: eyesightData, isLoading: eyesightLoading } =
     trpc.eyesightRouter.getByVisitId.useQuery(
-      { visitId: visitId },
+      { visitId },
       { enabled: !!visitId },
     );
 
@@ -113,10 +104,11 @@ export function EyesightForm({ visitId }: { visitId: number }) {
 
   useEffect(() => {
     if (eyesightLoading) return;
+    // Preserve visitSelect — it's owned by the parent page, not this form
     reset({
       ...BLANK_EYESIGHT,
       ...eyesightData,
-      visitSelect: visitId.toString(),
+      visitSelect: getValues("visitSelect"),
     });
   }, [eyesightData, eyesightLoading, reset, visitId]);
 
@@ -129,7 +121,7 @@ export function EyesightForm({ visitId }: { visitId: number }) {
     }
 
     const payload = {
-      visitId: visitId,
+      visitId,
       leftEyeDegree: data.leftEyeDegree || undefined,
       rightEyeDegree: data.rightEyeDegree || undefined,
       leftEyePinhole: data.leftEyePinhole || undefined,
