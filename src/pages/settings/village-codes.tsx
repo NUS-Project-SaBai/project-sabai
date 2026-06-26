@@ -15,6 +15,7 @@ import {
 } from "react-hook-form";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { toast } from "react-hot-toast";
+import { ConsoleLogWriter } from "drizzle-orm";
 
 const DEFAULT_FORM: NewVillageCode = {
   code: "",
@@ -118,16 +119,14 @@ function ChangeModal({
 
   const handleSubmit: SubmitHandler<FormFields> = async (data) => {
     if (activeForm && activeForm.id) {
-      if (form.formState.isDirty) {
+      const numDirtyFields = Object.keys(form.formState.dirtyFields).length;
+      if (form.formState.isDirty || numDirtyFields > 0) {
         updateMutation.mutate({
           ...data,
           id: activeForm.id,
         });
-      }
-
-      if (!(Object.keys(form.formState.dirtyFields).length > 0)) {
+      } else {
         toast.error("Fields not changed!");
-        return;
       }
     } else {
       createMutation.mutate(data);
