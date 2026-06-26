@@ -131,7 +131,7 @@ export function EyesightForm({
     const onSuccess = () => {
       utils.eyesightRouter.getByVisitId.invalidate({ visitId });
       toast.success("Vision record saved successfully!");
-      // Re-baseline immediately so isDirty reflects changes since this save
+
       reset({ ...data, visitSelect });
     };
     const onError = () => toast.error("Failed to save vision record.");
