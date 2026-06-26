@@ -71,13 +71,22 @@ const EYE_SECTIONS: {
   },
 ];
 
-export function EyesightForm({ visitId }: { visitId: number }) {
+export function EyesightForm({
+  visitId,
+  visitSelect,
+}: {
+  visitId: number;
+  visitSelect: string;
+}) {
+  const ctx = useFormContext<EyesightFormValues>();
   const {
-    reset,
-    getValues,
     handleSubmit,
     formState: { isDirty },
-  } = useFormContext<EyesightFormValues & { visitSelect: string }>();
+  } = ctx;
+
+  const reset = ctx.reset as (
+    values: EyesightFormValues & { visitSelect: string },
+  ) => void;
 
   const { data: eyesightData, isLoading: eyesightLoading } =
     trpc.eyesightRouter.getByVisitId.useQuery(
@@ -87,30 +96,14 @@ export function EyesightForm({ visitId }: { visitId: number }) {
 
   const utils = trpc.useUtils();
 
-  const mutationOptions = {
-    onSuccess: () => {
-      utils.eyesightRouter.getByVisitId.invalidate({ visitId });
-      toast.success("Vision record saved successfully!");
-    },
-    onError: () => {
-      toast.error("Failed to save vision record.");
-    },
-  };
-
-  const createEyesightMutation =
-    trpc.eyesightRouter.create.useMutation(mutationOptions);
+  const createEyesightMutation = trpc.eyesightRouter.create.useMutation();
   const updateEyesightMutation =
-    trpc.eyesightRouter.updateByVisitId.useMutation(mutationOptions);
+    trpc.eyesightRouter.updateByVisitId.useMutation();
 
   useEffect(() => {
     if (eyesightLoading) return;
-    // Preserve visitSelect — it's owned by the parent page, not this form
-    reset({
-      ...BLANK_EYESIGHT,
-      ...eyesightData,
-      visitSelect: getValues("visitSelect"),
-    });
-  }, [eyesightData, eyesightLoading, reset, visitId]);
+    reset({ ...BLANK_EYESIGHT, ...eyesightData, visitSelect });
+  }, [eyesightData, eyesightLoading, reset, visitId, visitSelect]);
 
   if (eyesightLoading) return <LoadingSpinner message="Loading vision data" />;
 
@@ -135,10 +128,18 @@ export function EyesightForm({ visitId }: { visitId: number }) {
       comments: data.comments || undefined,
     };
 
+    const onSuccess = () => {
+      utils.eyesightRouter.getByVisitId.invalidate({ visitId });
+      toast.success("Vision record saved successfully!");
+      // Re-baseline immediately so isDirty reflects changes since this save
+      reset({ ...data, visitSelect });
+    };
+    const onError = () => toast.error("Failed to save vision record.");
+
     if (!eyesightData) {
-      createEyesightMutation.mutate(payload);
+      createEyesightMutation.mutate(payload, { onSuccess, onError });
     } else {
-      updateEyesightMutation.mutate(payload);
+      updateEyesightMutation.mutate(payload, { onSuccess, onError });
     }
   };
 
