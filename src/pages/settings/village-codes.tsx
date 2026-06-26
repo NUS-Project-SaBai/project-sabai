@@ -15,7 +15,6 @@ import {
 } from "react-hook-form";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { toast } from "react-hot-toast";
-import { ConsoleLogWriter } from "drizzle-orm";
 
 const DEFAULT_FORM: NewVillageCode = {
   code: "",
@@ -119,17 +118,21 @@ function ChangeModal({
 
   const handleSubmit: SubmitHandler<FormFields> = async (data) => {
     if (activeForm && activeForm.id) {
-      const numDirtyFields = Object.keys(form.formState.dirtyFields).length;
-      if (form.formState.isDirty || numDirtyFields > 0) {
-        updateMutation.mutate({
-          ...data,
-          id: activeForm.id,
-        });
-      } else {
-        toast.error("Fields not changed!");
-      }
+      handleEdit(data);
     } else {
       createMutation.mutate(data);
+    }
+  };
+
+  const handleEdit = async (data: FormFields) => {
+    const numDirtyFields = Object.keys(form.formState.dirtyFields).length;
+    if (form.formState.isDirty || numDirtyFields > 0) {
+      updateMutation.mutate({
+        ...data,
+        id: activeForm!.id!, // Non-null assertion operator because handleEdit only gets called by handleSubmit which already does the check
+      });
+    } else {
+      toast.error("Fields not changed!");
     }
   };
 
