@@ -115,7 +115,10 @@ function UpdateGlassesPage() {
 
             <div className="p-6">
               {selectedVisit ? (
-                <EyesightForm visitId={selectedVisit.id} />
+                <EyesightForm
+                  visitId={selectedVisit.id}
+                  visitSelect={selectedVisitValue ?? ""}
+                />
               ) : (
                 visits &&
                 visits.length > 0 && (

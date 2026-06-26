@@ -78,13 +78,13 @@ export function EyesightForm({
   visitId: number;
   visitSelect: string;
 }) {
-  const ctx = useFormContext<EyesightFormValues>();
   const {
     handleSubmit,
     formState: { isDirty },
-  } = ctx;
-
-  const reset = ctx.reset as (
+    reset: resetCtx,
+  } = useFormContext<EyesightFormValues>();
+  
+  const reset = resetCtx as (
     values: EyesightFormValues & { visitSelect: string },
   ) => void;
 
