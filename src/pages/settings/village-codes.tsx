@@ -7,7 +7,12 @@ import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import Modal from "@/components/interactive/Modal";
-import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
+import {
+  FormProvider,
+  useForm,
+  SubmitHandler,
+  useWatch,
+} from "react-hook-form";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { toast } from "react-hot-toast";
 
@@ -54,6 +59,15 @@ function ChangeModal({
 
   const form = useForm<FormFields>({
     values: currentValues,
+  });
+
+  const watchedColor = useWatch({
+    name: "colorHex",
+    compute: (data: string) => {
+      return data;
+    },
+    defaultValue: DEFAULT_FORM.colorHex,
+    control: form.control,
   });
 
   // Useful link for subscription mechanism: https://react-hook-form.com/docs/useform/subscribe
@@ -155,9 +169,9 @@ function ChangeModal({
               defaultValue={DEFAULT_FORM.colorHex}
             />
             <input
-              defaultValue={DEFAULT_FORM.colorHex}
               id="color-value"
               readOnly
+              value={watchedColor}
               className="h-10 block w-full rounded-md border border-slate-300 px-3 bg-slate-50 text-slate-500"
             />
           </div>
