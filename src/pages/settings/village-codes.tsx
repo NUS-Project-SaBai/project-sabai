@@ -15,6 +15,7 @@ import {
 } from "react-hook-form";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { toast } from "react-hot-toast";
+import clsx from "clsx";
 
 const DEFAULT_FORM: NewVillageCode = {
   code: "",
@@ -30,6 +31,60 @@ type FormFields = {
   colorHex: string;
   isVisible: boolean | undefined;
 };
+
+function DeleteModal({
+  activeForm,
+  onClose,
+}: {
+  onClose: () => void;
+  activeForm: FormFields | null;
+}) {
+  const utils = trpc.useUtils();
+  const deleteMutation = trpc.villageCodesRouter.delete.useMutation({
+    onSuccess: () => {
+      utils.villageCodesRouter.list.invalidate();
+      toast.success("Village code deleted!");
+      onClose();
+    },
+    onError: (err) => {
+      console.error(err);
+      toast.error(
+        "Unable to delete village code. Check that there are no visits with this village code before deleting.",
+      );
+    },
+  });
+
+  return (
+    <Modal onClose={onClose}>
+      <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-4">
+        Confirm Deletion
+      </h2>
+      <p>{activeForm?.code}</p>
+      <p>{activeForm?.name}</p>
+
+      <div className="flex gap-2">
+        <button
+          onClick={() => deleteMutation.mutate({ id: activeForm!.id! })}
+          className={clsx(
+            "flex-1 text-white px-4 py-1 rounded-lg font-medium",
+            deleteMutation.isPending
+              ? "bg-neutral-600"
+              : "bg-green-600 hover:bg-green-700",
+          )}
+          disabled={deleteMutation.isPending}
+        >
+          {deleteMutation.isPending ? "Deleting..." : "Confirm"}
+        </button>
+        <button
+          onClick={onClose}
+          className="bg-red-700 flex-1 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
+        >
+          Cancel
+        </button>
+      </div>
+    </Modal>
+  );
+}
 
 function ChangeModal({
   onClose,
@@ -224,9 +279,11 @@ function Wrapper({ children }: { children: ReactNode }) {
 function Content({
   showHidden,
   openEdit,
+  openDelete,
 }: {
   showHidden: boolean;
   openEdit: (code: VillageCode) => void;
+  openDelete: (code: VillageCode) => void;
 }) {
   const { data: codes, isLoading } = trpc.villageCodesRouter.list.useQuery({
     includeHidden: showHidden,
@@ -241,7 +298,12 @@ function Content({
       <TableHeader headers={["Code", "Name", "Color", "Status", "actions"]} />
       <tbody className="divide-y divide-slate-200 bg-white">
         {codes?.map((code: VillageCode) => (
-          <RowContent code={code} openEdit={openEdit} key={code.id} />
+          <RowContent
+            code={code}
+            openEdit={openEdit}
+            openDelete={openDelete}
+            key={code.id}
+          />
         ))}
       </tbody>
     </table>
@@ -249,17 +311,18 @@ function Content({
 }
 
 function VillageCodesPage() {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [activeForm, setActiveForm] = useState<FormFields | null>(null);
   const [showHidden, setShowHidden] = useState(false);
 
-  const closeForm = () => {
-    setIsEditing(false);
-    setActiveForm(null);
-  };
-
   const openEdit = (code: VillageCode) => {
     setIsEditing(true);
+    setActiveForm(code);
+  };
+
+  const openDelete = (code: VillageCode) => {
+    setIsDeleting(true);
     setActiveForm(code);
   };
 
@@ -291,10 +354,29 @@ function VillageCodesPage() {
       <div className="min-h-screen bg-slate-50 p-8">
         <div className="max-w-5xl mx-auto">
           {isEditing && (
-            <ChangeModal onClose={closeForm} activeForm={activeForm} />
+            <ChangeModal
+              onClose={() => {
+                setIsEditing(false);
+                setActiveForm(null);
+              }}
+              activeForm={activeForm}
+            />
+          )}
+          {isDeleting && (
+            <DeleteModal
+              onClose={() => {
+                setIsDeleting(false);
+                setActiveForm(null);
+              }}
+              activeForm={activeForm}
+            />
           )}
           <div className="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
-            <Content openEdit={openEdit} showHidden={showHidden} />
+            <Content
+              openEdit={openEdit}
+              openDelete={openDelete}
+              showHidden={showHidden}
+            />
           </div>
         </div>
       </div>
@@ -305,31 +387,12 @@ function VillageCodesPage() {
 function RowContent({
   code,
   openEdit,
+  openDelete,
 }: {
   code: VillageCode;
   openEdit: (code: VillageCode) => void;
+  openDelete: (code: VillageCode) => void;
 }) {
-  const utils = trpc.useUtils();
-
-  const deleteMutation = trpc.villageCodesRouter.delete.useMutation({
-    onSuccess: () => {
-      utils.villageCodesRouter.list.invalidate();
-      toast.success("Village code deleted!");
-    },
-    onError: (err) => {
-      console.error(err);
-      toast.error(
-        "Unable to delete village code. Check that there are no visits with this village code before deleting.",
-      );
-    },
-  });
-
-  const handleDelete = (id: number) => {
-    if (confirm("Are you sure you want to delete this code?")) {
-      deleteMutation.mutate({ id });
-    }
-  };
-
   return (
     <TableRow key={code.id}>
       <TableCell>{code.code}</TableCell>
@@ -366,7 +429,7 @@ function RowContent({
           Edit
         </button>
         <button
-          onClick={() => handleDelete(code.id)}
+          onClick={() => openDelete(code)}
           className="text-red-600 hover:text-red-900 font-medium"
         >
           Delete
