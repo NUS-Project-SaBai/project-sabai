@@ -220,7 +220,7 @@ export function RHFDropdown({
       </div>
       {fieldError && (
         <p className="min-h-6 text-red-400">
-          {fieldError ? fieldError.message?.toString() : ""}
+          {fieldError.message?.toString()}
         </p>
       )}
     </div>
