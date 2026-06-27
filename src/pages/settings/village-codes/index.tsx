@@ -31,12 +31,48 @@ function Content({
       <TableHeader headers={["Code", "Name", "Color", "Status", "actions"]} />
       <tbody className="divide-y divide-slate-200 bg-white">
         {codes?.map((code: VillageCode) => (
-          <RowContent
-            code={code}
-            openEdit={openEdit}
-            openDelete={openDelete}
-            key={code.id}
-          />
+          <TableRow key={code.id}>
+            <TableCell>{code.code}</TableCell>
+            <TableCell>{code.name}</TableCell>
+            <TableCell>
+              <div className="flex items-center gap-2">
+                <span
+                  className="h-4 w-4 rounded-full border border-slate-200 shadow-sm"
+                  style={{ backgroundColor: code.colorHex }}
+                />
+                <span className="text-slate-500 font-mono text-xs">
+                  {code.colorHex}
+                </span>
+              </div>
+            </TableCell>
+            <TableCell>
+              {code.isVisible ? (
+                <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                  Active
+                </span>
+              ) : (
+                <span className="inline-flex items-center rounded-full bg-slate-50 px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-500/10">
+                  Hidden
+                </span>
+              )}
+            </TableCell>
+            <TableCell>
+              <button
+                onClick={() => {
+                  openEdit(code);
+                }}
+                className="text-indigo-600 hover:text-indigo-900 font-medium mr-4"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => openDelete(code)}
+                className="text-red-600 hover:text-red-900 font-medium"
+              >
+                Delete
+              </button>
+            </TableCell>
+          </TableRow>
         ))}
       </tbody>
     </table>
@@ -114,61 +150,6 @@ function VillageCodesPage() {
         </div>
       </div>
     </div>
-  );
-}
-
-function RowContent({
-  code,
-  openEdit,
-  openDelete,
-}: {
-  code: VillageCode;
-  openEdit: (code: VillageCode) => void;
-  openDelete: (code: VillageCode) => void;
-}) {
-  return (
-    <TableRow key={code.id}>
-      <TableCell>{code.code}</TableCell>
-      <TableCell>{code.name}</TableCell>
-      <TableCell>
-        <div className="flex items-center gap-2">
-          <span
-            className="h-4 w-4 rounded-full border border-slate-200 shadow-sm"
-            style={{ backgroundColor: code.colorHex }}
-          />
-          <span className="text-slate-500 font-mono text-xs">
-            {code.colorHex}
-          </span>
-        </div>
-      </TableCell>
-      <TableCell>
-        {code.isVisible ? (
-          <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-            Active
-          </span>
-        ) : (
-          <span className="inline-flex items-center rounded-full bg-slate-50 px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-500/10">
-            Hidden
-          </span>
-        )}
-      </TableCell>
-      <TableCell>
-        <button
-          onClick={() => {
-            openEdit(code);
-          }}
-          className="text-indigo-600 hover:text-indigo-900 font-medium mr-4"
-        >
-          Edit
-        </button>
-        <button
-          onClick={() => openDelete(code)}
-          className="text-red-600 hover:text-red-900 font-medium"
-        >
-          Delete
-        </button>
-      </TableCell>
-    </TableRow>
   );
 }
 
