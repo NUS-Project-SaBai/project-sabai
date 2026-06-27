@@ -1,10 +1,10 @@
 import { trpc } from "@/utils/trpc";
-import { FormFields } from "./types";
 import toast from "react-hot-toast";
 import Modal from "@/components/interactive/Modal";
 import clsx from "clsx";
+import { FormFields } from "@/lib/utils/villageCodeTypes";
 
-export function DeleteModal({
+export default function DeleteModal({
   activeForm,
   onClose,
 }: {

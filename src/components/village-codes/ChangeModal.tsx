@@ -1,8 +1,8 @@
 import { trpc } from "@/utils/trpc";
-import { FormFields, DEFAULT_FORM } from "./types";
 import toast from "react-hot-toast";
 import Modal from "@/components/interactive/Modal";
 import { NewVillageCode } from "@/db/schema";
+import { DEFAULT_FORM, FormFields } from "@/lib/utils/villageCodeTypes";
 import {
   FormProvider,
   useForm,
@@ -13,7 +13,7 @@ import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { useSaveOnWrite } from "@/hooks/useSaveOnWrite";
 import { useEffect } from "react";
 
-export function ChangeModal({
+export default function ChangeModal({
   onClose,
   activeForm,
 }: {

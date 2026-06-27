@@ -1,13 +1,13 @@
-import { useState, useEffect, ReactNode } from "react";
+import { useState } from "react";
 import { trpc } from "@/utils/trpc";
 import { VillageCode } from "@/db/schema";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
-import { DeleteModal } from "./DeleteModal";
-import { ChangeModal } from "./ChangeModal";
-import { FormFields } from "./types";
+import DeleteModal from "@/components/village-codes/DeleteModal";
+import ChangeModal from "@/components/village-codes/ChangeModal";
+import { FormFields } from "@/lib/utils/villageCodeTypes";
 
 function Content({
   showHidden,
