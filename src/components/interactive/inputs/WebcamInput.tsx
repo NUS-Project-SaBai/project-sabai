@@ -77,6 +77,7 @@ export function WebcamInput({
             screenshotFormat="image/jpeg"
             screenshotQuality={1}
             videoConstraints={videoConstraints}
+            id="webcam"
           />
           <OldButton text="Capture" onClick={webcamCapture} colour="green" />
         </div>
@@ -93,7 +94,10 @@ export function WebcamInput({
             <OldButton
               colour="orange"
               text="Retake Photo"
-              onClick={toggleCameraOpen}
+              onClick={() => {
+                toggleCameraOpen();
+                setImageDetails(null);
+              }}
             />
           )
         ) : (

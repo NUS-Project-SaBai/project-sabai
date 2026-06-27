@@ -52,6 +52,7 @@ export function OldButton({
   const [isLoading, setIsLoading] = useState(false);
 
   // Prevent SSR hydration mismatch
+   
   useEffect(() => setHydrated(true), []);
 
   const handleClick = async (e: MouseEvent<HTMLButtonElement>) => {
