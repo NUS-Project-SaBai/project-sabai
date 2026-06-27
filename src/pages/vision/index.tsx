@@ -8,29 +8,148 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
-import { Button } from "@/components/interactive/Button/Button";
 import { ReactNode } from "react";
+import { formatPatientCode } from "@/lib/utils/patient";
+import { PatientsRouterListItem } from "@/utils/trpc-types";
+
+/**
+ * Renders a patient's code with a small dot in the village colour beside it.
+ * The dot is omitted when the patient has no village.
+ */
+function PatientCode({
+  villageCode,
+  villageColorHex,
+  id,
+  className = "",
+}: {
+  villageCode: string | null;
+  villageColorHex: string | null;
+  id: number;
+  className?: string;
+}) {
+  return (
+    <span className={`inline-flex items-center gap-2 ${className}`}>
+      {villageColorHex && (
+        <span
+          className="h-3 w-3 rounded-full"
+          style={{ backgroundColor: villageColorHex }}
+          title={villageCode ?? undefined}
+        />
+      )}
+      {formatPatientCode(villageCode, id)}
+    </span>
+  );
+}
+
+function UpdateGlassesButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title="Update Glasses"
+      className="inline-flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white transition hover:bg-emerald-700"
+    >
+      <HiOutlinePencilSquare className="h-5 w-5" />
+      Update Glasses
+    </button>
+  );
+}
+
+/**
+ * Stacked patient card used on small screens (e.g mobile)
+ */
+function PatientCard({
+  patient,
+  onUpdateGlasses,
+}: {
+  patient: PatientsRouterListItem;
+  onUpdateGlasses: (patientId: number) => void;
+}) {
+  return (
+    <div className="flex gap-10 p-4">
+      <PatientPhoto
+        pictureUrl={patient.patientImageUrl}
+        className="h-14 w-14 rounded-lg border border-slate-200 object-cover"
+      />
+      <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
+        <PatientCode
+          villageCode={patient.villageCode}
+          villageColorHex={patient.villageColorHex}
+          id={patient.id}
+          className="text-xs font-medium text-slate-500"
+        />
+        <div className="break-words text-sm font-medium text-slate-900">
+          {patient.name}
+        </div>
+        <UpdateGlassesButton onClick={() => onUpdateGlasses(patient.id)} />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Full patient table shown on tablet and desktop screens.
+ */
+function PatientTable({
+  patients,
+  onUpdateGlasses,
+}: {
+  patients: PatientsRouterListItem[];
+  onUpdateGlasses: (patientId: number) => void;
+}) {
+  return (
+    <div className="hidden overflow-x-auto md:block">
+      <table className="min-w-full divide-y divide-slate-200">
+        <TableHeader headers={["ID", "Photo", "Name", "Actions"]} />
+        <tbody className="bg-white divide-y divide-slate-200">
+          {patients.map((patient) => (
+            <TableRow key={patient.id}>
+              <TableCell>
+                <PatientCode
+                  villageCode={patient.villageCode}
+                  villageColorHex={patient.villageColorHex}
+                  id={patient.id}
+                  className="text-sm font-medium text-slate-900"
+                />
+              </TableCell>
+              <TableCell>
+                <PatientPhoto
+                  pictureUrl={patient.patientImageUrl}
+                  className="h-12 w-12 rounded-lg border border-slate-200 object-cover"
+                />
+              </TableCell>
+              <TableCell>
+                <span className="text-sm font-medium text-slate-900">
+                  {patient.name}
+                </span>
+              </TableCell>
+              <TableCell>
+                <UpdateGlassesButton
+                  onClick={() => onUpdateGlasses(patient.id)}
+                />
+              </TableCell>
+            </TableRow>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 function Wrapper({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen flex-1 p-8">
-      <div className="w-full mx-auto">
-        <Breadcrumbs
-          items={[{ label: "Home", href: "/" }, { label: "Vision" }]}
-        />
-
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">Vision</h1>
-            <p className="mt-2 text-slate-600">
-              Manage vision prescriptions and eye care records for all patients.
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          {children}
-        </div>
+    <div className="min-h-screen flex-1 p-4 sm:p-6">
+      <Breadcrumbs
+        items={[{ label: "Home", href: "/" }, { label: "Vision" }]}
+      />
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-slate-900">Vision</h1>
+        <p className="mt-2 text-slate-600">
+          Manage vision prescriptions and eye care records for all patients.
+        </p>
+      </div>
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        {children}
       </div>
     </div>
   );
@@ -70,43 +189,24 @@ function VisionPage() {
     }
 
     return (
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200">
-          <TableHeader headers={["ID", "Photo", "Full Name", "Actions"]} />
-          <tbody className="bg-white divide-y divide-slate-200">
-            {patients.map((patient) => (
-              <TableRow key={patient.id}>
-                <TableCell>
-                  <div className="text-sm font-medium text-slate-900">
-                    {patient.id.toString().padStart(4, "0")}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <PatientPhoto
-                    pictureUrl={patient.patientImageUrl}
-                    className="rounded-full border border-slate-200"
-                  />
-                </TableCell>
-                <TableCell>
-                  <div className="text-sm font-medium text-slate-900">
-                    {patient.name}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Button
-                    onClick={() => handleUpdateGlasses(patient.id)}
-                    title="Update Glasses"
-                    icon={<HiOutlinePencilSquare className="h-4 w-4" />}
-                    colour="emerald"
-                    variant="filled"
-                    size="medium"
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <>
+        {/* Mobile screens: stacked cards */}
+        <div className="divide-y divide-slate-200 md:hidden">
+          {patients.map((patient) => (
+            <PatientCard
+              key={patient.id}
+              patient={patient}
+              onUpdateGlasses={handleUpdateGlasses}
+            />
+          ))}
+        </div>
+
+        {/* Tablet and desktop screens: full table */}
+        <PatientTable
+          patients={patients}
+          onUpdateGlasses={handleUpdateGlasses}
+        />
+      </>
     );
   }
 

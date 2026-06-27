@@ -5,6 +5,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
+import { formatPatientId } from "@/lib/utils/patient";
 
 function UpdateGlassesPage() {
   const router = useRouter();
@@ -74,7 +75,7 @@ function UpdateGlassesPage() {
               Update Glasses - {patient.name}
             </h1>
             <p className="mt-2 text-slate-600">
-              Patient ID: {patient.id.toString().padStart(4, "0")}
+              Patient ID: {formatPatientId(patient.id)}
             </p>
           </div>
         </div>
