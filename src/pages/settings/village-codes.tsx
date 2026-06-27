@@ -259,23 +259,6 @@ function ChangeModal({
   );
 }
 
-function Wrapper({ children }: { children: ReactNode }) {
-  return (
-    <div className="min-h-screen bg-slate-50 p-8">
-      <div className="max-w-5xl mx-auto">
-        <Breadcrumbs
-          items={[
-            { label: "Home", href: "/" },
-            { label: "Settings" },
-            { label: "Village Codes" },
-          ]}
-        />
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function Content({
   showHidden,
   openEdit,
@@ -327,60 +310,68 @@ function VillageCodesPage() {
   };
 
   return (
-    <Wrapper>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-slate-900">Village Codes</h1>
-
-        <div className="flex items-center gap-4">
-          <label className="flex items-center gap-2 text-sm text-slate-600">
-            <input
-              type="checkbox"
-              checked={showHidden}
-              onChange={(e) => setShowHidden(e.target.checked)}
-              className="rounded border-slate-300"
-            />
-            Show Hidden
-          </label>
-          <button
-            onClick={() => {
-              setIsEditing(true);
-            }}
-            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700"
-          >
-            New Village Code
-          </button>
+    <div className="min-h-screen bg-slate-50 p-8">
+      <div className="max-w-5xl mx-auto">
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Settings" },
+            { label: "Village Codes" },
+          ]}
+        />
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-slate-900">Village Codes</h1>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={showHidden}
+                onChange={(e) => setShowHidden(e.target.checked)}
+                className="rounded border-slate-300"
+              />
+              Show Hidden
+            </label>
+            <button
+              onClick={() => {
+                setIsEditing(true);
+              }}
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700"
+            >
+              New Village Code
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="min-h-screen bg-slate-50 p-8">
-        <div className="max-w-5xl mx-auto">
-          {isEditing && (
-            <ChangeModal
-              onClose={() => {
-                setIsEditing(false);
-                setActiveForm(null);
-              }}
-              activeForm={activeForm}
-            />
-          )}
-          {isDeleting && (
-            <DeleteModal
-              onClose={() => {
-                setIsDeleting(false);
-                setActiveForm(null);
-              }}
-              activeForm={activeForm}
-            />
-          )}
-          <div className="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
-            <Content
-              openEdit={openEdit}
-              openDelete={openDelete}
-              showHidden={showHidden}
-            />
+        <div className="min-h-screen bg-slate-50 p-8">
+          <div className="max-w-5xl mx-auto">
+            {isEditing && (
+              <ChangeModal
+                onClose={() => {
+                  setIsEditing(false);
+                  setActiveForm(null);
+                }}
+                activeForm={activeForm}
+              />
+            )}
+            {isDeleting && (
+              <DeleteModal
+                onClose={() => {
+                  setIsDeleting(false);
+                  setActiveForm(null);
+                }}
+                activeForm={activeForm}
+              />
+            )}
+            <div className="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+              <Content
+                openEdit={openEdit}
+                openDelete={openDelete}
+                showHidden={showHidden}
+              />
+            </div>
           </div>
         </div>
       </div>
-    </Wrapper>
+    </div>
   );
 }
 
