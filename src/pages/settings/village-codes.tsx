@@ -294,19 +294,23 @@ function Content({
 }
 
 function VillageCodesPage() {
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [activeForm, setActiveForm] = useState<FormFields | null>(null);
   const [showHidden, setShowHidden] = useState(false);
+  const [mode, setMode] = useState<"editing" | "deleting" | null>(null);
 
   const openEdit = (code: VillageCode) => {
-    setIsEditing(true);
+    setMode("editing");
     setActiveForm(code);
   };
 
   const openDelete = (code: VillageCode) => {
-    setIsDeleting(true);
+    setMode("deleting");
     setActiveForm(code);
+  };
+
+  const closeModal = () => {
+    setMode(null);
+    setActiveForm(null);
   };
 
   return (
@@ -333,7 +337,7 @@ function VillageCodesPage() {
             </label>
             <button
               onClick={() => {
-                setIsEditing(true);
+                setMode("editing");
               }}
               className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700"
             >
@@ -343,23 +347,11 @@ function VillageCodesPage() {
         </div>
         <div className="min-h-screen bg-slate-50 p-8">
           <div className="max-w-5xl mx-auto">
-            {isEditing && (
-              <ChangeModal
-                onClose={() => {
-                  setIsEditing(false);
-                  setActiveForm(null);
-                }}
-                activeForm={activeForm}
-              />
+            {mode === "editing" && (
+              <ChangeModal onClose={closeModal} activeForm={activeForm} />
             )}
-            {isDeleting && (
-              <DeleteModal
-                onClose={() => {
-                  setIsDeleting(false);
-                  setActiveForm(null);
-                }}
-                activeForm={activeForm}
-              />
+            {mode === "deleting" && (
+              <DeleteModal onClose={closeModal} activeForm={activeForm} />
             )}
             <div className="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
               <Content
