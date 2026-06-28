@@ -10,7 +10,7 @@ import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import { ReactNode } from "react";
 import { formatPatientCode } from "@/lib/utils/patient";
-import { PatientsRouterListItem } from "@/utils/trpc-types";
+import { PatientsRouterListWithLatestVisitItem } from "@/utils/trpc-types";
 
 /**
  * Renders a patient's code with a small dot in the village colour beside it.
@@ -62,7 +62,7 @@ function PatientCard({
   patient,
   onUpdateGlasses,
 }: {
-  patient: PatientsRouterListItem;
+  patient: PatientsRouterListWithLatestVisitItem;
   onUpdateGlasses: (patientId: number) => void;
 }) {
   return (
@@ -94,7 +94,7 @@ function PatientTable({
   patients,
   onUpdateGlasses,
 }: {
-  patients: PatientsRouterListItem[];
+  patients: PatientsRouterListWithLatestVisitItem[];
   onUpdateGlasses: (patientId: number) => void;
 }) {
   return (
@@ -161,7 +161,7 @@ function VisionPage() {
     data: patients,
     isLoading,
     isError,
-  } = trpc.patientsRouter.list.useQuery();
+  } = trpc.patientsRouter.listWithLatestVisit.useQuery();
 
   /**
    * Navigates to the update glasses page for a specific patient.
