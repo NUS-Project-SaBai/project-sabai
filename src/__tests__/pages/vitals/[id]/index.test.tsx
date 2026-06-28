@@ -2,6 +2,7 @@ import PatientVitalsPage from "@/pages/vitals/[id]";
 import { trpc } from "@/utils/trpc";
 import { Toaster, toast } from "react-hot-toast";
 import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { assertLoadingSpinner } from "@/__tests__/utils/helper-functions";
 import { useRouter } from "next/router";
 
@@ -148,6 +149,57 @@ describe("VitalsForm", () => {
       expect(
         screen.getByDisplayValue(MOCK_VITALS.temperature),
       ).toBeInTheDocument();
+    });
+  });
+
+  test("shows success toast when vitals are saved", async () => {
+    const user = userEvent.setup();
+    mockTrpc.vitalsRouter.getByVisitId.useQuery.mockReturnValue({
+      data: null,
+      isLoading: false,
+    });
+    // useMutation receives onSuccess at setup time, so capture it via mockImplementation
+    mockTrpc.vitalsRouter.create.useMutation.mockImplementation(
+      ({ onSuccess }: { onSuccess: () => void }) => ({
+        mutate: vi.fn(() => onSuccess()),
+        isPending: false,
+      }),
+    );
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Height (cm)")).toBeInTheDocument();
+    });
+
+    // Dirty the form so isDirty guard doesn't block submission, value here to be different from what is in MOCK_VITALS
+    await user.type(screen.getByLabelText("Height (cm)"), "171");
+    await user.click(screen.getByText("Save Records"));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Vitals saved successfully!"),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test("shows error toast when submitting without changing any field", async () => {
+    const user = userEvent.setup();
+    mockTrpc.vitalsRouter.getByVisitId.useQuery.mockReturnValue({
+      data: null,
+      isLoading: false,
+    });
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByText("Save Records")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText("Save Records"));
+
+    await waitFor(() => {
+      expect(screen.getByText("No form field changed!")).toBeInTheDocument();
     });
   });
 });
