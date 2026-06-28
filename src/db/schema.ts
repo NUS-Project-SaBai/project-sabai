@@ -273,7 +273,7 @@ Consults Table:
 - date: Timestamp of the consultation.
 - pastMedicalHistory: Patient's past medical history notes.
 - consultation: Doctor's consultation notes.
-- plan: Treatment plan.
+- treatmentPlan: Treatment plan.
 - remarks: Additional remarks.
 - doctorId: Foreign key referencing the Supabase auth user (doctor).
 - visitId: Foreign key referencing the visit.
@@ -283,7 +283,7 @@ export const consults = pgTable("consults", {
   date: timestamp("date", { withTimezone: true }).defaultNow().notNull(),
   pastMedicalHistory: text("past_medical_history"),
   consultation: text("consultation"),
-  plan: text("plan"),
+  treatmentPlan: text("treatment_plan"),
   remarks: text("remarks"),
   doctorId: uuid("doctor_id").references(() => authUsers.id),
   visitId: integer("visit_id")
