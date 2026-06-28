@@ -183,7 +183,7 @@ describe("VitalsForm", () => {
     });
   });
 
-  test("shows error toast when submitting without changing any field", async () => {
+  test("shows info toast when submitting without changing any field", async () => {
     const user = userEvent.setup();
     mockTrpc.vitalsRouter.getByVisitId.useQuery.mockReturnValue({
       data: null,
