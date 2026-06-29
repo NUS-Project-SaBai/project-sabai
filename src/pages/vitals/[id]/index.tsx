@@ -91,7 +91,7 @@ export default function PatientVitalsPage() {
           items={[
             { label: "Home", href: "/" },
             { label: "Vitals", href: "/vitals" },
-            { label: `Vitals for - ${patient.name}` },
+            { label: `Vitals for — ${patient.name}` },
           ]}
         />
 

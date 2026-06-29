@@ -66,7 +66,7 @@ function UpdateGlassesPage() {
           items={[
             { label: "Home", href: "/" },
             { label: "Vision", href: "/vision" },
-            { label: `Update Glasses - ${patient.name}` },
+            { label: `Update Glasses — ${patient.name}` },
           ]}
         />
 
