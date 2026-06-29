@@ -11,8 +11,8 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,json}\"",
     "prepare": "husky",
     "seed:db": "supabase db reset",
-    "seed:users": "ts-node supabase/scripts/seed-users.ts",
-    "seed:all": "npm run seed:db && npm run seed:users",
+    "seed:users": "tsx supabase/scripts/seed-users.ts",
+    "seed:all": "pnpm seed:db && pnpm seed:users",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
@@ -39,7 +39,6 @@
     "react-hot-toast": "^2.6.0",
     "react-webcam": "^7.2.0",
     "superjson": "^2.2.6",
-    "ts-node": "^10.9.2",
     "zod": "^4.3.6",
     "zod-form-data": "^3.0.1"
   },
@@ -66,6 +65,7 @@
     "prettier": "^3.8.0",
     "react-icons": "^5.5.0",
     "tailwindcss": "^4",
+    "tsx": "^4.22.4",
     "typescript": "^5",
     "vitest": "^4.1.9"
   },
