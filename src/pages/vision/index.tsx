@@ -9,37 +9,8 @@ import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import { ReactNode } from "react";
-import { formatPatientCode } from "@/lib/utils/patient";
 import { PatientsRouterListWithLatestVisitItem } from "@/utils/trpc-types";
-
-/**
- * Renders a patient's code with a small dot in the village colour beside it.
- * The dot is omitted when the patient has no village.
- */
-function PatientCode({
-  villageCode,
-  villageColorHex,
-  id,
-  className = "",
-}: {
-  villageCode: string | null;
-  villageColorHex: string | null;
-  id: number;
-  className?: string;
-}) {
-  return (
-    <span className={`inline-flex items-center gap-2 ${className}`}>
-      {villageColorHex && (
-        <span
-          className="h-3 w-3 rounded-full"
-          style={{ backgroundColor: villageColorHex }}
-          title={villageCode ?? undefined}
-        />
-      )}
-      {formatPatientCode(villageCode, id)}
-    </span>
-  );
-}
+import { PatientCode } from "@/components/PatientCode";
 
 function UpdateGlassesButton({ onClick }: { onClick: () => void }) {
   return (
