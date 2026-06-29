@@ -40,6 +40,7 @@ export default function PatientVitalsPage() {
   const router = useRouter();
   const { id } = router.query;
   const methods = useForm();
+  const { setValue } = methods;
 
   // Fetch patient
   const { data: patient, isLoading: patientLoading } =
@@ -61,9 +62,9 @@ export default function PatientVitalsPage() {
   // Automatically select visit if only got one
   useEffect(() => {
     if (visits && visits.length == 1) {
-      methods.setValue("visitSelect", visits[0].id.toString());
+      setValue("visitSelect", visits[0].id.toString());
     }
-  }, [visits, methods]);
+  }, [visits, setValue]);
 
   // Ensure the router is fully initialized and patientId exists
   if (!router.isReady || patientLoading || visitsLoading) {

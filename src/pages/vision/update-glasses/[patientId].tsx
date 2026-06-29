@@ -6,7 +6,10 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
-import { EyesightForm, EyesightFormValues } from "@/components/vision/EyesightForm";
+import {
+  EyesightForm,
+  EyesightFormValues,
+} from "@/components/vision/EyesightForm";
 import { formatVisitDate } from "@/lib/utils/visit";
 import { formatPatientId } from "@/lib/utils/patient";
 
@@ -16,6 +19,7 @@ function UpdateGlassesPage() {
   const router = useRouter();
   const { patientId } = router.query;
   const methods = useForm<UpdateGlassesFormValues>();
+  const { setValue } = methods;
 
   const { data: patient, isLoading: patientLoading } =
     trpc.patientsRouter.getById.useQuery(
@@ -38,9 +42,9 @@ function UpdateGlassesPage() {
   // Automatically select visit if only got one
   useEffect(() => {
     if (visits && visits.length === 1) {
-      methods.setValue("visitSelect", visits[0].id.toString());
+      setValue("visitSelect", visits[0].id.toString());
     }
-  }, [visits, methods]);
+  }, [visits, setValue]);
 
   if (!router.isReady || patientLoading || visitsLoading) {
     return <LoadingSpinner message="Loading patient and visits..." />;
