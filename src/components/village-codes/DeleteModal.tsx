@@ -36,6 +36,12 @@ export default function DeleteModal({
 
       <div className="flex gap-2">
         <button
+          onClick={onClose}
+          className="bg-red-700 flex-1 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
+        >
+          Cancel
+        </button>
+        <button
           onClick={() => deleteMutation.mutate({ id: activeForm!.id! })}
           className={clsx(
             "flex-1 text-white px-4 py-1 rounded-lg font-medium",
@@ -46,12 +52,6 @@ export default function DeleteModal({
           disabled={deleteMutation.isPending}
         >
           {deleteMutation.isPending ? "Deleting..." : "Confirm"}
-        </button>
-        <button
-          onClick={onClose}
-          className="bg-red-700 flex-1 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
-        >
-          Cancel
         </button>
       </div>
     </Modal>
