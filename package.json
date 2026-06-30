@@ -70,12 +70,6 @@
     "typescript": "^5",
     "vitest": "^4.1.9"
   },
-  "pnpm": {
-    "overrides": {
-      "@types/react": "19.2.11",
-      "@types/react-dom": "19.2.3"
-    }
-  },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --fix"
   }
