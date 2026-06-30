@@ -5,6 +5,7 @@ import {
   ButtonSize,
   getButonTwClassName,
 } from "./buttonStyles";
+import clsx from "clsx";
 
 /**
  * A customizable button component with support for multiple styles and variants.
@@ -28,6 +29,7 @@ export function Button({
   size = "medium",
   loading = false,
   disabled = false,
+  className = "",
 }: {
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
@@ -38,6 +40,7 @@ export function Button({
   size?: ButtonSize;
   loading?: boolean;
   disabled?: boolean;
+  className?: string;
 }) {
   return (
     <button
@@ -45,7 +48,7 @@ export function Button({
       type={type}
       title={title}
       disabled={loading || disabled}
-      className={getButonTwClassName(colour, variant, size)}
+      className={clsx(getButonTwClassName(colour, variant, size), className)}
     >
       {loading ? (
         <>
