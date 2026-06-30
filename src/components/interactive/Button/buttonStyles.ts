@@ -45,8 +45,8 @@ const ButtonTWClassName: Record<
   red: {
     filled: "bg-red-700 text-white hover:bg-red-800",
     outline: "border border-red-700 text-red-700 hover:bg-red-800",
-    text: "text-red-700 hover:text-red-700",
-    icon: "text-red-700 hover:text-red-700",
+    text: "text-red-700 hover:text-red-800",
+    icon: "text-red-700 hover:text-red-800",
   },
   indigo: {
     filled: "bg-indigo-600 text-white hover:bg-indigo-700",
