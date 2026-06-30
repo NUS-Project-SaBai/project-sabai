@@ -8,7 +8,7 @@ import TableCell from "@/components/TableCell";
 import DeleteModal from "@/components/village-codes/DeleteModal";
 import ChangeModal from "@/components/village-codes/ChangeModal";
 import { FormFields } from "@/lib/utils/villageCodeTypes";
-import { Button } from "@/components/interactive/Button/Button";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 function Content({
   showHidden,
@@ -24,7 +24,7 @@ function Content({
   });
 
   if (isLoading) {
-    return <div className="p-8 text-center text-slate-500">Loading...</div>;
+    return <LoadingSpinner message="Loading Village Codes..." />;
   }
 
   return (
