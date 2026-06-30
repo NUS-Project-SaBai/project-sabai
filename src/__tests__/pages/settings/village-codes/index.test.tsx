@@ -67,10 +67,6 @@ const FORM_PLACEHOLDERS = {
   NAME: "Central Village",
 } as const;
 
-const UI_MESSAGES = {
-  DELETE_CONFIRM: "Are you sure you want to delete this code?",
-} as const;
-
 const mockVillageCodes = [
   MOCK_VILLAGE_CODES.PC,
   MOCK_VILLAGE_CODES.CA,
