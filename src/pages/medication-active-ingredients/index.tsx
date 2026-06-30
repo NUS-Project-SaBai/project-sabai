@@ -99,7 +99,6 @@ function Header() {
                 <div className="flex flex-row gap-2">
                   <Button
                     colour="emerald"
-                    variant="filled"
                     type="submit"
                     className="w-full"
                     title={form.formState.isSubmitting ? "Saving..." : "Save"}
@@ -107,7 +106,6 @@ function Header() {
                   />
                   <Button
                     colour="red"
-                    variant="filled"
                     title="Cancel"
                     className="w-full"
                     onClick={() => {
@@ -122,7 +120,6 @@ function Header() {
         )}
 
         <Button
-          variant="filled"
           colour="indigo"
           onClick={() => setModalIsOpen(true)}
           title="Add Active Ingredient"
@@ -165,7 +162,6 @@ function DeleteConfirmModal({
       <div className="flex flex-row gap-2">
         <Button
           onClick={onCancel}
-          variant="filled"
           colour="red"
           title="Cancel"
           className="w-full"
@@ -173,7 +169,6 @@ function DeleteConfirmModal({
         <Button
           onClick={onConfirm}
           colour="emerald"
-          variant="filled"
           title="Confirm"
           className="w-full"
         />
@@ -297,7 +292,6 @@ function Row(ingredient: MedicationActiveIngredient) {
           <div className="flex items-left gap-2">
             {isEditing ? (
               <Button
-                variant="filled"
                 colour="emerald"
                 disabled={isSubmitting}
                 onClick={() => form.handleSubmit(handleSubmit)()}
@@ -305,7 +299,6 @@ function Row(ingredient: MedicationActiveIngredient) {
               />
             ) : (
               <Button
-                variant="filled"
                 colour="emerald"
                 onClick={() => setIsEditing(!isEditing)}
                 title="Edit"
@@ -318,7 +311,6 @@ function Row(ingredient: MedicationActiveIngredient) {
                   form.reset();
                   setIsEditing(false);
                 }}
-                variant="filled"
                 colour="red"
                 title="Cancel"
               />
@@ -327,7 +319,6 @@ function Row(ingredient: MedicationActiveIngredient) {
                 onClick={() => {
                   setIsDeleting(true);
                 }}
-                variant="filled"
                 colour="red"
                 title="Delete"
               />

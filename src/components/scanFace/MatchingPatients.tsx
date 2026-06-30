@@ -69,7 +69,6 @@ export default function MatchingPatients({
         </h2>
         <Button
           onClick={() => setMode(Mode.REGISTERING)}
-          variant="filled"
           colour="indigo"
           title="Register New Patient"
         />
@@ -111,7 +110,6 @@ export default function MatchingPatients({
       </table>
       <div className="flex gap-3 mt-6">
         <Button
-          variant="filled"
           colour="indigo"
           onClick={() => setMode(Mode.REGISTERING)}
           title="Register New Patient Instead"

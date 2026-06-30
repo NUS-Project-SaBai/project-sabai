@@ -135,7 +135,6 @@ export default function RegistrationPage({
               type="submit"
               disabled={createMutation.isPending}
               colour="emerald"
-              variant="filled"
               title={
                 createMutation.isPending
                   ? "Creating new patient..."
@@ -148,7 +147,6 @@ export default function RegistrationPage({
       <div className="flex gap-3 mt-6">
         <Button
           onClick={() => setMode(Mode.MATCHING)}
-          variant="filled"
           colour="indigo"
           title="Match Instead"
         />

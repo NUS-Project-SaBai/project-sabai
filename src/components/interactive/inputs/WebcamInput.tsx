@@ -71,12 +71,7 @@ export function WebcamInput({
             videoConstraints={videoConstraints}
             id="webcam"
           />
-          <Button
-            title="Capture"
-            variant="filled"
-            colour="emerald"
-            onClick={webcamCapture}
-          />
+          <Button title="Capture" colour="emerald" onClick={webcamCapture} />
         </div>
       )}
       <div className="mt-2 flex items-center justify-center">
@@ -86,12 +81,10 @@ export function WebcamInput({
               colour="emerald"
               title="Take Photo"
               onClick={toggleCameraOpen}
-              variant="filled"
             />
           ) : (
             <Button
               colour="red"
-              variant="filled"
               title="Retake Photo"
               onClick={() => {
                 toggleCameraOpen();
@@ -102,12 +95,7 @@ export function WebcamInput({
         ) : (
           // don't show cancel button when there is no image captured yet
           imageDetails != null && (
-            <Button
-              colour="red"
-              variant="filled"
-              title="Cancel"
-              onClick={toggleCameraOpen}
-            />
+            <Button colour="red" title="Cancel" onClick={toggleCameraOpen} />
           )
         )}
       </div>

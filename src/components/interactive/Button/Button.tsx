@@ -25,7 +25,7 @@ export function Button({
   icon = <></>,
   type = "button",
   colour = "white",
-  variant = "outline",
+  variant = "filled",
   size = "medium",
   loading = false,
   disabled = false,

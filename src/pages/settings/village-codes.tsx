@@ -113,7 +113,6 @@ function VillageCodesPage() {
               Show Hidden
             </label>
             <Button
-              variant="filled"
               colour="indigo"
               onClick={() => setIsEditing(true)}
               title="New Village Code"
@@ -196,7 +195,6 @@ function VillageCodesPage() {
 
               <div className="flex gap-3 mt-6">
                 <Button
-                  variant="filled"
                   colour="red"
                   onClick={closeForm}
                   title="Cancel"
@@ -205,7 +203,6 @@ function VillageCodesPage() {
 
                 <Button
                   type="submit"
-                  variant="filled"
                   colour="emerald"
                   title="Save"
                   className="w-full"
@@ -253,13 +250,11 @@ function VillageCodesPage() {
                     </TableCell>
                     <TableCell className="flex gap-2">
                       <Button
-                        variant="filled"
                         colour="indigo"
                         onClick={() => openEdit(code)}
                         title="Edit"
                       />
                       <Button
-                        variant="filled"
                         colour="red"
                         onClick={() => handleDelete(code.id)}
                         title="Delete"
