@@ -83,7 +83,7 @@ export function EyesightForm({
     formState: { isDirty },
     reset: resetCtx,
   } = useFormContext<EyesightFormValues>();
-  
+
   const reset = resetCtx as (
     values: EyesightFormValues & { visitSelect: string },
   ) => void;
@@ -103,7 +103,7 @@ export function EyesightForm({
   useEffect(() => {
     if (eyesightLoading) return;
     reset({ ...BLANK_EYESIGHT, ...eyesightData, visitSelect });
-  }, [eyesightData, eyesightLoading, reset, visitId, visitSelect]);
+  }, [eyesightData, eyesightLoading, reset, visitId, visitSelect]); // visitId not used directly but ensures the form resets on visit change
 
   if (eyesightLoading) return <LoadingSpinner message="Loading vision data" />;
 
