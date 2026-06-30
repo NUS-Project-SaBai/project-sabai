@@ -140,6 +140,7 @@ export default function RegistrationPage({
                   ? "Creating new patient..."
                   : "Create New Patient"
               }
+              className="w-full"
             />
           </div>
         </form>
@@ -149,6 +150,7 @@ export default function RegistrationPage({
           onClick={() => setMode(Mode.MATCHING)}
           colour="indigo"
           title="Match Instead"
+          className="w-full"
         />
       </div>
     </>
