@@ -130,7 +130,7 @@ export default function RegistrationPage({
           />
 
           {/* Submit Button */}
-          <div className="flex gap-3 mt-6">
+          <div className="flex gap-3 mt-6 justify-center">
             <Button
               type="submit"
               disabled={createMutation.isPending}
@@ -140,17 +140,15 @@ export default function RegistrationPage({
                   ? "Creating new patient..."
                   : "Create New Patient"
               }
-              className="w-full"
             />
           </div>
         </form>
       </FormProvider>
-      <div className="flex gap-3 mt-6">
+      <div className="flex gap-3 mt-6 justify-center">
         <Button
           onClick={() => setMode(Mode.MATCHING)}
           colour="indigo"
           title="Match Instead"
-          className="w-full"
         />
       </div>
     </>
