@@ -15,9 +15,10 @@ import clsx from "clsx";
  * @param {React.ReactNode} [icon=<></>] - An icon element to display within the button
  * @param {"button" | "submit" | "reset"} [type="button"] - The HTML button type attribute
  * @param {ButtonColour} [colour="white"] - The color scheme of the button
- * @param {ButtonVariant} [variant="outline"] - The visual style variant of the button @see ButtonVariant
+ * @param {ButtonVariant} [variant="filled"] - The visual style variant of the button @see ButtonVariant
  * @param {ButtonSize} [size="medium"] - The size of the button
  * @param {boolean} [loading=false] - Whether the button is in loading state; disables the button and shows a spinner
+ * @param {string} [className] - The classNames of the component
  */
 export function Button({
   onClick,
