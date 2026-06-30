@@ -1,6 +1,6 @@
 import { HTMLProps } from "react";
 
-export type ButtonColour = "white" | "emerald";
+export type ButtonColour = "white" | "emerald" | "red";
 
 /**
  * Represents the available visual styles for button components.
@@ -41,6 +41,12 @@ const ButtonTWClassName: Record<
     outline: "border border-emerald-600 text-emerald-600 hover:bg-emerald-50",
     text: "text-emerald-600 hover:text-emerald-700",
     icon: "text-emerald-600 hover:text-emerald-700",
+  },
+  red: {
+    filled: "bg-red-700 text-white hover:bg-red-800",
+    outline: "border border-red-700 text-red-700 hover:bg-red-800",
+    text: "text-red-700 hover:text-red-700",
+    icon: "text-red-700 hover:text-red-700",
   },
 };
 
