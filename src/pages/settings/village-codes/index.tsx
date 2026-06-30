@@ -8,6 +8,7 @@ import TableCell from "@/components/TableCell";
 import DeleteModal from "@/components/village-codes/DeleteModal";
 import ChangeModal from "@/components/village-codes/ChangeModal";
 import { FormFields } from "@/lib/utils/villageCodeTypes";
+import { Button } from "@/components/interactive/Button/Button";
 
 function Content({
   showHidden,
@@ -61,13 +62,13 @@ function Content({
                 onClick={() => {
                   openEdit(code);
                 }}
-                className="text-indigo-600 hover:text-indigo-900 font-medium mr-4"
+                className="mr-4 bg-indigo-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-indigo-700"
               >
                 Edit
               </button>
               <button
                 onClick={() => openDelete(code)}
-                className="text-red-600 hover:text-red-900 font-medium"
+                className="bg-red-700 flex-1 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
               >
                 Delete
               </button>
