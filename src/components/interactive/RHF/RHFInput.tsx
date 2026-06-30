@@ -2,6 +2,7 @@ import { DetailedHTMLProps, HTMLAttributes, InputHTMLAttributes } from "react";
 import { RegisterOptions, useFormContext } from "react-hook-form";
 import { useRHFRegister } from "./useRHFRegister";
 import { IsRequiredStar } from "@/components/IsRequiredStar";
+import clsx from "clsx";
 
 type RHFInputProps = {
   name: string;
@@ -14,6 +15,34 @@ type RHFInputProps = {
   registerOptions?: RegisterOptions;
   type: "text" | "email" | "password" | "number" | "date" | "checkbox";
 } & DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+
+/**
+ * **Important:** This component must be used within a `FormProvider` context.
+ *
+ * A React form component that wraps an input element with React Hook Form integration.
+ *
+ * Other RHF input components that are available:
+ * - `RHFRadio` for radio inputs
+ * - `RHFTextArea` for text area inputs
+ *
+ * @param {string} name - The name of the form field for registration
+ * @param {string} label - The label text displayed above the input
+ * @param {boolean} [isRequired=false] - Whether the field is required for form submission
+ * @param {string} [className=""] - Additional CSS classes to apply to the wrapper div
+ * @param {RegisterOptions} [registerOptions={}] - Additional React Hook Form register options
+ * @param {"text" | "email" | "password" | "number" | "date" | "checkbox"} type - The HTML input type, use RHFRadio for radio input, and Button type="submit" for submit buttons
+ * @param {HTMLInputElement} [props] - Additional HTML input element attributes
+ *
+ * @example
+ * ```tsx
+ * <RHFInput
+ *   name="email"
+ *   label="Email Address"
+ *   type="email"
+ *   isRequired={true}
+ * />
+ * ```
+ */
 
 export function RHFInput({
   name,
@@ -56,22 +85,14 @@ export function RHFInput({
           type="checkbox"
           {...registerProps}
           {...props}
-          className="
-            h-4 w-4
-            accent-blue-500
-            cursor-pointer
-            border-gray-300
-            rounded
-            justify-self-end
-            focus:ring-2 focus:ring-blue-400
-          "
+          className="h-4 w-4 accent-blue-500 cursor-pointer border-gray-300 rounded justify-self-end focus:ring-2 focus:ring-blue-400"
         />
       </div>
     );
   }
 
   return (
-    <div className={`flex flex-col gap-1 ${className}`}>
+    <div className={clsx("flex flex-col gap-1", className)}>
       <label
         htmlFor={name}
         className="text-sm font-medium text-gray-700 flex items-center gap-1"
@@ -85,16 +106,13 @@ export function RHFInput({
         type={type}
         {...registerProps}
         {...props}
-        className={`
-          w-full rounded-md px-3 py-2 text-sm
-          border transition
-          focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400
-          ${
-            fieldError
-              ? "border-red-400 focus:ring-red-300 focus:border-red-400"
-              : "border-gray-300"
-          }
-        `}
+        className={clsx([
+          "w-full rounded-md px-3 py-2 text-sm border transition",
+          "focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400",
+          fieldError
+            ? "border-red-400 focus:ring-red-300 focus:border-red-400"
+            : "border-gray-300",
+        ])}
       />
 
       <p className="min-h-5 text-xs text-red-500 mt-1">
