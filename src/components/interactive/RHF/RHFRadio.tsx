@@ -87,7 +87,7 @@ export function RHFRadio({
                 <div
                   key={option.value}
                   className={clsx([
-                    "flex items-center gap-2 px-4 py-2 border border-gray-300 rounded hover:cursor-pointer hover:shadow",
+                    "flex items-center gap-2 px-4 py-2 border border-gray-300 w-fit rounded hover:cursor-pointer hover:shadow",
                     value === option.value
                       ? "border-blue-500 bg-blue-100 font-semibold"
                       : "bg-gray-50 text-gray-500",
