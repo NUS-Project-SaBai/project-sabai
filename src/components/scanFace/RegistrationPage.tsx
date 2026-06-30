@@ -5,7 +5,7 @@ import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { Mode } from "@/types/scan";
 import { useVillageCode } from "@/lib/context/VillageCodeContext";
-import clsx from "clsx";
+import { Button } from "@/components/interactive/Button/Button";
 
 export type PatientForm = {
   name: string;
@@ -131,30 +131,27 @@ export default function RegistrationPage({
 
           {/* Submit Button */}
           <div className="flex gap-3 mt-6">
-            <button
+            <Button
               type="submit"
               disabled={createMutation.isPending}
-              className={clsx(
-                "flex-1 px-4 py-2 rounded-lg font-medium text-white",
+              colour="emerald"
+              variant="filled"
+              title={
                 createMutation.isPending
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-green-600 hover:bg-green-700",
-              )}
-            >
-              {createMutation.isPending
-                ? "Creating new patient..."
-                : "Create New Patient"}
-            </button>
+                  ? "Creating new patient..."
+                  : "Create New Patient"
+              }
+            />
           </div>
         </form>
       </FormProvider>
       <div className="flex gap-3 mt-6">
-        <button
+        <Button
           onClick={() => setMode(Mode.MATCHING)}
-          className="flex-1 px-4 py-2 rounded-lg font-medium bg-indigo-700 text-white"
-        >
-          Match Instead
-        </button>
+          variant="filled"
+          colour="indigo"
+          title="Match Instead"
+        />
       </div>
     </>
   );

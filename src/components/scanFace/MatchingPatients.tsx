@@ -9,6 +9,7 @@ import { PatientPhoto } from "@/components/PatientPhoto";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import toast from "react-hot-toast";
 import { Mode } from "@/types/scan";
+import { Button } from "@/components/interactive/Button/Button";
 
 type PatientWithImage = Patient & {
   patientImageUrl: string | null;
@@ -66,12 +67,12 @@ export default function MatchingPatients({
         <h2 className="text-xl font-bold mb-4 text-center py-10">
           No matches found
         </h2>
-        <button
+        <Button
           onClick={() => setMode(Mode.REGISTERING)}
-          className="flex-1 px-4 py-2 rounded-lg font-medium bg-indigo-700 text-white"
-        >
-          Register New Patient
-        </button>
+          variant="filled"
+          colour="indigo"
+          title="Register New Patient"
+        />
       </div>
     );
   }
@@ -109,12 +110,12 @@ export default function MatchingPatients({
         </tbody>
       </table>
       <div className="flex gap-3 mt-6">
-        <button
+        <Button
+          variant="filled"
+          colour="indigo"
           onClick={() => setMode(Mode.REGISTERING)}
-          className="flex-1 px-4 py-2 rounded-lg font-medium bg-indigo-700 text-white"
-        >
-          Register New Patient Instead
-        </button>
+          title="Register New Patient Instead"
+        />
       </div>
     </div>
   );

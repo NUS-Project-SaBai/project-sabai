@@ -121,15 +121,12 @@ function Header() {
           </Modal>
         )}
 
-        <button
-          className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700"
-          onClick={() => {
-            setModalIsOpen(true);
-          }}
-          type="button"
-        >
-          Add Active Ingredient
-        </button>
+        <Button
+          variant="filled"
+          colour="indigo"
+          onClick={() => setModalIsOpen(true)}
+          title="Add Active Ingredient"
+        />
       </div>
     </div>
   );
