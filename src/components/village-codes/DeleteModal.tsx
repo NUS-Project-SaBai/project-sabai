@@ -28,11 +28,11 @@ export default function DeleteModal({
 
   return (
     <Modal onClose={onClose}>
-      <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-4">
+      <h2 className="text-xl font-bold tracking-tight text-slate-900">
         Confirm Deletion
       </h2>
-      <p>{activeForm?.code}</p>
-      <p>{activeForm?.name}</p>
+      <p>Code: {activeForm?.code}</p>
+      <p>Name: {activeForm?.name}</p>
 
       <div className="flex gap-2">
         <button
