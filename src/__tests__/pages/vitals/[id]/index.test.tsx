@@ -78,7 +78,7 @@ function renderPage() {
 describe("VitalsForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    toast.dismissAll();
+    toast.remove();
 
     mockUseRouter.mockReturnValue({ query: { id: "1" }, isReady: true });
 
@@ -131,7 +131,9 @@ describe("VitalsForm", () => {
       expect(
         screen.getByText("Diabetes Mellitus History Status Flag"),
       ).toBeInTheDocument();
-      expect(screen.getByText("Save Records")).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Save Records" }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -174,12 +176,12 @@ describe("VitalsForm", () => {
 
     // Dirty the form so isDirty guard doesn't block submission, value here to be different from what is in MOCK_VITALS
     await user.type(screen.getByLabelText("Height (cm)"), "171");
-    await user.click(screen.getByText("Save Records"));
+    await user.click(screen.getByRole("button", { name: "Save Records" }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Vitals saved successfully!"),
-      ).toBeInTheDocument();
+      const toastEl = screen.getByRole("status");
+      expect(toastEl).toBeInTheDocument();
+      expect(toastEl.textContent).toBe("Vitals saved successfully!");
     });
   });
 
@@ -193,13 +195,17 @@ describe("VitalsForm", () => {
     renderPage();
 
     await waitFor(() => {
-      expect(screen.getByText("Save Records")).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Save Records" }),
+      ).toBeInTheDocument();
     });
 
-    await user.click(screen.getByText("Save Records"));
+    await user.click(screen.getByRole("button", { name: "Save Records" }));
 
     await waitFor(() => {
-      expect(screen.getByText("No form field changed!")).toBeInTheDocument();
+      const toastEl = screen.getByRole("status");
+      expect(toastEl).toBeInTheDocument();
+      expect(toastEl.textContent).toBe("No form field changed!");
     });
   });
 });
