@@ -66,7 +66,12 @@ export default function PatientVitalsPage() {
 
   // Ensure the router is fully initialized and patientId exists
   if (!router.isReady || patientLoading || visitsLoading) {
-    return <LoadingSpinner message="Loading patient and visits..." />;
+    return (
+      <LoadingSpinner
+        message="Loading patient and visits..."
+        className="p-12"
+      />
+    );
   }
 
   // Only check if patient is missing AFTER we are certain the query ran
@@ -224,7 +229,8 @@ function VitalsForm({ visitId }: { visitId: number }) {
     }
   }, [vitalData, vitalsLoading, reset, visitId]);
 
-  if (vitalsLoading) return <LoadingSpinner message="Loading Vitals" />;
+  if (vitalsLoading)
+    return <LoadingSpinner message="Loading Vitals" className="p-12" />;
 
   const onSubmit = (data: VitalsFormValues) => {
     if (!isDirty) {

@@ -31,7 +31,12 @@ function UpdateGlassesPage() {
   });
 
   if (patientLoading || visitsLoading) {
-    return <LoadingSpinner message="Loading patient and visits..." />;
+    return (
+      <LoadingSpinner
+        message="Loading patient and visits..."
+        className="p-12"
+      />
+    );
   }
 
   if (!patient) {

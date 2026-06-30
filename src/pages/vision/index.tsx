@@ -177,7 +177,7 @@ function VisionPage() {
     }
 
     if (isLoading) {
-      return <LoadingSpinner message="Loading patients..." />;
+      return <LoadingSpinner message="Loading patients..." className="p-12" />;
     }
 
     if (!patients || patients.length === 0) {

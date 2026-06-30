@@ -53,11 +53,15 @@ export default function MatchingPatients({
   }, []);
 
   if (findFaceMatchMutation.isPending) {
-    return <LoadingSpinner message="Finding face matches..." />;
+    return (
+      <LoadingSpinner message="Finding face matches..." className="p-12" />
+    );
   }
 
   if (findMatchingPatientsMutation.isPending) {
-    return <LoadingSpinner message="Finding matching patients..." />;
+    return (
+      <LoadingSpinner message="Finding matching patients..." className="p-12" />
+    );
   }
 
   if (matchingPatients.length === 0) {

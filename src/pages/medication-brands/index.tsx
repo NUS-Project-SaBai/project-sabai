@@ -40,7 +40,7 @@ function MedicationBrandsBasePage() {
     }
 
     if (isLoading) {
-      return <LoadingSpinner message="Loading brands..." />;
+      return <LoadingSpinner message="Loading brands..." className="p-12" />;
     }
 
     if (!brands || brands.length === 0) {
