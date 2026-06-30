@@ -1,6 +1,6 @@
 import { HTMLProps } from "react";
 
-export type ButtonColour = "white" | "emerald" | "red";
+export type ButtonColour = "white" | "emerald" | "red" | "indigo";
 
 /**
  * Represents the available visual styles for button components.
@@ -47,6 +47,12 @@ const ButtonTWClassName: Record<
     outline: "border border-red-700 text-red-700 hover:bg-red-800",
     text: "text-red-700 hover:text-red-700",
     icon: "text-red-700 hover:text-red-700",
+  },
+  indigo: {
+    filled: "bg-indigo-600 text-white hover:bg-indigo-700",
+    outline: "border border-indigo-600 text-indigo-600 hover:bg-indigo-700",
+    text: "text-indigo-600 hover:text-indigo-700",
+    icon: "text-indigo-600 hover:text-indigo-700",
   },
 };
 
