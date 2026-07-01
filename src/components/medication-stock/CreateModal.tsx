@@ -70,7 +70,12 @@ export default function CreateModal({
             form.handleSubmit(handleSubmit)(e);
           }}
         >
-          <RHFInput name="location" label="Location" type="text" />
+          <RHFInput
+            name="location"
+            label="Location"
+            type="text"
+            className="mb-4"
+          />
           <RHFInput
             name="quantity"
             label="Quantity"
@@ -83,8 +88,14 @@ export default function CreateModal({
               },
               required: true,
             }}
+            className="mb-4"
           />
-          <RHFInput name="expiry" label="Expiry Date" type="date" />
+          <RHFInput
+            name="expiry"
+            label="Expiry Date"
+            type="date"
+            className="mb-4"
+          />
 
           {!brandWithActiveIngredientIsLoading &&
             !brandWithActiveIngredientIsError && (
@@ -95,6 +106,7 @@ export default function CreateModal({
                   value: elem.id.toString(),
                   label: `${elem.activeIngredientName} (${elem.name})`,
                 }))}
+                className="mb-4"
               />
             )}
 
@@ -102,6 +114,7 @@ export default function CreateModal({
             name="stockStatus"
             label="Status"
             dropdownOptions={stockStatusDropdown}
+            className="mb-8"
           />
           <div className="flex flex-row gap-2">
             <button
