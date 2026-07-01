@@ -103,7 +103,7 @@ export function EyesightForm({
   useEffect(() => {
     if (eyesightLoading) return;
     reset({ ...BLANK_EYESIGHT, ...eyesightData, visitSelect });
-  }, [eyesightData, eyesightLoading, reset, visitId, visitSelect]); // visitId not used directly but ensures the form resets on visit change
+  }, [eyesightData, eyesightLoading, reset, visitId, visitSelect]); // eyesightData and visitSelect are redundant alongside visitId (both change when visitId changes), but included to satisfy the linter
 
   if (eyesightLoading) return <LoadingSpinner message="Loading vision data" />;
 
