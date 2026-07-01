@@ -5,8 +5,11 @@ import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
+import { useState } from "react";
 
 function Header() {
+  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
+
   return (
     <div className="w-full mx-auto">
       <div className="flex justify-between items-center mb-8">
@@ -44,6 +47,17 @@ function Header() {
             </Link>
           </button>
         </div>
+
+        {modalIsOpen && <h1>Modal placeholder</h1>}
+        <button
+          className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700"
+          onClick={() => {
+            setModalIsOpen(true);
+          }}
+          type="button"
+        >
+          Add new stock
+        </button>
       </div>
     </div>
   );
