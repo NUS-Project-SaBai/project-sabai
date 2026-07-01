@@ -7,6 +7,7 @@ import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import Modal from "@/components/interactive/Modal";
+import { Button } from "@/components/interactive/Button/Button";
 
 const DEFAULT_FORM: NewVillageCode = {
   code: "",
@@ -111,12 +112,11 @@ function VillageCodesPage() {
               />
               Show Hidden
             </label>
-            <button
+            <Button
+              colour="indigo"
               onClick={() => setIsEditing(true)}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700"
-            >
-              New Village Code
-            </button>
+              title="New Village Code"
+            />
           </div>
         </div>
 
@@ -194,19 +194,19 @@ function VillageCodesPage() {
               </div>
 
               <div className="flex gap-3 mt-6">
-                <button
-                  type="button"
+                <Button
+                  colour="red"
                   onClick={closeForm}
-                  className="flex-1 bg-slate-100 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-200"
-                >
-                  Cancel
-                </button>
-                <button
+                  title="Cancel"
+                  className="w-full"
+                />
+
+                <Button
                   type="submit"
-                  className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700"
-                >
-                  Save
-                </button>
+                  colour="emerald"
+                  title="Save"
+                  className="w-full"
+                />
               </div>
             </form>
           </Modal>
@@ -248,19 +248,17 @@ function VillageCodesPage() {
                         </span>
                       )}
                     </TableCell>
-                    <TableCell>
-                      <button
+                    <TableCell className="flex gap-2">
+                      <Button
+                        colour="indigo"
                         onClick={() => openEdit(code)}
-                        className="text-indigo-600 hover:text-indigo-900 font-medium mr-4"
-                      >
-                        Edit
-                      </button>
-                      <button
+                        title="Edit"
+                      />
+                      <Button
+                        colour="red"
                         onClick={() => handleDelete(code.id)}
-                        className="text-red-600 hover:text-red-900 font-medium"
-                      >
-                        Delete
-                      </button>
+                        title="Delete"
+                      />
                     </TableCell>
                   </TableRow>
                 ))}

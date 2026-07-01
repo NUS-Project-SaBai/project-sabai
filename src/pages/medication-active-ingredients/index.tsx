@@ -10,8 +10,8 @@ import { MedicationActiveIngredient } from "@/db/schema";
 import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import toast from "react-hot-toast";
-import clsx from "clsx";
 import EditableCell from "@/components/interactive/EditableCell";
+import { Button } from "@/components/interactive/Button/Button";
 
 type EditFormFields = {
   id: number;
@@ -97,43 +97,33 @@ function Header() {
                   }}
                 />
                 <div className="flex flex-row gap-2">
-                  <button
-                    className={clsx(
-                      "flex-1 text-white px-4 py-1 rounded-lg font-medium",
-                      form.formState.isSubmitting
-                        ? "bg-neutral-600"
-                        : "bg-green-600 hover:bg-green-700",
-                    )}
-                    disabled={form.formState.isSubmitting}
+                  <Button
+                    colour="emerald"
                     type="submit"
-                  >
-                    {form.formState.isSubmitting ? "Saving..." : "Save"}
-                  </button>
-                  <button
-                    className="bg-red-700 flex-1 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
+                    className="w-full"
+                    title={form.formState.isSubmitting ? "Saving..." : "Save"}
+                    disabled={form.formState.isSubmitting}
+                  />
+                  <Button
+                    colour="red"
+                    title="Cancel"
+                    className="w-full"
                     onClick={() => {
                       form.reset();
                       setModalIsOpen(false);
                     }}
-                    type="button"
-                  >
-                    Cancel
-                  </button>
+                  />
                 </div>
               </form>
             </FormProvider>
           </Modal>
         )}
 
-        <button
-          className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700"
-          onClick={() => {
-            setModalIsOpen(true);
-          }}
-          type="button"
-        >
-          Add Active Ingredient
-        </button>
+        <Button
+          colour="indigo"
+          onClick={() => setModalIsOpen(true)}
+          title="Add Active Ingredient"
+        />
       </div>
     </div>
   );
@@ -170,20 +160,18 @@ function DeleteConfirmModal({
         </tbody>
       </table>
       <div className="flex flex-row gap-2">
-        <button
-          onClick={onConfirm}
-          className="bg-green-600 flex-1 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700"
-          type="button"
-        >
-          Confirm
-        </button>
-        <button
+        <Button
           onClick={onCancel}
-          className="bg-red-600 flex-1 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700"
-          type="button"
-        >
-          Cancel
-        </button>
+          colour="red"
+          title="Cancel"
+          className="w-full"
+        />
+        <Button
+          onClick={onConfirm}
+          colour="emerald"
+          title="Confirm"
+          className="w-full"
+        />
       </div>
     </Modal>
   );
@@ -303,50 +291,37 @@ function Row(ingredient: MedicationActiveIngredient) {
         <TableCell>
           <div className="flex items-left gap-2">
             {isEditing ? (
-              <button
-                className={clsx(
-                  "flex-1 text-white px-4 py-1 rounded-lg font-medium",
-                  form.formState.isSubmitting
-                    ? "bg-neutral-600"
-                    : "bg-green-600 hover:bg-green-700",
-                )}
+              <Button
+                colour="emerald"
                 disabled={isSubmitting}
                 onClick={() => form.handleSubmit(handleSubmit)()}
-                type="button"
-              >
-                {isSubmitting ? "Saving..." : "Save"}
-              </button>
+                title={isSubmitting ? "Saving..." : "Save"}
+              />
             ) : (
-              <button
-                className="bg-green-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-green-700"
+              <Button
+                colour="emerald"
                 onClick={() => setIsEditing(!isEditing)}
-                type="button"
-              >
-                Edit
-              </button>
+                title="Edit"
+              />
             )}
 
             {isEditing ? (
-              <button
-                className="bg-red-700 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
+              <Button
                 onClick={() => {
                   form.reset();
                   setIsEditing(false);
                 }}
-                type="button"
-              >
-                Cancel
-              </button>
+                colour="red"
+                title="Cancel"
+              />
             ) : (
-              <button
-                className="bg-red-700 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
+              <Button
                 onClick={() => {
                   setIsDeleting(true);
                 }}
-                type="button"
-              >
-                Delete
-              </button>
+                colour="red"
+                title="Delete"
+              />
             )}
 
             {isDeleting && (

@@ -337,7 +337,6 @@ function VitalsForm({ visitId }: { visitId: number }) {
             type="submit"
             title="Save Records"
             colour="emerald"
-            variant="filled"
             loading={
               createVitalsMutation.isPending || updateVitalsMutation.isPending
             }
