@@ -5,6 +5,7 @@ import Modal from "@/components/interactive/Modal";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import clsx from "clsx";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 enum StockStatus {
   ACTIVE = "active",
@@ -97,18 +98,23 @@ export default function CreateModal({
             className="mb-4"
           />
 
-          {!brandWithActiveIngredientIsLoading &&
-            !brandWithActiveIngredientIsError && (
-              <RHFDropdown
-                name="medicationBrandId"
-                label="Brand + Active Ingredient"
-                dropdownOptions={brandWithActiveIngredientData!.map((elem) => ({
-                  value: elem.id.toString(),
-                  label: `${elem.activeIngredientName} (${elem.name})`,
-                }))}
-                className="mb-4"
-              />
-            )}
+          {brandWithActiveIngredientIsLoading && (
+            <LoadingSpinner message="Loading brands with active ingredients..." />
+          )}
+
+          {!brandWithActiveIngredientIsError ? (
+            <RHFDropdown
+              name="medicationBrandId"
+              label="Brand + Active Ingredient"
+              dropdownOptions={brandWithActiveIngredientData!.map((elem) => ({
+                value: elem.id.toString(),
+                label: `${elem.activeIngredientName} (${elem.name})`,
+              }))}
+              className="mb-4"
+            />
+          ) : (
+            "An error has occurred while loading the dropdown options for brand + active ingredient. Please refresh the page."
+          )}
 
           <RHFDropdown
             name="stockStatus"
