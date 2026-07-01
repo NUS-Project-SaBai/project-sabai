@@ -102,7 +102,8 @@ export default function CreateModal({
             <LoadingSpinner message="Loading brands with active ingredients..." />
           )}
 
-          {!brandWithActiveIngredientIsError ? (
+          {!brandWithActiveIngredientIsError &&
+          !brandWithActiveIngredientIsLoading ? (
             <RHFDropdown
               name="medicationBrandId"
               label="Brand + Active Ingredient"
