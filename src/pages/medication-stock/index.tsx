@@ -93,12 +93,12 @@ function MedicationStockBasePage() {
         <table className="min-w-full divide-y divide-slate-200">
           <TableHeader
             headers={[
-              "Active Ingredient Name",
-              "Brand Name",
-              "Stock Location",
-              "Stock Quantity",
-              "Stock Expiry",
-              "Stock State",
+              "Active Ingredient",
+              "Brand",
+              "Location",
+              "Quantity",
+              "Expiry",
+              "State",
             ]}
           />
           <tbody className="bg-white divide-y divide-slate-200">
