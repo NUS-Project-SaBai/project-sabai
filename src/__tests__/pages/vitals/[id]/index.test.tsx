@@ -179,9 +179,9 @@ describe("VitalsForm", () => {
     await user.click(screen.getByRole("button", { name: "Save Records" }));
 
     await waitFor(() => {
-      const toastEl = screen.getByRole("status");
-      expect(toastEl).toBeInTheDocument();
-      expect(toastEl.textContent).toBe("Vitals saved successfully!");
+      const toast = screen.getByRole("status");
+      expect(toast).toBeInTheDocument();
+      expect(toast.textContent).toBe("Vitals saved successfully!");
     });
   });
 
@@ -203,9 +203,9 @@ describe("VitalsForm", () => {
     await user.click(screen.getByRole("button", { name: "Save Records" }));
 
     await waitFor(() => {
-      const toastEl = screen.getByRole("status");
-      expect(toastEl).toBeInTheDocument();
-      expect(toastEl.textContent).toBe("No form field changed!");
+      const toast = screen.getByRole("status");
+      expect(toast).toBeInTheDocument();
+      expect(toast.textContent).toBe("No form field changed!");
     });
   });
 });
