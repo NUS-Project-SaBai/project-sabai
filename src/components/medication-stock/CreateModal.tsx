@@ -5,6 +5,7 @@ import Modal from "@/components/interactive/Modal";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import clsx from "clsx";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
+import { useEffect } from "react";
 
 enum StockStatus {
   ACTIVE = "active",
@@ -34,6 +35,12 @@ export default function CreateModal({
   const utils = trpc.useUtils();
 
   const form = useForm<CreateFormFields>();
+
+  const {
+    data: brandWithActiveIngredientData,
+    isLoading: brandWithActiveIngredientIsLoading,
+    isError: brandWithActiveIngredientIsError,
+  } = trpc.medicationBrandRouter.listWithActiveIngredientName.useQuery();
 
   const createMutation = trpc.medicationStockRouter.create.useMutation({
     onSuccess: () => {
@@ -79,14 +86,18 @@ export default function CreateModal({
             }}
           />
           <RHFInput name="expiry" label="Expiry Date" type="date" />
-          <RHFDropdown
-            name="medicationBrandId"
-            label="Brand + Active Ingredient"
-            dropdownOptions={[
-              { label: "placeholder", value: "placeholder" },
-              { label: "placeholder2", value: "placeholder2" },
-            ]}
-          />
+
+          {!brandWithActiveIngredientIsLoading &&
+            !brandWithActiveIngredientIsError && (
+              <RHFDropdown
+                name="medicationBrandId"
+                label="Brand + Active Ingredient"
+                dropdownOptions={brandWithActiveIngredientData!.map((elem) => ({
+                  value: elem.id.toString(),
+                  label: `${elem.activeIngredientName} (${elem.name})`,
+                }))}
+              />
+            )}
 
           <RHFDropdown
             name="stockStatus"
