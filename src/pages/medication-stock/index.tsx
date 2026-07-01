@@ -1,6 +1,8 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import CreateModal from "@/components/medication-stock/CreateModal";
+import EditingModal from "@/components/medication-stock/EditingModal";
+import SplittingModal from "@/components/medication-stock/SplittingModal";
 import TableCell from "@/components/TableCell";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
@@ -71,6 +73,9 @@ function MedicationStockBasePage() {
     isError,
   } = trpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery();
 
+  const [isSplitting, setIsSplitting] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+
   function renderContent() {
     if (isError) {
       return <h1 className="text-red-500">An error has occurred!</h1>;
@@ -90,6 +95,8 @@ function MedicationStockBasePage() {
 
     return (
       <div className="overflow-x-auto">
+        {isSplitting && <SplittingModal />}
+        {isEditing && <EditingModal />}
         <table className="min-w-full divide-y divide-slate-200">
           <TableHeader
             headers={[
@@ -99,6 +106,7 @@ function MedicationStockBasePage() {
               "Quantity",
               "Expiry",
               "State",
+              "Actions",
             ]}
           />
           <tbody className="bg-white divide-y divide-slate-200">
@@ -132,6 +140,12 @@ function MedicationStockBasePage() {
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
                     {item.stockStatus}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm font-medium text-slate-900">
+                    <button onClick={() => setIsEditing(true)}>Edit</button>
+                    <button onClick={() => setIsSplitting(true)}>Split</button>
                   </span>
                 </TableCell>
               </TableRow>
