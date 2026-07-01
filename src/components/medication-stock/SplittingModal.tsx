@@ -1,3 +1,3 @@
 export default function SplittingModal() {
-    return <h1>Splitting</h1>
+  return <h1>Splitting</h1>;
 }
