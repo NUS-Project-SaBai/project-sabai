@@ -220,7 +220,7 @@ function VitalsForm({ visitId }: { visitId: number }) {
 
   const onSubmit = (data: VitalsFormValues) => {
     if (!isDirty) {
-      toast.error("No form field changed!");
+      toast("No form field changed!");
       return;
     }
 
