@@ -27,7 +27,7 @@ export default function TableHeader({
         {headers.map((header, index) => (
           <th
             key={index}
-            className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+            className="px-3 py-3 sm:px-6 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
           >
             {header}
           </th>
