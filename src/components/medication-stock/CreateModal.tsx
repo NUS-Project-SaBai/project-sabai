@@ -5,7 +5,6 @@ import Modal from "@/components/interactive/Modal";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import clsx from "clsx";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
-import { useEffect } from "react";
 
 enum StockStatus {
   ACTIVE = "active",
