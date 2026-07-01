@@ -57,7 +57,7 @@ function Header() {
           }}
           type="button"
         >
-          Add new stock
+          Add Stock
         </button>
       </div>
     </div>
