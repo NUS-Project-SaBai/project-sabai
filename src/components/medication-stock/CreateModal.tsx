@@ -6,26 +6,7 @@ import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import clsx from "clsx";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import LoadingSpinner from "@/components/LoadingSpinner";
-
-enum StockStatus {
-  ACTIVE = "active",
-  DISPOSED = "disposed",
-  DONATED = "donated",
-  EXPIRED = "expired",
-}
-
-const stockStatusDropdown = Object.values(StockStatus).map((status) => ({
-  label: status,
-  value: status,
-}));
-
-type CreateFormFields = {
-  medicationBrandId: number;
-  quantity: number;
-  expiry: Date;
-  location: string;
-  stockStatus: StockStatus;
-};
+import { stockStatusDropdown, CreateFormFields } from "@/lib/utils/medication-stock";
 
 export default function CreateModal({
   setModalIsOpen,
