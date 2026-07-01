@@ -6,12 +6,24 @@ import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import clsx from "clsx";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 
+enum StockStatus {
+  ACTIVE = "active",
+  DISPOSED = "disposed",
+  DONATED = "donated",
+  EXPIRED = "expired",
+}
+
+const stockStatusDropdown = Object.values(StockStatus).map((status) => ({
+  label: status,
+  value: status,
+}));
+
 type CreateFormFields = {
   medicationBrandId: number;
   quantity: number;
   expiry: Date;
   location: string;
-  stockStatus: "active" | "disposed" | "donated" | "expired";
+  stockStatus: StockStatus;
 };
 
 export default function CreateModal({
@@ -79,10 +91,7 @@ export default function CreateModal({
           <RHFDropdown
             name="stockStatus"
             label="Status"
-            dropdownOptions={[
-              { label: "placeholder", value: "placeholder" },
-              { label: "placeholder2", value: "placeholder2" },
-            ]}
+            dropdownOptions={stockStatusDropdown}
           />
           <div className="flex flex-row gap-2">
             <button
