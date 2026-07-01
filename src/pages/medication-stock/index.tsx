@@ -97,6 +97,7 @@ function MedicationStockBasePage() {
               "Brand Name",
               "Stock Location",
               "Stock Quantity",
+              "Stock Expiry",
               "Stock State",
             ]}
           />
@@ -121,6 +122,11 @@ function MedicationStockBasePage() {
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
                     {item.quantity}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm font-medium text-slate-900">
+                    {item.expiry?.toLocaleDateString()}
                   </span>
                 </TableCell>
                 <TableCell>
