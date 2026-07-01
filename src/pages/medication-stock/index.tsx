@@ -69,7 +69,7 @@ function MedicationStockBasePage() {
     data: stock,
     isLoading,
     isError,
-  } = trpc.medicationStockRouter.list.useQuery();
+  } = trpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery();
 
   function renderContent() {
     if (isError) {
@@ -93,8 +93,8 @@ function MedicationStockBasePage() {
         <table className="min-w-full divide-y divide-slate-200">
           <TableHeader
             headers={[
-              "Stock ID",
-              "Medication Brand ID",
+              "Active Ingredient Name",
+              "Brand Name",
               "Stock Location",
               "Stock Quantity",
               "Stock State",
@@ -105,12 +105,12 @@ function MedicationStockBasePage() {
               <TableRow key={item.id}>
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
-                    {item.id}
+                    {item.medicationActiveIngredientName}
                   </span>
                 </TableCell>
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
-                    {item.medicationBrandId}
+                    {item.medicationBrandName}
                   </span>
                 </TableCell>
                 <TableCell>
