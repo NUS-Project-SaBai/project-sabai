@@ -100,6 +100,7 @@ export const medicationActiveIngredients = pgTable(
       length: 255,
     }).notNull(),
     fallBelow: integer("fall_below").notNull(),
+    remarks: text("remarks").notNull(),
   },
 );
 
@@ -122,6 +123,7 @@ export const medicationBrands = pgTable("medication_brands", {
     .references(() => medicationActiveIngredients.id, {
       onDelete: "restrict",
     }),
+  remarks: text("remarks").notNull(),
 });
 
 export type MedicationBrand = typeof medicationBrands.$inferSelect;
@@ -147,6 +149,7 @@ export const medicationStock = pgTable("medication_stock", {
   expiry: timestamp("expiry"),
   location: varchar("location", { length: 255 }),
   stockStatus: medicationStatusEnum("stock_status").default("active"),
+  remarks: text("remarks").notNull(),
 });
 
 export type MedicationStock = typeof medicationStock.$inferSelect;
