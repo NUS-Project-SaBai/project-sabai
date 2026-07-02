@@ -54,7 +54,9 @@ function MedicationBrandsBasePage() {
     return (
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200">
-          <TableHeader headers={["Brand ID", "Name", "Active Ingredient ID"]} />
+          <TableHeader
+            headers={["Brand ID", "Name", "Remarks", "Active Ingredient ID"]}
+          />
           <tbody className="bg-white divide-y divide-slate-200">
             {brands.map((brand) => (
               <TableRow key={brand.id}>
@@ -66,6 +68,11 @@ function MedicationBrandsBasePage() {
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
                     {brand.name}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm font-medium text-slate-900">
+                    {brand.remarks}
                   </span>
                 </TableCell>
                 <TableCell>
