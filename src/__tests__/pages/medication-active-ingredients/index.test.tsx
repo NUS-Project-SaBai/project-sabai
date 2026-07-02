@@ -15,6 +15,7 @@ const MOCK_ACTIVE_INGREDIENTS = {
     name: "Paracetamol",
     unitOfMeasurement: "mg",
     fallBelow: 3000,
+    remarks: "test",
   },
 };
 
@@ -140,9 +141,10 @@ describe("MedicationActiveIngredientsPage", () => {
         "Active Ingredient Name",
         "Unit of Measurement",
         "Fall Below",
+        "Remarks",
         "Actions",
       ],
-      ["1", "Paracetamol", "mg", "3000", "EditDelete"],
+      ["1", "Paracetamol", "mg", "3000", "test", "EditDelete"],
     ]);
   });
 
