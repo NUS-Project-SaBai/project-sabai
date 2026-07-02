@@ -14,9 +14,10 @@ import {
 export const genderEnum = pgEnum("gender", ["male", "female"]);
 export const medicationStatusEnum = pgEnum("medication_status", [
   "active",
-  "disposed",
+  "discarded",
   "donated",
-  "expired",
+  "dispensed",
+  "reserved",
 ]);
 
 // Define tables
