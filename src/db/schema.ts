@@ -91,6 +91,7 @@ Medication Active Ingredients Table:
 - name: Name of the active ingredient (e.g., "Paracetamol 500mg")
 - unitOfMeasurement: Unit used for measuring this ingredient (e.g., "bottles", "tablets")
 - fallBelow: Threshold quantity that triggers low stock alerts
+- remarks: Remarks for the active ingredient
 */
 export const medicationActiveIngredients = pgTable(
   "medication_active_ingredients",
@@ -115,6 +116,7 @@ Medication Brands Table:
 - id: Primary key, auto-incrementing integer
 - name: Name of the brand (e.g., "Panadol")
 - activeIngredientId: ID of the active ingredient
+- remarks: Remarks for the medication brand
 */
 export const medicationBrands = pgTable("medication_brands", {
   id: serial("id").primaryKey(),
@@ -137,7 +139,8 @@ Medication Stock Table:
 - quantity: Quantity of the medication
 - expiry: Expiry date of the medication
 - location: Location of the medication
-- state: State of the medication (e.g., 'active', 'disposed', 'donated', 'expired')
+- state: State of the medication (e.g., 'active', 'disposed', 'donated', 'dispensed', 'reserved')
+- remarks: Remarks for the medication stock
 */
 export const medicationStock = pgTable("medication_stock", {
   id: serial("id").primaryKey(),
