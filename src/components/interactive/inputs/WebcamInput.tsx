@@ -1,16 +1,8 @@
-/* 
-
-TO BE UPDATED!!
-
-THIS FILE WAS COPIED OVER FROM OLD REPO TO MOCK FRONTEND WORKFLOW
-
-*/
-
-import { OldButton } from "@/components/interactive/OldButton/OldButton";
 import { useToggle } from "@/lib/hooks/useToggle";
 import Image from "next/image";
 import { useCallback, useEffect, useRef } from "react";
 import Webcam from "react-webcam";
+import { Button } from "@/components/interactive/Button/Button";
 
 const videoConstraints = {
   width: 720,
@@ -79,21 +71,21 @@ export function WebcamInput({
             videoConstraints={videoConstraints}
             id="webcam"
           />
-          <OldButton text="Capture" onClick={webcamCapture} colour="green" />
+          <Button title="Capture" colour="emerald" onClick={webcamCapture} />
         </div>
       )}
       <div className="mt-2 flex items-center justify-center">
         {!cameraIsOpen ? (
           imageDetails == null ? (
-            <OldButton
-              colour="green"
-              text="Take Photo"
+            <Button
+              colour="emerald"
+              title="Take Photo"
               onClick={toggleCameraOpen}
             />
           ) : (
-            <OldButton
-              colour="orange"
-              text="Retake Photo"
+            <Button
+              colour="red"
+              title="Retake Photo"
               onClick={() => {
                 toggleCameraOpen();
                 setImageDetails(null);
@@ -103,7 +95,7 @@ export function WebcamInput({
         ) : (
           // don't show cancel button when there is no image captured yet
           imageDetails != null && (
-            <OldButton colour="red" text="Cancel" onClick={toggleCameraOpen} />
+            <Button colour="red" title="Cancel" onClick={toggleCameraOpen} />
           )
         )}
       </div>

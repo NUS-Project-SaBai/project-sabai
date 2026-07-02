@@ -64,6 +64,13 @@
       "when": 1781540125999,
       "tag": "0008_sweet_elektra",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1782138313274,
+      "tag": "0009_yummy_nekra",
+      "breakpoints": true
     }
   ]
 }

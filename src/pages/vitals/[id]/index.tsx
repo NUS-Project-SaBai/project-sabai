@@ -17,6 +17,7 @@ import { RHFRadio } from "@/components/interactive/RHF/RHFRadio";
 import { RHFTextArea } from "@/components/interactive/RHF/RHFTextArea";
 import { Button } from "@/components/interactive/Button/Button";
 import toast from "react-hot-toast";
+import { formatVisitDate } from "@/lib/utils/visit";
 
 type VitalsFormValues = {
   height?: string | null;
@@ -39,6 +40,7 @@ export default function PatientVitalsPage() {
   const router = useRouter();
   const { id } = router.query;
   const methods = useForm();
+  const { setValue } = methods;
 
   // Fetch patient
   const { data: patient, isLoading: patientLoading } =
@@ -60,9 +62,9 @@ export default function PatientVitalsPage() {
   // Automatically select visit if only got one
   useEffect(() => {
     if (visits && visits.length == 1) {
-      methods.setValue("visitSelect", visits[0].id.toString());
+      setValue("visitSelect", visits[0].id.toString());
     }
-  }, [visits, methods]);
+  }, [visits, setValue]);
 
   // Ensure the router is fully initialized and patientId exists
   if (!router.isReady || patientLoading || visitsLoading) {
@@ -83,16 +85,6 @@ export default function PatientVitalsPage() {
     ? visits?.find((v) => v.id.toString() === selectedVisitValue)
     : null;
 
-  const formatVisitDate = (date: Date) => {
-    return new Date(date).toLocaleString("en-GB", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   return (
     <div className="min-h-screen flex-1 p-8 bg-slate-50">
       <div className="w-full mx-auto max-w-5xl">
@@ -100,7 +92,7 @@ export default function PatientVitalsPage() {
           items={[
             { label: "Home", href: "/" },
             { label: "Vitals", href: "/vitals" },
-            { label: `Vitals for - ${patient.name}` },
+            { label: `Vitals for — ${patient.name}` },
           ]}
         />
 
@@ -228,7 +220,7 @@ function VitalsForm({ visitId }: { visitId: number }) {
 
   const onSubmit = (data: VitalsFormValues) => {
     if (!isDirty) {
-      toast.error("No form field changed!");
+      toast("No form field changed!");
       return;
     }
 
@@ -345,7 +337,6 @@ function VitalsForm({ visitId }: { visitId: number }) {
             type="submit"
             title="Save Records"
             colour="emerald"
-            variant="filled"
             loading={
               createVitalsMutation.isPending || updateVitalsMutation.isPending
             }
