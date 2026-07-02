@@ -71,6 +71,13 @@
       "when": 1782138313274,
       "tag": "0009_yummy_nekra",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1782975201230,
+      "tag": "0010_sparkling_jimmy_woo",
+      "breakpoints": true
     }
   ]
 }
