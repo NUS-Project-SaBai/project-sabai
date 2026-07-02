@@ -18,6 +18,7 @@ type EditFormFields = {
   name: string;
   unitOfMeasurement: string;
   fallBelow: number;
+  remarks: string;
 };
 
 type AddFormFields = Omit<EditFormFields, "id">;
@@ -157,6 +158,10 @@ function DeleteConfirmModal({
             <td>Fall Below:</td>
             <td>{ingredient.fallBelow}</td>
           </tr>
+          <tr>
+            <td>Remarks:</td>
+            <td>{ingredient.remarks}</td>
+          </tr>
         </tbody>
       </table>
       <div className="flex flex-row gap-2">
@@ -187,6 +192,7 @@ function Row(ingredient: MedicationActiveIngredient) {
       name: ingredient.name,
       unitOfMeasurement: ingredient.unitOfMeasurement,
       fallBelow: ingredient.fallBelow,
+      remarks: ingredient.remarks,
     },
   });
 
@@ -224,7 +230,8 @@ function Row(ingredient: MedicationActiveIngredient) {
     const hasChanged =
       data.name !== ingredient.name ||
       data.unitOfMeasurement !== ingredient.unitOfMeasurement ||
-      data.fallBelow !== ingredient.fallBelow;
+      data.fallBelow !== ingredient.fallBelow ||
+      data.remarks !== ingredient.remarks;
 
     if (!hasChanged) {
       toast.error("No form field changed!");
@@ -285,6 +292,17 @@ function Row(ingredient: MedicationActiveIngredient) {
                 },
                 required: true,
               }}
+            />
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            <EditableCell
+              isEditing={isEditing}
+              name="remarks"
+              type="text"
+              value={form.getValues().remarks}
+              label=""
             />
           </span>
         </TableCell>
@@ -371,6 +389,7 @@ function MedicationActiveIngredientsBasePage() {
               "Active Ingredient Name",
               "Unit of Measurement",
               "Fall Below",
+              "Remarks",
               "Actions",
             ]}
           />
