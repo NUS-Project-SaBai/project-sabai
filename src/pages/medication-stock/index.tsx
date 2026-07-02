@@ -83,6 +83,7 @@ function MedicationStockBasePage() {
               "Stock Location",
               "Stock Quantity",
               "Stock State",
+              "Remarks",
             ]}
           />
           <tbody className="bg-white divide-y divide-slate-200">
@@ -111,6 +112,11 @@ function MedicationStockBasePage() {
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
                     {item.stockStatus}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm font-medium text-slate-900">
+                    {item.remarks}
                   </span>
                 </TableCell>
               </TableRow>
