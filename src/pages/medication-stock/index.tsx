@@ -1,4 +1,5 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { Button } from "@/components/interactive/Button/Button";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import CreateModal from "@/components/medication-stock/CreateModal";
 import EditingModal from "@/components/medication-stock/EditingModal";
@@ -52,15 +53,13 @@ function Header() {
         </div>
 
         {modalIsOpen && <CreateModal setModalIsOpen={setModalIsOpen} />}
-        <button
-          className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700"
+        <Button
           onClick={() => {
             setModalIsOpen(true);
           }}
-          type="button"
-        >
-          Add Stock
-        </button>
+          title="Add Stock"
+          colour="indigo"
+        />
       </div>
     </div>
   );
@@ -143,9 +142,17 @@ function MedicationStockBasePage() {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    <button onClick={() => setIsEditing(true)}>Edit</button>
-                    <button onClick={() => setIsSplitting(true)}>Split</button>
+                  <span className="text-sm font-medium text-slate-900 flex flex-row gap-2">
+                    <Button
+                      onClick={() => setIsEditing(true)}
+                      colour="emerald"
+                      title="Edit"
+                    />
+                    <Button
+                      onClick={() => setIsSplitting(true)}
+                      colour="indigo"
+                      title="Split"
+                    />
                   </span>
                 </TableCell>
               </TableRow>
