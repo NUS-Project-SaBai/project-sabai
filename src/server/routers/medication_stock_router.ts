@@ -15,6 +15,7 @@ export const medicationStockRouter = router({
         expiry: medicationStock.expiry,
         location: medicationStock.location,
         stockStatus: medicationStock.stockStatus,
+        remarks: medicationStock.remarks,
       })
       .from(medicationStock);
     return result;
@@ -28,6 +29,7 @@ export const medicationStockRouter = router({
         expiry: zfd.text(z.coerce.date()),
         location: zfd.text(),
         stockStatus: zfd.text(z.enum(medicationStatusEnum.enumValues)),
+        remarks: zfd.text(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -53,7 +55,6 @@ export const medicationStockRouter = router({
       return { success: !!result };
     }),
 
-  // id, quantity, expiry, location, stock_status
   update: protectedProcedure
     .input(
       zfd.formData({
@@ -65,6 +66,7 @@ export const medicationStockRouter = router({
         stockStatus: zfd.text(
           z.enum(medicationStatusEnum.enumValues).optional(),
         ),
+        remarks: zfd.text(z.string().optional()),
       }),
     )
     .mutation(async ({ input }) => {
