@@ -1,3 +1,5 @@
+import { MedicationStock } from "@/db/schema";
+
 export enum StockStatus {
   ACTIVE = "active",
   DISPOSED = "disposed",
@@ -16,4 +18,9 @@ export type CreateFormFields = {
   expiry: Date;
   location: string;
   stockStatus: StockStatus;
+};
+
+export type MedicationStockWithBrandAndActiveIngredient = MedicationStock & {
+  medicationBrandName: string;
+  medicationActiveIngredientName: string;
 };
