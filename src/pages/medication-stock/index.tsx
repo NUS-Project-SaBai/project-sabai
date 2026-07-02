@@ -10,6 +10,7 @@ import TableRow from "@/components/TableRow";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import { useState } from "react";
+import { MedicationStockWithBrandAndActiveIngredient } from "@/lib/utils/medication-stock";
 
 function Header() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
@@ -72,8 +73,9 @@ function MedicationStockBasePage() {
     isError,
   } = trpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery();
 
-  const [isSplitting, setIsSplitting] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [splittingStock, setSplittingStock] =
+    useState<MedicationStockWithBrandAndActiveIngredient | null>(null);
 
   function renderContent() {
     if (isError) {
@@ -94,7 +96,12 @@ function MedicationStockBasePage() {
 
     return (
       <div className="overflow-x-auto">
-        {isSplitting && <SplittingModal />}
+        {splittingStock && (
+          <SplittingModal
+            onClose={() => setSplittingStock(null)}
+            stock={splittingStock}
+          />
+        )}
         {isEditing && <EditingModal />}
         <table className="min-w-full divide-y divide-slate-200">
           <TableHeader
@@ -149,7 +156,7 @@ function MedicationStockBasePage() {
                       title="Edit"
                     />
                     <Button
-                      onClick={() => setIsSplitting(true)}
+                      onClick={() => setSplittingStock(item)}
                       colour="indigo"
                       title="Split"
                     />
