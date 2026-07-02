@@ -97,6 +97,7 @@ function Header() {
                     required: true,
                   }}
                 />
+                <RHFInput name="remarks" label="Remarks" type="text" />
                 <div className="flex flex-row gap-2">
                   <Button
                     colour="emerald"
