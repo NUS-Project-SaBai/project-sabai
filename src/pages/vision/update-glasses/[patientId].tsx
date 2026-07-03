@@ -47,7 +47,12 @@ function UpdateGlassesPage() {
   }, [visits, setValue]);
 
   if (!router.isReady || patientLoading || visitsLoading) {
-    return <LoadingSpinner message="Loading patient and visits..." />;
+    return (
+      <LoadingSpinner
+        message="Loading patient and visits..."
+        className="p-12"
+      />
+    );
   }
 
   if (!patient) {

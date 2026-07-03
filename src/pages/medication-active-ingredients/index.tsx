@@ -351,7 +351,12 @@ function MedicationActiveIngredientsBasePage() {
     }
 
     if (isLoading) {
-      return <LoadingSpinner message="Loading active ingredients..." />;
+      return (
+        <LoadingSpinner
+          message="Loading active ingredients..."
+          className="p-12"
+        />
+      );
     }
 
     if (!ingredients || ingredients.length === 0) {
