@@ -24,7 +24,9 @@ function Content({
   });
 
   if (isLoading) {
-    return <LoadingSpinner message="Loading Village Codes..." />;
+    return (
+      <LoadingSpinner message="Loading Village Codes..." className="p-12" />
+    );
   }
 
   return (
