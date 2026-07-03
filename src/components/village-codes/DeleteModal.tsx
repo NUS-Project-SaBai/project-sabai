@@ -1,8 +1,8 @@
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import Modal from "@/components/interactive/Modal";
-import clsx from "clsx";
 import { FormFields } from "@/lib/utils/villageCodeTypes";
+import { Button } from "@/components/interactive/Button/Button";
 
 export default function DeleteModal({
   activeForm,
@@ -34,25 +34,20 @@ export default function DeleteModal({
       <p>Code: {activeForm?.code}</p>
       <p>Name: {activeForm?.name}</p>
 
-      <div className="flex gap-2">
-        <button
+      <div className="flex gap-2 justify-center">
+        <Button
           onClick={onClose}
-          className="bg-red-700 flex-1 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
-        >
-          Cancel
-        </button>
-        <button
+          colour="red"
+          title="Cancel"
+          className="w-full"
+        />
+        <Button
           onClick={() => deleteMutation.mutate({ id: activeForm!.id! })}
-          className={clsx(
-            "flex-1 text-white px-4 py-1 rounded-lg font-medium",
-            deleteMutation.isPending
-              ? "bg-neutral-600"
-              : "bg-green-600 hover:bg-green-700",
-          )}
           disabled={deleteMutation.isPending}
-        >
-          {deleteMutation.isPending ? "Deleting..." : "Confirm"}
-        </button>
+          colour="emerald"
+          title={deleteMutation.isPending ? "Deleting..." : "Confirm"}
+          className="w-full"
+        />
       </div>
     </Modal>
   );

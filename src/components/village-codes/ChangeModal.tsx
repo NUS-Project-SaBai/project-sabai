@@ -12,6 +12,7 @@ import {
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { useSaveOnWrite } from "@/hooks/useSaveOnWrite";
 import { useEffect } from "react";
+import { Button } from "@/components/interactive/Button/Button";
 
 export default function ChangeModal({
   onClose,
@@ -165,20 +166,19 @@ export default function ChangeModal({
             type="checkbox"
             className="flex flex-row-reverse"
           />
-          <div className="flex gap-3 mt-6">
-            <button
-              type="button"
+          <div className="flex gap-3 mt-6 justify-center">
+            <Button
+              colour="red"
               onClick={onClose}
-              className="flex-1 bg-red-700 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-800"
-            >
-              Cancel
-            </button>
-            <button
+              title="Cancel"
+              className="w-full"
+            />
+            <Button
+              colour="emerald"
+              title="Save"
+              className="w-full"
               type="submit"
-              className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700"
-            >
-              Save
-            </button>
+            />
           </div>
         </form>
       </FormProvider>

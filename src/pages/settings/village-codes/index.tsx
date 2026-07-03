@@ -9,6 +9,7 @@ import DeleteModal from "@/components/village-codes/DeleteModal";
 import ChangeModal from "@/components/village-codes/ChangeModal";
 import { FormFields } from "@/lib/utils/villageCodeTypes";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { Button } from "@/components/interactive/Button/Button";
 
 function Content({
   showHidden,
@@ -59,21 +60,17 @@ function Content({
                 </span>
               )}
             </TableCell>
-            <TableCell>
-              <button
-                onClick={() => {
-                  openEdit(code);
-                }}
-                className="mr-4 bg-indigo-600 text-white px-4 py-1 rounded-lg font-medium hover:bg-indigo-700"
-              >
-                Edit
-              </button>
-              <button
+            <TableCell className="flex gap-2">
+              <Button
+                onClick={() => openEdit(code)}
+                colour="indigo"
+                title="Edit"
+              />
+              <Button
                 onClick={() => openDelete(code)}
-                className="bg-red-700 flex-1 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
-              >
-                Delete
-              </button>
+                colour="red"
+                title="Delete"
+              />
             </TableCell>
           </TableRow>
         ))}
@@ -124,14 +121,11 @@ function VillageCodesPage() {
               />
               Show Hidden
             </label>
-            <button
-              onClick={() => {
-                setMode("editing");
-              }}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700"
-            >
-              New Village Code
-            </button>
+            <Button
+              onClick={() => setMode("editing")}
+              colour="emerald"
+              title="New Village Code"
+            />
           </div>
         </div>
         <div className="min-h-screen bg-slate-50 p-8">
