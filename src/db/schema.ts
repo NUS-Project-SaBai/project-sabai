@@ -234,6 +234,8 @@ Eyesight Table:
 - left_astigmatism: Left eye astigmatism measurement.
 - right_astigmatism: Right eye astigmatism measurement.
 - comments: Additional comments or observations.
+- left_prescribed_glasses_degree: Prescribed glasses degree for the left eye.
+- right_prescribed_glasses_degree: Prescribed glasses degree for the right eye.
 */
 export const eyesight = pgTable("eyesight", {
   id: serial("id").primaryKey(),
@@ -250,6 +252,8 @@ export const eyesight = pgTable("eyesight", {
   leftAstigmatism: text("left_astigmatism"),
   rightAstigmatism: text("right_astigmatism"),
   comments: text("comments"),
+  leftPrescribedGlassesDegree: text("left_prescribed_glasses_degree"),
+  rightPrescribedGlassesDegree: text("right_prescribed_glasses_degree"),
 });
 
 export type Eyesight = typeof eyesight.$inferSelect;

@@ -22,6 +22,8 @@ export default function TableCell({
   className = "",
 }: TableCellProps) {
   return (
-    <td className={`px-6 py-4 whitespace-nowrap ${className}`}>{children}</td>
+    <td className={`px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap ${className}`}>
+      {children}
+    </td>
   );
 }

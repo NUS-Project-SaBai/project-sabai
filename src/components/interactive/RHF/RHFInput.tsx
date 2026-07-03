@@ -2,7 +2,7 @@ import { DetailedHTMLProps, HTMLAttributes, InputHTMLAttributes } from "react";
 import { RegisterOptions, useFormContext } from "react-hook-form";
 import { useRHFRegister } from "./useRHFRegister";
 import { IsRequiredStar } from "@/components/IsRequiredStar";
-import clsx from "clsx";
+import { clsx } from "clsx";
 
 type RHFInputProps = {
   name: string;
@@ -70,7 +70,7 @@ export function RHFInput({
   const fieldError = formState?.errors[name];
 
   return (
-    <div className={className}>
+    <div className={clsx("flex flex-col gap-2", className)}>
       <label htmlFor={name}>
         {label}
         <IsRequiredStar isRequired={isRequired} />
@@ -80,16 +80,18 @@ export function RHFInput({
         type={type}
         {...registerProps}
         {...props}
-        className={clsx(
-          "border-2",
-          fieldError != undefined && "border-red-400 border-l-8",
-          type === "color" &&
-            "h-10 w-14 rounded cursor-pointer border border-slate-300 p-1",
-        )}
+        className={clsx([
+          "border border-gray-300 rounded bg-white px-3 py-2 transition focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400",
+          fieldError &&
+            "border-red-400 focus:ring-red-300 focus:border-red-400",
+        ])}
       />
-      <p className="min-h-6 text-red-400">
-        {fieldError ? fieldError.message?.toString() : ""}
-      </p>
+
+      {fieldError && (
+        <p className="mt-1 text-sm text-red-400">
+          {fieldError.message?.toString()}
+        </p>
+      )}
     </div>
   );
 }

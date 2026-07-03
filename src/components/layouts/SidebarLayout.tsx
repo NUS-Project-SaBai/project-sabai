@@ -25,9 +25,9 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
   );
 
   return (
-    <div className="flex h-screen flex-col sm:flex-row">
+    <div className="flex h-screen flex-col lg:flex-row">
       {/* mobile sidebar */}
-      <div className="sm:hidden relative" ref={dropdownRef}>
+      <div className="lg:hidden relative" ref={dropdownRef}>
         <div className="grid grid-cols-3 w-full p-2 items-center bg-[var(--color-navbar)]">
           <SabaiLogo />
           <div className="flex justify-center">
@@ -49,7 +49,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
         </div>
       </div>
       {/* desktop sidebar */}
-      <div className="hidden sm:flex flex-col min-w-64 p-2 gap-6 bg-[var(--color-navbar)]">
+      <div className="hidden lg:flex flex-col min-w-64 p-2 gap-6 bg-[var(--color-navbar)]">
         <LogoTitle className="m-2" />
         <div className="px-2">
           <VillageSelector />

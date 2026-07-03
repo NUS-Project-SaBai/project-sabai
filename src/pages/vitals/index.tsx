@@ -35,7 +35,7 @@ export default function VitalsPage() {
     }
 
     if (isLoading) {
-      return <LoadingSpinner message="Loading patients..." />;
+      return <LoadingSpinner message="Loading patients..." className="p-12" />;
     }
 
     if (!patients || patients.length === 0) {
@@ -75,8 +75,6 @@ export default function VitalsPage() {
                     title="Vitals"
                     icon={<CiMedicalClipboard className="h-6 w-6" />}
                     colour="emerald"
-                    variant="filled"
-                    size="medium"
                   />
                 </TableCell>
               </TableRow>

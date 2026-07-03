@@ -64,7 +64,7 @@ export function RHFRadio({
         className={clsx([
           "grid gap-2 p-1",
           !numberOfColumns && "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
-          fieldError ? "border-red-400 border-2 rounded" : "",
+          fieldError ? "border border-red-400 rounded" : "",
         ])}
         style={
           numberOfColumns
@@ -87,10 +87,10 @@ export function RHFRadio({
                 <div
                   key={option.value}
                   className={clsx([
-                    "flex items-center gap-2 px-4 py-2 border w-fit rounded hover:cursor-pointer hover:shadow ",
+                    "flex items-center gap-2 px-4 py-2 border border-gray-300 w-fit rounded hover:cursor-pointer hover:shadow",
                     value === option.value
-                      ? "border-blue-600 bg-blue-200 font-semibold"
-                      : "border-gray-300 bg-gray-50 text-gray-500",
+                      ? "border-blue-500 bg-blue-100 font-semibold"
+                      : "bg-gray-50 text-gray-500",
                   ])}
                   onClick={() => onChange(option.value)}
                 >
