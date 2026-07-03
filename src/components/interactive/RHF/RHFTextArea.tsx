@@ -6,6 +6,7 @@ import {
 import { RegisterOptions, useFormContext } from "react-hook-form";
 import { useRHFRegister } from "./useRHFRegister";
 import { IsRequiredStar } from "@/components/IsRequiredStar";
+import { clsx } from "clsx";
 
 type RHFTextAreaProps = {
   name: string;
@@ -61,16 +62,18 @@ export function RHFTextArea({
   const { formState } = useFormContext();
   const fieldError = formState?.errors[name];
   return (
-    <div className={className}>
+    <div className={clsx("flex flex-col gap-2", className)}>
       <label htmlFor={name}>
         {label}
         <IsRequiredStar isRequired={isRequired} />
       </label>
       <textarea
         id={name}
-        className={
-          fieldError ? "border-red-400 border-l-8 border-2" : "border-2"
-        }
+        className={clsx([
+          "border border-gray-300 rounded bg-white px-3 py-2 transition focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400",
+          fieldError &&
+            "border-red-400 focus:ring-red-300 focus:border-red-400",
+        ])}
         {...registerProps}
         {...props}
       />

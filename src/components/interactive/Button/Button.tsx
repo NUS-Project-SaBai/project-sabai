@@ -5,6 +5,7 @@ import {
   ButtonSize,
   getButonTwClassName,
 } from "./buttonStyles";
+import clsx from "clsx";
 
 /**
  * A customizable button component with support for multiple styles and variants.
@@ -14,9 +15,10 @@ import {
  * @param {React.ReactNode} [icon=<></>] - An icon element to display within the button
  * @param {"button" | "submit" | "reset"} [type="button"] - The HTML button type attribute
  * @param {ButtonColour} [colour="white"] - The color scheme of the button
- * @param {ButtonVariant} [variant="outline"] - The visual style variant of the button @see ButtonVariant
+ * @param {ButtonVariant} [variant="filled"] - The visual style variant of the button @see ButtonVariant
  * @param {ButtonSize} [size="medium"] - The size of the button
  * @param {boolean} [loading=false] - Whether the button is in loading state; disables the button and shows a spinner
+ * @param {string} [className] - The classNames of the component
  */
 export function Button({
   onClick,
@@ -24,10 +26,11 @@ export function Button({
   icon = <></>,
   type = "button",
   colour = "white",
-  variant = "outline",
+  variant = "filled",
   size = "medium",
   loading = false,
   disabled = false,
+  className = "",
 }: {
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
@@ -38,6 +41,7 @@ export function Button({
   size?: ButtonSize;
   loading?: boolean;
   disabled?: boolean;
+  className?: string;
 }) {
   return (
     <button
@@ -45,7 +49,7 @@ export function Button({
       type={type}
       title={title}
       disabled={loading || disabled}
-      className={getButonTwClassName(colour, variant, size)}
+      className={clsx(getButonTwClassName(colour, variant, size), className)}
     >
       {loading ? (
         <>

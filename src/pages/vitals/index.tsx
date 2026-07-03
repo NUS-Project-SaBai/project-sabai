@@ -75,8 +75,6 @@ export default function VitalsPage() {
                     title="Vitals"
                     icon={<CiMedicalClipboard className="h-6 w-6" />}
                     colour="emerald"
-                    variant="filled"
-                    size="medium"
                   />
                 </TableCell>
               </TableRow>
