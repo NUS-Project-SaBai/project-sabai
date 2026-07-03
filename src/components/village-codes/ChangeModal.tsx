@@ -144,7 +144,7 @@ export default function ChangeModal({
             placeholder="Central Village"
             defaultValue={DEFAULT_FORM.name}
           />
-          <div className="flex gap-2 mt-1 items-center">
+          <div className="flex gap-2 mt-1 items-end mb-4">
             <RHFInput
               name="colorHex"
               label="Color"
