@@ -51,7 +51,7 @@ export default function MatchingPatients({
 
   useEffect(() => {
     findFaceMatchMutation.mutate({ picture: imgDetails! });
-  }, []);
+  }, [findFaceMatchMutation, imgDetails]);
 
   if (findFaceMatchMutation.isPending) {
     return (
