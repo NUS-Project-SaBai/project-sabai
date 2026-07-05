@@ -1,5 +1,5 @@
 {
-  "id": "caf50239-cb26-42f1-9f72-b4ba278190c8",
+  "id": "8e436c93-668e-4adc-97fd-1a785809bb6d",
   "prevId": "f447a840-00b2-4f76-8541-ff81dbe8e645",
   "version": "7",
   "dialect": "postgresql",
@@ -68,7 +68,7 @@
           "name": "doctor_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "visit_id": {
           "name": "visit_id",
@@ -103,7 +103,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
@@ -154,7 +154,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },

@@ -285,10 +285,12 @@ export const consults = pgTable("consults", {
   consultation: text("consultation"),
   treatmentPlan: text("treatment_plan"),
   remarks: text("remarks"),
-  doctorId: uuid("doctor_id").references(() => authUsers.id),
+  doctorId: uuid("doctor_id")
+    .notNull()
+    .references(() => authUsers.id),
   visitId: integer("visit_id")
     .notNull()
-    .references(() => visits.id, { onDelete: "cascade" }),
+    .references(() => visits.id),
 });
 
 export type Consult = typeof consults.$inferSelect;
@@ -307,7 +309,7 @@ export const diagnosis = pgTable("diagnosis", {
   category: varchar("category", { length: 255 }),
   consultId: integer("consult_id")
     .notNull()
-    .references(() => consults.id, { onDelete: "cascade" }),
+    .references(() => consults.id),
 });
 
 export type Diagnosis = typeof diagnosis.$inferSelect;
