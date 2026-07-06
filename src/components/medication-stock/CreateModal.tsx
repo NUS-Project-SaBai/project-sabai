@@ -29,7 +29,7 @@ export default function CreateModal({
   const createMutation = trpc.medicationStockRouter.create.useMutation({
     onSuccess: () => {
       toast.success("Successfully created!");
-      utils.medicationStockRouter.list.invalidate();
+      utils.medicationStockRouter.listWithBrandAndActiveIngredient.invalidate();
       form.reset();
       setModalIsOpen(false);
     },
