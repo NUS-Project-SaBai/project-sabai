@@ -1,5 +1,8 @@
 import Modal from "@/components/interactive/Modal";
-import { MedicationStockWithBrandAndActiveIngredient } from "@/lib/utils/medication-stock";
+import {
+  MedicationStockWithBrandAndActiveIngredient,
+  StockStatus,
+} from "@/lib/utils/medication-stock";
 import { Button } from "@/components/interactive/Button/Button";
 import { useState } from "react";
 
@@ -69,18 +72,20 @@ export default function SplittingModal({
               }
             ></input>
             <select
-              value={split.stockStatus}
+              value={split.stockStatus!}
               onChange={(e) =>
                 setSplits(
                   splits.map((item, itemIndex) =>
                     itemIndex === index
-                      ? { ...item, stockStatus: e.target.value }
+                      ? { ...item, stockStatus: e.target.value as StockStatus }
                       : item,
                   ),
                 )
               }
             >
-              <option>active</option>
+              {Object.values(StockStatus).map((status) => (
+                <option key={status}>{status}</option>
+              ))}
             </select>
             <input
               type="number"
