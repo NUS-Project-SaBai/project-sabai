@@ -60,6 +60,7 @@ export default function CreateModal({
             label="Location"
             type="text"
             className="mb-4"
+            isRequired
           />
           <RHFInput
             name="quantity"
@@ -71,15 +72,16 @@ export default function CreateModal({
                 value: 1,
                 message: "Please input only positive values.",
               },
-              required: true,
             }}
             className="mb-4"
+            isRequired
           />
           <RHFInput
             name="expiry"
             label="Expiry Date"
             type="date"
             className="mb-4"
+            isRequired
           />
 
           {brandWithActiveIngredientIsLoading && (
@@ -96,6 +98,7 @@ export default function CreateModal({
                 label: `${elem.activeIngredientName} (${elem.name})`,
               }))}
               className="mb-4"
+              isRequired
             />
           ) : (
             "An error has occurred while loading the dropdown options for brand + active ingredient. Please refresh the page."
