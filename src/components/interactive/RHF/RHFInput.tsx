@@ -81,9 +81,10 @@ export function RHFInput({
         {...registerProps}
         {...props}
         className={clsx([
-          "border border-gray-300 rounded bg-white px-3 py-2 transition focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 h-10",
+          "border border-gray-300 rounded bg-white px-3 py-2 transition focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400",
           fieldError &&
             "border-red-400 focus:ring-red-300 focus:border-red-400",
+          type === "color" && "h-10",
         ])}
       />
 
