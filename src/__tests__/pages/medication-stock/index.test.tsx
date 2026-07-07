@@ -113,7 +113,7 @@ describe("MedicationStockPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("displays active ingredients in table", async () => {
+  it("displays stock in table", async () => {
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
         data: mockStock,
@@ -147,7 +147,7 @@ describe("MedicationStockPage", () => {
     ]);
   });
 
-  it("opens a modal to add new active ingredients when the Add Active Ingredient button is clicked", async () => {
+  it("opens a modal to add new stock when the Add Stock button is clicked", async () => {
     const user = userEvent.setup();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
@@ -179,7 +179,7 @@ describe("MedicationStockPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("closes the add new active ingredient modal when the cross button or the cancel button is clicked", async () => {
+  it("closes the add new stock modal when the cross button or the cancel button is clicked", async () => {
     const user = userEvent.setup();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
