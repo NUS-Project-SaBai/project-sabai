@@ -46,9 +46,6 @@ export default function ChangeModal({
 
   const watchedColor = useWatch({
     name: "colorHex",
-    compute: (data: string) => {
-      return data;
-    },
     defaultValue: DEFAULT_FORM.colorHex,
     control: form.control,
   });
