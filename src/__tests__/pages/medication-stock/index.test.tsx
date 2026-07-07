@@ -1,7 +1,13 @@
 import { Toaster, toast } from "react-hot-toast";
 import userEvent from "@testing-library/user-event";
 import { trpc } from "@/utils/trpc";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  screen,
+  within,
+  fireEvent,
+} from "@testing-library/react";
 import MedicationStockBasePage from "@/pages/medication-stock";
 import {
   assertBreadcrumbs,
@@ -206,6 +212,168 @@ describe("MedicationStockPage", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  (it("only allows positive numeric inputs in quantity field in add new stock modal", () => {}),
-    it("closes the new stock modal, displays a success toast, and refreshes the list when valid new stock is added", () => {}));
+  it("only allows positive numeric inputs in quantity field in add new stock modal", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: mockStock,
+        isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationBrandRouter.listWithActiveIngredientName.useQuery.mockReturnValue(
+      {
+        data: [
+          {
+            id: 1,
+            name: "Panadol",
+            activeIngredientName: "Paracetamol 500mg",
+          },
+        ],
+        isLoading: false,
+      },
+    );
+
+    render(
+      <>
+        <MedicationStockBasePage />
+      </>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Add Stock" }));
+
+    const dialog = await screen.findByRole("dialog");
+
+    const locationInput = dialog.querySelector('input[name="location"]');
+    const quantityInput = dialog.querySelector('input[name="quantity"]');
+    const expiryInput = dialog.querySelector('input[name="expiry"]');
+
+    expect(locationInput).toBeInTheDocument();
+    expect(quantityInput).toBeInTheDocument();
+    expect(expiryInput).toBeInTheDocument();
+
+    // dropdown uses buttons
+    const brandIdButton = dialog.querySelector(
+      'button[name="medicationBrandId-dropdown-button"]',
+    );
+    const statusButton = dialog.querySelector(
+      'button[name="stockStatus-dropdown-button"]',
+    );
+
+    expect(brandIdButton).toBeInTheDocument();
+    expect(statusButton).toBeInTheDocument();
+
+    await user.type(locationInput!, "valid location");
+    fireEvent.change(expiryInput!, { target: { value: "2026-12-31" } });
+    await user.click(brandIdButton!);
+
+    const brandDropdownButton = dialog.querySelector(
+      'button[name="medicationBrandId-1-dropdown-option"]',
+    );
+    await user.click(brandDropdownButton!);
+
+    await user.click(statusButton!);
+    const stockDropdownOption = dialog.querySelector(
+      'button[name="stockStatus-1-dropdown-option"]',
+    );
+    await user.click(stockDropdownOption!);
+
+    await user.type(quantityInput!, "-1");
+    await user.click(screen.getByRole("button", { name: "Save" }));
+    expect(await screen.findByText("Please input only positive values."));
+
+    await user.clear(quantityInput!);
+    await user.type(quantityInput!, "0");
+    await user.click(screen.getByRole("button", { name: "Save" }));
+    expect(await screen.findByText("Please input only positive values."));
+  });
+
+  it("closes the new stock modal, displays a success toast, and refreshes the list when valid new stock is added", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: mockStock,
+        isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationBrandRouter.listWithActiveIngredientName.useQuery.mockReturnValue(
+      {
+        data: [
+          {
+            id: 1,
+            name: "Panadol",
+            activeIngredientName: "Paracetamol 500mg",
+          },
+        ],
+        isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationStockRouter.create.useMutation.mockImplementation(
+      ({ onSuccess }) => {
+        return {
+          mutate: vi.fn(() => {
+            onSuccess?.();
+          }),
+          isLoading: false,
+        };
+      },
+    );
+
+    render(
+      <>
+        <MedicationStockBasePage />
+        <Toaster />
+      </>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Add Stock" }));
+
+    const dialog = await screen.findByRole("dialog");
+
+    const locationInput = dialog.querySelector('input[name="location"]');
+    const quantityInput = dialog.querySelector('input[name="quantity"]');
+    const expiryInput = dialog.querySelector('input[name="expiry"]');
+
+    expect(locationInput).toBeInTheDocument();
+    expect(quantityInput).toBeInTheDocument();
+    expect(expiryInput).toBeInTheDocument();
+
+    // dropdown uses buttons
+    const brandIdButton = dialog.querySelector(
+      'button[name="medicationBrandId-dropdown-button"]',
+    );
+    const statusButton = dialog.querySelector(
+      'button[name="stockStatus-dropdown-button"]',
+    );
+
+    expect(brandIdButton).toBeInTheDocument();
+    expect(statusButton).toBeInTheDocument();
+
+    await user.type(locationInput!, "valid location");
+    await user.type(quantityInput!, "100");
+    fireEvent.change(expiryInput!, { target: { value: "2026-12-31" } });
+    await user.click(brandIdButton!);
+
+    const brandDropdownButton = dialog.querySelector(
+      'button[name="medicationBrandId-1-dropdown-option"]',
+    );
+    await user.click(brandDropdownButton!);
+
+    await user.click(statusButton!);
+    const stockDropdownOption = dialog.querySelector(
+      'button[name="stockStatus-1-dropdown-option"]',
+    );
+    await user.click(stockDropdownOption!);
+
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    // assert toast appears
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Successfully created!",
+    );
+  });
 });
