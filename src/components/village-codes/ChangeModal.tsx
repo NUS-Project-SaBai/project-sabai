@@ -94,7 +94,7 @@ export default function ChangeModal({
       toast.success("Village code updated!");
     },
     onError: (err) => {
-      console.log(err);
+      console.error(err);
       toast.error("Unable to update village code.");
     },
   });
