@@ -224,10 +224,10 @@ describe("VillageCodesPage", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Save" }));
 
-    const toast = screen.getByRole("status");
+    const toastEl = screen.getByRole("status");
 
-    expect(toast).toBeInTheDocument();
-    expect(toast).toHaveTextContent("Village code updated!");
+    expect(toastEl).toBeInTheDocument();
+    expect(toastEl).toHaveTextContent("Village code updated!");
   });
 
   it("closes form when cancel button is clicked", async () => {
@@ -338,10 +338,10 @@ describe("VillageCodesPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 
-    const toast = screen.getByRole("status");
+    const toastEl = screen.getByRole("status");
 
-    expect(toast).toBeInTheDocument();
-    expect(toast.textContent).toBe("Village code created!");
+    expect(toastEl).toBeInTheDocument();
+    expect(toastEl.textContent).toBe("Village code created!");
   });
 
   it("toggles show hidden checkbox", async () => {
@@ -426,9 +426,9 @@ describe("VillageCodesPage", () => {
 
     await user.click(confirmButton);
 
-    const toast = screen.getByRole("status");
-    expect(toast).toBeInTheDocument();
-    expect(toast).toHaveTextContent("Village code deleted!");
+    const toastEl = screen.getByRole("status");
+    expect(toastEl).toBeInTheDocument();
+    expect(toastEl).toHaveTextContent("Village code deleted!");
   });
 
   it("does not delete when confirmation is cancelled", async () => {
@@ -491,9 +491,9 @@ describe("VillageCodesPage", () => {
 
     await user.click(confirmButton);
 
-    const toast = screen.getByRole("status");
-    expect(toast).toBeInTheDocument();
-    expect(toast).toHaveTextContent(
+    const toastEl = screen.getByRole("status");
+    expect(toastEl).toBeInTheDocument();
+    expect(toastEl).toHaveTextContent(
       "Unable to delete village code. Check that there are no visits with this village code before deleting.",
     );
   });
