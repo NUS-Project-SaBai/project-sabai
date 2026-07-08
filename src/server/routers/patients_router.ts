@@ -63,6 +63,7 @@ export const patientsRouter = router({
       .selectDistinctOn([visits.patientId], {
         patientId: visits.patientId,
         villageCodeId: visits.villageCodeId,
+        date: visits.date,
       })
       .from(visits)
       .orderBy(visits.patientId, desc(visits.date))
@@ -87,7 +88,9 @@ export const patientsRouter = router({
       })
       .from(patients)
       .leftJoin(latestVisit, eq(latestVisit.patientId, patients.id))
-      .leftJoin(villageCodes, eq(villageCodes.id, latestVisit.villageCodeId));
+      .leftJoin(villageCodes, eq(villageCodes.id, latestVisit.villageCodeId))
+      // Most recent visit on top
+      .orderBy(desc(latestVisit.date));
 
     return result.map(getPatientWithImageUrl);
   }),
