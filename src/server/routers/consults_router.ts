@@ -22,7 +22,10 @@ const diagnosisInput = z.object({
  */
 const createConsultInput = z.object({
   visitId: z.number().int().positive(),
-  pastMedicalHistory: z.string().trim().min(1, "Past medical history is required"),
+  pastMedicalHistory: z
+    .string()
+    .trim()
+    .min(1, "Past medical history is required"),
   consultation: z.string().trim().min(1, "Consultation is required"),
   treatmentPlan: z.string().optional(),
   remarks: z.string().optional(),

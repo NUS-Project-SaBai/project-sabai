@@ -5,9 +5,9 @@ import {
 } from "@/lib/utils/vitals";
 
 describe("computeBmi", () => {
-  it("computes BMI to one decimal place", () => {
-    // 70kg at 175cm => 22.857... => "22.9"
-    expect(computeBmi("175", "70")).toBe("22.9");
+  it("computes BMI to two decimal places", () => {
+    // 70kg at 175cm => 22.857... => "22.86" (rounded to 2 decimal places)
+    expect(computeBmi("175", "70")).toBe("22.86");
   });
 
   it("returns a placeholder when height is missing", () => {
