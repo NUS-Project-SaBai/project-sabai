@@ -54,17 +54,30 @@ export function ConsultForm({ visitId }: { visitId: number }) {
     toast.error("Please fill in all required fields before saving.");
 
   const onSubmit = (data: ConsultFormValues) => {
+    const pastMedicalHistory = data.pastMedicalHistory.trim();
+    const consultation = data.consultation.trim();
+    const diagnoses = data.diagnoses.map((d) => ({
+      details: d.details.trim(),
+      category: d.category as DiagnosisCategory,
+    }));
+
+    if (
+      !pastMedicalHistory ||
+      !consultation ||
+      diagnoses.some((d) => !d.details || !d.category)
+    ) {
+      onInvalid();
+      return;
+    }
+
     createConsult.mutate(
       {
         visitId,
-        pastMedicalHistory: data.pastMedicalHistory,
-        consultation: data.consultation,
-        treatmentPlan: data.treatmentPlan || undefined,
-        remarks: data.remarks || undefined,
-        diagnoses: data.diagnoses.map((d) => ({
-          details: d.details,
-          category: d.category as DiagnosisCategory,
-        })),
+        pastMedicalHistory,
+        consultation,
+        treatmentPlan: data.treatmentPlan?.trim() || undefined,
+        remarks: data.remarks?.trim() || undefined,
+        diagnoses,
       },
       {
         onSuccess: () => {
