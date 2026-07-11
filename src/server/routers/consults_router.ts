@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { eq, desc, inArray } from "drizzle-orm";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { consults, diagnosis } from "@/db/schema";
@@ -66,10 +66,24 @@ export const consultsRouter = router({
   getByVisitId: protectedProcedure
     .input(z.object({ visitId: z.number().int().positive() }))
     .query(async ({ input }) => {
-      return db
+      const rows = await db
         .select()
         .from(consults)
-        .where(eq(consults.visitId, input.visitId));
+        .where(eq(consults.visitId, input.visitId))
+        .orderBy(desc(consults.date));
+
+      const ids = rows.map((c) => c.id);
+      const diagnoses = ids.length
+        ? await db
+            .select()
+            .from(diagnosis)
+            .where(inArray(diagnosis.consultId, ids))
+        : [];
+
+      return rows.map((consult) => ({
+        ...consult,
+        diagnoses: diagnoses.filter((d) => d.consultId === consult.id),
+      }));
     }),
 });
 
