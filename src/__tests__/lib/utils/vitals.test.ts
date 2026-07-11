@@ -29,9 +29,14 @@ describe("formatBloodPressure", () => {
     expect(formatBloodPressure(120, 80)).toBe("120 / 80");
   });
 
-  it("uses a dash for missing values", () => {
+  it("uses a dash for an individually missing value", () => {
     expect(formatBloodPressure(null, 80)).toBe("- / 80");
-    expect(formatBloodPressure(undefined, undefined)).toBe("- / -");
+    expect(formatBloodPressure(120, null)).toBe("120 / -");
+  });
+
+  it("collapses to a single dash when both readings are missing", () => {
+    expect(formatBloodPressure(undefined, undefined)).toBe("-");
+    expect(formatBloodPressure(null, null)).toBe("-");
   });
 });
 

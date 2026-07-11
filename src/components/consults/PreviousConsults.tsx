@@ -38,7 +38,7 @@ function ConsultCard({ consult }: { consult: Consult }) {
           <ul className="mt-1 space-y-1">
             {consult.diagnoses.map((d) => (
               <li key={d.id} className="break-words text-sm text-slate-700">
-                <span className="font-medium">{d.category ?? "—"}:</span>{" "}
+                <span className="font-medium">{d.category ?? "-"}:</span>{" "}
                 {d.details}
               </li>
             ))}

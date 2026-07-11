@@ -16,12 +16,15 @@ export function computeBmi(
 }
 
 /**
- * Formats systolic/diastolic readings as "120 / 80", using a dash for any missing value.
+ * Formats systolic/diastolic readings as "120 / 80", using a dash for an
+ * individually missing value. When both are missing, returns a single "-" so it
+ * matches the placeholder used for every other empty vital.
  */
 export function formatBloodPressure(
   systolic: number | null | undefined,
   diastolic: number | null | undefined,
 ): string {
+  if (systolic == null && diastolic == null) return "-";
   return `${systolic ?? "-"} / ${diastolic ?? "-"}`;
 }
 
