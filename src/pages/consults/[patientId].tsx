@@ -9,6 +9,7 @@ import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { formatVisitDate } from "@/lib/utils/visit";
 import { formatPatientId } from "@/lib/utils/patient";
 import { ConsultForm } from "@/components/consults/ConsultForm";
+import { PreviousConsults } from "@/components/consults/PreviousConsults";
 import { VisitSummaryPanel } from "@/components/consults/VisitSummaryPanel";
 
 function ConsultsPage() {
@@ -110,8 +111,9 @@ function ConsultsPage() {
           <div className="p-6">
             {selectedVisitId ? (
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                <aside className="lg:border-r lg:border-slate-100 lg:pr-8">
+                <aside className="min-w-0 lg:border-r lg:border-slate-100 lg:pr-8">
                   <VisitSummaryPanel visitId={selectedVisitId} />
+                  <PreviousConsults visitId={selectedVisitId} />
                 </aside>
                 <ConsultForm key={selectedVisitId} visitId={selectedVisitId} />
               </div>
