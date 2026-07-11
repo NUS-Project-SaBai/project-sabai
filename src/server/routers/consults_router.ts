@@ -29,7 +29,9 @@ const createConsultInput = z.object({
   consultation: z.string().trim().min(1, "Consultation is required"),
   treatmentPlan: z.string().optional(),
   remarks: z.string().optional(),
-  diagnoses: z.array(diagnosisInput),
+  diagnoses: z
+    .array(diagnosisInput)
+    .min(1, "At least one diagnosis is required"),
 });
 
 export const consultsRouter = router({
