@@ -230,7 +230,7 @@ export const patientsRouter = router({
         }
       } catch (err) {
         // Log the error and return an empty array if the search fails
-        console.error(err);
+        console.error("error searchFaceprint:", err);
         return [];
       }
 
