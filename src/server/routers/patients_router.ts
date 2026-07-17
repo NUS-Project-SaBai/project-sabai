@@ -289,7 +289,7 @@ export const patientsRouter = router({
   // This endpoint takes a picture, searches for faceprint matches, and returns the corresponding patients from the database.
   abc: protectedProcedure
     .input(z.object({ picture: z.string() }))
-    .query(async ({ input }) => {
+    .mutation(async ({ input }) => {
       // Step 1: Search for faceprint matches using the provided picture
       let searchFaceprintResults;
       try {
@@ -314,7 +314,7 @@ export const patientsRouter = router({
       }
 
       // Step 2: Query the database for patients whose rekognitionFaceId matches any of the FaceIds found
-      const result = await db
+      const matchingPatients = await db
         .select({
           id: patients.id,
           name: patients.name,
@@ -332,6 +332,6 @@ export const patientsRouter = router({
         .from(patients)
         .where(inArray(patients.rekognitionFaceId, faceIds));
 
-      return result.map(getPatientWithImageUrl);
+      return matchingPatients.map(getPatientWithImageUrl);
     }),
 });
