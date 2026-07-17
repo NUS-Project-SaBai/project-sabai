@@ -284,4 +284,54 @@ export const patientsRouter = router({
 
       return result.map(getPatientWithImageUrl);
     }),
+
+  // abc - new endpoint for facial recognition
+  // This endpoint takes a picture, searches for faceprint matches, and returns the corresponding patients from the database.
+  abc: protectedProcedure
+    .input(z.object({ picture: z.string() }))
+    .query(async ({ input }) => {
+      // Step 1: Search for faceprint matches using the provided picture
+      let searchFaceprintResults;
+      try {
+        searchFaceprintResults = await searchFaceprint(input.picture);
+        // If there are no matches, return an empty array
+        if (!searchFaceprintResults || searchFaceprintResults.length === 0) {
+          return [];
+        }
+      } catch (err) {
+        // Log the error and return an empty array if the search fails
+        console.error(err);
+        return [];
+      }
+
+      // get the FaceIds from the search results, filtering out any undefined values
+      const faceIds = searchFaceprintResults
+        .map((item) => item.Face?.FaceId)
+        .filter((id): id is string => typeof id === "string"); // use Type Predicate to ensure TypeScript knows these are strings
+
+      if (faceIds.length === 0) {
+        return [];
+      }
+
+      // Step 2: Query the database for patients whose rekognitionFaceId matches any of the FaceIds found
+      const result = await db
+        .select({
+          id: patients.id,
+          name: patients.name,
+          identificationNumber: patients.identificationNumber,
+          contactNo: patients.contactNo,
+          gender: patients.gender,
+          dateOfBirth: patients.dateOfBirth,
+          hasPoorCard: patients.hasPoorCard,
+          hasBS2Card: patients.hasBS2Card,
+          drugAllergy: patients.drugAllergy,
+          hasSabaiCard: patients.hasSabaiCard,
+          patientImagePublicId: patients.patientImagePublicId,
+          rekognitionFaceId: patients.rekognitionFaceId,
+        })
+        .from(patients)
+        .where(inArray(patients.rekognitionFaceId, faceIds));
+
+      return result.map(getPatientWithImageUrl);
+    }),
 });
