@@ -15,16 +15,17 @@ export default function MatchingPatients({
   imgDetails: string;
   setMode: React.Dispatch<React.SetStateAction<Mode>>;
 }) {
-  const abcQuery = trpc.patientsRouter.abc.useMutation();
+  const searchPatientsByPictureQuery =
+    trpc.patientsRouter.searchPatientsByPicture.useMutation();
   useEffect(() => {
     if (imgDetails) {
-      abcQuery.mutate({ picture: imgDetails });
+      searchPatientsByPictureQuery.mutate({ picture: imgDetails });
     }
     // suppress the warning about missing dependencies because we only want to run this effect when imgDetails changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imgDetails]);
 
-  if (abcQuery.isError) {
+  if (searchPatientsByPictureQuery.isError) {
     return (
       <div className="flex-col">
         <h2 className="text-xl font-bold mb-4 text-center py-10">
@@ -35,7 +36,7 @@ export default function MatchingPatients({
     );
   }
 
-  if (abcQuery.isIdle) {
+  if (searchPatientsByPictureQuery.isIdle) {
     return (
       <div className="flex-col">
         <h2 className="text-xl font-bold mb-4 text-center py-10">
@@ -45,13 +46,13 @@ export default function MatchingPatients({
     );
   }
 
-  if (abcQuery.isPending) {
+  if (searchPatientsByPictureQuery.isPending) {
     return (
       <LoadingSpinner message="Finding face matches..." className="p-12" />
     );
   }
 
-  if (abcQuery.data.length === 0) {
+  if (searchPatientsByPictureQuery.data.length === 0) {
     return (
       <div className="flex-col">
         <h2 className="text-xl font-bold mb-4 text-center py-10">
@@ -72,7 +73,7 @@ export default function MatchingPatients({
       <table className="min-w-full divide-y divide-slate-200">
         <TableHeader headers={["ID", "Photo", "Full Name", "Actions"]} />
         <tbody className="bg-white divide-y divide-slate-200">
-          {abcQuery.data.map((patient) => (
+          {searchPatientsByPictureQuery.data.map((patient) => (
             <TableRow key={patient.id}>
               <TableCell>
                 <div className="text-sm font-medium text-slate-900">
