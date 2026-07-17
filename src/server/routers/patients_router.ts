@@ -6,7 +6,7 @@ import { db } from "@/db/drizzle";
 import { patients, genderEnum, visits, villageCodes } from "@/db/schema";
 import serverEnv from "@/lib/envVariables";
 import { TRPCError } from "@trpc/server";
-import { eq, desc, inArray } from "drizzle-orm";
+import { eq, desc, inArray, isNotNull } from "drizzle-orm";
 import {
   generateFaceprint,
   searchFaceprint,
@@ -89,8 +89,9 @@ export const patientsRouter = router({
       .from(patients)
       .leftJoin(latestVisit, eq(latestVisit.patientId, patients.id))
       .leftJoin(villageCodes, eq(villageCodes.id, latestVisit.villageCodeId))
-      // Most recent visit on top
-      .orderBy(desc(latestVisit.date));
+      // Patients with a visit first (isNotNull true sorts before false), then
+      // most recent visit on top; visit-less patients sink to the bottom.
+      .orderBy(desc(isNotNull(latestVisit.date)), desc(latestVisit.date));
 
     return result.map(getPatientWithImageUrl);
   }),
