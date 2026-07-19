@@ -9,37 +9,8 @@ import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import { ReactNode } from "react";
-import { formatPatientCode } from "@/lib/utils/patient";
-import { PatientsRouterListItem } from "@/utils/trpc-types";
-
-/**
- * Renders a patient's code with a small dot in the village colour beside it.
- * The dot is omitted when the patient has no village.
- */
-function PatientCode({
-  villageCode,
-  villageColorHex,
-  id,
-  className = "",
-}: {
-  villageCode: string | null;
-  villageColorHex: string | null;
-  id: number;
-  className?: string;
-}) {
-  return (
-    <span className={`inline-flex items-center gap-2 ${className}`}>
-      {villageColorHex && (
-        <span
-          className="h-3 w-3 rounded-full"
-          style={{ backgroundColor: villageColorHex }}
-          title={villageCode ?? undefined}
-        />
-      )}
-      {formatPatientCode(villageCode, id)}
-    </span>
-  );
-}
+import { PatientsRouterListWithLatestVisitItem } from "@/utils/trpc-types";
+import { PatientCode } from "@/components/PatientCode";
 
 function UpdateGlassesButton({ onClick }: { onClick: () => void }) {
   return (
@@ -62,7 +33,7 @@ function PatientCard({
   patient,
   onUpdateGlasses,
 }: {
-  patient: PatientsRouterListItem;
+  patient: PatientsRouterListWithLatestVisitItem;
   onUpdateGlasses: (patientId: number) => void;
 }) {
   return (
@@ -94,7 +65,7 @@ function PatientTable({
   patients,
   onUpdateGlasses,
 }: {
-  patients: PatientsRouterListItem[];
+  patients: PatientsRouterListWithLatestVisitItem[];
   onUpdateGlasses: (patientId: number) => void;
 }) {
   return (
@@ -161,7 +132,7 @@ function VisionPage() {
     data: patients,
     isLoading,
     isError,
-  } = trpc.patientsRouter.list.useQuery();
+  } = trpc.patientsRouter.listWithLatestVisit.useQuery();
 
   /**
    * Navigates to the update glasses page for a specific patient.
