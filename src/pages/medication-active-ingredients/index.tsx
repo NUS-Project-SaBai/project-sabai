@@ -12,6 +12,7 @@ import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import toast from "react-hot-toast";
 import EditableCell from "@/components/interactive/EditableCell";
 import { Button } from "@/components/interactive/Button/Button";
+import { positiveNumberOptions } from "@/lib/utils/medication";
 
 type EditFormFields = {
   id: number;
@@ -81,14 +82,7 @@ function Header() {
                     name="fallBelow"
                     label="Fall below"
                     type="number"
-                    registerOptions={{
-                      valueAsNumber: true,
-                      min: {
-                        value: 1,
-                        message: "Please input only positive values.",
-                      },
-                      required: true,
-                    }}
+                    registerOptions={positiveNumberOptions}
                   />
                   <div className="flex flex-row gap-2">
                     <Button
@@ -278,14 +272,7 @@ function Row(ingredient: MedicationActiveIngredient) {
               type="number"
               value={form.getValues().fallBelow}
               label=""
-              registerOptions={{
-                valueAsNumber: true,
-                min: {
-                  value: 1,
-                  message: "Please input only positive values.",
-                },
-                required: true,
-              }}
+              registerOptions={positiveNumberOptions}
             />
           </span>
         </TableCell>
