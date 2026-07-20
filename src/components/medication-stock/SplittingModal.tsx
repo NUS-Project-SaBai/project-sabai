@@ -5,6 +5,7 @@ import {
 } from "@/lib/utils/medication-stock";
 import { Button } from "@/components/interactive/Button/Button";
 import { useState } from "react";
+import { medicationStatusValues } from "@/db/schema";
 
 export default function SplittingModal({
   onClose,
@@ -73,17 +74,21 @@ export default function SplittingModal({
             ></input>
             <select
               value={split.stockStatus!}
-              onChange={(e) =>
+              onChange={(e) => {
                 setSplits(
                   splits.map((item, itemIndex) =>
                     itemIndex === index
-                      ? { ...item, stockStatus: e.target.value as StockStatus }
+                      ? {
+                          ...item,
+                          stockStatus: e.target
+                            .value as StockStatus,
+                        }
                       : item,
                   ),
-                )
-              }
+                );
+              }}
             >
-              {Object.values(StockStatus).map((status) => (
+              {medicationStatusValues.map((status) => (
                 <option key={status}>{status}</option>
               ))}
             </select>

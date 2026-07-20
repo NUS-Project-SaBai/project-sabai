@@ -27,6 +27,8 @@ export const medicationStatusEnum = pgEnum("medication_status", [
   "expired",
 ]);
 
+export const medicationStatusValues = medicationStatusEnum.enumValues;
+
 // Define tables
 
 /*

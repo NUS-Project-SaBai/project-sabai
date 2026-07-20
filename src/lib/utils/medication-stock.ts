@@ -1,13 +1,10 @@
 import { MedicationStock } from "@/db/schema";
 
-export enum StockStatus {
-  ACTIVE = "active",
-  DISPOSED = "disposed",
-  DONATED = "donated",
-  EXPIRED = "expired",
-}
+import { medicationStatusValues } from "@/db/schema";
 
-export const stockStatusDropdown = Object.values(StockStatus).map((status) => ({
+export type StockStatus = typeof medicationStatusValues[number];
+
+export const stockStatusDropdown = medicationStatusValues.map((status) => ({
   label: status,
   value: status,
 }));
