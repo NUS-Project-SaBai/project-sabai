@@ -80,8 +80,7 @@ export default function SplittingModal({
                     itemIndex === index
                       ? {
                           ...item,
-                          stockStatus: e.target
-                            .value as StockStatus,
+                          stockStatus: e.target.value as StockStatus,
                         }
                       : item,
                   ),
@@ -120,7 +119,7 @@ export default function SplittingModal({
         title="Confirm"
         colour="emerald"
         onClick={() => console.log(splits)}
-        // onClick: validate parent qty === sum(all child qty) here, then bulk mutate
+        // TODO(separate PR): validate parent qty === sum(all child qty), then bulk mutate the splits
       />
     </Modal>
   );
