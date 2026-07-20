@@ -1,9 +1,169 @@
 {
-  "id": "f447a840-00b2-4f76-8541-ff81dbe8e645",
-  "prevId": "6e4913f1-409f-4ab0-8559-abb61e133764",
+  "id": "211e12dd-c4fd-4d3b-b951-ee6c5f9fcc40",
+  "prevId": "8e436c93-668e-4adc-97fd-1a785809bb6d",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "auth.users": {
+      "name": "users",
+      "schema": "auth",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.consults": {
+      "name": "consults",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "past_medical_history": {
+          "name": "past_medical_history",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "consultation": {
+          "name": "consultation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "treatment_plan": {
+          "name": "treatment_plan",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "remarks": {
+          "name": "remarks",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "doctor_id": {
+          "name": "doctor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "visit_id": {
+          "name": "visit_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "consults_doctor_id_users_id_fk": {
+          "name": "consults_doctor_id_users_id_fk",
+          "tableFrom": "consults",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "doctor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "consults_visit_id_visits_id_fk": {
+          "name": "consults_visit_id_visits_id_fk",
+          "tableFrom": "consults",
+          "tableTo": "visits",
+          "columnsFrom": [
+            "visit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.diagnosis": {
+      "name": "diagnosis",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "details": {
+          "name": "details",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "consult_id": {
+          "name": "consult_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "diagnosis_consult_id_consults_id_fk": {
+          "name": "diagnosis_consult_id_consults_id_fk",
+          "tableFrom": "diagnosis",
+          "tableTo": "consults",
+          "columnsFrom": [
+            "consult_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.eyesight": {
       "name": "eyesight",
       "schema": "",
@@ -335,6 +495,119 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.puberty": {
+      "name": "puberty",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "pubarche": {
+          "name": "pubarche",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pubarche_age": {
+          "name": "pubarche_age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "thelarche": {
+          "name": "thelarche",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "thelarche_age": {
+          "name": "thelarche_age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "menarche": {
+          "name": "menarche",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "menarche_age": {
+          "name": "menarche_age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "voice_change": {
+          "name": "voice_change",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "voice_change_age": {
+          "name": "voice_change_age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "testicular_growth": {
+          "name": "testicular_growth",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "testicular_growth_age": {
+          "name": "testicular_growth_age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "additional_notes": {
+          "name": "additional_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vital_id": {
+          "name": "vital_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "puberty_vital_id_vitals_id_fk": {
+          "name": "puberty_vital_id_vitals_id_fk",
+          "tableFrom": "puberty",
+          "tableTo": "vitals",
+          "columnsFrom": [
+            "vital_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "puberty_vital_id_unique": {
+          "name": "puberty_vital_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "vital_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

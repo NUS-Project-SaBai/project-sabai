@@ -1,17 +1,26 @@
+import clsx from "clsx";
+
 /**
  * A loading spinner component with animated SVG and customizable message.
  *
  * @param {string} message - The text message to display below the spinner
+ * @param {string} className - The className of the LoadingSpinner
  *
  * @example
  * ```tsx
- * <LoadingSpinner message="Loading patient data..." />
+ * <LoadingSpinner message="Loading patient data..." className="p-12"/>
  * ```
  */
-export default function LoadingSpinner({ message }: { message: string }) {
+export default function LoadingSpinner({
+  message,
+  className,
+}: {
+  message: string;
+  className?: string;
+}) {
   return (
     <div
-      className="p-12 text-center text-slate-500"
+      className={clsx("text-center text-slate-500", className)}
       data-testid="loading-spinner"
     >
       <svg
