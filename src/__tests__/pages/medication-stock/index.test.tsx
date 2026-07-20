@@ -164,6 +164,10 @@ describe("MedicationStockPage", () => {
       },
     );
 
+    mockTrpc.medicationStockRouter.create.useMutation.mockReturnValue({
+      isPending: false,
+    });
+
     render(
       <>
         <MedicationStockBasePage />
@@ -234,6 +238,10 @@ describe("MedicationStockPage", () => {
         isLoading: false,
       },
     );
+
+    mockTrpc.medicationStockRouter.create.useMutation.mockReturnValue({
+      isPending: false,
+    });
 
     render(
       <>
