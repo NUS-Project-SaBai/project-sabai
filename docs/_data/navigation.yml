@@ -1,0 +1,17 @@
+main:
+  - title: "Documentation"
+    url: /docs/
+# documentation links
+docs:
+  - title: "Getting Started"
+    children:
+      - title: "Developer Guide"
+        url: /docs/developer-guide/
+      - title: "Contributing to Documentation"
+        url: /docs/contributing-to-documentation/
+  - title: "Backend Code"
+    children:
+      - title: "Drizzle ORM"
+        url: /docs/drizzle-orm/
+      - title: "trpc"
+        url: /docs/trpc/
