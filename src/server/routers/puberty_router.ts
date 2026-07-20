@@ -9,67 +9,70 @@ import { puberty } from "@/db/schema";
  * and reduce code duplication across different procedures.
  */
 const selectPubertyFields = {
-    id: puberty.id,
-    pubarche: puberty.pubarche,
-    pubarcheAge: puberty.pubarcheAge,
-    thelarche: puberty.thelarche,
-    thelarcheAge: puberty.thelarcheAge,
-    menarche: puberty.menarche,
-    menarcheAge: puberty.menarcheAge,
-    voiceChange: puberty.voiceChange,
-    voiceChangeAge: puberty.voiceChangeAge,
-    testicularGrowth: puberty.testicularGrowth,
-    testicularGrowthAge: puberty.testicularGrowthAge,
-    additionalNotes: puberty.additionalNotes,
-    vitalId: puberty.vitalId,
-}
+  id: puberty.id,
+  pubarche: puberty.pubarche,
+  pubarcheAge: puberty.pubarcheAge,
+  thelarche: puberty.thelarche,
+  thelarcheAge: puberty.thelarcheAge,
+  menarche: puberty.menarche,
+  menarcheAge: puberty.menarcheAge,
+  voiceChange: puberty.voiceChange,
+  voiceChangeAge: puberty.voiceChangeAge,
+  testicularGrowth: puberty.testicularGrowth,
+  testicularGrowthAge: puberty.testicularGrowthAge,
+  additionalNotes: puberty.additionalNotes,
+  vitalId: puberty.vitalId,
+};
 
 /**
  * Input validation schema for creating puberty records.
  */
 const createPubertyInput = z.object({
-    pubarche: z.boolean().optional(),
-    pubarcheAge: z.number().int().optional(),
-    thelarche: z.boolean().optional(),
-    thelarcheAge: z.number().int().optional(),
-    menarche: z.boolean().optional(),
-    menarcheAge: z.number().int().optional(),
-    voiceChange: z.boolean().optional(),
-    voiceChangeAge: z.number().int().optional(),
-    testicularGrowth: z.boolean().optional(),
-    testicularGrowthAge: z.number().int().optional(),
-    additionalNotes: z.string().optional(),
-    vitalId: z.number().int().positive(),
+  pubarche: z.boolean().optional(),
+  pubarcheAge: z.number().int().positive().optional(),
+  thelarche: z.boolean().optional(),
+  thelarcheAge: z.number().int().positive().optional(),
+  menarche: z.boolean().optional(),
+  menarcheAge: z.number().int().positive().optional(),
+  voiceChange: z.boolean().optional(),
+  voiceChangeAge: z.number().int().positive().optional(),
+  testicularGrowth: z.boolean().optional(),
+  testicularGrowthAge: z.number().int().positive().optional(),
+  additionalNotes: z.string().optional(),
+  vitalId: z.number().int().positive(),
 });
 
 /**
  * Input validation schema for updating puberty records.
  */
 const updatePubertyInput = createPubertyInput
-    .omit({vitalId: true})
-    .partial()
-    .extend({
-        id: z.number().int().positive(),
-    });
+  .omit({ vitalId: true })
+  .partial()
+  .extend({
+    id: z.number().int().positive(),
+  });
 
 /**
  * Input validation schema for updating puberty records by vitalsId.
- */  
+ */
 const updatePubertyInputByVitalsId = createPubertyInput
-    .omit({vitalId:true}) //we want it to always be attached to the same vital object
-    .partial()
-    .extend({
-        vitalId: z.number().int().positive()
-    });
+  .omit({ vitalId: true }) //we want it to always be attached to the same vital object
+  .partial()
+  .extend({
+    vitalId: z.number().int().positive(),
+  });
 
-    export const pubertyRouter = router({
+export const pubertyRouter = router({
   /**
    * Creates a new puberty record for a vitals record.
    */
   create: protectedProcedure
     .input(createPubertyInput)
     .mutation(async ({ input }) => {
-      const [pubertyRecord] = await db.insert(puberty).values(input).returning();
+      const [pubertyRecord] = await db
+        .insert(puberty)
+        .values(input)
+        .returning();
       return pubertyRecord;
     }),
 
