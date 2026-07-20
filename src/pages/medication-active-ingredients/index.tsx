@@ -381,7 +381,7 @@ function MedicationActiveIngredientsBasePage() {
           />
           <tbody className="bg-white divide-y divide-slate-200">
             {ingredients.map((ingredient) => (
-              <Row key={ingredient.id} {...ingredient} />
+              <IngredientRow key={ingredient.id} {...ingredient} />
             ))}
           </tbody>
         </table>
@@ -391,7 +391,16 @@ function MedicationActiveIngredientsBasePage() {
 
   return (
     <div className="min-h-screen flex-1 p-8">
-      <Header />
+      <PageHeader
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Medication Stock", href: "/medication-stock" },
+          { label: "Medication Active Ingredients" },
+        ]}
+        title="Medication Active Ingredient"
+        description="Manage medication active ingredients."
+        actions={<AddIngredientModal />}
+      />
       {renderContent()}
     </div>
   );
