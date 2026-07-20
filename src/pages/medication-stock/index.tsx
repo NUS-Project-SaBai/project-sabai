@@ -1,4 +1,4 @@
-import Breadcrumbs from "@/components/Breadcrumbs";
+import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/interactive/Button/Button";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import CreateModal from "@/components/medication-stock/CreateModal";
@@ -15,19 +15,15 @@ function Header() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
 
   return (
-    <div className="w-full mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Medication Stock" },
-            ]}
-          />
-          <h1 className="text-3xl font-bold text-slate-900">
-            Medication Stock
-          </h1>
-          <p className="mt-2 text-slate-600">Manage medication stock.</p>
+    <PageHeader
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Medication Stock" },
+      ]}
+      title="Medication Stock"
+      description="Manage medication stock."
+      actions={
+        <div className="flex flex-col gap-2">
           <button
             type="submit"
             className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
@@ -50,18 +46,18 @@ function Header() {
               <span>Manage Active Ingredients</span>
             </Link>
           </button>
-        </div>
 
-        {modalIsOpen && <CreateModal setModalIsOpen={setModalIsOpen} />}
-        <Button
-          onClick={() => {
-            setModalIsOpen(true);
-          }}
-          title="Add Stock"
-          colour="indigo"
-        />
-      </div>
-    </div>
+          {modalIsOpen && <CreateModal setModalIsOpen={setModalIsOpen} />}
+          <Button
+            onClick={() => {
+              setModalIsOpen(true);
+            }}
+            title="Add Stock"
+            colour="indigo"
+          />
+        </div>
+      }
+    />
   );
 }
 

@@ -1,5 +1,5 @@
 import { trpc } from "@/utils/trpc";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import PageHeader from "@/components/PageHeader";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
@@ -49,85 +49,78 @@ function Header() {
   };
 
   return (
-    <div className="w-full mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Medication Stock", href: "/medication-stock" },
-              { label: "Medication Active Ingredients" },
-            ]}
-          />
-          <h1 className="text-3xl font-bold text-slate-900">
-            Medication Active Ingredient
-          </h1>
-          <p className="mt-2 text-slate-600">
-            Manage medication active ingredients.
-          </p>
-        </div>
-        {modalIsOpen && (
-          <Modal onClose={() => setModalIsOpen(false)}>
-            <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-4">
-              Add New Active Ingredient
-            </h2>
-            <FormProvider {...form}>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  form.handleSubmit(handleSubmit)(e);
-                }}
-              >
-                <RHFInput name="name" label="Name" type="text" />
-                <RHFInput
-                  name="unitOfMeasurement"
-                  label="Unit of Measurement"
-                  type="text"
-                />
-                <RHFInput
-                  name="fallBelow"
-                  label="Fall below"
-                  type="number"
-                  registerOptions={{
-                    valueAsNumber: true,
-                    min: {
-                      value: 1,
-                      message: "Please input only positive values.",
-                    },
-                    required: true,
+    <PageHeader
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Medication Stock", href: "/medication-stock" },
+        { label: "Medication Active Ingredients" },
+      ]}
+      title="Medication Active Ingredient"
+      description="Manage medication active ingredients."
+      actions={
+        <>
+          {modalIsOpen && (
+            <Modal onClose={() => setModalIsOpen(false)}>
+              <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-4">
+                Add New Active Ingredient
+              </h2>
+              <FormProvider {...form}>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    form.handleSubmit(handleSubmit)(e);
                   }}
-                />
-                <RHFInput name="remarks" label="Remarks" type="text" />
-                <div className="flex flex-row gap-2">
-                  <Button
-                    colour="emerald"
-                    type="submit"
-                    className="w-full"
-                    title={form.formState.isSubmitting ? "Saving..." : "Save"}
-                    disabled={form.formState.isSubmitting}
+                >
+                  <RHFInput name="name" label="Name" type="text" />
+                  <RHFInput
+                    name="unitOfMeasurement"
+                    label="Unit of Measurement"
+                    type="text"
                   />
-                  <Button
-                    colour="red"
-                    title="Cancel"
-                    className="w-full"
-                    onClick={() => {
-                      form.reset();
-                      setModalIsOpen(false);
+                  <RHFInput
+                    name="fallBelow"
+                    label="Fall below"
+                    type="number"
+                    registerOptions={{
+                      valueAsNumber: true,
+                      min: {
+                        value: 1,
+                        message: "Please input only positive values.",
+                      },
+                      required: true,
                     }}
                   />
-                </div>
-              </form>
-            </FormProvider>
-          </Modal>
-        )}
+                  <div className="flex flex-row gap-2">
+                    <Button
+                      colour="emerald"
+                      type="submit"
+                      className="w-full"
+                      title={form.formState.isSubmitting ? "Saving..." : "Save"}
+                      disabled={form.formState.isSubmitting}
+                    />
+                    <Button
+                      colour="red"
+                      title="Cancel"
+                      className="w-full"
+                      onClick={() => {
+                        form.reset();
+                        setModalIsOpen(false);
+                      }}
+                    />
+                  </div>
+                </form>
+              </FormProvider>
+            </Modal>
+          )}
 
-        <Button
-          colour="indigo"
-          onClick={() => setModalIsOpen(true)}
-          title="Add Active Ingredient"
-        />
-      </div>
-    </div>
+          <Button
+            colour="indigo"
+            onClick={() => setModalIsOpen(true)}
+            title="Add Active Ingredient"
+          />
+        </>
+      }
+    />
   );
 }
 
