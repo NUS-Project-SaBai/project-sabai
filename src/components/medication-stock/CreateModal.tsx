@@ -3,13 +3,13 @@ import toast from "react-hot-toast";
 import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
 import Modal from "@/components/interactive/Modal";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
-import clsx from "clsx";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import {
   stockStatusDropdown,
   CreateFormFields,
 } from "@/lib/utils/medication-stock";
+import { Button } from "@/components/interactive/Button/Button";
 
 export default function CreateModal({
   setModalIsOpen,
@@ -88,8 +88,10 @@ export default function CreateModal({
             <LoadingSpinner message="Loading brands with active ingredients..." />
           )}
 
-          {!brandWithActiveIngredientIsError &&
-          !brandWithActiveIngredientIsLoading ? (
+          {!(
+            brandWithActiveIngredientIsError ||
+            brandWithActiveIngredientIsLoading
+          ) ? (
             <RHFDropdown
               name="medicationBrandId"
               label="Brand + Active Ingredient"
@@ -112,28 +114,20 @@ export default function CreateModal({
             isRequired
           />
           <div className="flex flex-row gap-2">
-            <button
-              className={clsx(
-                "flex-1 text-white px-4 py-1 rounded-lg font-medium",
-                form.formState.isSubmitting
-                  ? "bg-neutral-600"
-                  : "bg-green-600 hover:bg-green-700",
-              )}
-              disabled={form.formState.isSubmitting}
+            <Button
+              colour="emerald"
+              disabled={createMutation.isPending}
               type="submit"
-            >
-              {form.formState.isSubmitting ? "Saving..." : "Save"}
-            </button>
-            <button
-              className="bg-red-700 flex-1 text-white px-4 py-1 rounded-lg font-medium hover:bg-red-800"
+              title={createMutation.isPending ? "Saving..." : "Save"}
+            />
+            <Button
+              title="Cancel"
+              colour="red"
               onClick={() => {
                 form.reset();
                 setModalIsOpen(false);
               }}
-              type="button"
-            >
-              Cancel
-            </button>
+            />
           </div>
         </form>
       </FormProvider>
