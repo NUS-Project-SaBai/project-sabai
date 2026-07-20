@@ -268,6 +268,46 @@ export type Eyesight = typeof eyesight.$inferSelect;
 export type NewEyesight = typeof eyesight.$inferInsert;
 
 /*
+Puberty Table:
+- id: Primary key, auto-incrementing integer.
+- pubarche: Whether pubarche has occurred (nullable = not assessed).
+- pubarcheAge: Age at pubarche in years.
+- thelarche: Whether thelarche has occurred.
+- thelarcheAge: Age at thelarche in years.
+- menarche: Whether menarche has occurred.
+- menarcheAge: Age at menarche in years.
+- voiceChange: Whether voice change has occurred.
+- voiceChangeAge: Age at voice change in years.
+- testicularGrowth: Whether testicular growth has occurred.
+- testicularGrowthAge: Age at testicular growth in years.
+- additionalNotes: Additional notes or observations.
+- vitalId: Foreign key referencing the vitals record (unique).
+*/
+export const puberty = pgTable("puberty", {
+  id: serial("id").primaryKey(),
+  pubarche: boolean("pubarche"),
+  pubarcheAge: integer("pubarche_age"),
+  thelarche: boolean("thelarche"),
+  thelarcheAge: integer("thelarche_age"),
+  menarche: boolean("menarche"),
+  menarcheAge: integer("menarche_age"),
+  voiceChange: boolean("voice_change"),
+  voiceChangeAge: integer("voice_change_age"),
+  testicularGrowth: boolean("testicular_growth"),
+  testicularGrowthAge: integer("testicular_growth_age"),
+  additionalNotes: text("additional_notes"),
+  vitalId: integer("vital_id")
+    .notNull()
+    .unique()
+    .references(() => vitals.id, {
+      onDelete: "cascade",
+    }),
+});
+
+export type Puberty = typeof puberty.$inferSelect;
+export type NewPuberty = typeof puberty.$inferInsert;
+
+/*
 Consults Table:
 - id: Primary key, auto-incrementing integer.
 - date: Timestamp of the consultation.
