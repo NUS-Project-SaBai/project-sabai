@@ -109,6 +109,7 @@ export default function CreateModal({
             label="Status"
             dropdownOptions={stockStatusDropdown}
             className="mb-8"
+            isRequired
           />
           <div className="flex flex-row gap-2">
             <button
