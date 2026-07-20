@@ -365,7 +365,7 @@ describe("MedicationStockPage", () => {
 
     await user.click(statusButton!);
     const stockDropdownOption = dialog.querySelector(
-      'button[name="stockStatus-1-dropdown-option"]',
+      'button[name="stockStatus-active-dropdown-option"]',
     );
     await user.click(stockDropdownOption!);
 
