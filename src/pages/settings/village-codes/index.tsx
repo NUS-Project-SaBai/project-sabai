@@ -132,7 +132,7 @@ function VillageCodesPage() {
           {mode === "editing" && (
             <ChangeModal onClose={closeModal} activeForm={activeForm} />
           )}
-          {mode === "deleting" && (
+          {mode === "deleting" && activeForm && (
             <DeleteModal onClose={closeModal} activeForm={activeForm} />
           )}
           <div className="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
