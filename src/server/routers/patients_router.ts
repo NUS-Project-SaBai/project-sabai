@@ -239,58 +239,38 @@ export const patientsRouter = router({
       return { success: !!result };
     }),
 
-  // find all matches
-  findFaceMatches: protectedProcedure
+  // searchPatientsByPicture uses AWS Rekognition to find matching patients based on a provided face image.
+  // It returns an array of patients whose rekognitionFaceId matches any of the FaceIds found in the search results.
+  // NOTE: Though this endpoint does not modify any data, it is a mutation because it receives a base64-encoded image as input, which can be large.
+  // Using a mutation allows for larger payloads compared to a query.
+  searchPatientsByPicture: protectedProcedure
     .input(z.object({ picture: z.string() }))
     .mutation(async ({ input }) => {
+      // Step 1: Search for faceprint matches using the provided picture
+      let searchFaceprintResults;
       try {
-        const res = await searchFaceprint(input.picture);
-        return { data: res };
+        searchFaceprintResults = await searchFaceprint(input.picture);
+        // If there are no matches, return an empty array
+        if (!searchFaceprintResults || searchFaceprintResults.length === 0) {
+          return [];
+        }
       } catch (err) {
-        console.error(err);
-        return { data: [] };
+        // Log the error and return an empty array if the search fails
+        console.error("error searchFaceprint:", err);
+        return [];
       }
-    }),
 
-  listMatchingPatients: protectedProcedure
-    .input(
-      z.object({
-        matches: z.array(
-          z.object({
-            Face: z
-              .object({
-                FaceId: z.string().optional(),
-                BoundingBox: z
-                  .object({
-                    Width: z.number().optional(),
-                    Height: z.number().optional(),
-                    Left: z.number().optional(),
-                    Top: z.number().optional(),
-                  })
-                  .optional(),
-                ImageId: z.string().optional(),
-                Confidence: z.number().optional(),
-                IndexFacesModelVersion: z.string().optional(),
-              })
-              .optional(),
-            Similarity: z.number().optional(),
-          }),
-        ),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      if (input.matches.length === 0) return [];
-
-      // use typescript typeguard filter to avoid inArray type errors
-      const faceIds = input.matches
+      // get the FaceIds from the search results, filtering out any undefined values
+      const faceIds = searchFaceprintResults
         .map((item) => item.Face?.FaceId)
-        .filter((id): id is string => typeof id === "string");
+        .filter((id): id is string => typeof id === "string"); // use Type Predicate to ensure TypeScript knows these are strings
 
       if (faceIds.length === 0) {
         return [];
       }
 
-      const result = await db
+      // Step 2: Query the database for patients whose rekognitionFaceId matches any of the FaceIds found
+      const matchingPatients = await db
         .select({
           id: patients.id,
           name: patients.name,
@@ -308,6 +288,6 @@ export const patientsRouter = router({
         .from(patients)
         .where(inArray(patients.rekognitionFaceId, faceIds));
 
-      return result.map(getPatientWithImageUrl);
+      return matchingPatients.map(getPatientWithImageUrl);
     }),
 });

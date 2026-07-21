@@ -25,10 +25,7 @@ vi.mock("@/utils/trpc", () => ({
       create: {
         useMutation: vi.fn(),
       },
-      findFaceMatches: {
-        useMutation: vi.fn(),
-      },
-      listMatchingPatients: {
+      searchPatientsByPicture: {
         useMutation: vi.fn(),
       },
     },
@@ -59,12 +56,15 @@ describe("ScanFacePage", () => {
     mockTrpc.patientsRouter.create.useMutation.mockReturnValue({
       mutate: vi.fn(),
     });
-    mockTrpc.patientsRouter.findFaceMatches.useMutation.mockReturnValue({
-      mutate: vi.fn(),
-    });
-    mockTrpc.patientsRouter.listMatchingPatients.useMutation.mockReturnValue({
-      mutate: vi.fn(),
-    });
+    mockTrpc.patientsRouter.searchPatientsByPicture.useMutation.mockReturnValue(
+      {
+        mutate: vi.fn(),
+        isIdle: false,
+        isPending: false,
+        isError: false,
+        data: [],
+      },
+    );
   });
 
   afterEach(() => {
@@ -300,16 +300,13 @@ describe("ScanFacePage", () => {
   it("displays a loading spinner while locating face matches", async () => {
     const user = userEvent.setup();
 
-    mockTrpc.patientsRouter.findFaceMatches.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: true,
-      mutate: vi.fn(),
-    });
-    mockTrpc.patientsRouter.listMatchingPatients.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: false,
-      mutate: vi.fn(),
-    });
+    mockTrpc.patientsRouter.searchPatientsByPicture.useMutation.mockReturnValue(
+      {
+        data: undefined,
+        isPending: true,
+        mutate: vi.fn(),
+      },
+    );
 
     render(<ScanFacePage />);
 
@@ -320,57 +317,20 @@ describe("ScanFacePage", () => {
     });
   });
 
-  it("displays a loading spinner while fetching the matching patients list", async () => {
-    const user = userEvent.setup();
-
-    mockTrpc.patientsRouter.findFaceMatches.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: false,
-      mutate: vi.fn(),
-    });
-    mockTrpc.patientsRouter.listMatchingPatients.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: true,
-      mutate: vi.fn(),
-    });
-
-    render(<ScanFacePage />);
-
-    user.click(screen.getByRole("button", { name: "Capture" }));
-
-    await waitFor(() => {
-      assertLoadingSpinner("Finding matching patients...");
-    });
-  });
-
   it("displays a message that there is no matching patients, and a button to register new patients if no matching patients", async () => {
     const user = userEvent.setup();
 
-    mockTrpc.patientsRouter.findFaceMatches.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: false,
-      mutate: vi.fn(),
-    });
-    mockTrpc.patientsRouter.listMatchingPatients.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: true,
-      mutate: vi.fn(),
-    });
+    mockTrpc.patientsRouter.searchPatientsByPicture.useMutation.mockReturnValue(
+      {
+        data: [],
+        isPending: false,
+        mutate: vi.fn(),
+      },
+    );
 
     render(<ScanFacePage />);
 
     user.click(screen.getByRole("button", { name: "Capture" }));
-
-    mockTrpc.patientsRouter.findFaceMatches.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: false,
-      mutate: vi.fn(),
-    });
-    mockTrpc.patientsRouter.listMatchingPatients.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: false,
-      mutate: vi.fn(),
-    });
 
     await waitFor(() => {
       expect(screen.getByText("No matches found")).toBeInTheDocument();
