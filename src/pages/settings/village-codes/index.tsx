@@ -128,21 +128,19 @@ function VillageCodesPage() {
             />
           </div>
         </div>
-        <div className="min-h-screen bg-slate-50 p-8">
-          <div className="max-w-5xl mx-auto">
-            {mode === "editing" && (
-              <ChangeModal onClose={closeModal} activeForm={activeForm} />
-            )}
-            {mode === "deleting" && (
-              <DeleteModal onClose={closeModal} activeForm={activeForm} />
-            )}
-            <div className="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
-              <Content
-                openEdit={openEdit}
-                openDelete={openDelete}
-                showHidden={showHidden}
-              />
-            </div>
+        <div className="max-w-5xl mx-auto">
+          {mode === "editing" && (
+            <ChangeModal onClose={closeModal} activeForm={activeForm} />
+          )}
+          {mode === "deleting" && (
+            <DeleteModal onClose={closeModal} activeForm={activeForm} />
+          )}
+          <div className="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+            <Content
+              openEdit={openEdit}
+              openDelete={openDelete}
+              showHidden={showHidden}
+            />
           </div>
         </div>
       </div>
