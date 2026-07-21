@@ -133,12 +133,14 @@ export default function ChangeModal({
             label="Code"
             type="text"
             placeholder="e.g. V001"
+            required
           />
           <RHFInput
             name="name"
             label="Name"
             type="text"
             placeholder="Central Village"
+            required
           />
           <div className="flex gap-2 mt-1 items-end mb-4">
             <RHFInput
