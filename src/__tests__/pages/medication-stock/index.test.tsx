@@ -140,7 +140,7 @@ describe("MedicationStockPage", () => {
         "Panadol",
         "Shelf 1",
         "200",
-        "5/21/2026",
+        "21/05/2026",
         "active",
         "EditSplit",
       ],
