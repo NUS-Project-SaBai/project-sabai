@@ -15,37 +15,40 @@ function Header() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
 
   return (
-    <PageHeader
-      breadcrumbs={[
-        { label: "Home", href: "/" },
-        { label: "Medication Stock" },
-      ]}
-      title="Medication Stock"
-      description="Manage medication stock."
-    >
-      <button
-        type="submit"
-        className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
-      >
-        <Link
-          href="/medication-brands"
-          className="group flex items-center p-2 rounded-md"
+    <>
+      <PageHeader
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Medication Stock" },
+        ]}
+        title="Medication Stock"
+        description="Manage medication stock."
+      />
+      <div className="mb-8">
+        <button
+          type="submit"
+          className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
         >
-          <span>Manage Brands</span>
-        </Link>
-      </button>
-      <button
-        type="submit"
-        className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
-      >
-        <Link
-          href="/medication-active-ingredients"
-          className="group flex items-center p-2 rounded-md"
+          <Link
+            href="/medication-brands"
+            className="group flex items-center p-2 rounded-md"
+          >
+            <span>Manage Brands</span>
+          </Link>
+        </button>
+        <button
+          type="submit"
+          className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
         >
-          <span>Manage Active Ingredients</span>
-        </Link>
-      </button>
-    </PageHeader>
+          <Link
+            href="/medication-active-ingredients"
+            className="group flex items-center p-2 rounded-md"
+          >
+            <span>Manage Active Ingredients</span>
+          </Link>
+        </button>
+      </div>
+    </>
   );
 }
 

@@ -6,7 +6,6 @@ interface PageHeaderProps {
   title: string;
   description: string;
   actions?: ReactNode;
-  children?: ReactNode;
 }
 
 export default function PageHeader({
@@ -14,7 +13,6 @@ export default function PageHeader({
   title,
   description,
   actions,
-  children,
 }: PageHeaderProps) {
   return (
     <div className="w-full mx-auto">
@@ -23,7 +21,6 @@ export default function PageHeader({
           <Breadcrumbs items={breadcrumbs} />
           <h1 className="text-3xl font-bold text-slate-900">{title}</h1>
           <p className="mt-2 text-slate-600">{description}</p>
-          {children}
         </div>
         {actions}
       </div>
