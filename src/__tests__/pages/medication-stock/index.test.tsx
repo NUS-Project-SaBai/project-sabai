@@ -321,7 +321,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.create.useMutation.mockImplementation(
-      ({ onSuccess }) => {
+      ({ onSuccess }: { onSuccess: () => void }) => {
         return {
           mutate: vi.fn(() => {
             onSuccess?.();
