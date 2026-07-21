@@ -22,6 +22,19 @@ export default function SplittingModal({
     setSplits(splits.filter((item, index) => index !== remove));
   }
 
+  function updateSplit(index: number, patch: object) {
+    const newSplits = splits.map((item, itemIndex) =>
+      itemIndex === index
+        ? {
+            ...item,
+            ...patch,
+          }
+        : item,
+    );
+
+    setSplits(newSplits!);
+  }
+
   return (
     <Modal onClose={onClose}>
       <h2 className="text-xl font-bold mb-4">Split Stock</h2>
@@ -62,29 +75,14 @@ export default function SplittingModal({
             <input
               type="text"
               value={split.location ? split.location : ""}
-              onChange={(e) =>
-                setSplits(
-                  splits.map((item, itemIndex) =>
-                    itemIndex === index
-                      ? { ...item, location: e.target.value }
-                      : item,
-                  ),
-                )
-              }
+              onChange={(e) => updateSplit(index, { location: e.target.value })}
             ></input>
             <select
               value={split.stockStatus!}
               onChange={(e) => {
-                setSplits(
-                  splits.map((item, itemIndex) =>
-                    itemIndex === index
-                      ? {
-                          ...item,
-                          stockStatus: e.target.value as StockStatus,
-                        }
-                      : item,
-                  ),
-                );
+                updateSplit(index, {
+                  stockStatus: e.target.value as StockStatus,
+                });
               }}
             >
               {medicationStatusValues.map((status) => (
@@ -96,13 +94,7 @@ export default function SplittingModal({
               value={split.quantity}
               min="1"
               onChange={(e) =>
-                setSplits(
-                  splits.map((item, itemIndex) =>
-                    itemIndex === index
-                      ? { ...item, quantity: parseInt(e.target.value) }
-                      : item,
-                  ),
-                )
+                updateSplit(index, { quantity: parseInt(e.target.value) })
               }
             />
           </div>
