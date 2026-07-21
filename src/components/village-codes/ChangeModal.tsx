@@ -43,6 +43,7 @@ export default function ChangeModal({
   const form = useForm<FormFields>({
     values: currentValues,
   });
+  const { isDirty } = form.formState;
 
   const watchedColor = useWatch({
     name: "colorHex",
@@ -105,8 +106,7 @@ export default function ChangeModal({
   };
 
   const handleEdit = async (data: FormFields) => {
-    const numDirtyFields = Object.keys(form.formState.dirtyFields).length;
-    if (form.formState.isDirty || numDirtyFields > 0) {
+    if (isDirty) {
       updateMutation.mutate({
         ...data,
         id: activeForm!.id!, // Non-null assertion operator because handleEdit only gets called by handleSubmit which already does the check
@@ -133,14 +133,12 @@ export default function ChangeModal({
             label="Code"
             type="text"
             placeholder="e.g. V001"
-            defaultValue={DEFAULT_FORM.code}
           />
           <RHFInput
             name="name"
             label="Name"
             type="text"
             placeholder="Central Village"
-            defaultValue={DEFAULT_FORM.name}
           />
           <div className="flex gap-2 mt-1 items-end mb-4">
             <RHFInput
@@ -148,7 +146,6 @@ export default function ChangeModal({
               label="Color"
               type="color"
               className="w-full"
-              defaultValue={DEFAULT_FORM.colorHex}
             />
             <input
               id="color-value"
