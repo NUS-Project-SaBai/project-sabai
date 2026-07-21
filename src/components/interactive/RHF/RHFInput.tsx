@@ -13,7 +13,14 @@ type RHFInputProps = {
     HTMLDivElement
   >["className"];
   registerOptions?: RegisterOptions;
-  type: "text" | "email" | "password" | "number" | "date" | "checkbox";
+  type:
+    | "text"
+    | "email"
+    | "password"
+    | "number"
+    | "date"
+    | "color"
+    | "checkbox";
 } & DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 /**
@@ -30,7 +37,7 @@ type RHFInputProps = {
  * @param {boolean} [isRequired=false] - Whether the field is required for form submission
  * @param {string} [className=""] - Additional CSS classes to apply to the wrapper div
  * @param {RegisterOptions} [registerOptions={}] - Additional React Hook Form register options
- * @param {"text" | "email" | "password" | "number" | "date" | "checkbox"} type - The HTML input type, use RHFRadio for radio input, and Button type="submit" for submit buttons
+ * @param {"text" | "email" | "password" | "number" | "date" | "checkbox" | "color"} type - The HTML input type, use RHFRadio for radio input, and Button type="submit" for submit buttons
  * @param {HTMLInputElement} [props] - Additional HTML input element attributes
  *
  * @example
@@ -107,6 +114,7 @@ export function RHFInput({
           "border border-gray-300 rounded bg-white px-3 py-2 transition focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400",
           fieldError &&
             "border-red-400 focus:ring-red-300 focus:border-red-400",
+          type === "color" && "h-10",
         ])}
       />
 
