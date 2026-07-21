@@ -9,7 +9,6 @@ import { Toaster, toast } from "react-hot-toast";
 import ScanFacePage from "@/pages/scan-face";
 import Webcam from "react-webcam";
 import { VillageCodeProvider } from "@/lib/context/VillageCodeContext";
-import { useState } from "react";
 
 // Mock tRPC
 vi.mock("@/utils/trpc", () => ({
