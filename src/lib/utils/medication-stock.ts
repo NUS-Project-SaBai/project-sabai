@@ -2,7 +2,7 @@ import { MedicationStock } from "@/db/schema";
 
 import { medicationStatusValues } from "@/db/schema";
 
-export type StockStatus = typeof medicationStatusValues[number];
+export type StockStatus = (typeof medicationStatusValues)[number];
 
 export const stockStatusDropdown = medicationStatusValues.map((status) => ({
   label: status,
