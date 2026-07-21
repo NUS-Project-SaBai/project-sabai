@@ -22,42 +22,30 @@ function Header() {
       ]}
       title="Medication Stock"
       description="Manage medication stock."
-      actions={
-        <div className="flex flex-col gap-2">
-          <button
-            type="submit"
-            className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
-          >
-            <Link
-              href="/medication-brands"
-              className="group flex items-center p-2 rounded-md"
-            >
-              <span>Manage Brands</span>
-            </Link>
-          </button>
-          <button
-            type="submit"
-            className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
-          >
-            <Link
-              href="/medication-active-ingredients"
-              className="group flex items-center p-2 rounded-md"
-            >
-              <span>Manage Active Ingredients</span>
-            </Link>
-          </button>
-
-          {modalIsOpen && <CreateModal setModalIsOpen={setModalIsOpen} />}
-          <Button
-            onClick={() => {
-              setModalIsOpen(true);
-            }}
-            title="Add Stock"
-            colour="indigo"
-          />
-        </div>
-      }
-    />
+    >
+      <button
+        type="submit"
+        className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
+      >
+        <Link
+          href="/medication-brands"
+          className="group flex items-center p-2 rounded-md"
+        >
+          <span>Manage Brands</span>
+        </Link>
+      </button>
+      <button
+        type="submit"
+        className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
+      >
+        <Link
+          href="/medication-active-ingredients"
+          className="group flex items-center p-2 rounded-md"
+        >
+          <span>Manage Active Ingredients</span>
+        </Link>
+      </button>
+    </PageHeader>
   );
 }
 
