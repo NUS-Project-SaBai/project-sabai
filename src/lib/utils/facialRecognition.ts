@@ -10,6 +10,8 @@ import {
 } from "@aws-sdk/client-rekognition";
 import env from "@/lib/envVariables";
 
+const client: RekognitionClient = new RekognitionClient();
+
 /**
  * Indexes faces in the AWS Collection.
  * @param str Base64 encoded string of an image
@@ -22,7 +24,6 @@ export async function generateFaceprint(str: string) {
     Image: image,
   };
 
-  const client: RekognitionClient = new RekognitionClient();
   const command = new IndexFacesCommand(input);
 
   try {
@@ -45,7 +46,6 @@ export async function searchFaceprint(str: string) {
     Image: image,
     // Keep the other attributes as default
   };
-  const client: RekognitionClient = new RekognitionClient();
   const command = new SearchFacesByImageCommand(input);
   try {
     const results: SearchFacesByImageCommandOutput = await client.send(command);

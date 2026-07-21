@@ -18,12 +18,9 @@ export default function MatchingPatients({
   const searchPatientsByPictureQuery =
     trpc.patientsRouter.searchPatientsByPicture.useMutation();
   useEffect(() => {
-    if (imgDetails) {
-      searchPatientsByPictureQuery.mutate({ picture: imgDetails });
-    }
-    // suppress the warning about missing dependencies because we only want to run this effect when imgDetails changes
+    findFaceMatchMutation.mutate({ picture: imgDetails! });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [imgDetails]);
+  }, [imgDetails]); // suppress warning about missing dependencies because we only want to run this effect when imgDetails changes
 
   if (searchPatientsByPictureQuery.isError) {
     return (

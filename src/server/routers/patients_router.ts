@@ -6,7 +6,7 @@ import { db } from "@/db/drizzle";
 import { patients, genderEnum, visits, villageCodes } from "@/db/schema";
 import serverEnv from "@/lib/envVariables";
 import { TRPCError } from "@trpc/server";
-import { eq, desc, inArray } from "drizzle-orm";
+import { eq, desc, inArray, isNotNull } from "drizzle-orm";
 import {
   generateFaceprint,
   searchFaceprint,
@@ -34,13 +34,36 @@ const getPatientWithImageUrl = <
 });
 
 export const patientsRouter = router({
-  // List all patients with village details
+  // List all of patients (no visit data)
   list: protectedProcedure.query(async () => {
-    // A patient's village is taken from their most recent visit. DISTINCT ON keeps one row per patient, the latest by visit date.
+    const result = await db
+      .select({
+        id: patients.id,
+        name: patients.name,
+        identificationNumber: patients.identificationNumber,
+        contactNo: patients.contactNo,
+        gender: patients.gender,
+        dateOfBirth: patients.dateOfBirth,
+        hasPoorCard: patients.hasPoorCard,
+        hasBS2Card: patients.hasBS2Card,
+        drugAllergy: patients.drugAllergy,
+        hasSabaiCard: patients.hasSabaiCard,
+        patientImagePublicId: patients.patientImagePublicId,
+        rekognitionFaceId: patients.rekognitionFaceId,
+      })
+      .from(patients);
+
+    return result.map(getPatientWithImageUrl);
+  }),
+
+  // List all patients, along with village info from their most recent visit
+  listWithLatestVisit: protectedProcedure.query(async () => {
+    // DISTINCT ON keeps one row per patient, the latest by visit date
     const latestVisit = db
       .selectDistinctOn([visits.patientId], {
         patientId: visits.patientId,
         villageCodeId: visits.villageCodeId,
+        date: visits.date,
       })
       .from(visits)
       .orderBy(visits.patientId, desc(visits.date))
@@ -65,7 +88,10 @@ export const patientsRouter = router({
       })
       .from(patients)
       .leftJoin(latestVisit, eq(latestVisit.patientId, patients.id))
-      .leftJoin(villageCodes, eq(villageCodes.id, latestVisit.villageCodeId));
+      .leftJoin(villageCodes, eq(villageCodes.id, latestVisit.villageCodeId))
+      // Patients with a visit first (isNotNull true sorts before false), then
+      // most recent visit on top; visit-less patients sink to the bottom.
+      .orderBy(desc(isNotNull(latestVisit.date)), desc(latestVisit.date));
 
     return result.map(getPatientWithImageUrl);
   }),
