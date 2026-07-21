@@ -9,7 +9,7 @@ export default function DeleteModal({
   onClose,
 }: {
   onClose: () => void;
-  activeForm: FormFields | null;
+  activeForm: FormFields;
 }) {
   const utils = trpc.useUtils();
   const deleteMutation = trpc.villageCodesRouter.delete.useMutation({
