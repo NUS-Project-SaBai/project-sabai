@@ -32,7 +32,7 @@ export default function SplittingModal({
         : item,
     );
 
-    setSplits(newSplits!);
+    setSplits(newSplits);
   }
 
   return (
