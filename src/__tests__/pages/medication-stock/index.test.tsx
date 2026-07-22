@@ -15,7 +15,7 @@ import {
   assertTableContents,
 } from "@/__tests__/utils/helper-functions";
 
-const mockStock = [
+const MOCK_STOCK = [
   {
     id: 1,
     medicationBrandId: 1,
@@ -64,7 +64,7 @@ describe("MedicationStockPage", () => {
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockImplementation(
       () => ({
-        data: mockStock,
+        data: MOCK_STOCK,
         isLoading: false,
       }),
     );
@@ -116,7 +116,7 @@ describe("MedicationStockPage", () => {
   it("displays stock in table", async () => {
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
-        data: mockStock,
+        data: MOCK_STOCK,
         isLoading: false,
       },
     );
@@ -152,7 +152,7 @@ describe("MedicationStockPage", () => {
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
-        data: mockStock,
+        data: MOCK_STOCK,
         isLoading: false,
       },
     );
@@ -188,7 +188,7 @@ describe("MedicationStockPage", () => {
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
-        data: mockStock,
+        data: MOCK_STOCK,
         isLoading: false,
       },
     );
@@ -221,7 +221,7 @@ describe("MedicationStockPage", () => {
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
-        data: mockStock,
+        data: MOCK_STOCK,
         isLoading: false,
       },
     );
@@ -302,7 +302,7 @@ describe("MedicationStockPage", () => {
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
-        data: mockStock,
+        data: MOCK_STOCK,
         isLoading: false,
       },
     );
