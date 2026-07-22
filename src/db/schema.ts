@@ -363,12 +363,12 @@ export type NewDiagnosis = typeof diagnosis.$inferInsert;
 /*
 Referrals Table:
 - id: Primary key, auto-incrementing integer.
-- referredFor: The reason/specialty the patient is referred for (the "why").
-- referredTo: The destination the patient is referred to, e.g. hospital/department/provider (the "where").
-- referralNotes: Free-text notes about the referral.
+- referredFor: The reason that the patient is referred for.
+- referredTo: The destination clinic that the patient is referred to
+- referralNotes: Free-text notes about the referral notes
 - referralState: Lifecycle state of the referral (e.g. 'pending', 'completed', 'cancelled').
-- referralOutcome: Free-text result of the referral.
-- consultId: Foreign key referencing the consult. Referral cannot be deleted out from under a consult (restrict).
+- referralOutcome: Free-text result of the referral outcome
+- consultId: Foreign key referencing the consult. Referral cannot be deleted out from under a consult (restrict). Deleting a consult that still have referrals should be blocked
 - createdAt: Timestamp of when the referral was created.
 */
 export const referrals = pgTable("referrals", {
