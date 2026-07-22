@@ -2,7 +2,6 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { Button } from "@/components/interactive/Button/Button";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import CreateModal from "@/components/medication-stock/CreateModal";
-import EditingModal from "@/components/medication-stock/EditingModal";
 import SplittingModal from "@/components/medication-stock/SplittingModal";
 import TableCell from "@/components/TableCell";
 import TableHeader from "@/components/TableHeader";
@@ -102,7 +101,8 @@ function MedicationStockBasePage() {
             stock={splittingStock}
           />
         )}
-        {isEditing && <EditingModal />}
+        {isEditing && <span>editing</span>}
+        {/* TODO: Implement stock editing, placeholder for now*/}
         <table className="min-w-full divide-y divide-slate-200">
           <TableHeader
             headers={[
