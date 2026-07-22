@@ -26,6 +26,11 @@ export const medicationStatusEnum = pgEnum("medication_status", [
   "donated",
   "expired",
 ]);
+export const referralStateEnum = pgEnum("referral_state", [
+  "pending",
+  "completed",
+  "cancelled",
+]);
 
 // Define tables
 
@@ -354,6 +359,35 @@ export const diagnosis = pgTable("diagnosis", {
 
 export type Diagnosis = typeof diagnosis.$inferSelect;
 export type NewDiagnosis = typeof diagnosis.$inferInsert;
+
+/*
+Referrals Table:
+- id: Primary key, auto-incrementing integer.
+- referredFor: The reason/specialty the patient is referred for (the "why").
+- referredTo: The destination the patient is referred to, e.g. hospital/department/provider (the "where").
+- referralNotes: Free-text notes about the referral.
+- referralState: Lifecycle state of the referral (e.g. 'pending', 'completed', 'cancelled').
+- referralOutcome: Free-text result of the referral.
+- consultId: Foreign key referencing the consult. Referral cannot be deleted out from under a consult (restrict).
+- createdAt: Timestamp of when the referral was created.
+*/
+export const referrals = pgTable("referrals", {
+  id: serial("id").primaryKey(),
+  referredFor: text("referred_for").notNull(),
+  referredTo: text("referred_to"),
+  referralNotes: text("referral_notes"),
+  referralState: referralStateEnum("referral_state").default("pending"),
+  referralOutcome: text("referral_outcome"),
+  consultId: integer("consult_id")
+    .notNull()
+    .references(() => consults.id, {
+      onDelete: "restrict",
+    }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type Referral = typeof referrals.$inferSelect;
+export type NewReferral = typeof referrals.$inferInsert;
 
 // todo: medication_log table (after users table done)
 // todo: medication_review table (after users table done)
