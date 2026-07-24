@@ -47,6 +47,13 @@ describe("visualAcuitySchema", () => {
     expect(visualAcuitySchema.safeParse(input).success).toBe(false);
   });
 
+  it("normalizes low-vision codes to uppercase", () => {
+    expect(visualAcuitySchema.parse("cf")).toBe("CF");
+    expect(visualAcuitySchema.parse("nlp")).toBe("NLP");
+    expect(visualAcuitySchema.parse(" lp ")).toBe("LP"); // trims too
+    expect(visualAcuitySchema.parse("6/9 +2")).toBe("6/9 +2"); // numeric unchanged
+  });
+
   it("treats empty string as not recorded (valid)", () => {
     expect(visualAcuitySchema.safeParse("").success).toBe(true);
   });
@@ -58,7 +65,16 @@ describe("visualAcuitySchema", () => {
 
 describe("pinholeSchema", () => {
   it("accepts every acuity value the degree fields accept", () => {
-    for (const v of ["6/6", "6/60", "6/120", "6/9 +2", "CF", "HM", "LP", "NLP"]) {
+    for (const v of [
+      "6/6",
+      "6/60",
+      "6/120",
+      "6/9 +2",
+      "CF",
+      "HM",
+      "LP",
+      "NLP",
+    ]) {
       expect(pinholeSchema.safeParse(v).success).toBe(true);
     }
   });

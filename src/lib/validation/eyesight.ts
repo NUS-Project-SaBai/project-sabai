@@ -22,7 +22,13 @@ export const PINHOLE_REGEX = new RegExp(`^(${ACUITY_PATTERN}|NI)$`, "i");
 
 // Optional, trimmed string field; empty string means "not recorded".
 const optionalField = (regex: RegExp, message: string) =>
-  z.string().trim().regex(regex, message).or(z.literal("")).optional();
+  z
+    .string()
+    .trim()
+    .regex(regex, message)
+    .toUpperCase()
+    .or(z.literal(""))
+    .optional();
 
 export const visualAcuitySchema = optionalField(
   VISUAL_ACUITY_REGEX,
