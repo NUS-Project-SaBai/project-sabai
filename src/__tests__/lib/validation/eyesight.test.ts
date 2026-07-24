@@ -10,15 +10,17 @@ describe("visualAcuitySchema", () => {
     "6/24",
     "6/36",
     "6/60",
-    "6/60-",
-    "6/12+",
+    "6/120", // biggest E on the SOP chart
+    "6/9 +2", // passed 6/9, read 2 letters of the next line
+    "6/9+2", // space is optional
     "CF",
     "HM",
-    "PL",
-    "NPL",
-    "cf", // test for case-insensitive
-    "npl",
-    " 6/6 ", // have whitespace, to be trimmed before validation
+    "LP",
+    "NLP",
+    "cf", // case-insensitive
+    "lp",
+    "nlp",
+    " 6/6 ", // whitespace trimmed before validation
   ];
 
   it.each(valid)("accepts valid notation %j", (input) => {
@@ -29,10 +31,15 @@ describe("visualAcuitySchema", () => {
     "66",
     "6-6",
     "6/7", // not a standard denominator
+    "6/2", // clinically nonsensical
     "6/",
     "20/20", // imperial not accepted
     "garbage",
     "6/6++",
+    "6/12+", // "+" must carry a letter count
+    "6/9 -2", // SOP uses "+" only, not "-"
+    "PL", // clinic uses LP, not PL
+    "NPL", // clinic uses NLP, not NPL
     "PLL",
   ];
 
@@ -51,7 +58,7 @@ describe("visualAcuitySchema", () => {
 
 describe("pinholeSchema", () => {
   it("accepts every acuity value the degree fields accept", () => {
-    for (const v of ["6/6", "6/60", "6/12+", "CF", "HM", "PL", "NPL"]) {
+    for (const v of ["6/6", "6/60", "6/120", "6/9 +2", "CF", "HM", "LP", "NLP"]) {
       expect(pinholeSchema.safeParse(v).success).toBe(true);
     }
   });
@@ -62,7 +69,7 @@ describe("pinholeSchema", () => {
   });
 
   it("rejects the same malformed values as the acuity schema", () => {
-    for (const v of ["6/2", "20/20", "garbage", "PLL"]) {
+    for (const v of ["6/2", "20/20", "garbage", "PL", "PLL"]) {
       expect(pinholeSchema.safeParse(v).success).toBe(false);
     }
   });
