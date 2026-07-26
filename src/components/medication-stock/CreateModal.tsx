@@ -88,23 +88,22 @@ export default function CreateModal({
             <LoadingSpinner message="Loading brands with active ingredients..." />
           )}
 
-          {!(
-            brandWithActiveIngredientIsError ||
-            brandWithActiveIngredientIsLoading
-          ) ? (
-            <RHFDropdown
-              name="medicationBrandId"
-              label="Brand + Active Ingredient"
-              dropdownOptions={brandWithActiveIngredientData!.map((elem) => ({
-                value: elem.id.toString(),
-                label: `${elem.activeIngredientName} (${elem.name})`,
-              }))}
-              className="mb-4"
-              isRequired
-            />
-          ) : (
-            "An error has occurred while loading the dropdown options for brand + active ingredient. Please refresh the page."
-          )}
+          {brandWithActiveIngredientIsError &&
+            "An error has occurred while loading the dropdown options for brand + active ingredient. Please refresh the page."}
+
+          {!brandWithActiveIngredientIsError &&
+            !brandWithActiveIngredientIsLoading && (
+              <RHFDropdown
+                name="medicationBrandId"
+                label="Brand + Active Ingredient"
+                dropdownOptions={brandWithActiveIngredientData!.map((elem) => ({
+                  value: elem.id.toString(),
+                  label: `${elem.activeIngredientName} (${elem.name})`,
+                }))}
+                className="mb-4"
+                isRequired
+              />
+            )}
 
           <RHFDropdown
             name="stockStatus"
