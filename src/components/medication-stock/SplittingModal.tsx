@@ -50,7 +50,7 @@ export default function SplittingModal({
             <td>{stock.medicationActiveIngredientName}</td>
           </tr>
           <tr>
-            <td>Brand Id</td>
+            <td>Brand Name</td>
             <td>{stock.medicationBrandName}</td>
           </tr>
           <tr>
