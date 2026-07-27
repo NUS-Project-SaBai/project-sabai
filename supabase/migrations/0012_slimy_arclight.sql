@@ -1,10 +1,9 @@
-CREATE TYPE "public"."referral_state" AS ENUM('pending', 'completed', 'cancelled');--> statement-breakpoint
+CREATE TYPE "public"."referral_state" AS ENUM('CompletedFailure', 'New', 'Seen', 'Outgoing', 'CompletedSuccess', 'Completed', 'None');--> statement-breakpoint
 CREATE TABLE "referrals" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"referred_for" text NOT NULL,
-	"referred_to" text,
 	"referral_notes" text,
-	"referral_state" "referral_state" DEFAULT 'pending',
+	"referral_state" "referral_state" DEFAULT 'New' NOT NULL,
 	"referral_outcome" text,
 	"consult_id" integer NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL

@@ -628,12 +628,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "referred_to": {
-          "name": "referred_to",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "referral_notes": {
           "name": "referral_notes",
           "type": "text",
@@ -645,8 +639,8 @@
           "type": "referral_state",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'pending'"
+          "notNull": true,
+          "default": "'New'"
         },
         "referral_outcome": {
           "name": "referral_outcome",
@@ -970,9 +964,13 @@
       "name": "referral_state",
       "schema": "public",
       "values": [
-        "pending",
-        "completed",
-        "cancelled"
+        "CompletedFailure",
+        "New",
+        "Seen",
+        "Outgoing",
+        "CompletedSuccess",
+        "Completed",
+        "None"
       ]
     }
   },
