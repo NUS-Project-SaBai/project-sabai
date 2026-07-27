@@ -383,3 +383,23 @@ export const stockChanges = pgTable("stock_changes", {
     .references(() => authUsers.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+/*
+Orders Table:
+- id: Primary key, auto-incrementing integer.
+- consultId: Foreign key referencing the consult in which the order was created.
+- dosageInstructions: The dosage instructions for the order.
+- status: The order status. Can be 'PENDING', 'CANCELLED', or 'APPROVED'.
+- stockChangeId: Foreign key representing the entry in the stockChange table that displays stocks going from 'active' to 'reserved' state.
+*/
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  consultId: integer("consult_id")
+    .notNull()
+    .references(() => consults.id),
+  dosageInstructions: text("dosage_instructions").notNull(),
+  status: orderStatusEnum("status").notNull().default("PENDING"),
+  stockChangeId: integer("stock_change_id")
+    .notNull()
+    .references(() => stockChanges.id),
+});
