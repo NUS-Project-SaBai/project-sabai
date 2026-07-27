@@ -26,7 +26,7 @@ export const medicationActiveIngredientsRouter = router({
         name: zfd.text().nonoptional(),
         unitOfMeasurement: zfd.text().nonoptional(),
         fallBelow: zfd.numeric(z.number().int().positive()).nonoptional(),
-        remarks: zfd.text().nonoptional(),
+        remarks: zfd.text().optional(),
       }),
     )
     .mutation(async ({ input }) => {

@@ -193,7 +193,7 @@ function Row(ingredient: MedicationActiveIngredient) {
       name: ingredient.name,
       unitOfMeasurement: ingredient.unitOfMeasurement,
       fallBelow: ingredient.fallBelow,
-      remarks: ingredient.remarks,
+      remarks: ingredient.remarks ?? "",
     },
   });
 
