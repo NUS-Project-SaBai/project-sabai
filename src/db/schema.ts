@@ -26,6 +26,11 @@ export const medicationStatusEnum = pgEnum("medication_status", [
   "donated",
   "expired",
 ]);
+export const orderStatusEnum = pgEnum("order_status", [
+  "APPROVED",
+  "CANCELLED",
+  "PENDING",
+]);
 
 // Define tables
 
@@ -355,5 +360,26 @@ export const diagnosis = pgTable("diagnosis", {
 export type Diagnosis = typeof diagnosis.$inferSelect;
 export type NewDiagnosis = typeof diagnosis.$inferInsert;
 
-// todo: medication_log table (after users table done)
-// todo: medication_review table (after users table done)
+/*
+Stock Changes Table:
+- id: Primary key, auto-incrementing integer.
+- stockId: Foreign key referencing the stock that was changed.
+- field: The field of the row that was changed in the medication_stock table.
+- from: The previous value of the changed field.
+- to: The new value of the changed field.
+- userId: Foreign key referencing the user who changed the field.
+- createdAt: The timestamp of when the field was changed.
+*/
+export const stockChanges = pgTable("stock_changes", {
+  id: serial("id").primaryKey(),
+  stockId: integer("stock_id")
+    .notNull()
+    .references(() => medicationStock.id),
+  field: varchar("field").notNull(),
+  from: varchar("from").notNull(),
+  to: varchar("to").notNull(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => authUsers.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
