@@ -14,13 +14,7 @@ type RHFInputProps = {
   >["className"];
   registerOptions?: RegisterOptions;
   type:
-    | "text"
-    | "email"
-    | "password"
-    | "number"
-    | "date"
-    | "color"
-    | "checkbox";
+    "text" | "email" | "password" | "number" | "date" | "color" | "checkbox";
 } & DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 /**
