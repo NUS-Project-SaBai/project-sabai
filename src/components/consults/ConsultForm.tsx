@@ -61,11 +61,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
       category: d.category as DiagnosisCategory,
     }));
 
-    if (
-      !pastMedicalHistory ||
-      !consultation ||
-      diagnoses.some((d) => !d.details || !d.category)
-    ) {
+    if (diagnoses.some((d) => !d.details || !d.category)) {
       onInvalid();
       return;
     }
@@ -73,8 +69,8 @@ export function ConsultForm({ visitId }: { visitId: number }) {
     createConsult.mutate(
       {
         visitId,
-        pastMedicalHistory,
-        consultation,
+        pastMedicalHistory: pastMedicalHistory || undefined,
+        consultation: consultation || undefined,
         treatmentPlan: data.treatmentPlan?.trim() || undefined,
         remarks: data.remarks?.trim() || undefined,
         diagnoses,
@@ -101,14 +97,12 @@ export function ConsultForm({ visitId }: { visitId: number }) {
           <RHFTextArea
             name="pastMedicalHistory"
             label="Past Medical History"
-            isRequired
             rows={3}
             placeholder="Type the patient's past medical history here..."
           />
           <RHFTextArea
             name="consultation"
             label="Consultation"
-            isRequired
             rows={4}
             placeholder="Type your consultation here..."
           />
