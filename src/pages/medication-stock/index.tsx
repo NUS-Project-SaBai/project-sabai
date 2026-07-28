@@ -1,12 +1,19 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { Button } from "@/components/interactive/Button/Button";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import CreateModal from "@/components/medication-stock/CreateModal";
+import SplittingModal from "@/components/medication-stock/SplittingModal";
 import TableCell from "@/components/TableCell";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
+import { useState } from "react";
+import { MedicationStockWithBrandAndActiveIngredient } from "@/lib/utils/medication-stock";
 
 function Header() {
+  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
+
   return (
     <div className="w-full mx-auto">
       <div className="flex justify-between items-center mb-8">
@@ -44,6 +51,15 @@ function Header() {
             </Link>
           </button>
         </div>
+
+        {modalIsOpen && <CreateModal setModalIsOpen={setModalIsOpen} />}
+        <Button
+          onClick={() => {
+            setModalIsOpen(true);
+          }}
+          title="Add Stock"
+          colour="indigo"
+        />
       </div>
     </div>
   );
@@ -54,7 +70,11 @@ function MedicationStockBasePage() {
     data: stock,
     isLoading,
     isError,
-  } = trpc.medicationStockRouter.list.useQuery();
+  } = trpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery();
+
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [splittingStock, setSplittingStock] =
+    useState<MedicationStockWithBrandAndActiveIngredient | null>(null);
 
   function renderContent() {
     if (isError) {
@@ -75,14 +95,24 @@ function MedicationStockBasePage() {
 
     return (
       <div className="overflow-x-auto">
+        {splittingStock && (
+          <SplittingModal
+            onClose={() => setSplittingStock(null)}
+            stock={splittingStock}
+          />
+        )}
+        {isEditing && <span>editing</span>}
+        {/* TODO: Implement stock editing, placeholder for now*/}
         <table className="min-w-full divide-y divide-slate-200">
           <TableHeader
             headers={[
-              "Stock ID",
-              "Medication Brand ID",
-              "Stock Location",
-              "Stock Quantity",
-              "Stock State",
+              "Active Ingredient",
+              "Brand",
+              "Location",
+              "Quantity",
+              "Expiry",
+              "State",
+              "Actions",
             ]}
           />
           <tbody className="bg-white divide-y divide-slate-200">
@@ -90,12 +120,12 @@ function MedicationStockBasePage() {
               <TableRow key={item.id}>
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
-                    {item.id}
+                    {item.medicationActiveIngredientName}
                   </span>
                 </TableCell>
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
-                    {item.medicationBrandId}
+                    {item.medicationBrandName}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -110,7 +140,26 @@ function MedicationStockBasePage() {
                 </TableCell>
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
+                    {item.expiry?.toLocaleDateString()}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm font-medium text-slate-900">
                     {item.stockStatus}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm font-medium text-slate-900 flex flex-row gap-2">
+                    <Button
+                      onClick={() => setIsEditing(true)}
+                      colour="emerald"
+                      title="Edit"
+                    />
+                    <Button
+                      onClick={() => setSplittingStock(item)}
+                      colour="indigo"
+                      title="Split"
+                    />
                   </span>
                 </TableCell>
               </TableRow>

@@ -3,7 +3,12 @@ import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { eq } from "drizzle-orm";
-import { medicationStatusEnum, medicationStock } from "@/db/schema";
+import {
+  medicationBrands,
+  medicationStatusEnum,
+  medicationStock,
+  medicationActiveIngredients,
+} from "@/db/schema";
 
 export const medicationStockRouter = router({
   list: protectedProcedure.query(async () => {
@@ -17,6 +22,30 @@ export const medicationStockRouter = router({
         stockStatus: medicationStock.stockStatus,
       })
       .from(medicationStock);
+    return result;
+  }),
+
+  listWithBrandAndActiveIngredient: protectedProcedure.query(async () => {
+    const result = await db
+      .select({
+        id: medicationStock.id,
+        medicationBrandId: medicationStock.medicationBrandId,
+        quantity: medicationStock.quantity,
+        expiry: medicationStock.expiry,
+        location: medicationStock.location,
+        stockStatus: medicationStock.stockStatus,
+        medicationBrandName: medicationBrands.name,
+        medicationActiveIngredientName: medicationActiveIngredients.name,
+      })
+      .from(medicationStock)
+      .innerJoin(
+        medicationBrands,
+        eq(medicationStock.medicationBrandId, medicationBrands.id),
+      )
+      .innerJoin(
+        medicationActiveIngredients,
+        eq(medicationActiveIngredients.id, medicationBrands.activeIngredientId),
+      );
     return result;
   }),
 
