@@ -1,5 +1,6 @@
 import {
   pgTable,
+  pgSchema,
   serial,
   varchar,
   boolean,
@@ -8,7 +9,14 @@ import {
   pgEnum,
   integer,
   numeric,
+  uuid,
 } from "drizzle-orm/pg-core";
+
+// Stub for Supabase-managed auth schema — not migrated, used only for FK references
+const authSchema = pgSchema("auth");
+export const authUsers = authSchema.table("users", {
+  id: uuid("id").primaryKey(),
+});
 
 // Define enums
 export const genderEnum = pgEnum("gender", ["male", "female"]);
@@ -18,6 +26,15 @@ export const medicationStatusEnum = pgEnum("medication_status", [
   "donated",
   "dispensed",
   "reserved",
+]);
+export const referralStateEnum = pgEnum("referral_state", [
+  "CompletedFailure",
+  "New",
+  "Seen",
+  "Outgoing",
+  "CompletedSuccess",
+  "Completed",
+  "None",
 ]);
 
 // Define tables
@@ -265,6 +282,121 @@ export const eyesight = pgTable("eyesight", {
 
 export type Eyesight = typeof eyesight.$inferSelect;
 export type NewEyesight = typeof eyesight.$inferInsert;
+
+/*
+Puberty Table:
+- id: Primary key, auto-incrementing integer.
+- pubarche: Whether pubarche has occurred (nullable = not assessed).
+- pubarcheAge: Age at pubarche in years.
+- thelarche: Whether thelarche has occurred.
+- thelarcheAge: Age at thelarche in years.
+- menarche: Whether menarche has occurred.
+- menarcheAge: Age at menarche in years.
+- voiceChange: Whether voice change has occurred.
+- voiceChangeAge: Age at voice change in years.
+- testicularGrowth: Whether testicular growth has occurred.
+- testicularGrowthAge: Age at testicular growth in years.
+- additionalNotes: Additional notes or observations.
+- vitalId: Foreign key referencing the vitals record (unique).
+*/
+export const puberty = pgTable("puberty", {
+  id: serial("id").primaryKey(),
+  pubarche: boolean("pubarche"),
+  pubarcheAge: integer("pubarche_age"),
+  thelarche: boolean("thelarche"),
+  thelarcheAge: integer("thelarche_age"),
+  menarche: boolean("menarche"),
+  menarcheAge: integer("menarche_age"),
+  voiceChange: boolean("voice_change"),
+  voiceChangeAge: integer("voice_change_age"),
+  testicularGrowth: boolean("testicular_growth"),
+  testicularGrowthAge: integer("testicular_growth_age"),
+  additionalNotes: text("additional_notes"),
+  vitalId: integer("vital_id")
+    .notNull()
+    .unique()
+    .references(() => vitals.id, {
+      onDelete: "cascade",
+    }),
+});
+
+export type Puberty = typeof puberty.$inferSelect;
+export type NewPuberty = typeof puberty.$inferInsert;
+
+/*
+Consults Table:
+- id: Primary key, auto-incrementing integer.
+- date: Timestamp of the consultation.
+- pastMedicalHistory: Patient's past medical history notes.
+- consultation: Doctor's consultation notes.
+- treatmentPlan: Treatment plan.
+- remarks: Additional remarks.
+- doctorId: Foreign key referencing the Supabase auth user (doctor).
+- visitId: Foreign key referencing the visit.
+*/
+export const consults = pgTable("consults", {
+  id: serial("id").primaryKey(),
+  date: timestamp("date", { withTimezone: true }).defaultNow().notNull(),
+  pastMedicalHistory: text("past_medical_history"),
+  consultation: text("consultation"),
+  treatmentPlan: text("treatment_plan"),
+  remarks: text("remarks"),
+  doctorId: uuid("doctor_id")
+    .notNull()
+    .references(() => authUsers.id),
+  visitId: integer("visit_id")
+    .notNull()
+    .references(() => visits.id),
+});
+
+export type Consult = typeof consults.$inferSelect;
+export type NewConsult = typeof consults.$inferInsert;
+
+/*
+Diagnosis Table:
+- id: Primary key, auto-incrementing integer.
+- details: Description of the diagnosis.
+- category: Classification of the diagnosis (e.g. "Chronic", "Acute").
+- consultId: Foreign key referencing the consult.
+*/
+export const diagnosis = pgTable("diagnosis", {
+  id: serial("id").primaryKey(),
+  details: text("details").notNull(),
+  category: varchar("category", { length: 255 }),
+  consultId: integer("consult_id")
+    .notNull()
+    .references(() => consults.id),
+});
+
+export type Diagnosis = typeof diagnosis.$inferSelect;
+export type NewDiagnosis = typeof diagnosis.$inferInsert;
+
+/*
+Referrals Table:
+- id: Primary key, auto-incrementing integer.
+- referredFor: The reason the patient is referred.
+- referralNotes: Free-text notes about the referral.
+- referralState: Lifecycle state of the referral (e.g. 'New', 'Completed').
+- referralOutcome: Free-text result of the referral.
+- consultId: Foreign key referencing the consult. Deleting a consult that still has referrals is blocked (restrict).
+- createdAt: Timestamp of when the referral was created.
+*/
+export const referrals = pgTable("referrals", {
+  id: serial("id").primaryKey(),
+  referredFor: text("referred_for").notNull(),
+  referralNotes: text("referral_notes"),
+  referralState: referralStateEnum("referral_state").default("New").notNull(),
+  referralOutcome: text("referral_outcome"),
+  consultId: integer("consult_id")
+    .notNull()
+    .references(() => consults.id, {
+      onDelete: "restrict",
+    }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type Referral = typeof referrals.$inferSelect;
+export type NewReferral = typeof referrals.$inferInsert;
 
 // todo: medication_log table (after users table done)
 // todo: medication_review table (after users table done)

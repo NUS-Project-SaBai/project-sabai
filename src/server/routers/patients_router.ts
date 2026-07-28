@@ -6,7 +6,7 @@ import { db } from "@/db/drizzle";
 import { patients, genderEnum, visits, villageCodes } from "@/db/schema";
 import serverEnv from "@/lib/envVariables";
 import { TRPCError } from "@trpc/server";
-import { eq, desc, inArray } from "drizzle-orm";
+import { eq, desc, inArray, isNotNull } from "drizzle-orm";
 import {
   generateFaceprint,
   searchFaceprint,
@@ -34,13 +34,36 @@ const getPatientWithImageUrl = <
 });
 
 export const patientsRouter = router({
-  // List all patients with village details
+  // List all of patients (no visit data)
   list: protectedProcedure.query(async () => {
-    // A patient's village is taken from their most recent visit. DISTINCT ON keeps one row per patient, the latest by visit date.
+    const result = await db
+      .select({
+        id: patients.id,
+        name: patients.name,
+        identificationNumber: patients.identificationNumber,
+        contactNo: patients.contactNo,
+        gender: patients.gender,
+        dateOfBirth: patients.dateOfBirth,
+        hasPoorCard: patients.hasPoorCard,
+        hasBS2Card: patients.hasBS2Card,
+        drugAllergy: patients.drugAllergy,
+        hasSabaiCard: patients.hasSabaiCard,
+        patientImagePublicId: patients.patientImagePublicId,
+        rekognitionFaceId: patients.rekognitionFaceId,
+      })
+      .from(patients);
+
+    return result.map(getPatientWithImageUrl);
+  }),
+
+  // List all patients, along with village info from their most recent visit
+  listWithLatestVisit: protectedProcedure.query(async () => {
+    // DISTINCT ON keeps one row per patient, the latest by visit date
     const latestVisit = db
       .selectDistinctOn([visits.patientId], {
         patientId: visits.patientId,
         villageCodeId: visits.villageCodeId,
+        date: visits.date,
       })
       .from(visits)
       .orderBy(visits.patientId, desc(visits.date))
@@ -65,7 +88,10 @@ export const patientsRouter = router({
       })
       .from(patients)
       .leftJoin(latestVisit, eq(latestVisit.patientId, patients.id))
-      .leftJoin(villageCodes, eq(villageCodes.id, latestVisit.villageCodeId));
+      .leftJoin(villageCodes, eq(villageCodes.id, latestVisit.villageCodeId))
+      // Patients with a visit first (isNotNull true sorts before false), then
+      // most recent visit on top; visit-less patients sink to the bottom.
+      .orderBy(desc(isNotNull(latestVisit.date)), desc(latestVisit.date));
 
     return result.map(getPatientWithImageUrl);
   }),
@@ -213,58 +239,38 @@ export const patientsRouter = router({
       return { success: !!result };
     }),
 
-  // find all matches
-  findFaceMatches: protectedProcedure
+  // searchPatientsByPicture uses AWS Rekognition to find matching patients based on a provided face image.
+  // It returns an array of patients whose rekognitionFaceId matches any of the FaceIds found in the search results.
+  // NOTE: Though this endpoint does not modify any data, it is a mutation because it receives a base64-encoded image as input, which can be large.
+  // Using a mutation allows for larger payloads compared to a query.
+  searchPatientsByPicture: protectedProcedure
     .input(z.object({ picture: z.string() }))
     .mutation(async ({ input }) => {
+      // Step 1: Search for faceprint matches using the provided picture
+      let searchFaceprintResults;
       try {
-        const res = await searchFaceprint(input.picture);
-        return { data: res };
+        searchFaceprintResults = await searchFaceprint(input.picture);
+        // If there are no matches, return an empty array
+        if (!searchFaceprintResults || searchFaceprintResults.length === 0) {
+          return [];
+        }
       } catch (err) {
-        console.error(err);
-        return { data: [] };
+        // Log the error and return an empty array if the search fails
+        console.error("error searchFaceprint:", err);
+        return [];
       }
-    }),
 
-  listMatchingPatients: protectedProcedure
-    .input(
-      z.object({
-        matches: z.array(
-          z.object({
-            Face: z
-              .object({
-                FaceId: z.string().optional(),
-                BoundingBox: z
-                  .object({
-                    Width: z.number().optional(),
-                    Height: z.number().optional(),
-                    Left: z.number().optional(),
-                    Top: z.number().optional(),
-                  })
-                  .optional(),
-                ImageId: z.string().optional(),
-                Confidence: z.number().optional(),
-                IndexFacesModelVersion: z.string().optional(),
-              })
-              .optional(),
-            Similarity: z.number().optional(),
-          }),
-        ),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      if (input.matches.length === 0) return [];
-
-      // use typescript typeguard filter to avoid inArray type errors
-      const faceIds = input.matches
+      // get the FaceIds from the search results, filtering out any undefined values
+      const faceIds = searchFaceprintResults
         .map((item) => item.Face?.FaceId)
-        .filter((id): id is string => typeof id === "string");
+        .filter((id): id is string => typeof id === "string"); // use Type Predicate to ensure TypeScript knows these are strings
 
       if (faceIds.length === 0) {
         return [];
       }
 
-      const result = await db
+      // Step 2: Query the database for patients whose rekognitionFaceId matches any of the FaceIds found
+      const matchingPatients = await db
         .select({
           id: patients.id,
           name: patients.name,
@@ -282,6 +288,6 @@ export const patientsRouter = router({
         .from(patients)
         .where(inArray(patients.rekognitionFaceId, faceIds));
 
-      return result.map(getPatientWithImageUrl);
+      return matchingPatients.map(getPatientWithImageUrl);
     }),
 });

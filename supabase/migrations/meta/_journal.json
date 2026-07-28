@@ -71,6 +71,27 @@
       "when": 1782138313274,
       "tag": "0009_yummy_nekra",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1783249778562,
+      "tag": "0010_violet_zuras",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1783836783254,
+      "tag": "0011_dusty_agent_brand",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1784724949701,
+      "tag": "0012_slimy_arclight",
+      "breakpoints": true
     }
   ]
 }

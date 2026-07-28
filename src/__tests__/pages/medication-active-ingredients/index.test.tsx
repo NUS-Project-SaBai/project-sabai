@@ -162,8 +162,8 @@ describe("MedicationActiveIngredientsPage", () => {
       '<span class="text-sm font-medium text-slate-900">Paracetamol</span>',
     );
     let nameInput = container.querySelector('input[name="name"]');
-    let unitInput = container.querySelector('input[name="unitOfMeasurement]"');
-    let fallBelowInput = container.querySelector('input[name="fallBelow]"');
+    let unitInput = container.querySelector('input[name="unitOfMeasurement"]');
+    let fallBelowInput = container.querySelector('input[name="fallBelow"]');
 
     expect(unitInput).not.toBeInTheDocument();
     expect(fallBelowInput).not.toBeInTheDocument();

@@ -62,7 +62,7 @@ function MedicationStockBasePage() {
     }
 
     if (isLoading) {
-      return <LoadingSpinner message="Loading stock..." />;
+      return <LoadingSpinner message="Loading stock..." className="p-12" />;
     }
 
     if (!stock || stock.length === 0) {

@@ -10,6 +10,7 @@ import TableCell from "@/components/TableCell";
 import { useRouter } from "next/router";
 import { Button } from "@/components/interactive/Button/Button";
 import { CiMedicalClipboard } from "react-icons/ci";
+import { PatientCode } from "@/components/PatientCode";
 
 export default function VitalsPage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function VitalsPage() {
     data: patients,
     isLoading,
     isError,
-  } = trpc.patientsRouter.list.useQuery();
+  } = trpc.patientsRouter.listWithLatestVisit.useQuery();
 
   function renderContent() {
     if (isError) {
@@ -35,7 +36,7 @@ export default function VitalsPage() {
     }
 
     if (isLoading) {
-      return <LoadingSpinner message="Loading patients..." />;
+      return <LoadingSpinner message="Loading patients..." className="p-12" />;
     }
 
     if (!patients || patients.length === 0) {
@@ -55,7 +56,11 @@ export default function VitalsPage() {
               <TableRow key={patient.id}>
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
-                    {patient.id || "No id found"}
+                    <PatientCode
+                      villageCode={patient.villageCode}
+                      villageColorHex={patient.villageColorHex}
+                      id={patient.id}
+                    />
                   </span>
                 </TableCell>
                 <TableCell>
