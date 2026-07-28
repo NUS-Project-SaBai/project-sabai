@@ -13,6 +13,7 @@ export type CreateFormFields = {
   expiry: Date;
   location: string;
   stockStatus: StockStatus;
+  remarks: string;
 };
 
 export type MedicationStockWithBrandAndActiveIngredient = MedicationStock & {
