@@ -35,6 +35,7 @@ export const medicationStockRouter = router({
         expiry: medicationStock.expiry,
         location: medicationStock.location,
         stockStatus: medicationStock.stockStatus,
+        remarks: medicationStock.remarks,
         medicationBrandName: medicationBrands.name,
         medicationActiveIngredientName: medicationActiveIngredients.name,
       })
