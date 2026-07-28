@@ -156,7 +156,7 @@ Medication Stock Table:
 - quantity: Quantity of the medication
 - expiry: Expiry date of the medication
 - location: Location of the medication
-- state: State of the medication (e.g., 'active', 'disposed', 'donated', 'dispensed', 'reserved')
+- state: State of the medication (e.g., 'active', 'discarded', 'donated', 'dispensed', 'reserved')
 - remarks: Remarks for the medication stock
 */
 export const medicationStock = pgTable("medication_stock", {
