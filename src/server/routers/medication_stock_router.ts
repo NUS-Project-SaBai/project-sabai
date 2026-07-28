@@ -59,7 +59,7 @@ export const medicationStockRouter = router({
         expiry: zfd.text(z.coerce.date()),
         location: zfd.text(),
         stockStatus: zfd.text(z.enum(medicationStatusEnum.enumValues)),
-        remarks: zfd.text(),
+        remarks: zfd.text(z.string().optional()),
       }),
     )
     .mutation(async ({ input }) => {
