@@ -37,6 +37,8 @@ export const referralStateEnum = pgEnum("referral_state", [
   "None",
 ]);
 
+export const medicationStatusValues = medicationStatusEnum.enumValues;
+
 // Define tables
 
 /*
