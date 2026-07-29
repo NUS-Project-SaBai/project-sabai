@@ -56,7 +56,7 @@ const updatePubertyInput = createPubertyInput
  * Input validation schema for updating puberty records by vitalsId.
  */
 const updatePubertyInputByVitalsId = createPubertyInput
-  .omit({ vitalId: true }) //we want it to always be attached to the same vital object
+  .omit({ vitalId: true }) // We want it to always be attached to the same vital object
   .partial()
   .extend({
     vitalId: z.number().int().positive(),
