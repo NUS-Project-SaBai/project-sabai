@@ -24,43 +24,79 @@ const selectPubertyFields = {
   vitalId: puberty.vitalId,
 };
 
-/**
- * Input validation schema for creating puberty records.
- */
-const createPubertyInput = z.object({
+const MAX_PUBERTY_AGE = 18;
+
+const pubertyAgePairs = [
+  { flag: "pubarche", age: "pubarcheAge" },
+  { flag: "thelarche", age: "thelarcheAge" },
+  { flag: "menarche", age: "menarcheAge" },
+  { flag: "voiceChange", age: "voiceChangeAge" },
+  { flag: "testicularGrowth", age: "testicularGrowthAge" },
+] as const;
+
+function validatePubertyAges(
+  data: Record<string, unknown>,
+  ctx: z.RefinementCtx,
+) {
+  for (const { flag, age } of pubertyAgePairs) {
+    if (data[flag] === false && data[age] !== undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `${age} must not be set when ${flag} is false`,
+        path: [age],
+      });
+    }
+  }
+}
+
+// Base object used for schema derivation — superRefine is applied per schema below
+// because ZodEffects (returned by superRefine) does not support .omit()/.partial().
+const pubertyBaseShape = z.object({
   pubarche: z.boolean().optional(),
-  pubarcheAge: z.number().int().positive().optional(),
+  pubarcheAge: z.number().int().positive().max(MAX_PUBERTY_AGE).optional(),
   thelarche: z.boolean().optional(),
-  thelarcheAge: z.number().int().positive().optional(),
+  thelarcheAge: z.number().int().positive().max(MAX_PUBERTY_AGE).optional(),
   menarche: z.boolean().optional(),
-  menarcheAge: z.number().int().positive().optional(),
+  menarcheAge: z.number().int().positive().max(MAX_PUBERTY_AGE).optional(),
   voiceChange: z.boolean().optional(),
-  voiceChangeAge: z.number().int().positive().optional(),
+  voiceChangeAge: z.number().int().positive().max(MAX_PUBERTY_AGE).optional(),
   testicularGrowth: z.boolean().optional(),
-  testicularGrowthAge: z.number().int().positive().optional(),
+  testicularGrowthAge: z
+    .number()
+    .int()
+    .positive()
+    .max(MAX_PUBERTY_AGE)
+    .optional(),
   additionalNotes: z.string().optional(),
   vitalId: z.number().int().positive(),
 });
 
 /**
+ * Input validation schema for creating puberty records.
+ */
+const createPubertyInput = pubertyBaseShape.superRefine(validatePubertyAges);
+
+/**
  * Input validation schema for updating puberty records.
  */
-const updatePubertyInput = createPubertyInput
+const updatePubertyInput = pubertyBaseShape
   .omit({ vitalId: true })
   .partial()
   .extend({
     id: z.number().int().positive(),
-  });
+  })
+  .superRefine(validatePubertyAges);
 
 /**
  * Input validation schema for updating puberty records by vitalsId.
  */
-const updatePubertyInputByVitalsId = createPubertyInput
+const updatePubertyInputByVitalsId = pubertyBaseShape
   .omit({ vitalId: true }) // We want it to always be attached to the same vital object
   .partial()
   .extend({
     vitalId: z.number().int().positive(),
-  });
+  })
+  .superRefine(validatePubertyAges);
 
 export const pubertyRouter = router({
   /**
@@ -72,7 +108,7 @@ export const pubertyRouter = router({
       const [pubertyRecord] = await db
         .insert(puberty)
         .values(input)
-        .returning();
+        .returning(selectPubertyFields);
       return pubertyRecord;
     }),
 
@@ -121,7 +157,7 @@ export const pubertyRouter = router({
         .where(eq(puberty.id, id))
         .returning();
 
-      return updatedPuberty;
+      return updatedPuberty ?? null;
     }),
 
   /**
@@ -139,7 +175,7 @@ export const pubertyRouter = router({
         .where(eq(puberty.vitalId, vitalId))
         .returning();
 
-      return updatedPuberty;
+      return updatedPuberty ?? null;
     }),
 
   /**
