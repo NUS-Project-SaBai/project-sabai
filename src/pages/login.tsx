@@ -10,7 +10,7 @@ function useLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -39,48 +39,6 @@ function useLogin() {
   };
 }
 
-function LockIcon() {
-  return (
-    <svg
-      className="h-6 w-6 text-white"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-      />
-    </svg>
-  );
-}
-
-function Spinner() {
-  return (
-    <svg
-      className="animate-spin h-4 w-4 text-white"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-      />
-    </svg>
-  );
-}
-
 function ErrorBanner({ message }: { message: string }) {
   return (
     <div className="rounded-lg bg-red-50 p-3.5 border border-red-100">
@@ -106,7 +64,7 @@ function ErrorBanner({ message }: { message: string }) {
 }
 
 const inputClass =
-  "block w-full rounded-lg border-0 px-3 py-2.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-slate-900 sm:text-sm transition-all duration-200";
+  "block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:outline-none sm:text-sm";
 
 export default function Login() {
   const {
@@ -125,32 +83,35 @@ export default function Login() {
         src="/cambodia-image.jpg"
         alt="Angkor Wat, Cambodia"
         fill
+        sizes="100vw"
         className="object-cover"
         priority
       />
       <div className="absolute inset-0 bg-black/50" />
 
       <div className="relative z-10 w-full max-w-md px-4">
-        <div className="rounded-2xl bg-white px-8 py-10 shadow-2xl ring-1 ring-black/5">
+        <div className="rounded-2xl bg-white px-8 py-10 shadow-2xl">
           {/* Header */}
-          <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 shadow-lg">
-              <LockIcon />
-            </div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-              Welcome back
-            </h2>
-            <p className="mt-2 text-sm text-slate-600">
-              Sign in to access your project dashboard
+          <div className="mb-4 text-center">
+            <Image
+              src="/sabaiLogo.png"
+              alt="Sabai logo"
+              width={56}
+              height={56}
+              className="mx-auto mb-4"
+            />
+            <h2 className="text-2xl font-bold text-slate-900">Welcome</h2>
+            <p className="mt-2 text-sm text-slate-500">
+              Log in to Sabai to continue to Sabai.
             </p>
           </div>
 
           {/* Form */}
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-slate-700"
+                className="block text-sm font-medium text-slate-700 mb-1"
               >
                 Email address
               </label>
@@ -162,7 +123,7 @@ export default function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={`mt-2 ${inputClass}`}
+                className={inputClass}
                 placeholder="you@example.com"
               />
             </div>
@@ -170,7 +131,7 @@ export default function Login() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-slate-700"
+                className="block text-sm font-medium text-slate-700 mb-1"
               >
                 Password
               </label>
@@ -182,7 +143,7 @@ export default function Login() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`mt-2 ${inputClass}`}
+                className={inputClass}
                 placeholder="••••••••"
               />
             </div>
@@ -192,22 +153,12 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full justify-center rounded-lg bg-slate-900 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              className="flex w-full justify-center rounded-lg bg-violet-600 px-3 py-2.5 text-sm font-semibold text-white hover:bg-violet-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             >
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <Spinner /> Signing in...
-                </span>
-              ) : (
-                "Sign in"
-              )}
+              {loading ? "Signing in..." : "Continue"}
             </button>
           </form>
         </div>
-
-        <p className="mt-4 text-center text-xs text-white/60">
-          Angkor Wat, Siem Reap, Cambodia
-        </p>
       </div>
     </div>
   );
