@@ -80,7 +80,7 @@ export default function Login() {
   return (
     <div className="relative flex min-h-screen items-center justify-center">
       <Image
-        src="/cambodia-image.jpg"
+        src="/cambodia-image.webp"
         alt="Angkor Wat, Cambodia"
         fill
         sizes="100vw"
