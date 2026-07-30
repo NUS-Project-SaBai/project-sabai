@@ -137,19 +137,23 @@ describe("ConsultForm", () => {
     const user = userEvent.setup();
     renderForm();
 
-    // only one diagnosis: its Remove button is disabled
-    expect(screen.getByRole("button", { name: "Remove" })).toBeDisabled();
+    // only one diagnosis: Remove button is hidden
+    expect(
+      screen.queryByRole("button", { name: "Remove" }),
+    ).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Add Diagnosis" }));
     expect(screen.getByText("Diagnosis 2")).toBeInTheDocument();
 
-    // with two, both Remove buttons are enabled; removing one returns to one
+    // with two, both Remove buttons are visible; removing one hides the button again
     const removeButtons = screen.getAllByRole("button", { name: "Remove" });
     expect(removeButtons).toHaveLength(2);
     await user.click(removeButtons[0]);
 
     expect(screen.queryByText("Diagnosis 2")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Remove" })).toBeDisabled();
+    expect(
+      screen.queryByRole("button", { name: "Remove" }),
+    ).not.toBeInTheDocument();
   });
 
   test("shows the save button in a loading state while pending", () => {
