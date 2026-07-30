@@ -132,16 +132,17 @@ export function ConsultForm({ visitId }: { visitId: number }) {
                 <p className="text-sm font-semibold text-slate-600">
                   Diagnosis {index + 1}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => remove(index)}
-                  disabled={fields.length === 1}
-                  title="Remove diagnosis"
-                  className="inline-flex items-center gap-1 rounded p-1 text-sm text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:text-slate-300 disabled:hover:bg-transparent"
-                >
-                  <HiOutlineTrash className="h-4 w-4" />
-                  Remove
-                </button>
+                {fields.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => remove(index)}
+                    title="Remove diagnosis"
+                    className="inline-flex items-center gap-1 rounded p-1 text-sm text-red-600 transition hover:bg-red-50"
+                  >
+                    <HiOutlineTrash className="h-4 w-4" />
+                    Remove
+                  </button>
+                )}
               </div>
               <RHFDropdown
                 name={`diagnoses.${index}.category`}
