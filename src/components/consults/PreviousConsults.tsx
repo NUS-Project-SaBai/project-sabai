@@ -74,7 +74,7 @@ export function PreviousConsults({ visitId }: { visitId: number }) {
   return (
     <section className="mt-8 space-y-4 border-t border-slate-200 pt-8">
       <h2 className="text-sm font-semibold text-slate-700">
-        Previous Consults ({consults.length})
+        Previous consults from this visit ({consults.length})
       </h2>
       <div className="space-y-4">
         {consults.map((consult) => (
