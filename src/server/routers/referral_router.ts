@@ -1,18 +1,16 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { referrals, consults, visits, patients } from "@/db/schema";
+import {
+  referrals,
+  consults,
+  visits,
+  patients,
+  referralStateEnum,
+} from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 
-const referralStateSchema = z.enum([
-  "New",
-  "Seen",
-  "Outgoing",
-  "Completed",
-  "CompletedSuccess",
-  "CompletedFailure",
-  "None",
-]);
+const referralStateSchema = z.enum(referralStateEnum.enumValues);
 
 export const referralRouter = router({
   // List all referrals enriched with patient, doctor, and date
