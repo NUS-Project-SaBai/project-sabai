@@ -29,3 +29,12 @@ export function calculateAge(dateOfBirth: Date) {
 
   return age;
 }
+
+/**
+ * Formats a Date/ISO value into the yyyy-MM-dd string a native date input expects.
+ * Returns an empty string for invalid dates.
+ */
+export function toDateInputValue(dateOfBirth: Date | string) {
+  const date = new Date(dateOfBirth);
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+}

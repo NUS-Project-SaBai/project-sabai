@@ -42,6 +42,8 @@ export default function EditPatientForm({
       contactNo: patient.contactNo ?? "",
       gender: patient.gender,
       drugAllergy: patient.drugAllergy,
+      // <input type="date"> only accepts a yyyy-MM-dd value; patient.dateOfBirth
+      // arrives as a Date/ISO string, so convert it or the field renders blank.
       dateOfBirth: toDateInputValue(patient.dateOfBirth),
       hasPoorCard: patient.hasPoorCard,
       hasBS2Card: patient.hasBS2Card,
