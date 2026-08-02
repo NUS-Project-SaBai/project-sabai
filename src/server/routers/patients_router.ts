@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { zfd } from "zod-form-data";
-import { uploadToCloudinary } from "@/server/utils/cloudinary";
+import {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+} from "@/server/utils/cloudinary";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { patients, genderEnum, visits } from "@/db/schema/patients";
@@ -11,6 +14,7 @@ import { eq, desc, inArray, isNotNull } from "drizzle-orm";
 import {
   generateFaceprint,
   searchFaceprint,
+  deleteFaceprint,
   dataUrlToFile,
 } from "@/lib/utils/facialRecognition";
 
@@ -212,17 +216,57 @@ export const patientsRouter = router({
     )
     .mutation(async ({ input }) => {
       const { id, patientImage, ...updateData } = input;
-      let patientImagePublicId;
+
+      let imageUpdate: {
+        patientImagePublicId?: string;
+        rekognitionFaceId?: string;
+      } = {};
+
+      // Client sends a new base64 image (recapture)
       if (patientImage) {
-        const patientImage: File = dataUrlToFile(
-          input.patientImage!, // Temporarily add non-null operator until later refactoring
-          `${input.name}.jpg`,
+        // Reads patient's current Cloudinary image id and Rekognition face id before overwriting them
+        const [existing] = await db
+          .select({
+            patientImagePublicId: patients.patientImagePublicId,
+            rekognitionFaceId: patients.rekognitionFaceId,
+          })
+          .from(patients)
+          .where(eq(patients.id, id))
+          .limit(1);
+
+        const imageFile: File = dataUrlToFile(
+          patientImage,
+          `${input.name ?? id}.jpg`,
         );
-        patientImagePublicId = await uploadToCloudinary(patientImage);
+
+        const [patientImagePublicId, rekognitionFaceId] = await Promise.all([
+          uploadToCloudinary(imageFile),
+          generateFaceprint(patientImage),
+        ]);
+        imageUpdate = { patientImagePublicId, rekognitionFaceId };
+
+        // No faceprint means the new photo wasn't indexed; keep the old one so
+        // the patient stays searchable by face.
+        if (!rekognitionFaceId) {
+          console.warn(
+            `Faceprint not generated for patient ${id}; new photo is not searchable by face. Keeping previous faceprint.`,
+          );
+        }
+
+        // Best-effort cleanup of the replaced assets.
+        if (existing?.patientImagePublicId) {
+          await deleteFromCloudinary(existing.patientImagePublicId).catch(
+            (err) => console.error("Failed to delete old patient image:", err),
+          );
+        }
+        if (rekognitionFaceId && existing?.rekognitionFaceId) {
+          await deleteFaceprint(existing.rekognitionFaceId);
+        }
       }
+
       const [result] = await db
         .update(patients)
-        .set({ ...updateData, patientImagePublicId })
+        .set({ ...updateData, ...imageUpdate })
         .where(eq(patients.id, id))
         .returning();
 
