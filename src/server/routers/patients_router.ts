@@ -200,6 +200,7 @@ export const patientsRouter = router({
         id: zfd.numeric(z.number().int()), // ID must be included for updates
         name: zfd.text(z.string().optional()),
         identificationNumber: zfd.text(z.string().optional()),
+        contactNo: zfd.text(z.string().optional()),
         gender: zfd.text(z.enum(genderEnum.enumValues).optional()),
         dateOfBirth: zfd.text(z.coerce.date().optional()),
         drugAllergy: zfd.text(z.string().optional()),
