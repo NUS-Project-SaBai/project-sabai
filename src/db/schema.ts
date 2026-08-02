@@ -38,6 +38,16 @@ export const referralStateEnum = pgEnum("referral_state", [
 ]);
 
 export const medicationStatusValues = medicationStatusEnum.enumValues;
+export const orderStatusEnum = pgEnum("order_status", [
+  "APPROVED",
+  "CANCELLED",
+  "PENDING",
+]);
+export const stockChangeFieldEnum = pgEnum("stock_change_field_enum", [
+  "location",
+  "quantity",
+  "stock_status",
+]);
 
 // Define tables
 
@@ -400,5 +410,52 @@ export const referrals = pgTable("referrals", {
 export type Referral = typeof referrals.$inferSelect;
 export type NewReferral = typeof referrals.$inferInsert;
 
-// todo: medication_log table (after users table done)
-// todo: medication_review table (after users table done)
+/*
+Stock Changes Table:
+- id: Primary key, auto-incrementing integer.
+- stockId: Foreign key referencing the stock that was changed.
+- field: The field of the row that was changed in the medication_stock table.
+- previousValue: The previous value of the changed field.
+- newValue: The new value of the changed field.
+- userId: Foreign key referencing the user who changed the field.
+- createdAt: The timestamp of when the field was changed.
+*/
+export const stockChanges = pgTable("stock_changes", {
+  id: serial("id").primaryKey(),
+  stockId: integer("stock_id")
+    .notNull()
+    .references(() => medicationStock.id),
+  field: stockChangeFieldEnum("field").notNull(),
+  previousValue: varchar("previous_value").notNull(),
+  newValue: varchar("new_value").notNull(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => authUsers.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type StockChange = typeof stockChanges.$inferSelect;
+export type NewStockChange = typeof stockChanges.$inferInsert;
+
+/*
+Orders Table:
+- id: Primary key, auto-incrementing integer.
+- consultId: Foreign key referencing the consult in which the order was created.
+- dosageInstructions: The dosage instructions for the order.
+- status: The order status. Can be 'PENDING', 'CANCELLED', or 'APPROVED'.
+- stockChangeId: Foreign key representing the entry in the stockChange table that displays stocks going from 'active' to 'reserved' state.
+*/
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  consultId: integer("consult_id")
+    .notNull()
+    .references(() => consults.id),
+  dosageInstructions: text("dosage_instructions").notNull(),
+  status: orderStatusEnum("status").notNull().default("PENDING"),
+  stockChangeId: integer("stock_change_id")
+    .notNull()
+    .references(() => stockChanges.id),
+});
+
+export type Order = typeof orders.$inferSelect;
+export type NewOrder = typeof orders.$inferInsert;
