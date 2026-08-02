@@ -10,7 +10,7 @@ import { patients, genderEnum, visits } from "@/db/schema/patients";
 import { villageCodes } from "@/db/schema/villageCodes";
 import serverEnv from "@/lib/envVariables";
 import { TRPCError } from "@trpc/server";
-import { eq, desc, inArray, isNotNull } from "drizzle-orm";
+import { eq, and, ne, desc, inArray, isNotNull } from "drizzle-orm";
 import {
   generateFaceprint,
   searchFaceprint,
@@ -216,6 +216,31 @@ export const patientsRouter = router({
     )
     .mutation(async ({ input }) => {
       const { id, patientImage, ...updateData } = input;
+
+      // Reject an identificationNumber that already belongs to a different
+      // patient. This is the guard against creating duplicate IDs via updates.
+      if (updateData.identificationNumber) {
+        const [conflict] = await db
+          .select({ id: patients.id })
+          .from(patients)
+          .where(
+            and(
+              eq(
+                patients.identificationNumber,
+                updateData.identificationNumber,
+              ),
+              ne(patients.id, id),
+            ),
+          )
+          .limit(1);
+
+        if (conflict) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Another patient already has this identification number.",
+          });
+        }
+      }
 
       let imageUpdate: {
         patientImagePublicId?: string;

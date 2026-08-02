@@ -77,7 +77,13 @@ export default function EditPatientForm({
         },
         onError(error) {
           console.error("Error updating patient:", error);
-          toast.error("Failed to update patient. Please try again.");
+          // Surface a known conflict (duplicate ID) directly; fall back to a
+          // generic message otherwise.
+          toast.error(
+            error.data?.code === "CONFLICT"
+              ? error.message
+              : "Failed to update patient. Please try again.",
+          );
         },
       },
     );
