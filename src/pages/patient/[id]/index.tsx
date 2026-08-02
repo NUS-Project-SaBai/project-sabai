@@ -5,6 +5,10 @@ import { calculateAge } from "@/lib/utils/patient";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
+import { useState } from "react";
+import Modal from "@/components/interactive/Modal";
+import EditPatientForm from "@/components/patient/EditPatientForm";
+import { Button } from "@/components/interactive/Button/Button";
 
 function parsePatientId(id: string | string[] | undefined) {
   if (typeof id !== "string") {
@@ -18,6 +22,7 @@ function parsePatientId(id: string | string[] | undefined) {
 export default function PatientPage() {
   const router = useRouter();
   const patientId = parsePatientId(router.query.id);
+  const [isEditingPatient, setIsEditingPatient] = useState(false);
 
   const {
     data: patient,
@@ -87,13 +92,31 @@ export default function PatientPage() {
               width={64}
               className="h-16 w-16 rounded-lg object-cover border border-slate-200"
             />
-            <div>
+            <div className="flex-1">
               <h1 className="text-2xl font-semibold text-slate-900">
                 {patient.name}
               </h1>
               <p className="text-slate-600">Simple patient profile details</p>
             </div>
+            <Button
+              title="Edit Patient Details"
+              colour="indigo"
+              onClick={() => setIsEditingPatient(true)}
+              className="shrink-0"
+            />
           </div>
+
+          {isEditingPatient && (
+            <Modal
+              title="Edit Patient Details"
+              onClose={() => setIsEditingPatient(false)}
+            >
+              <EditPatientForm
+                patient={patient}
+                onSuccess={() => setIsEditingPatient(false)}
+              />
+            </Modal>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {details.map((detail) => (

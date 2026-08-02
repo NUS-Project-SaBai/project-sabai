@@ -19,6 +19,9 @@ import { Button } from "@/components/interactive/Button/Button";
 import toast from "react-hot-toast";
 import { formatVisitDate } from "@/lib/utils/visit";
 import FormSection from "@/components/interactive/inputs/FormSection";
+import { useState } from "react";
+import Modal from "@/components/interactive/Modal";
+import EditPatientForm from "@/components/patient/EditPatientForm";
 
 type VitalsFormValues = {
   height?: string | null;
@@ -42,6 +45,7 @@ export default function PatientVitalsPage() {
   const { id } = router.query;
   const methods = useForm();
   const { setValue } = methods;
+  const [isEditingPatient, setIsEditingPatient] = useState(false);
 
   // Fetch patient
   const { data: patient, isLoading: patientLoading } =
@@ -102,11 +106,30 @@ export default function PatientVitalsPage() {
           ]}
         />
 
-        <div className="flex flex-col mb-8">
+        <div className="flex items-start justify-between gap-4 mb-8">
           <h1 className="text-3xl font-bold text-slate-900">
             Patient Vitals — {patient.name}
           </h1>
+          <Button
+            title="Edit Patient Details"
+            colour="indigo"
+            onClick={() => setIsEditingPatient(true)}
+            className="shrink-0"
+          />
         </div>
+
+        {isEditingPatient && (
+          <Modal
+            title="Edit Patient Details"
+            onClose={() => setIsEditingPatient(false)}
+            maxWidthClassName="max-w-2xl"
+          >
+            <EditPatientForm
+              patient={patient}
+              onSuccess={() => setIsEditingPatient(false)}
+            />
+          </Modal>
+        )}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <FormProvider {...methods}>
             <div className="p-6 border-b border-slate-100 bg-slate-50/50">
