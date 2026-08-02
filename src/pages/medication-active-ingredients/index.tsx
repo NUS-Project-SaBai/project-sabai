@@ -18,7 +18,7 @@ type EditFormFields = {
   name: string;
   unitOfMeasurement: string;
   fallBelow: number;
-  remarks: string;
+  remarks?: string;
 };
 
 type AddFormFields = Omit<EditFormFields, "id">;
