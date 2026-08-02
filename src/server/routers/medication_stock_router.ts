@@ -3,7 +3,12 @@ import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { eq } from "drizzle-orm";
-import { medicationStatusEnum, medicationStock } from "@/db/schema";
+import {
+  medicationBrands,
+  medicationStatusEnum,
+  medicationStock,
+  medicationActiveIngredients,
+} from "@/db/schema";
 
 export const medicationStockRouter = router({
   list: protectedProcedure.query(async () => {
@@ -15,8 +20,34 @@ export const medicationStockRouter = router({
         expiry: medicationStock.expiry,
         location: medicationStock.location,
         stockStatus: medicationStock.stockStatus,
+        remarks: medicationStock.remarks,
       })
       .from(medicationStock);
+    return result;
+  }),
+
+  listWithBrandAndActiveIngredient: protectedProcedure.query(async () => {
+    const result = await db
+      .select({
+        id: medicationStock.id,
+        medicationBrandId: medicationStock.medicationBrandId,
+        quantity: medicationStock.quantity,
+        expiry: medicationStock.expiry,
+        location: medicationStock.location,
+        stockStatus: medicationStock.stockStatus,
+        remarks: medicationStock.remarks,
+        medicationBrandName: medicationBrands.name,
+        medicationActiveIngredientName: medicationActiveIngredients.name,
+      })
+      .from(medicationStock)
+      .innerJoin(
+        medicationBrands,
+        eq(medicationStock.medicationBrandId, medicationBrands.id),
+      )
+      .innerJoin(
+        medicationActiveIngredients,
+        eq(medicationActiveIngredients.id, medicationBrands.activeIngredientId),
+      );
     return result;
   }),
 
@@ -28,6 +59,7 @@ export const medicationStockRouter = router({
         expiry: zfd.text(z.coerce.date()),
         location: zfd.text(),
         stockStatus: zfd.text(z.enum(medicationStatusEnum.enumValues)),
+        remarks: zfd.text(z.string().optional()),
       }),
     )
     .mutation(async ({ input }) => {
@@ -53,7 +85,6 @@ export const medicationStockRouter = router({
       return { success: !!result };
     }),
 
-  // id, quantity, expiry, location, stock_status
   update: protectedProcedure
     .input(
       zfd.formData({
@@ -65,6 +96,7 @@ export const medicationStockRouter = router({
         stockStatus: zfd.text(
           z.enum(medicationStatusEnum.enumValues).optional(),
         ),
+        remarks: zfd.text(z.string().optional()),
       }),
     )
     .mutation(async ({ input }) => {

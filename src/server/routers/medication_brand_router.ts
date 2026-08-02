@@ -3,7 +3,7 @@ import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { eq } from "drizzle-orm";
-import { medicationBrands } from "@/db/schema";
+import { medicationActiveIngredients, medicationBrands } from "@/db/schema";
 
 export const medicationBrandRouter = router({
   list: protectedProcedure.query(async () => {
@@ -12,8 +12,25 @@ export const medicationBrandRouter = router({
         id: medicationBrands.id,
         name: medicationBrands.name,
         activeIngredientId: medicationBrands.activeIngredientId,
+        remarks: medicationBrands.remarks,
       })
       .from(medicationBrands);
+    return result;
+  }),
+
+  listWithActiveIngredientName: protectedProcedure.query(async () => {
+    const result = await db
+      .select({
+        id: medicationBrands.id,
+        name: medicationBrands.name,
+        activeIngredientName: medicationActiveIngredients.name,
+      })
+      .from(medicationBrands)
+      .innerJoin(
+        medicationActiveIngredients,
+        eq(medicationActiveIngredients.id, medicationBrands.activeIngredientId),
+      );
+
     return result;
   }),
 
@@ -22,6 +39,7 @@ export const medicationBrandRouter = router({
       zfd.formData({
         name: zfd.text(z.string().nonoptional()),
         activeIngredientId: zfd.numeric(z.number().int()),
+        remarks: zfd.text().nonoptional(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -38,6 +56,7 @@ export const medicationBrandRouter = router({
         id: zfd.numeric(z.number().int()).nonoptional(),
         name: zfd.text().optional(),
         activeIngredientId: zfd.numeric(z.number().int()),
+        remarks: zfd.text(),
       }),
     )
     .mutation(async ({ input }) => {

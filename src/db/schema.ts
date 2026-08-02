@@ -22,10 +22,22 @@ export const authUsers = authSchema.table("users", {
 export const genderEnum = pgEnum("gender", ["male", "female"]);
 export const medicationStatusEnum = pgEnum("medication_status", [
   "active",
-  "disposed",
+  "discarded",
   "donated",
-  "expired",
+  "dispensed",
+  "reserved",
 ]);
+export const referralStateEnum = pgEnum("referral_state", [
+  "CompletedFailure",
+  "New",
+  "Seen",
+  "Outgoing",
+  "CompletedSuccess",
+  "Completed",
+  "None",
+]);
+
+export const medicationStatusValues = medicationStatusEnum.enumValues;
 export const orderStatusEnum = pgEnum("order_status", [
   "APPROVED",
   "CANCELLED",
@@ -108,6 +120,7 @@ Medication Active Ingredients Table:
 - name: Name of the active ingredient (e.g., "Paracetamol 500mg")
 - unitOfMeasurement: Unit used for measuring this ingredient (e.g., "bottles", "tablets")
 - fallBelow: Threshold quantity that triggers low stock alerts
+- remarks: Remarks for the active ingredient
 */
 export const medicationActiveIngredients = pgTable(
   "medication_active_ingredients",
@@ -118,6 +131,7 @@ export const medicationActiveIngredients = pgTable(
       length: 255,
     }).notNull(),
     fallBelow: integer("fall_below").notNull(),
+    remarks: text("remarks"),
   },
 );
 
@@ -131,6 +145,7 @@ Medication Brands Table:
 - id: Primary key, auto-incrementing integer
 - name: Name of the brand (e.g., "Panadol")
 - activeIngredientId: ID of the active ingredient
+- remarks: Remarks for the medication brand
 */
 export const medicationBrands = pgTable("medication_brands", {
   id: serial("id").primaryKey(),
@@ -140,6 +155,7 @@ export const medicationBrands = pgTable("medication_brands", {
     .references(() => medicationActiveIngredients.id, {
       onDelete: "restrict",
     }),
+  remarks: text("remarks"),
 });
 
 export type MedicationBrand = typeof medicationBrands.$inferSelect;
@@ -152,7 +168,8 @@ Medication Stock Table:
 - quantity: Quantity of the medication
 - expiry: Expiry date of the medication
 - location: Location of the medication
-- state: State of the medication (e.g., 'active', 'disposed', 'donated', 'expired')
+- state: State of the medication (e.g., 'active', 'discarded', 'donated', 'dispensed', 'reserved')
+- remarks: Remarks for the medication stock
 */
 export const medicationStock = pgTable("medication_stock", {
   id: serial("id").primaryKey(),
@@ -162,9 +179,10 @@ export const medicationStock = pgTable("medication_stock", {
       onDelete: "restrict",
     }),
   quantity: integer("quantity").notNull().default(0),
-  expiry: timestamp("expiry"),
-  location: varchar("location", { length: 255 }),
-  stockStatus: medicationStatusEnum("stock_status").default("active"),
+  expiry: timestamp("expiry").notNull(),
+  location: varchar("location", { length: 255 }).notNull(),
+  stockStatus: medicationStatusEnum("stock_status").default("active").notNull(),
+  remarks: text("remarks"),
 });
 
 export type MedicationStock = typeof medicationStock.$inferSelect;
@@ -364,6 +382,33 @@ export const diagnosis = pgTable("diagnosis", {
 
 export type Diagnosis = typeof diagnosis.$inferSelect;
 export type NewDiagnosis = typeof diagnosis.$inferInsert;
+
+/*
+Referrals Table:
+- id: Primary key, auto-incrementing integer.
+- referredFor: The reason the patient is referred.
+- referralNotes: Free-text notes about the referral.
+- referralState: Lifecycle state of the referral (e.g. 'New', 'Completed').
+- referralOutcome: Free-text result of the referral.
+- consultId: Foreign key referencing the consult. Deleting a consult that still has referrals is blocked (restrict).
+- createdAt: Timestamp of when the referral was created.
+*/
+export const referrals = pgTable("referrals", {
+  id: serial("id").primaryKey(),
+  referredFor: text("referred_for").notNull(),
+  referralNotes: text("referral_notes"),
+  referralState: referralStateEnum("referral_state").default("New").notNull(),
+  referralOutcome: text("referral_outcome"),
+  consultId: integer("consult_id")
+    .notNull()
+    .references(() => consults.id, {
+      onDelete: "restrict",
+    }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type Referral = typeof referrals.$inferSelect;
+export type NewReferral = typeof referrals.$inferInsert;
 
 /*
 Stock Changes Table:
