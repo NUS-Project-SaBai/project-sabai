@@ -376,8 +376,8 @@ export const stockChanges = pgTable("stock_changes", {
     .notNull()
     .references(() => medicationStock.id),
   field: varchar("field").notNull(),
-  from: varchar("from").notNull(),
-  to: varchar("to").notNull(),
+  previousValue: varchar("previous_value").notNull(),
+  newValue: varchar("new_value").notNull(),
   userId: uuid("user_id")
     .notNull()
     .references(() => authUsers.id),
