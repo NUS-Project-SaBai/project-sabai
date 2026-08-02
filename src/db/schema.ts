@@ -365,8 +365,8 @@ Stock Changes Table:
 - id: Primary key, auto-incrementing integer.
 - stockId: Foreign key referencing the stock that was changed.
 - field: The field of the row that was changed in the medication_stock table.
-- from: The previous value of the changed field.
-- to: The new value of the changed field.
+- previousValue: The previous value of the changed field.
+- newValue: The new value of the changed field.
 - userId: Foreign key referencing the user who changed the field.
 - createdAt: The timestamp of when the field was changed.
 */
