@@ -12,6 +12,11 @@ export interface ModalProps {
    * with a "Close" button (and an "or press Esc" hint) instead of bare corner cross.
    */
   title?: string;
+  /**
+   * Optional Tailwind max-width class controlling the modal's width.
+   * Defaults to `max-w-md`.
+   */
+  maxWidthClassName?: string;
 }
 
 /**
@@ -26,6 +31,7 @@ export default function Modal({
   children,
   onClose = () => {},
   title,
+  maxWidthClassName = "max-w-md",
 }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -46,7 +52,7 @@ export default function Modal({
         onClose();
       }}
       onClose={onClose}
-      className="inset-0 bg-white rounded-xl shadow-xl p-6 w-full max-w-md fixed flex min-h-60 flex-col justify-between self-center justify-self-center backdrop:fixed backdrop:inset-0 backdrop:bg-black/50"
+      className={`inset-0 bg-white rounded-xl shadow-xl p-6 w-full ${maxWidthClassName} fixed flex min-h-60 flex-col justify-between self-center justify-self-center backdrop:fixed backdrop:inset-0 backdrop:bg-black/50`}
       onClick={(e) => e.stopPropagation()}
     >
       {title ? (
