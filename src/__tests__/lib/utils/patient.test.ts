@@ -1,4 +1,8 @@
-import { formatPatientCode, formatPatientId } from "@/lib/utils/patient";
+import {
+  formatPatientCode,
+  formatPatientId,
+  toDateInputValue,
+} from "@/lib/utils/patient";
 
 describe("formatPatientId", () => {
   it("zero-pads ids to 4 digits", () => {
@@ -14,5 +18,24 @@ describe("formatPatientId", () => {
 describe("formatPatientCode", () => {
   it("prefixes the village code when present", () => {
     expect(formatPatientCode("PC", 12)).toBe("PC0012");
+  });
+});
+
+describe("toDateInputValue", () => {
+  it("returns yyyy-MM-dd for an ISO string with a time component", () => {
+    // The shape <input type='date'> requires; the time must be dropped.
+    expect(toDateInputValue("1987-04-10T00:00:00.000Z")).toBe("1987-04-10");
+  });
+
+  it("returns yyyy-MM-dd for a bare date string", () => {
+    expect(toDateInputValue("1987-04-10")).toBe("1987-04-10");
+  });
+
+  it("returns an empty string for an unparseable date string", () => {
+    expect(toDateInputValue("not a date")).toBe("");
+  });
+
+  it("returns an empty string for an invalid Date object", () => {
+    expect(toDateInputValue(new Date(NaN))).toBe("");
   });
 });
