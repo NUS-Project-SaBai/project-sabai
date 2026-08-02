@@ -31,6 +31,11 @@ export const orderStatusEnum = pgEnum("order_status", [
   "CANCELLED",
   "PENDING",
 ]);
+export const stockChangeFieldEnum = pgEnum("stock_change_field_enum", [
+  "location",
+  "quantity",
+  "stock_status",
+]);
 
 // Define tables
 
@@ -375,7 +380,7 @@ export const stockChanges = pgTable("stock_changes", {
   stockId: integer("stock_id")
     .notNull()
     .references(() => medicationStock.id),
-  field: varchar("field").notNull(),
+  field: stockChangeFieldEnum("field").notNull(),
   previousValue: varchar("previous_value").notNull(),
   newValue: varchar("new_value").notNull(),
   userId: uuid("user_id")
