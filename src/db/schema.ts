@@ -384,6 +384,9 @@ export const stockChanges = pgTable("stock_changes", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export type StockChange = typeof stockChanges.$inferSelect;
+export type NewStockChange = typeof stockChanges.$inferInsert;
+
 /*
 Orders Table:
 - id: Primary key, auto-incrementing integer.
@@ -403,3 +406,6 @@ export const orders = pgTable("orders", {
     .notNull()
     .references(() => stockChanges.id),
 });
+
+export type Order = typeof orders.$inferSelect;
+export type NewOrder = typeof orders.$inferInsert;
