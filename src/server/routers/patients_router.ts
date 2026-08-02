@@ -217,6 +217,11 @@ export const patientsRouter = router({
     .mutation(async ({ input }) => {
       const { id, patientImage, ...updateData } = input;
 
+      if (updateData.identificationNumber !== undefined) {
+        updateData.identificationNumber =
+          updateData.identificationNumber.trim();
+      }
+
       // Reject an identificationNumber that already belongs to a different
       // patient. This is the guard against creating duplicate IDs via updates.
       if (updateData.identificationNumber) {
