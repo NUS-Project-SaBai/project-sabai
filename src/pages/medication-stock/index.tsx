@@ -112,6 +112,7 @@ function MedicationStockBasePage() {
               "Quantity",
               "Expiry",
               "State",
+              "Remarks",
               "Actions",
             ]}
           />
@@ -146,6 +147,11 @@ function MedicationStockBasePage() {
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
                     {item.stockStatus}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm font-medium text-slate-900">
+                    {item.remarks}
                   </span>
                 </TableCell>
                 <TableCell>

@@ -12,6 +12,7 @@ export const medicationBrandRouter = router({
         id: medicationBrands.id,
         name: medicationBrands.name,
         activeIngredientId: medicationBrands.activeIngredientId,
+        remarks: medicationBrands.remarks,
       })
       .from(medicationBrands);
     return result;
@@ -38,6 +39,7 @@ export const medicationBrandRouter = router({
       zfd.formData({
         name: zfd.text(z.string().nonoptional()),
         activeIngredientId: zfd.numeric(z.number().int()),
+        remarks: zfd.text().nonoptional(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -54,6 +56,7 @@ export const medicationBrandRouter = router({
         id: zfd.numeric(z.number().int()).nonoptional(),
         name: zfd.text().optional(),
         activeIngredientId: zfd.numeric(z.number().int()),
+        remarks: zfd.text(),
       }),
     )
     .mutation(async ({ input }) => {

@@ -109,8 +109,14 @@ export default function CreateModal({
             name="stockStatus"
             label="Status"
             dropdownOptions={stockStatusDropdown}
-            className="mb-8"
+            className="mb-4"
             isRequired
+          />
+          <RHFInput
+            name="remarks"
+            label="Remarks"
+            type="text"
+            className="mb-8"
           />
           <div className="flex flex-row gap-2">
             <Button

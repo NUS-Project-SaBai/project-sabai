@@ -23,6 +23,7 @@ const MOCK_STOCK = [
     expiry: new Date("2026-05-21 09:30:00+00"),
     location: "Shelf 1",
     stockStatus: "active",
+    remarks: "test remark",
     medicationBrandName: "Panadol",
     medicationActiveIngredientName: "Paracetamol",
   },
@@ -133,6 +134,7 @@ describe("MedicationStockPage", () => {
         "Quantity",
         "Expiry",
         "State",
+        "Remarks",
         "Actions",
       ],
       [
@@ -142,6 +144,7 @@ describe("MedicationStockPage", () => {
         "200",
         "5/21/2026",
         "active",
+        "test remark",
         "EditSplit",
       ],
     ]);
