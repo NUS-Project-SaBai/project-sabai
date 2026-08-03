@@ -10,6 +10,7 @@ import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import { SetStateAction, useState } from "react";
 import { MedicationStockWithBrandAndActiveIngredient } from "@/lib/utils/medication-stock";
+import { FormProvider, useForm } from "react-hook-form";
 
 function Header() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
@@ -135,6 +136,14 @@ function MedicationStockBasePage() {
   );
 }
 
+// Only able to edit location, stockStatus and remarks.
+// All other fields are locked from editing.
+type EditFormFields = {
+  location: string;
+  stockStatus: string;
+  remarks: string;
+};
+
 function Row({
   item,
   setSplittingStock,
@@ -145,58 +154,67 @@ function Row({
   >;
 }) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const form = useForm<EditFormFields>({
+    values: {
+      location: item.location,
+      stockStatus: item.stockStatus,
+      remarks: item.remarks ?? "",
+    },
+  });
 
   return (
     <TableRow key={item.id}>
-      <TableCell>
-        <span className="text-sm font-medium text-slate-900">
-          {item.medicationActiveIngredientName}
-        </span>
-      </TableCell>
-      <TableCell>
-        <span className="text-sm font-medium text-slate-900">
-          {item.medicationBrandName}
-        </span>
-      </TableCell>
-      <TableCell>
-        <span className="text-sm font-medium text-slate-900">
-          {item.location}
-        </span>
-      </TableCell>
-      <TableCell>
-        <span className="text-sm font-medium text-slate-900">
-          {item.quantity}
-        </span>
-      </TableCell>
-      <TableCell>
-        <span className="text-sm font-medium text-slate-900">
-          {item.expiry?.toLocaleDateString()}
-        </span>
-      </TableCell>
-      <TableCell>
-        <span className="text-sm font-medium text-slate-900">
-          {item.stockStatus}
-        </span>
-      </TableCell>
-      <TableCell>
-        <span className="text-sm font-medium text-slate-900">
-          {item.remarks}
-        </span>
-      </TableCell>
-      <TableCell>
-        <span className="text-sm font-medium text-slate-900 flex flex-row gap-2">
-          <Button
-            onClick={() => setIsEditing(true)}
-            colour="emerald"
-            title="Edit"
-          />
-          <Button
-            onClick={() => setSplittingStock(item)}
-            colour="indigo"
-            title="Split"
-          />
-        </span>
-      </TableCell>
+      <FormProvider {...form}>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {item.medicationActiveIngredientName}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {item.medicationBrandName}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {item.location}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {item.quantity}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {item.expiry?.toLocaleDateString()}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {item.stockStatus}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {item.remarks}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900 flex flex-row gap-2">
+            <Button
+              onClick={() => setIsEditing(true)}
+              colour="emerald"
+              title="Edit"
+            />
+            <Button
+              onClick={() => setSplittingStock(item)}
+              colour="indigo"
+              title="Split"
+            />
+          </span>
+        </TableCell>
+      </FormProvider>
     </TableRow>
   );
 }
