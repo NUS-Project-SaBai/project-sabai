@@ -9,7 +9,7 @@ import TableRow from "@/components/TableRow";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import { SetStateAction, useState } from "react";
-import { MedicationStockWithBrandAndActiveIngredient } from "@/lib/utils/medication-stock";
+import { MedicationStockWithBrandAndActiveIngredient, StockStatus } from "@/lib/utils/medication-stock";
 import { FormProvider, useForm } from "react-hook-form";
 
 function Header() {
@@ -140,7 +140,7 @@ function MedicationStockBasePage() {
 // All other fields are locked from editing.
 type EditFormFields = {
   location: string;
-  stockStatus: string;
+  stockStatus: StockStatus;
   remarks: string;
 };
 
