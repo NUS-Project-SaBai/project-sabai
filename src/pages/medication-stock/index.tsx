@@ -72,7 +72,6 @@ function MedicationStockBasePage() {
     isError,
   } = trpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery();
 
-  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [splittingStock, setSplittingStock] =
     useState<MedicationStockWithBrandAndActiveIngredient | null>(null);
 
@@ -101,8 +100,6 @@ function MedicationStockBasePage() {
             stock={splittingStock}
           />
         )}
-        {isEditing && <span>editing</span>}
-        {/* TODO: Implement stock editing, placeholder for now*/}
         <table className="min-w-full divide-y divide-slate-200">
           <TableHeader
             headers={[
@@ -120,7 +117,6 @@ function MedicationStockBasePage() {
             {stock.map((item) => (
               <Row
                 key={item.id}
-                setIsEditing={setIsEditing}
                 setSplittingStock={setSplittingStock}
                 item={item}
               />
@@ -141,15 +137,15 @@ function MedicationStockBasePage() {
 
 function Row({
   item,
-  setIsEditing,
   setSplittingStock,
 }: {
   item: MedicationStockWithBrandAndActiveIngredient;
-  setIsEditing: React.Dispatch<SetStateAction<boolean>>;
   setSplittingStock: React.Dispatch<
     SetStateAction<MedicationStockWithBrandAndActiveIngredient | null>
   >;
 }) {
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+
   return (
     <TableRow key={item.id}>
       <TableCell>
