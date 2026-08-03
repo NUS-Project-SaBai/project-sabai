@@ -9,8 +9,14 @@ import TableRow from "@/components/TableRow";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import { SetStateAction, useState } from "react";
-import { MedicationStockWithBrandAndActiveIngredient, StockStatus } from "@/lib/utils/medication-stock";
+import {
+  MedicationStockWithBrandAndActiveIngredient,
+  StockStatus,
+  stockStatusDropdown,
+} from "@/lib/utils/medication-stock";
 import { FormProvider, useForm } from "react-hook-form";
+import EditableCell from "@/components/interactive/EditableCell";
+import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 
 function Header() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
@@ -177,7 +183,13 @@ function Row({
         </TableCell>
         <TableCell>
           <span className="text-sm font-medium text-slate-900">
-            {item.location}
+            <EditableCell
+              isEditing={isEditing}
+              name="location"
+              type="text"
+              value={form.getValues().location}
+              label=""
+            />
           </span>
         </TableCell>
         <TableCell>
@@ -192,21 +204,46 @@ function Row({
         </TableCell>
         <TableCell>
           <span className="text-sm font-medium text-slate-900">
-            {item.stockStatus}
+            {isEditing ? (
+              <RHFDropdown
+                name="stockStatus"
+                label=""
+                dropdownOptions={stockStatusDropdown}
+              />
+            ) : (
+              form.getValues().stockStatus
+            )}
           </span>
         </TableCell>
         <TableCell>
           <span className="text-sm font-medium text-slate-900">
-            {item.remarks}
+            <EditableCell
+              isEditing={isEditing}
+              name="remarks"
+              type="text"
+              value={form.getValues().remarks}
+              label=""
+            />
           </span>
         </TableCell>
         <TableCell>
           <span className="text-sm font-medium text-slate-900 flex flex-row gap-2">
-            <Button
-              onClick={() => setIsEditing(true)}
-              colour="emerald"
-              title="Edit"
-            />
+            {isEditing ? (
+              <Button
+                onClick={() => {
+                  setIsEditing(false);
+                  console.log("save");
+                }}
+                colour="emerald"
+                title="Save"
+              />
+            ) : (
+              <Button
+                onClick={() => setIsEditing(true)}
+                colour="emerald"
+                title="Edit"
+              />
+            )}
             <Button
               onClick={() => setSplittingStock(item)}
               colour="indigo"
