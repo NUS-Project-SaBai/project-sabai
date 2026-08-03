@@ -8,7 +8,7 @@ import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { MedicationStockWithBrandAndActiveIngredient } from "@/lib/utils/medication-stock";
 
 function Header() {
@@ -118,57 +118,12 @@ function MedicationStockBasePage() {
           />
           <tbody className="bg-white divide-y divide-slate-200">
             {stock.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {item.medicationActiveIngredientName}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {item.medicationBrandName}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {item.location}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {item.quantity}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {item.expiry?.toLocaleDateString()}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {item.stockStatus}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {item.remarks}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900 flex flex-row gap-2">
-                    <Button
-                      onClick={() => setIsEditing(true)}
-                      colour="emerald"
-                      title="Edit"
-                    />
-                    <Button
-                      onClick={() => setSplittingStock(item)}
-                      colour="indigo"
-                      title="Split"
-                    />
-                  </span>
-                </TableCell>
-              </TableRow>
+              <Row
+                key={item.id}
+                setIsEditing={setIsEditing}
+                setSplittingStock={setSplittingStock}
+                item={item}
+              />
             ))}
           </tbody>
         </table>
@@ -181,6 +136,72 @@ function MedicationStockBasePage() {
       <Header />
       {renderContent()}
     </div>
+  );
+}
+
+function Row({
+  item,
+  setIsEditing,
+  setSplittingStock,
+}: {
+  item: MedicationStockWithBrandAndActiveIngredient;
+  setIsEditing: React.Dispatch<SetStateAction<boolean>>;
+  setSplittingStock: React.Dispatch<
+    SetStateAction<MedicationStockWithBrandAndActiveIngredient | null>
+  >;
+}) {
+  return (
+    <TableRow key={item.id}>
+      <TableCell>
+        <span className="text-sm font-medium text-slate-900">
+          {item.medicationActiveIngredientName}
+        </span>
+      </TableCell>
+      <TableCell>
+        <span className="text-sm font-medium text-slate-900">
+          {item.medicationBrandName}
+        </span>
+      </TableCell>
+      <TableCell>
+        <span className="text-sm font-medium text-slate-900">
+          {item.location}
+        </span>
+      </TableCell>
+      <TableCell>
+        <span className="text-sm font-medium text-slate-900">
+          {item.quantity}
+        </span>
+      </TableCell>
+      <TableCell>
+        <span className="text-sm font-medium text-slate-900">
+          {item.expiry?.toLocaleDateString()}
+        </span>
+      </TableCell>
+      <TableCell>
+        <span className="text-sm font-medium text-slate-900">
+          {item.stockStatus}
+        </span>
+      </TableCell>
+      <TableCell>
+        <span className="text-sm font-medium text-slate-900">
+          {item.remarks}
+        </span>
+      </TableCell>
+      <TableCell>
+        <span className="text-sm font-medium text-slate-900 flex flex-row gap-2">
+          <Button
+            onClick={() => setIsEditing(true)}
+            colour="emerald"
+            title="Edit"
+          />
+          <Button
+            onClick={() => setSplittingStock(item)}
+            colour="indigo"
+            title="Split"
+          />
+        </span>
+      </TableCell>
+    </TableRow>
   );
 }
 
