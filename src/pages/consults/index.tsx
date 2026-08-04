@@ -17,7 +17,7 @@ function ConsultsPage() {
     data: patients,
     isLoading,
     isError,
-  } = trpc.patientsRouter.list.useQuery();
+  } = trpc.patientsRouter.listWithLatestVisit.useQuery();
 
   const startConsult = (patientId: number) =>
     router.push(`/consults/${patientId}`);
