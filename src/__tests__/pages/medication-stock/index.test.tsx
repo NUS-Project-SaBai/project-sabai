@@ -72,6 +72,10 @@ describe("MedicationStockPage", () => {
         isLoading: false,
       }),
     );
+
+    mockTrpc.medicationStockRouter.update.useMutation.mockReturnValue({
+      mutate: vi.fn(),
+    });
   });
 
   afterEach(() => {
@@ -389,5 +393,187 @@ describe("MedicationStockPage", () => {
     expect(await screen.findByRole("status")).toHaveTextContent(
       "Successfully created!",
     );
+  });
+
+  // Stock editing
+
+  it("changes to row editing mode when edit button is clicked", async () => {
+    // only location, state, remarks editable
+    // edit button turns into save button
+    const user = userEvent.setup();
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    const screen = render(<MedicationStockBasePage />);
+
+    expect(document.querySelectorAll("input").length).toBe(0);
+
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+
+    // Location and remarks field (free text)
+    expect(document.querySelectorAll("input").length).toBe(2);
+
+    // Dropdown field
+    expect(
+      document.querySelector('button[name="stockStatus-dropdown-button"]'),
+    ).toBeInTheDocument();
+
+    expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
+  });
+
+  it("disallows saves if the Save button is clicked when no fields are dirty", async () => {
+    const user = userEvent.setup();
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    const screen = render(
+      <>
+        <Toaster />
+        <MedicationStockBasePage />
+      </>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    const toastEl = screen.getByRole("status");
+    expect(toastEl).toBeInTheDocument();
+    expect(toastEl).toHaveTextContent("No fields changed!");
+  });
+
+  it("saves when location field has been dirtied and saved", async () => {
+    const user = userEvent.setup();
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationStockRouter.update.useMutation.mockImplementation(
+      ({ onSuccess }) => {
+        return {
+          mutate: vi.fn(() => {
+            onSuccess?.();
+          }),
+          isLoading: false,
+        };
+      },
+    );
+
+    const screen = render(
+      <>
+        <Toaster />
+        <MedicationStockBasePage />
+      </>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+
+    const locationInput = document.querySelector('input[name="location"]');
+
+    await user.type(locationInput!, "valid location");
+
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    const toastEl = screen.getByRole("status");
+    expect(toastEl).toBeInTheDocument();
+    expect(toastEl).toHaveTextContent("Successfully updated!");
+  });
+
+  it("saves when remarks field has been dirtied and saved", async () => {
+    const user = userEvent.setup();
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationStockRouter.update.useMutation.mockImplementation(
+      ({ onSuccess }) => {
+        return {
+          mutate: vi.fn(() => {
+            onSuccess?.();
+          }),
+          isLoading: false,
+        };
+      },
+    );
+
+    const screen = render(
+      <>
+        <Toaster />
+        <MedicationStockBasePage />
+      </>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+
+    const remarksInput = document.querySelector('input[name="remarks"]');
+
+    await user.type(remarksInput!, "valid remarks");
+
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    const toastEl = screen.getByRole("status");
+    expect(toastEl).toBeInTheDocument();
+    expect(toastEl).toHaveTextContent("Successfully updated!");
+  });
+
+  it("saves when stock status dropdown has been dirtied and saved", async () => {
+    const user = userEvent.setup();
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationStockRouter.update.useMutation.mockImplementation(
+      ({ onSuccess }) => {
+        return {
+          mutate: vi.fn(() => {
+            onSuccess?.();
+          }),
+          isLoading: false,
+        };
+      },
+    );
+
+    const screen = render(
+      <>
+        <Toaster />
+        <MedicationStockBasePage />
+      </>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+
+    const dropdownButton = document.querySelector(
+      'button[name="stockStatus-dropdown-button"]',
+    );
+
+    await user.click(dropdownButton!);
+
+    const dropdownButtonDonated = document.querySelector(
+      'button[name="stockStatus-donated-dropdown-option"]',
+    );
+    await user.click(dropdownButtonDonated!);
+
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    const toastEl = screen.getByRole("status");
+    expect(toastEl).toBeInTheDocument();
+    expect(toastEl).toHaveTextContent("Successfully updated!");
   });
 });
