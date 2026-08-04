@@ -56,6 +56,17 @@ export default function SplittingModal({
       toast.error("Must have at least 2 splits!");
       return;
     }
+
+    const quantity = splits.reduce(
+      (accumulator, current) => accumulator + current.quantity,
+      0,
+    );
+
+    if (quantity != stock.quantity) {
+      toast.error("Child stock quantity does not equal parent stock quantity!");
+      return;
+    }
+
     const payload = splits.map((split) => ({
       parentId: split.id,
       location: split.location,
