@@ -336,6 +336,42 @@ export type Puberty = typeof puberty.$inferSelect;
 export type NewPuberty = typeof puberty.$inferInsert;
 
 /*
+Child Vitals Table:
+- id: Primary key, auto-incrementing integer.
+- grossMotor: Gross motor assessment.
+- redReflex: Red reflex test result.
+- scoliosis: Scoliosis assessment.
+- pallor: Presence of pallor (nullable = not assessed).
+- oralCavity: Oral cavity assessment.
+- heart: Heart examination findings.
+- abdomen: Abdomen examination findings.
+- lungs: Lungs examination findings.
+- hernialOrifices: Hernial orifices examination findings.
+- vitalId: Foreign key referencing the vitals record (unique).
+*/
+export const childVitals = pgTable("child_vitals", {
+  id: serial("id").primaryKey(),
+  grossMotor: text("gross_motor"),
+  redReflex: text("red_reflex"),
+  scoliosis: text("scoliosis"),
+  pallor: boolean("pallor"),
+  oralCavity: text("oral_cavity"),
+  heart: text("heart"),
+  abdomen: text("abdomen"),
+  lungs: text("lungs"),
+  hernialOrifices: text("hernial_orifices"),
+  vitalId: integer("vital_id")
+    .notNull()
+    .unique()
+    .references(() => vitals.id, {
+      onDelete: "cascade",
+    }),
+});
+
+export type ChildVital = typeof childVitals.$inferSelect;
+export type NewChildVital = typeof childVitals.$inferInsert;
+
+/*
 Consults Table:
 - id: Primary key, auto-incrementing integer.
 - date: Timestamp of the consultation.
