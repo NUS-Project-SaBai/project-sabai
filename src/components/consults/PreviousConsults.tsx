@@ -12,7 +12,9 @@ function Field({ label, value }: { label: string; value: string | null }) {
   if (!value) return null;
   return (
     <div>
-      <p className="text-xs font-semibold text-slate-500">{label}</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        {label}
+      </p>
       <p className="whitespace-pre-wrap break-words text-sm text-slate-700">
         {value}
       </p>
@@ -34,7 +36,9 @@ function ConsultCard({ consult }: { consult: Consult }) {
 
       {consult.diagnoses.length > 0 && (
         <div>
-          <p className="text-xs font-semibold text-slate-500">Diagnoses</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Diagnoses
+          </p>
           <ul className="mt-1 space-y-1">
             {consult.diagnoses.map((d) => (
               <li key={d.id} className="break-words text-sm text-slate-700">
