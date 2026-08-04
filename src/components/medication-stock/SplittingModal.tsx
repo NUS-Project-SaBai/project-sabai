@@ -163,7 +163,6 @@ export default function SplittingModal({
         title="Confirm"
         colour="emerald"
         onClick={handleSubmit}
-        // TODO(separate PR): validate parent qty === sum(all child qty), then bulk mutate the splits
       />
     </Modal>
   );
