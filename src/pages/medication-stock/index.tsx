@@ -14,9 +14,10 @@ import {
   StockStatus,
   stockStatusDropdown,
 } from "@/lib/utils/medication-stock";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import EditableCell from "@/components/interactive/EditableCell";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
+import toast from "react-hot-toast";
 
 function Header() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
@@ -145,6 +146,7 @@ function MedicationStockBasePage() {
 // Only able to edit location, stockStatus and remarks.
 // All other fields are locked from editing.
 type EditFormFields = {
+  id: number;
   location: string;
   stockStatus: StockStatus;
   remarks: string;
@@ -162,11 +164,37 @@ function Row({
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const form = useForm<EditFormFields>({
     values: {
+      id: item.id,
       location: item.location,
       stockStatus: item.stockStatus,
       remarks: item.remarks ?? "",
     },
   });
+
+  const { isDirty } = form.formState;
+
+  const utils = trpc.useUtils();
+
+  const updateMutation = trpc.medicationStockRouter.update.useMutation({
+    onSuccess: () => {
+      toast.success("Successfully updated!");
+      utils.medicationStockRouter.listWithBrandAndActiveIngredient.invalidate();
+      form.reset();
+      setIsEditing(false);
+    },
+    onError: (err) => {
+      console.error(err);
+      toast.error("An error has occurred.");
+    },
+  });
+
+  const handleSubmit: SubmitHandler<EditFormFields> = async (data) => {
+    if (isDirty) {
+      updateMutation.mutate(data);
+    } else {
+      toast.error("No fields changed!");
+    }
+  };
 
   return (
     <TableRow key={item.id}>
@@ -231,8 +259,7 @@ function Row({
             {isEditing ? (
               <Button
                 onClick={() => {
-                  setIsEditing(false);
-                  console.log("save");
+                  form.handleSubmit(handleSubmit)();
                 }}
                 colour="emerald"
                 title="Save"
