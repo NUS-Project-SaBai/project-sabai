@@ -68,13 +68,12 @@ export default function SplittingModal({
     }
 
     const payload = splits.map((split) => ({
-      parentId: split.id,
       location: split.location,
       stockStatus: split.stockStatus,
       quantity: split.quantity,
       remarks: split.remarks ?? undefined,
     }));
-    splitMutation.mutate({ splits: payload });
+    splitMutation.mutate({ splits: payload, parentId: stock.id });
   }
 
   return (
