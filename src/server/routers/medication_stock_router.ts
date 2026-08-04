@@ -2,7 +2,7 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import {
   medicationBrands,
   medicationStatusEnum,
@@ -47,7 +47,8 @@ export const medicationStockRouter = router({
       .innerJoin(
         medicationActiveIngredients,
         eq(medicationActiveIngredients.id, medicationBrands.activeIngredientId),
-      );
+      )
+      .orderBy(desc(medicationStock.id));
     return result;
   }),
 
