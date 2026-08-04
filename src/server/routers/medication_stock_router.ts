@@ -109,4 +109,24 @@ export const medicationStockRouter = router({
 
       return result ? result : null;
     }),
+
+  createSplits: protectedProcedure
+    .input(
+      zfd.formData({
+        splits: z
+          .array(
+            z.object({
+              parentId: zfd.numeric(z.number().int()),
+              quantity: zfd.numeric(z.number().int()),
+              location: zfd.text(z.string()),
+              stockStatus: zfd.text(z.enum(medicationStatusEnum.enumValues)),
+              remarks: zfd.text(z.string().optional()),
+            }),
+          )
+          .min(2),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      console.log(input);
+    }),
 });
