@@ -24,8 +24,8 @@ const createConsultInput = z.object({
   visitId: z.number().int().positive(),
   pastMedicalHistory: z.string().trim().optional(),
   consultation: z.string().trim().optional(),
-  treatmentPlan: z.string().optional(),
-  remarks: z.string().optional(),
+  treatmentPlan: z.string().trim().optional(),
+  remarks: z.string().trim().optional(),
   diagnoses: z
     .array(diagnosisInput)
     .min(1, "At least one diagnosis is required"),
