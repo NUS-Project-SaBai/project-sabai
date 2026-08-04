@@ -6,6 +6,8 @@ import {
 import { Button } from "@/components/interactive/Button/Button";
 import { useState } from "react";
 import { medicationStatusValues } from "@/db/schema";
+import { trpc } from "@/utils/trpc";
+import toast from "react-hot-toast";
 
 export default function SplittingModal({
   onClose,
@@ -22,6 +24,20 @@ export default function SplittingModal({
     setSplits(splits.filter((item, index) => index !== remove));
   }
 
+  const utils = trpc.useUtils();
+
+  const splitMutation = trpc.medicationStockRouter.createSplits.useMutation({
+    onSuccess: () => {
+      toast.success("Successfully split!");
+      utils.medicationStockRouter.listWithBrandAndActiveIngredient.invalidate();
+      onClose();
+    },
+    onError: (err) => {
+      console.error(err);
+      toast.error("An error has occurred.");
+    },
+  });
+
   function updateSplit(index: number, patch: object) {
     const newSplits = splits.map((item, itemIndex) =>
       itemIndex === index
@@ -33,6 +49,21 @@ export default function SplittingModal({
     );
 
     setSplits(newSplits);
+  }
+
+  function handleSubmit() {
+    if (splits.length < 2) {
+      toast.error("Must have at least 2 splits!");
+      return;
+    }
+    const payload = splits.map((split) => ({
+      parentId: split.id,
+      location: split.location,
+      stockStatus: split.stockStatus,
+      quantity: split.quantity,
+      remarks: split.remarks ?? undefined,
+    }));
+    splitMutation.mutate({ splits: payload });
   }
 
   return (
@@ -101,6 +132,13 @@ export default function SplittingModal({
                 updateSplit(index, { quantity: parseInt(e.target.value) })
               }
             />
+            <input
+              type="text"
+              value={split.remarks ? split.remarks : ""}
+              onChange={(e) => {
+                updateSplit(index, { remarks: e.target.value });
+              }}
+            />
           </div>
           <hr></hr>
         </div>
@@ -114,7 +152,7 @@ export default function SplittingModal({
       <Button
         title="Confirm"
         colour="emerald"
-        onClick={() => console.log(splits)}
+        onClick={handleSubmit}
         // TODO(separate PR): validate parent qty === sum(all child qty), then bulk mutate the splits
       />
     </Modal>
