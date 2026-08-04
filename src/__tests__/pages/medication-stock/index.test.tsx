@@ -46,6 +46,9 @@ vi.mock("@/utils/trpc", () => ({
       create: {
         useMutation: vi.fn(),
       },
+      update: {
+        useMutation: vi.fn(),
+      },
     },
     medicationBrandRouter: {
       listWithActiveIngredientName: {
