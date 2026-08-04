@@ -61,6 +61,10 @@ export default function SplittingModal({
             <td>Status:</td>
             <td>{stock.stockStatus}</td>
           </tr>
+          <tr>
+            <td>Remarks:</td>
+            <td>{stock.remarks}</td>
+          </tr>
         </tbody>
       </table>
       <h3 className="text-l font-bold mb-4 mt-4">Child stock details</h3>
