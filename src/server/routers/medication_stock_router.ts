@@ -2,7 +2,7 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { eq } from "drizzle-orm";
+import { eq, ne } from "drizzle-orm";
 import {
   medicationBrands,
   medicationStatusEnum,
@@ -23,7 +23,8 @@ export const medicationStockRouter = router({
         stockStatus: medicationStock.stockStatus,
         remarks: medicationStock.remarks,
       })
-      .from(medicationStock);
+      .from(medicationStock)
+      .where(ne(medicationStock.quantity, 0));
     return result;
   }),
 
@@ -48,7 +49,8 @@ export const medicationStockRouter = router({
       .innerJoin(
         medicationActiveIngredients,
         eq(medicationActiveIngredients.id, medicationBrands.activeIngredientId),
-      );
+      )
+      .where(ne(medicationStock.quantity, 0));
     return result;
   }),
 
