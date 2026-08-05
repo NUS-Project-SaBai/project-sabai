@@ -150,19 +150,16 @@ export const medicationStockRouter = router({
       }
 
       return db.transaction(async (tx) => {
-        for (let i = 0; i < splits.length; i++) {
-          // splits copy parent's medicationBrandId and expiry
-          await tx.insert(medicationStock).values({
+        await tx.insert(medicationStock).values(
+          splits.map((s) => ({
             medicationBrandId: parent[0].medicationBrandId,
             expiry: parent[0].expiry,
-            quantity: splits[i].quantity,
-            location: splits[i].location,
-            stockStatus: splits[i].stockStatus,
-            remarks: splits[i].remarks,
-          });
-
-          // TODO: stockChanges table obtains the IDs of the new splits and writes
-        }
+            quantity: s.quantity,
+            location: s.location,
+            stockStatus: s.stockStatus,
+            remarks: s.remarks,
+          })),
+        );
 
         // parent stock quantity reduces to 0
         await tx
