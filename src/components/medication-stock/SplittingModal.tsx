@@ -8,6 +8,7 @@ import { useState } from "react";
 import { medicationStatusValues } from "@/db/schema";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
+import { areStocksDistinct } from "@/lib/utils/medication-stock";
 
 export default function SplittingModal({
   onClose,
@@ -49,25 +50,6 @@ export default function SplittingModal({
     );
 
     setSplits(newSplits);
-  }
-
-  type Payload = {
-    location: string;
-    stockStatus: StockStatus;
-    quantity: number;
-    remarks: string | undefined;
-  };
-
-  function areStocksDistinct(stocks: Payload[]) {
-    const stocksSet = new Set();
-    for (let i = 0; i < stocks.length; i++) {
-      const stringified = JSON.stringify(stocks[i]);
-      if (stocksSet.has(stringified)) {
-        return false;
-      }
-      stocksSet.add(stringified);
-    }
-    return true;
   }
 
   function handleSubmit() {
