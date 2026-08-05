@@ -387,4 +387,22 @@ describe("MedicationStockPage", () => {
       "Successfully created!",
     );
   });
+
+  // Stock splitting
+
+  it("opens a 'Split Stock' modal with the parent stock details, 'Add Split' button, and 'Confirm' button when the split button is clicked", () => {});
+
+  it("shows 'No splits added, add a split to begin' when there are 0 child stocks added", () => {});
+
+  it("creates a new child stock component with corresponding split indexes, with editable components for all editable fields, default values copying the parent stock, when the 'Add Split' button is clicked", () => {});
+
+  it("removes the split when the '-' button is clicked", () => {});
+
+  it("rejects when confirming the split if there are less than 2 child stock", () => {});
+
+  it("rejects when the total quantity of child splits do not equal the quantity in the parent split", () => {});
+
+  it("rejects when splits are not distinct from each other", () => {});
+
+  it("creates new child stock entries in the table when the split succeeds", () => {});
 });
