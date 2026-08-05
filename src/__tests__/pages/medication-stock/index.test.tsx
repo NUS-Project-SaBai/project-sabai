@@ -7,6 +7,7 @@ import {
   screen,
   within,
   fireEvent,
+  waitFor,
 } from "@testing-library/react";
 import MedicationStockBasePage from "@/pages/medication-stock";
 import {
@@ -44,6 +45,9 @@ vi.mock("@/utils/trpc", () => ({
         useQuery: vi.fn(),
       },
       create: {
+        useMutation: vi.fn(),
+      },
+      createSplits: {
         useMutation: vi.fn(),
       },
     },
@@ -390,7 +394,35 @@ describe("MedicationStockPage", () => {
 
   // Stock splitting
 
-  it("opens a 'Split Stock' modal with the parent stock details, 'Add Split' button, and 'Confirm' button when the split button is clicked", () => {});
+  it("opens a 'Split Stock' modal with the parent stock details, 'Add Split' button, and 'Confirm' button when the split button is clicked", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    render(
+      <>
+        <MedicationStockBasePage />
+      </>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Split" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Split Stock")).toBeInTheDocument();
+      expect(screen.getByText("Parent stock details")).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Add Split" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Confirm" }),
+      ).toBeInTheDocument();
+    });
+  });
 
   it("shows 'No splits added, add a split to begin' when there are 0 child stocks added", () => {});
 
