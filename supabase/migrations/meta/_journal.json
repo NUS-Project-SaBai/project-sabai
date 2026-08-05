@@ -113,6 +113,13 @@
       "when": 1785850909548,
       "tag": "0015_normal_doorman",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1785947411594,
+      "tag": "0016_pretty_guardian",
+      "breakpoints": true
     }
   ]
 }
