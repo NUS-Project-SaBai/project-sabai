@@ -101,9 +101,7 @@ export default function Login() {
               className="mx-auto mb-4"
             />
             <h2 className="text-2xl font-bold text-slate-900">Welcome</h2>
-            <p className="mt-2 text-sm text-slate-500">
-              Log in to Sabai to continue to Sabai.
-            </p>
+            <p className="mt-2 text-sm text-slate-500">Log in to Sabai.</p>
           </div>
 
           {/* Form */}
