@@ -9,6 +9,7 @@ import {
   medicationStock,
   medicationActiveIngredients,
 } from "@/db/schema";
+import { TRPCError } from "@trpc/server";
 
 export const medicationStockRouter = router({
   list: protectedProcedure.query(async () => {
@@ -134,14 +135,20 @@ export const medicationStockRouter = router({
         .where(eq(medicationStock.id, parentId))
         .limit(1); // Guaranteed to be one result anyway
 
+      const totalSplitQty = splits.reduce(
+        (sum, split) => sum + split.quantity,
+        0,
+      );
+
+      if (parent[0].quantity != totalSplitQty) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Parent stock quantity not equal to splits quantity!",
+        });
+      }
+
       return db.transaction(async (tx) => {
         for (let i = 0; i < splits.length; i++) {
-          const parentQuantityRow = await db
-            .select({ quantity: medicationStock.quantity })
-            .from(medicationStock)
-            .where(eq(medicationStock.id, parentId))
-            .limit(1);
-          const parentQuantity = parentQuantityRow[0].quantity;
           // splits copy parent's medicationBrandId and expiry
           await tx.insert(medicationStock).values({
             medicationBrandId: parent[0].medicationBrandId,
@@ -151,12 +158,15 @@ export const medicationStockRouter = router({
             stockStatus: splits[i].stockStatus,
             remarks: splits[i].remarks,
           });
-          // parent stock quantity reduces
-          await tx
-            .update(medicationStock)
-            .set({ quantity: parentQuantity - splits[i].quantity });
+
           // TODO: stockChanges table obtains the IDs of the new splits and writes
         }
+
+        // parent stock quantity reduces to 0
+        await tx
+          .update(medicationStock)
+          .set({ quantity: 0 })
+          .where(eq(medicationStock.id, parentId));
       });
     }),
 });
