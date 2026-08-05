@@ -8,7 +8,7 @@ import { useState } from "react";
 import { medicationStatusValues } from "@/db/schema";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
-import { areStocksDistinct } from "@/lib/utils/medication-stock";
+import { validateSplits } from "@/lib/utils/medication-stock";
 
 export default function SplittingModal({
   onClose,
@@ -53,21 +53,6 @@ export default function SplittingModal({
   }
 
   function handleSubmit() {
-    if (splits.length < 2) {
-      toast.error("Must have at least 2 splits!");
-      return;
-    }
-
-    const quantity = splits.reduce(
-      (accumulator, current) => accumulator + current.quantity,
-      0,
-    );
-
-    if (quantity != stock.quantity) {
-      toast.error("Child stock quantity does not equal parent stock quantity!");
-      return;
-    }
-
     // DO NOT CHANGE THIS MAP FUNCTION, OR THE PRESENCE OF THE REMARKS COLUMN (undefined). The key order is important for the implementation of areStocksDistinct (due to use of json.stringify)
     // DO NOT CHANGE THE PRESENCE OF THE REMARKS COLUMN. json.stringify drops undefined columns, so 2 objects, 1 with remarks key missing and another with remarks: undefined are evaluated the same way.
     const payload = splits.map((split) => ({
@@ -77,12 +62,14 @@ export default function SplittingModal({
       remarks: split.remarks ?? undefined,
     }));
 
-    if (!areStocksDistinct(payload)) {
-      toast.error("Stocks are not distinct!");
+    const validationResults = validateSplits(payload, stock);
+
+    if (validationResults.success) {
+      splitMutation.mutate({ splits: payload, parentId: stock.id });
       return;
     }
 
-    splitMutation.mutate({ splits: payload, parentId: stock.id });
+    toast.error(validationResults.message);
   }
 
   return (

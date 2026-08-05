@@ -21,6 +21,8 @@ export type MedicationStockWithBrandAndActiveIngredient = MedicationStock & {
   medicationActiveIngredientName: string;
 };
 
+// Functions used for split stock
+
 type Payload = {
   location: string;
   stockStatus: StockStatus;
@@ -28,14 +30,50 @@ type Payload = {
   remarks: string | undefined;
 };
 
-export function areStocksDistinct(stocks: Payload[]) {
-  const stocksSet = new Set();
-  for (let i = 0; i < stocks.length; i++) {
-    const stringified = JSON.stringify(stocks[i]);
-    if (stocksSet.has(stringified)) {
+function areSplitsDistinct(splits: Payload[]) {
+  const splitsSet = new Set();
+  for (let i = 0; i < splits.length; i++) {
+    const stringified = JSON.stringify(splits[i]);
+    if (splitsSet.has(stringified)) {
       return false;
     }
-    stocksSet.add(stringified);
+    splitsSet.add(stringified);
   }
   return true;
+}
+
+export function validateSplits(
+  splits: Payload[],
+  parent: MedicationStockWithBrandAndActiveIngredient,
+) {
+  if (splits.length < 2) {
+    return {
+      success: false,
+      message: "Must have at least 2 splits!",
+    };
+  }
+
+  const quantity = splits.reduce(
+    (accumulator, current) => accumulator + current.quantity,
+    0,
+  );
+
+  if (quantity != parent.quantity) {
+    return {
+      success: false,
+      message: "Child stock quantity does not equal parent stock quantity!",
+    };
+  }
+
+  if (!areSplitsDistinct(splits)) {
+    return {
+      success: false,
+      message: "Splits are not distinct!",
+    };
+  }
+
+  return {
+    success: true,
+    message: "Splits are valid!",
+  };
 }
