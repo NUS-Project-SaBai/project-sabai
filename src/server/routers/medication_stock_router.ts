@@ -112,7 +112,7 @@ export const medicationStockRouter = router({
 
   createSplits: protectedProcedure
     .input(
-      zfd.formData({
+      z.object({
         parentId: zfd.numeric(z.number().int()),
         splits: z
           .array(
@@ -127,6 +127,36 @@ export const medicationStockRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      console.log(input);
+      const { splits, parentId } = input;
+      const parent = await db
+        .select()
+        .from(medicationStock)
+        .where(eq(medicationStock.id, parentId))
+        .limit(1); // Guaranteed to be one result anyway
+
+      return db.transaction(async (tx) => {
+        for (let i = 0; i < splits.length; i++) {
+          const parentQuantityRow = await db
+            .select({ quantity: medicationStock.quantity })
+            .from(medicationStock)
+            .where(eq(medicationStock.id, parentId))
+            .limit(1);
+          const parentQuantity = parentQuantityRow[0].quantity;
+          // splits copy parent's medicationBrandId and expiry
+          await tx.insert(medicationStock).values({
+            medicationBrandId: parent[0].medicationBrandId,
+            expiry: parent[0].expiry,
+            quantity: splits[i].quantity,
+            location: splits[i].location,
+            stockStatus: splits[i].stockStatus,
+            remarks: splits[i].remarks,
+          });
+          // parent stock quantity reduces
+          await tx
+            .update(medicationStock)
+            .set({ quantity: parentQuantity - splits[i].quantity });
+          // TODO: stockChanges table obtains the IDs of the new splits and writes
+        }
+      });
     }),
 });
