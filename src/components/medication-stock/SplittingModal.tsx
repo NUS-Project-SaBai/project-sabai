@@ -51,6 +51,25 @@ export default function SplittingModal({
     setSplits(newSplits);
   }
 
+  type Payload = {
+    location: string;
+    stockStatus: StockStatus;
+    quantity: number;
+    remarks: string | undefined;
+  };
+
+  function areStocksDistinct(stocks: Payload[]) {
+    const stocksSet = new Set();
+    for (let i = 0; i < stocks.length; i++) {
+      const stringified = JSON.stringify(stocks[i]);
+      if (stocksSet.has(stringified)) {
+        return false;
+      }
+      stocksSet.add(stringified);
+    }
+    return true;
+  }
+
   function handleSubmit() {
     if (splits.length < 2) {
       toast.error("Must have at least 2 splits!");
@@ -67,12 +86,20 @@ export default function SplittingModal({
       return;
     }
 
+    // DO NOT CHANGE THIS MAP FUNCTION, OR THE PRESENCE OF THE REMARKS COLUMN (undefined). The key order is important for the implementation of areStocksDistinct (due to use of json.stringify)
+    // DO NOT CHANGE THE PRESENCE OF THE REMARKS COLUMN. json.stringify drops undefined columns, so 2 objects, 1 with remarks key missing and another with remarks: undefined are evaluated the same way.
     const payload = splits.map((split) => ({
       location: split.location,
       stockStatus: split.stockStatus,
       quantity: split.quantity,
       remarks: split.remarks ?? undefined,
     }));
+
+    if (!areStocksDistinct(payload)) {
+      toast.error("Stocks are not distinct!");
+      return;
+    }
+
     splitMutation.mutate({ splits: payload, parentId: stock.id });
   }
 
@@ -159,11 +186,7 @@ export default function SplittingModal({
         onClick={() => setSplits([...splits, stock])}
         className="my-4"
       />
-      <Button
-        title="Confirm"
-        colour="emerald"
-        onClick={handleSubmit}
-      />
+      <Button title="Confirm" colour="emerald" onClick={handleSubmit} />
     </Modal>
   );
 }
