@@ -106,51 +106,74 @@ export default function SplittingModal({
       </table>
       <h3 className="text-l font-bold mb-4 mt-4">Child stock details</h3>
       {splits.length === 0 && "No splits added, add a split to begin."}
-      {splits.map((split, index) => (
-        <div key={`${split.id}-${index}`}>
-          <div className="flex justify-between">
-            <h3>Split {index + 1}</h3>
-            <button onClick={() => removeSplit(index)}>-</button>
-          </div>
-          <div className="flex flex-row justify-evenly">
-            <input
-              type="text"
-              value={split.location ? split.location : ""}
-              onChange={(e) => updateSplit(index, { location: e.target.value })}
-              placeholder="location"
-            ></input>
-            <select
-              value={split.stockStatus!}
-              onChange={(e) => {
-                updateSplit(index, {
-                  stockStatus: e.target.value as StockStatus,
-                });
-              }}
-            >
-              {medicationStatusValues.map((status) => (
-                <option key={status}>{status}</option>
-              ))}
-            </select>
-            <input
-              type="number"
-              value={split.quantity}
-              min="1"
-              onChange={(e) =>
-                updateSplit(index, { quantity: parseInt(e.target.value) })
-              }
-            />
-            <input
-              type="text"
-              value={split.remarks ? split.remarks : ""}
-              onChange={(e) => {
-                updateSplit(index, { remarks: e.target.value });
-              }}
-              placeholder="remarks"
-            />
-          </div>
-          <hr></hr>
-        </div>
-      ))}
+      {splits.length > 0 && (
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Qty</th>
+              <th>Remarks</th>
+              <th>-</th>
+            </tr>
+          </thead>
+          <tbody>
+            {splits.map((split, index) => (
+              <tr key={`${split.id}-${index}`}>
+                <td>{index + 1}</td>
+                <td>
+                  <input
+                    type="text"
+                    value={split.location ? split.location : ""}
+                    onChange={(e) =>
+                      updateSplit(index, { location: e.target.value })
+                    }
+                    placeholder="location"
+                  ></input>
+                </td>
+                <td>
+                  <select
+                    value={split.stockStatus!}
+                    onChange={(e) => {
+                      updateSplit(index, {
+                        stockStatus: e.target.value as StockStatus,
+                      });
+                    }}
+                  >
+                    {medicationStatusValues.map((status) => (
+                      <option key={status}>{status}</option>
+                    ))}
+                  </select>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={split.quantity}
+                    min="1"
+                    onChange={(e) =>
+                      updateSplit(index, { quantity: parseInt(e.target.value) })
+                    }
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={split.remarks ? split.remarks : ""}
+                    onChange={(e) => {
+                      updateSplit(index, { remarks: e.target.value });
+                    }}
+                    placeholder="remarks"
+                  />
+                </td>
+                <td>
+                  <button onClick={() => removeSplit(index)}>-</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       <Button
         title="Add Split"
         colour="indigo"
