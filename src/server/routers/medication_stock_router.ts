@@ -90,9 +90,6 @@ export const medicationStockRouter = router({
     .input(
       zfd.formData({
         id: zfd.numeric(z.number().int()),
-        medicationBrandId: zfd.numeric(z.number().int().optional()),
-        quantity: zfd.numeric(z.number().int().optional()),
-        expiry: zfd.text(z.coerce.date().optional()),
         location: zfd.text(z.string().optional()),
         stockStatus: zfd.text(
           z.enum(medicationStatusEnum.enumValues).optional(),
