@@ -47,6 +47,7 @@ export const stockChangeFieldEnum = pgEnum("stock_change_field_enum", [
   "location",
   "quantity",
   "stock_status",
+  "remarks",
 ]);
 
 // Define tables

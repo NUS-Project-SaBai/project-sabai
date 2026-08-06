@@ -1,0 +1,1 @@
+ALTER TYPE "public"."stock_change_field_enum" ADD VALUE 'remarks';
