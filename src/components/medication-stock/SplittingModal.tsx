@@ -129,7 +129,6 @@ export default function SplittingModal({
                     onChange={(e) =>
                       updateSplit(index, { location: e.target.value })
                     }
-                    placeholder="location"
                   ></input>
                 </td>
                 <td>
@@ -163,7 +162,6 @@ export default function SplittingModal({
                     onChange={(e) => {
                       updateSplit(index, { remarks: e.target.value });
                     }}
-                    placeholder="remarks"
                   />
                 </td>
                 <td>
