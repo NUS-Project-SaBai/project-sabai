@@ -413,8 +413,21 @@ describe("MedicationStockPage", () => {
     await user.click(screen.getByRole("button", { name: "Split" }));
 
     await waitFor(() => {
+      const dialog = screen.getByRole("dialog");
       expect(screen.getByText("Split Stock")).toBeInTheDocument();
       expect(screen.getByText("Parent stock details")).toBeInTheDocument();
+      const parentStockTable = within(dialog).getByRole("table");
+
+      // expect parent stock details to be in table format
+      assertTableContents(parentStockTable, [
+        ["Location:", MOCK_STOCK[0].location],
+        ["Active Ingredient", MOCK_STOCK[0].medicationActiveIngredientName],
+        ["Brand Name", MOCK_STOCK[0].medicationBrandName],
+        ["Quantity", String(MOCK_STOCK[0].quantity)],
+        ["Status:", MOCK_STOCK[0].stockStatus],
+        ["Remarks", MOCK_STOCK[0].remarks],
+      ]);
+      // expect buttons to be there
       expect(
         screen.getByRole("button", { name: "Add Split" }),
       ).toBeInTheDocument();
@@ -424,9 +437,63 @@ describe("MedicationStockPage", () => {
     });
   });
 
-  it("shows 'No splits added, add a split to begin' when there are 0 child stocks added", () => {});
+  it("shows 'No splits added, add a split to begin' only when there are 0 child stocks added", async () => {
+    const user = userEvent.setup();
 
-  it("creates a new child stock component with corresponding split indexes, with editable components for all editable fields, default values copying the parent stock, when the 'Add Split' button is clicked", () => {});
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    render(
+      <>
+        <MedicationStockBasePage />
+      </>,
+    );
+
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    expect(
+      screen.getByText("No splits added, add a split to begin."),
+    ).toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("No splits added, add a split to begin."),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("creates a new child stock component with corresponding split indexes, with editable components for all editable fields, default values copying the parent stock, when the 'Add Split' button is clicked", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    render(
+      <>
+        <MedicationStockBasePage />
+      </>,
+    );
+
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    await waitFor(() => {
+      const dialog = screen.getByRole("dialog");
+      const childSplitsTable = within(dialog).getAllByRole("table")[1];
+
+      screen.debug();
+    });
+  });
 
   it("removes the split when the '-' button is clicked", () => {});
 
