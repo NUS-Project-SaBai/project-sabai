@@ -117,6 +117,7 @@ export default function SplittingModal({
               type="text"
               value={split.location ? split.location : ""}
               onChange={(e) => updateSplit(index, { location: e.target.value })}
+              placeholder="location"
             ></input>
             <select
               value={split.stockStatus!}
@@ -144,6 +145,7 @@ export default function SplittingModal({
               onChange={(e) => {
                 updateSplit(index, { remarks: e.target.value });
               }}
+              placeholder="remarks"
             />
           </div>
           <hr></hr>
