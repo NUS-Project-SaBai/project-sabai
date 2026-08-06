@@ -108,14 +108,14 @@ export default function SplittingModal({
       {splits.length === 0 && "No splits added, add a split to begin."}
       {splits.length > 0 && (
         <table>
-          <thead>
+          <thead className="text-center">
             <tr>
               <th>#</th>
               <th>Location</th>
               <th>Status</th>
               <th>Qty</th>
               <th>Remarks</th>
-              <th>-</th>
+              <th className="pl-2">-</th>
             </tr>
           </thead>
           <tbody>
@@ -129,6 +129,7 @@ export default function SplittingModal({
                     onChange={(e) =>
                       updateSplit(index, { location: e.target.value })
                     }
+                    className="text-right"
                   ></input>
                 </td>
                 <td>
@@ -153,6 +154,7 @@ export default function SplittingModal({
                     onChange={(e) =>
                       updateSplit(index, { quantity: parseInt(e.target.value) })
                     }
+                    className="text-right"
                   />
                 </td>
                 <td>
@@ -164,7 +166,7 @@ export default function SplittingModal({
                     }}
                   />
                 </td>
-                <td>
+                <td className="pl-2">
                   <button onClick={() => removeSplit(index)}>-</button>
                 </td>
               </tr>
