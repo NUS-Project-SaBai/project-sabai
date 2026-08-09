@@ -10,6 +10,7 @@ import { medicationStockRouter } from "./medication_stock_router";
 import { visitsRouter } from "./visits_router";
 import { vitalsRouter } from "./vitals_router";
 import { eyesightRouter } from "./eyesight_router";
+import { pubertyRouter } from "./puberty_router";
 import { consultsRouter } from "./consults_router";
 
 export const appRouter = router({
@@ -23,6 +24,7 @@ export const appRouter = router({
   visitsRouter: visitsRouter,
   vitalsRouter: vitalsRouter,
   eyesightRouter: eyesightRouter,
+  pubertyRouter: pubertyRouter,
   consultsRouter: consultsRouter,
 });
 
