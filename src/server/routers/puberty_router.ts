@@ -41,7 +41,7 @@ function validatePubertyAges(
   for (const { flag, age } of pubertyAgePairs) {
     if (data[flag] === false && data[age] !== undefined) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: `${age} must not be set when ${flag} is false`,
         path: [age],
       });
