@@ -568,7 +568,7 @@ const usersWithOrg = await db.query.users.findMany({
 ### Importing in Routers
 
 ```typescript
-// src/server/routers/villageCodeRouters.ts
+// src/server/routers/village_codes_router.ts
 import { db } from "@/db/drizzle";
 import { villageCodes } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
@@ -584,7 +584,7 @@ import { db } from "@/db/drizzle";
 import { villageCodes } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 
-export const villageCodeRouter = router({
+export const villageCodesRouter = router({
   // LIST
   list: protectedProcedure
     .input(z.object({ includeHidden: z.boolean().default(false) }))
