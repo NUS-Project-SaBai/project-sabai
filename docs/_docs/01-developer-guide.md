@@ -41,7 +41,7 @@ project-sabai/
 |   |   |   |   |-- [trpc].ts   # tRPC API handler (don't need to touch)
 |   |   |-- index.tsx          # Home page
 |   |-- components/            # Shared UI components
-|   |   |-- inputs/            # RHF input components
+|   |   |-- interactive/RHF/   # RHF input components
 |   |
 |   |-- server/                # Main backend server
 |   |   |-- context.ts         # tRPC context (auth)
@@ -55,10 +55,11 @@ project-sabai/
 |   |   |-- drizzle.ts         # Drizzle client
 |-- supabase/
 |   |-- migrations/            # SQL migrations
-|-- docs/
-|   |-- developer-guide.md
-|   |-- trpc.md
-|   |-- orm.md
+|-- docs/                      # Jekyll documentation site
+|   |-- _docs/                 # Documentation pages
+|   |   |-- 01-developer-guide.md
+|   |   |-- 03-drizzle-orm.md
+|   |   |-- 04-trpc.md
 ```
 
 Quick pointers:
@@ -76,14 +77,14 @@ Quick pointers:
 2. Generate a migration with Drizzle Kit.
 3. Apply the migration to local Supabase.
 
-See [docs/orm.md](./orm.md) for details and commands.
+See [Drizzle ORM docs](/docs/drizzle-orm/) for details and commands.
 
 ### Add a new page that calls the backend
 
 1. Add or update a tRPC procedure
    - Create or update a router in [src/server/routers](../src/server/routers) folder.
    - Use `publicProcedure` (no auth) or `protectedProcedure` (auth required).
-   - Example reference: [src/server/routers/villageCodeRouters.ts](../src/server/routers/villageCodeRouters.ts)
+   - Example reference: [src/server/routers/village_codes_router.ts](../src/server/routers/village_codes_router.ts)
 
 2. Ensure the router is mounted
    - Add it to the root router in [src/server/routers/\_app.ts](../src/server/routers/_app.ts).
@@ -95,11 +96,24 @@ See [docs/orm.md](./orm.md) for details and commands.
 4. Call the procedure from the page
    - Use hooks from [src/utils/trpc.ts](../src/utils/trpc.ts).
 
-See [docs/trpc.md](./trpc.md) for a full walkthrough.
+See [tRPC docs](/docs/trpc/) for a full walkthrough.
 
 ### Add a new UI component
 
 - Place shared components in [src/components](../src/components).
+
+### Run and open this documentation site
+
+This site is built with Jekyll. To preview it locally, run these commands from
+the `docs/` folder:
+
+1. Install the [Jekyll prerequisites](https://jekyllrb.com/docs/installation/) (Ruby + Bundler).
+2. `bundle install`
+3. `bundle exec jekyll serve`
+4. Open <http://localhost:4000> in your browser.
+
+See [Contributing to Documentation](/docs/contributing-to-documentation/) for
+how to add new pages and sidebar links.
 
 ## 5. Auth model (short)
 
@@ -107,7 +121,7 @@ See [docs/trpc.md](./trpc.md) for a full walkthrough.
 - `createContext` reads cookies and provides `ctx.user`.
 - `protectedProcedure` blocks requests without a user.
 
-See [docs/trpc.md](./trpc.md) for the full flow.
+See [tRPC docs](/docs/trpc/) for the full flow.
 
 ## 6. Tips
 
