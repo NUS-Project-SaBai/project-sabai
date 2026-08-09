@@ -24,8 +24,6 @@ const selectPubertyFields = {
   vitalId: puberty.vitalId,
 };
 
-const MAX_PUBERTY_AGE = 18;
-
 const pubertyAgePairs = [
   { flag: "pubarche", age: "pubarcheAge" },
   { flag: "thelarche", age: "thelarcheAge" },
@@ -53,20 +51,15 @@ function validatePubertyAges(
 // because ZodEffects (returned by superRefine) does not support .omit()/.partial().
 const pubertyBaseShape = z.object({
   pubarche: z.boolean().optional(),
-  pubarcheAge: z.number().int().positive().max(MAX_PUBERTY_AGE).optional(),
+  pubarcheAge: z.number().int().positive().optional(),
   thelarche: z.boolean().optional(),
-  thelarcheAge: z.number().int().positive().max(MAX_PUBERTY_AGE).optional(),
+  thelarcheAge: z.number().int().positive().optional(),
   menarche: z.boolean().optional(),
-  menarcheAge: z.number().int().positive().max(MAX_PUBERTY_AGE).optional(),
+  menarcheAge: z.number().int().positive().optional(),
   voiceChange: z.boolean().optional(),
-  voiceChangeAge: z.number().int().positive().max(MAX_PUBERTY_AGE).optional(),
+  voiceChangeAge: z.number().int().positive().optional(),
   testicularGrowth: z.boolean().optional(),
-  testicularGrowthAge: z
-    .number()
-    .int()
-    .positive()
-    .max(MAX_PUBERTY_AGE)
-    .optional(),
+  testicularGrowthAge: z.number().int().positive().optional(),
   additionalNotes: z.string().optional(),
   vitalId: z.number().int().positive(),
 });
