@@ -404,6 +404,11 @@ describe("MedicationStockPage", () => {
       },
     );
 
+    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    });
+
     render(
       <>
         <MedicationStockBasePage />
@@ -447,6 +452,11 @@ describe("MedicationStockPage", () => {
       },
     );
 
+    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    });
+
     render(
       <>
         <MedicationStockBasePage />
@@ -477,6 +487,11 @@ describe("MedicationStockPage", () => {
       },
     );
 
+    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    });
+
     render(
       <>
         <MedicationStockBasePage />
@@ -490,8 +505,6 @@ describe("MedicationStockPage", () => {
     await waitFor(() => {
       const dialog = screen.getByRole("dialog");
       const childSplitsTable = within(dialog).getAllByRole("table")[1];
-
-      screen.debug();
     });
   });
 
