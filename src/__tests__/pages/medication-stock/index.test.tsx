@@ -642,7 +642,7 @@ describe("MedicationStockPage", () => {
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
     const locationInput = document.querySelector('input[name="location"]');
-    await user.type(locationInput!, "New Shelf");
+    await user.type(locationInput!, " New Shelf");
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 
