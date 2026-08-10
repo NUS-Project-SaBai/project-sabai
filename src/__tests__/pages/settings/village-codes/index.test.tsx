@@ -194,7 +194,7 @@ describe("VillageCodesPage", () => {
     });
 
     mockTrpc.villageCodesRouter.update.useMutation.mockImplementation(
-      ({ onSuccess }) => {
+      ({ onSuccess }: { onSuccess: () => void }) => {
         return {
           mutate: vi.fn(() => {
             onSuccess?.(); // call it immediately when mutate is called
@@ -302,7 +302,7 @@ describe("VillageCodesPage", () => {
     });
 
     mockTrpc.villageCodesRouter.create.useMutation.mockImplementation(
-      ({ onSuccess }) => {
+      ({ onSuccess }: { onSuccess: () => void }) => {
         return {
           mutate: vi.fn(() => {
             onSuccess?.();
@@ -399,7 +399,7 @@ describe("VillageCodesPage", () => {
     });
 
     mockTrpc.villageCodesRouter.delete.useMutation.mockImplementation(
-      ({ onSuccess }) => {
+      ({ onSuccess }: { onSuccess: () => void }) => {
         return {
           mutate: vi.fn(() => {
             onSuccess?.();
@@ -464,7 +464,7 @@ describe("VillageCodesPage", () => {
     });
 
     mockTrpc.villageCodesRouter.delete.useMutation.mockImplementation(
-      ({ onError }) => {
+      ({ onError }: { onError: () => void }) => {
         return {
           mutate: vi.fn(() => {
             onError?.();
