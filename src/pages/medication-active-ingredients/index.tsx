@@ -6,7 +6,7 @@ import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import { useState } from "react";
 import Modal from "@/components/interactive/Modal";
-import { MedicationActiveIngredient } from "@/db/schema";
+import { MedicationActiveIngredient } from "@/db/schema/schema";
 import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import toast from "react-hot-toast";

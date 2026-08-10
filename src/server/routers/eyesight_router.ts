@@ -2,7 +2,7 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { eyesight } from "@/db/schema";
+import { eyesight } from "@/db/schema/schema";
 
 /**
  * Common select fields for eyesight queries to ensure consistency

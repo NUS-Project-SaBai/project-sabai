@@ -3,7 +3,10 @@ import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { eq } from "drizzle-orm";
-import { medicationActiveIngredients, medicationBrands } from "@/db/schema";
+import {
+  medicationActiveIngredients,
+  medicationBrands,
+} from "@/db/schema/schema";
 
 export const medicationBrandRouter = router({
   list: protectedProcedure.query(async () => {

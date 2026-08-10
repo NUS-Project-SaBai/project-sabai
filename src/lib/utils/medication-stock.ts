@@ -1,4 +1,4 @@
-import { MedicationStock, medicationStatusValues } from "@/db/schema";
+import { MedicationStock, medicationStatusValues } from "@/db/schema/schema";
 
 export type StockStatus = (typeof medicationStatusValues)[number];
 

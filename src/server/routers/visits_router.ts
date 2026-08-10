@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { visits, patients, villageCodes } from "@/db/schema";
+import { visits, patients, villageCodes } from "@/db/schema/schema";
 import { eq, desc } from "drizzle-orm";
 
 export const visitsRouter = router({

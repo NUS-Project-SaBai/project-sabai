@@ -3,7 +3,7 @@ import { zfd } from "zod-form-data";
 import { uploadToCloudinary } from "@/server/utils/cloudinary";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { patients, genderEnum, visits, villageCodes } from "@/db/schema";
+import { patients, genderEnum, visits, villageCodes } from "@/db/schema/schema";
 import serverEnv from "@/lib/envVariables";
 import { TRPCError } from "@trpc/server";
 import { eq, desc, inArray, isNotNull } from "drizzle-orm";
