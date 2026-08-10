@@ -5,7 +5,7 @@ import {
 } from "@/lib/utils/medication-stock";
 import { Button } from "@/components/interactive/Button/Button";
 import { useState } from "react";
-import { medicationStatusValues } from "@/db/schema/schema";
+import { medicationStatusValues } from "@/db/schema/pharmacy";
 
 export default function SplittingModal({
   onClose,

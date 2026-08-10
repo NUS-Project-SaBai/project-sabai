@@ -2,7 +2,7 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { db } from "@/db/drizzle";
 import { router, protectedProcedure } from "@/server/trpc";
-import { medicationActiveIngredients } from "@/db/schema/schema";
+import { medicationActiveIngredients } from "@/db/schema/pharmacy";
 import { eq } from "drizzle-orm";
 
 export const medicationActiveIngredientsRouter = router({

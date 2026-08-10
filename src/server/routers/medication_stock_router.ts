@@ -8,7 +8,7 @@ import {
   medicationStatusEnum,
   medicationStock,
   medicationActiveIngredients,
-} from "@/db/schema/schema";
+} from "@/db/schema/pharmacy";
 
 export const medicationStockRouter = router({
   list: protectedProcedure.query(async () => {

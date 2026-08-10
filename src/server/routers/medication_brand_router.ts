@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import {
   medicationActiveIngredients,
   medicationBrands,
-} from "@/db/schema/schema";
+} from "@/db/schema/pharmacy";
 
 export const medicationBrandRouter = router({
   list: protectedProcedure.query(async () => {
