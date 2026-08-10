@@ -2,7 +2,7 @@ import { z } from "zod";
 import { eq, desc, inArray } from "drizzle-orm";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { consults, diagnosis } from "@/db/schema/schema";
+import { consults, diagnosis } from "@/db/schema/consults";
 import { DIAGNOSIS_CATEGORIES } from "@/lib/constants/diagnosisCategories";
 
 /**

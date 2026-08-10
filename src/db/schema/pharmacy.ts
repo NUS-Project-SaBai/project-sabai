@@ -9,7 +9,9 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { authUsers, consults } from "./schema";
+import { authUsers } from "./schema";
+
+import { consults } from "./consults";
 
 export const medicationStatusEnum = pgEnum("medication_status", [
   "active",
