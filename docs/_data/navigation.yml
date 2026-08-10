@@ -1,6 +1,8 @@
 main:
   - title: "Documentation"
     url: /docs/
+  - title: "Features"
+    url: /features/
 # documentation links
 docs:
   - title: "Getting Started"
@@ -15,3 +17,12 @@ docs:
         url: /docs/drizzle-orm/
       - title: "trpc"
         url: /docs/trpc/
+
+features:
+  - title: "Features"
+    children:
+      - title: "Patients"
+        url: /features/patients/
+      - title: "Vitals"
+        url: /features/vitals/
+    
