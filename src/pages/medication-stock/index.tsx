@@ -184,7 +184,9 @@ function Row({
     },
     onError: (err) => {
       console.error(err);
-      toast.error("An error has occurred.");
+      toast.error(
+        "An error has occurred while updating the stock. Refresh and try again.",
+      );
     },
   });
 
