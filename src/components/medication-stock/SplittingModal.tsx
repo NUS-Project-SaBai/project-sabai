@@ -180,7 +180,12 @@ export default function SplittingModal({
         onClick={() => setSplits([...splits, stock])}
         className="my-4"
       />
-      <Button title="Confirm" colour="emerald" onClick={handleSubmit} />
+      <Button
+        title="Confirm"
+        colour="emerald"
+        onClick={handleSubmit}
+        disabled={splitMutation.isPending}
+      />
     </Modal>
   );
 }
