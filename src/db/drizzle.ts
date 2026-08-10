@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import * as schema from "./schema/schema";
+import * as schema from "@/db/schema/index";
 import env from "@/lib/envVariables";
 
 // Disable prefetch for serverless environments usually, but fine for standalone
