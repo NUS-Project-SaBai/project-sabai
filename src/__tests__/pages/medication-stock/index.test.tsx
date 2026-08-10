@@ -492,29 +492,242 @@ describe("MedicationStockPage", () => {
       isPending: false,
     });
 
-    render(
-      <>
-        <MedicationStockBasePage />
-      </>,
-    );
+    render(<MedicationStockBasePage />);
 
     await user.click(await screen.findByRole("button", { name: "Split" }));
-
     await user.click(await screen.findByRole("button", { name: "Add Split" }));
 
     await waitFor(() => {
       const dialog = screen.getByRole("dialog");
       const childSplitsTable = within(dialog).getAllByRole("table")[1];
+
+      // index starts at 1
+      expect(
+        within(childSplitsTable).getByRole("cell", { name: "1" }),
+      ).toBeInTheDocument();
+
+      // editablecell populated with default parent values
+      const locationInput = within(childSplitsTable).getByDisplayValue(
+        MOCK_STOCK[0].location,
+      );
+      const statusSelect = within(childSplitsTable).getByDisplayValue(
+        MOCK_STOCK[0].stockStatus,
+      );
+      const quantityInput = within(childSplitsTable).getByDisplayValue(
+        String(MOCK_STOCK[0].quantity),
+      );
+      const remarksInput = within(childSplitsTable).getByDisplayValue(
+        MOCK_STOCK[0].remarks,
+      );
+
+      expect(locationInput).toBeInTheDocument();
+      expect(statusSelect).toBeInTheDocument();
+      expect(quantityInput).toBeInTheDocument();
+      expect(remarksInput).toBeInTheDocument();
     });
   });
 
-  it("removes the split when the '-' button is clicked", () => {});
+  it("removes the split when the '-' button is clicked", async () => {
+    const user = userEvent.setup();
 
-  it("rejects when confirming the split if there are less than 2 child stock", () => {});
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
 
-  it("rejects when the total quantity of child splits do not equal the quantity in the parent split", () => {});
+    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    });
 
-  it("rejects when splits are not distinct from each other", () => {});
+    render(<MedicationStockBasePage />);
 
-  it("creates new child stock entries in the table when the split succeeds", () => {});
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    const dialog = screen.getByRole("dialog");
+    const removeButtons = within(dialog).getAllByRole("button", { name: "-" });
+    expect(removeButtons).toHaveLength(2);
+
+    await user.click(removeButtons[0]);
+
+    await waitFor(() => {
+      const updatedRemoveButtons = within(dialog).getAllByRole("button", {
+        name: "-",
+      });
+      expect(updatedRemoveButtons).toHaveLength(1);
+    });
+  });
+
+  it("rejects when confirming the split if there are less than 2 child stock", async () => {
+    const user = userEvent.setup();
+    const mutateMock = vi.fn();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
+      mutate: mutateMock,
+      isPending: false,
+    });
+
+    render(<MedicationStockBasePage />);
+
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    await user.click(screen.getByRole("button", { name: "Confirm" }));
+
+    // caught by validation, mutation not called
+    expect(mutateMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects when the total quantity of child splits do not equal the quantity in the parent split", async () => {
+    const user = userEvent.setup();
+    const mutateMock = vi.fn();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
+      mutate: mutateMock,
+      isPending: false,
+    });
+
+    render(<MedicationStockBasePage />);
+
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    await user.click(screen.getByRole("button", { name: "Confirm" }));
+
+    expect(mutateMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects when splits are not distinct from each other", async () => {
+    const user = userEvent.setup();
+    const mutateMock = vi.fn();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
+      mutate: mutateMock,
+      isPending: false,
+    });
+
+    render(<MedicationStockBasePage />);
+
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    const dialog = screen.getByRole("dialog");
+    const childSplitsTable = within(dialog).getAllByRole("table")[1];
+    const quantityInputs = within(childSplitsTable).getAllByDisplayValue(
+      String(MOCK_STOCK[0].quantity),
+    );
+
+    const halfQuantity = Math.floor(MOCK_STOCK[0].quantity / 2);
+    await user.clear(quantityInputs[0]);
+    await user.type(quantityInputs[0], String(halfQuantity));
+    await user.clear(quantityInputs[1]);
+    await user.type(
+      quantityInputs[1],
+      String(MOCK_STOCK[0].quantity - halfQuantity),
+    );
+
+    await user.click(screen.getByRole("button", { name: "Confirm" }));
+
+    expect(mutateMock).not.toHaveBeenCalled();
+  });
+
+  it("creates new child stock entries in the table when the split succeeds", async () => {
+    const user = userEvent.setup();
+    const mutateMock = vi.fn();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
+      mutate: mutateMock,
+      isPending: false,
+    });
+
+    render(<MedicationStockBasePage />);
+
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    const dialog = screen.getByRole("dialog");
+    const childSplitsTable = within(dialog).getAllByRole("table")[1];
+
+    // distinct inputs, total quantity matches parent quantity
+    const locationInputs = within(childSplitsTable).getAllByDisplayValue(
+      MOCK_STOCK[0].location,
+    );
+    const quantityInputs = within(childSplitsTable).getAllByDisplayValue(
+      String(MOCK_STOCK[0].quantity),
+    );
+
+    const halfQty = Math.floor(MOCK_STOCK[0].quantity / 2);
+    const remainingQty = MOCK_STOCK[0].quantity - halfQty;
+
+    // split 1 updates
+    await user.clear(locationInputs[0]);
+    await user.type(locationInputs[0], "Location A");
+    await user.clear(quantityInputs[0]);
+    await user.type(quantityInputs[0], String(halfQty));
+
+    // split 2 updates
+    await user.clear(locationInputs[1]);
+    await user.type(locationInputs[1], "Location B");
+    await user.clear(quantityInputs[1]);
+    await user.type(quantityInputs[1], String(remainingQty));
+
+    await user.click(screen.getByRole("button", { name: "Confirm" }));
+
+    expect(mutateMock).toHaveBeenCalledWith({
+      parentId: MOCK_STOCK[0].id,
+      splits: [
+        {
+          location: "Location A",
+          stockStatus: MOCK_STOCK[0].stockStatus,
+          quantity: halfQty,
+          remarks: MOCK_STOCK[0].remarks ?? undefined,
+        },
+        {
+          location: "Location B",
+          stockStatus: MOCK_STOCK[0].stockStatus,
+          quantity: remainingQty,
+          remarks: MOCK_STOCK[0].remarks ?? undefined,
+        },
+      ],
+    });
+  });
 });
