@@ -1,14 +1,11 @@
 import {
   pgTable,
-  pgSchema,
   serial,
   varchar,
-  boolean,
   timestamp,
   text,
   pgEnum,
   integer,
-  numeric,
   uuid,
 } from "drizzle-orm/pg-core";
 
