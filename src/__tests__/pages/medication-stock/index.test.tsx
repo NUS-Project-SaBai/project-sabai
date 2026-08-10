@@ -586,7 +586,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    const mockError = new Error("Test error");
+    const mockError = new Error("Mock test error");
 
     mockTrpc.medicationStockRouter.update.useMutation.mockImplementation(
       ({ onError }: { onError: (err: Error) => void }) => {
@@ -621,5 +621,42 @@ describe("MedicationStockPage", () => {
     );
   });
 
-  it("does not include locked fields in mutation payload", () => {});
+  it("does not include locked fields in mutation payload", async () => {
+    const user = userEvent.setup();
+    const mutateMock = vi.fn();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationStockRouter.update.useMutation.mockReturnValue({
+      mutate: mutateMock,
+      isLoading: false,
+    });
+
+    render(<MedicationStockBasePage />);
+
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+
+    const locationInput = document.querySelector('input[name="location"]');
+    await user.type(locationInput!, "New Shelf");
+
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    expect(mutateMock).toHaveBeenCalledTimes(1);
+
+    const payload = mutateMock.mock.calls[0][0];
+
+    expect(payload).toHaveProperty("id", MOCK_STOCK[0].id);
+    expect(payload).toHaveProperty("location", "Shelf 1 New Shelf");
+
+    expect(payload).not.toHaveProperty("quantity");
+    expect(payload).not.toHaveProperty("expiry");
+    expect(payload).not.toHaveProperty("medicationBrandId");
+    expect(payload).not.toHaveProperty("medicationBrandName");
+    expect(payload).not.toHaveProperty("medicationActiveIngredientName");
+  });
 });
