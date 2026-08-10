@@ -460,7 +460,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.update.useMutation.mockImplementation(
-      ({ onSuccess }) => {
+      ({ onSuccess }: { onSuccess: () => void }) => {
         return {
           mutate: vi.fn(() => {
             onSuccess?.();
@@ -500,7 +500,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.update.useMutation.mockImplementation(
-      ({ onSuccess }) => {
+      ({ onSuccess }: { onSuccess: () => void }) => {
         return {
           mutate: vi.fn(() => {
             onSuccess?.();
@@ -540,7 +540,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.update.useMutation.mockImplementation(
-      ({ onSuccess }) => {
+      ({ onSuccess }: { onSuccess: () => void }) => {
         return {
           mutate: vi.fn(() => {
             onSuccess?.();
