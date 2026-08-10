@@ -25,4 +25,12 @@ features:
         url: /features/patients/
       - title: "Vitals"
         url: /features/vitals/
+      - title: "Vision"
+        url: /features/vision/
+      - title: "Consults"
+        url: /features/consults/
+      - title: "Medication Stock"
+        url: /features/medication-stock/
+      - title: "Settings"
+        url: /features/settings/
     
