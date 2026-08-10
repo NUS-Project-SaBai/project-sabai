@@ -1,6 +1,6 @@
 ---
 title: Vitals
-excerpt: Introduction to Vitals
+excerpt: Vitals Page
 permalink: /features/vitals/
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Patients
-excerpt: Introduction to Patients
+excerpt: Patients Page
 permalink: /features/patients/
 ---
 
