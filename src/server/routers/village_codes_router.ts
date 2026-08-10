@@ -2,7 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { villageCodes } from "@/db/schema/schema";
+import { villageCodes } from "@/db/schema/villageCodes";
 import { eq, desc } from "drizzle-orm";
 
 export const villageCodesRouter = router({
