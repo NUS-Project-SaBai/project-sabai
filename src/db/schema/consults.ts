@@ -8,7 +8,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { visits } from "./schema";
+import { visits } from "./patients";
 import { authUsers } from "./auth";
 /*
 Consults Table:

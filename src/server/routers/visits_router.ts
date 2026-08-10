@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { visits, patients } from "@/db/schema/schema";
+import { visits, patients } from "@/db/schema/patients";
 import { villageCodes } from "@/db/schema/villageCodes";
 import { eq, desc } from "drizzle-orm";
 

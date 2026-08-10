@@ -7,7 +7,7 @@ import {
   numeric,
 } from "drizzle-orm/pg-core";
 
-import { visits } from "./schema";
+import { visits } from "./patients";
 
 /*
 Vitals Table:

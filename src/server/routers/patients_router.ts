@@ -3,7 +3,7 @@ import { zfd } from "zod-form-data";
 import { uploadToCloudinary } from "@/server/utils/cloudinary";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { patients, genderEnum, visits } from "@/db/schema/schema";
+import { patients, genderEnum, visits } from "@/db/schema/patients";
 import { villageCodes } from "@/db/schema/villageCodes";
 import serverEnv from "@/lib/envVariables";
 import { TRPCError } from "@trpc/server";
