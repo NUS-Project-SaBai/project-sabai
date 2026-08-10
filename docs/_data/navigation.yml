@@ -21,6 +21,8 @@ docs:
 features:
   - title: "Features"
     children:
+      - title: "Scan Face"
+        url: /features/scan-face/
       - title: "Patients"
         url: /features/patients/
       - title: "Vitals"
