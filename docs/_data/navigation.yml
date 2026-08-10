@@ -33,6 +33,10 @@ features:
         url: /features/consults/
       - title: "Medication Stock"
         url: /features/medication-stock/
+      - title: "Medication Brands"
+        url: /features/medication-brands/
+      - title: "Medication Active Ingredients"
+        url: /features/medication-active-ingredients/
       - title: "Settings"
         url: /features/settings/
     
