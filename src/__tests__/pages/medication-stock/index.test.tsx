@@ -576,4 +576,50 @@ describe("MedicationStockPage", () => {
     expect(toastEl).toBeInTheDocument();
     expect(toastEl).toHaveTextContent("Successfully updated!");
   });
+
+  it("shows an error toast if an error occurs during update", async () => {
+    const user = userEvent.setup();
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    const mockError = new Error("Test error");
+
+    mockTrpc.medicationStockRouter.update.useMutation.mockImplementation(
+      ({ onError }: { onError: (err: Error) => void }) => {
+        return {
+          mutate: vi.fn(() => {
+            onError?.(mockError);
+          }),
+          isLoading: false,
+        };
+      },
+    );
+
+    const screen = render(
+      <>
+        <Toaster />
+        <MedicationStockBasePage />
+      </>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+
+    const remarksInput = document.querySelector('input[name="remarks"]');
+
+    await user.type(remarksInput!, "valid remarks");
+
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    const toastEl = screen.getByRole("status");
+    expect(toastEl).toBeInTheDocument();
+    expect(toastEl).toHaveTextContent(
+      "An error has occurred while updating the stock. Refresh and try again.",
+    );
+  });
+
+  it("does not include locked fields in mutation payload", () => {});
 });
