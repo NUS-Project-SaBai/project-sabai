@@ -8,7 +8,8 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { authUsers, visits } from "./schema";
+import { visits } from "./schema";
+import { authUsers } from "./auth";
 /*
 Consults Table:
 - id: Primary key, auto-incrementing integer.

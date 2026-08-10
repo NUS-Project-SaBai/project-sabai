@@ -1,6 +1,5 @@
 import {
   pgTable,
-  pgSchema,
   serial,
   varchar,
   boolean,
@@ -8,21 +7,11 @@ import {
   text,
   pgEnum,
   integer,
-  uuid,
 } from "drizzle-orm/pg-core";
 
 import { villageCodes } from "./villageCodes";
 
-// Stub for Supabase-managed auth schema — not migrated, used only for FK references
-const authSchema = pgSchema("auth");
-export const authUsers = authSchema.table("users", {
-  id: uuid("id").primaryKey(),
-});
-
-// Define enums
 export const genderEnum = pgEnum("gender", ["male", "female"]);
-
-// Define tables
 
 /*
 Patients Table:

@@ -9,7 +9,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { authUsers } from "./schema";
+import { authUsers } from "./auth";
 
 import { consults } from "./consults";
 
