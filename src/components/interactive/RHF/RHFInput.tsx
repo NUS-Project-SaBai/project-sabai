@@ -82,7 +82,7 @@ export function RHFInput({
           type="checkbox"
           {...registerProps}
           {...props}
-          className="h-4 w-4 shrink-0 accent-blue-500 cursor-pointer border-gray-300 rounded justify-self-end focus:ring-2 focus:ring-blue-400"
+          className="h-4 w-4 accent-blue-500 cursor-pointer border-gray-300 rounded justify-self-end focus:ring-2 focus:ring-blue-400"
         />
       </label>
     );
