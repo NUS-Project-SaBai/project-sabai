@@ -230,26 +230,26 @@ function VitalsForm({ visitId }: { visitId: number }) {
       return;
     }
 
+    // Send `null` (not `undefined`) for cleared fields so they are explicitly
+    // set to NULL on update — `undefined` is skipped by Drizzle and would leave
+    // the previous value untouched.
     const payload = {
       visitId: visitId,
-      height: data.height || undefined,
-      weight: data.weight || undefined,
-      temperature: data.temperature || undefined,
-      systolic: data.systolic ? Number(data.systolic) : undefined,
-      diastolic: data.diastolic ? Number(data.diastolic) : undefined,
-      heartRate: data.heartRate ? Number(data.heartRate) : undefined,
-      hemocueCount: data.hemocueCount || undefined,
-      diabetesMellitus:
-        data.diabetesMellitus === "true"
-          ? true
-          : data.diabetesMellitus === "false"
-            ? false
-            : undefined,
-      urineTest: data.urineTest || undefined,
-      bloodGlucoseNonFasting: data.bloodGlucoseNonFasting || undefined,
-      bloodGlucoseFasting: data.bloodGlucoseFasting || undefined,
-      hba1c: data.hba1c || undefined,
-      others: data.others || undefined,
+      height: data.height || null,
+      weight: data.weight || null,
+      temperature: data.temperature || null,
+      systolic: data.systolic ? Number(data.systolic) : null,
+      diastolic: data.diastolic ? Number(data.diastolic) : null,
+      heartRate: data.heartRate ? Number(data.heartRate) : null,
+      hemocueCount: data.hemocueCount || null,
+      diabetesMellitus: data.diabetesMellitus
+        ? data.diabetesMellitus === "true"
+        : null,
+      urineTest: data.urineTest || null,
+      bloodGlucoseNonFasting: data.bloodGlucoseNonFasting || null,
+      bloodGlucoseFasting: data.bloodGlucoseFasting || null,
+      hba1c: data.hba1c || null,
+      others: data.others || null,
     };
 
     if (!vitalData) {

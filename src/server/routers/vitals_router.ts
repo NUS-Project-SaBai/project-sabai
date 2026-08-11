@@ -31,19 +31,22 @@ const selectVitalsFields = {
  * Uses z.coerce.string() for PostgreSQL numeric fields.
  */
 const createVitalsInput = z.object({
-  height: z.coerce.string().optional(), // cm
-  weight: z.coerce.string().optional(), // kg
-  temperature: z.coerce.string().optional(), // °C
-  systolic: z.number().int().optional(), // mmHg
-  diastolic: z.number().int().optional(), // mmHg
-  heartRate: z.number().int().optional(), // bpm
-  hemocueCount: z.coerce.string().optional(), // g/dL
-  diabetesMellitus: z.boolean().optional(),
-  urineTest: z.string().optional(),
-  bloodGlucoseNonFasting: z.coerce.string().optional(), // mg/dL or mmol/L
-  bloodGlucoseFasting: z.coerce.string().optional(), // mg/dL or mmol/L
-  hba1c: z.coerce.string().optional(), // %
-  others: z.string().optional(),
+  // `.nullish()` (not `.optional()`) so the form can send `null` to explicitly
+  // clear a field on update; `undefined` is skipped by Drizzle and would leave
+  // the previous value untouched.
+  height: z.coerce.string().nullish(), // cm
+  weight: z.coerce.string().nullish(), // kg
+  temperature: z.coerce.string().nullish(), // °C
+  systolic: z.number().int().nullish(), // mmHg
+  diastolic: z.number().int().nullish(), // mmHg
+  heartRate: z.number().int().nullish(), // bpm
+  hemocueCount: z.coerce.string().nullish(), // g/dL
+  diabetesMellitus: z.boolean().nullish(),
+  urineTest: z.string().nullish(),
+  bloodGlucoseNonFasting: z.coerce.string().nullish(), // mg/dL or mmol/L
+  bloodGlucoseFasting: z.coerce.string().nullish(), // mg/dL or mmol/L
+  hba1c: z.coerce.string().nullish(), // %
+  others: z.string().nullish(),
   visitId: z.number().int().positive(),
 });
 
