@@ -31,7 +31,6 @@ const selectVitalsFields = {
  * number at the given precision (`step` mirrors the form input's `step`), then
  * serializes back to the string that Drizzle `numeric` columns expect.
  * `label` is used in error messages
- *
  */
 const numericColumn = (label: string, { step }: { step: number }) =>
   z.coerce
