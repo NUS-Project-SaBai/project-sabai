@@ -39,6 +39,5 @@ If all fields are valid, the patient is registered and a visit is also automatic
 
 ## Upcoming Features
 
-1) For repeat patients where the facial recognition system is unable to recognize them (especially children), there would be another button in order to manually select the patient through a regular search system. The patient's picture would then be updated with the currently captured picture.
-
-2) The table that displays matching patients would have the button at the side where a visit can be created by clicking on the button.
+- For repeat patients where the facial recognition system is unable to recognize them (especially children), there would be another button in order to manually select the patient through a regular search system. The patient's picture would then be updated with the currently captured picture.
+- The table that displays matching patients would have the button at the side where a visit can be created by clicking on the button.
