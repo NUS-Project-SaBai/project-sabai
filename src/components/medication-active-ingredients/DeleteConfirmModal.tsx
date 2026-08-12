@@ -30,6 +30,10 @@ export default function DeleteConfirmModal({
             <td>Fall Below:</td>
             <td>{ingredient.fallBelow}</td>
           </tr>
+          <tr>
+            <td>Remarks:</td>
+            <td>{ingredient.remarks}</td>
+          </tr>
         </tbody>
       </table>
       <div className="flex flex-row gap-2">

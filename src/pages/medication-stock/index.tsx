@@ -16,6 +16,7 @@ function Header() {
 
   return (
     <>
+      {modalIsOpen && <CreateModal setModalIsOpen={setModalIsOpen} />}
       <PageHeader
         breadcrumbs={[
           { label: "Home", href: "/" },
@@ -23,6 +24,13 @@ function Header() {
         ]}
         title="Medication Stock"
         description="Manage medication stock."
+        actions={
+          <Button
+            onClick={() => setModalIsOpen(true)}
+            title="Add Stock"
+            colour="indigo"
+          />
+        }
       />
       <div className="mb-8">
         <button

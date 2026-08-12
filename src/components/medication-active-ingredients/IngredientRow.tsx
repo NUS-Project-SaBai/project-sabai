@@ -21,6 +21,7 @@ export default function IngredientRow(ingredient: MedicationActiveIngredient) {
       name: ingredient.name,
       unitOfMeasurement: ingredient.unitOfMeasurement,
       fallBelow: ingredient.fallBelow,
+      remarks: ingredient.remarks ?? "",
     },
   });
 
@@ -58,7 +59,8 @@ export default function IngredientRow(ingredient: MedicationActiveIngredient) {
     const hasChanged =
       data.name !== ingredient.name ||
       data.unitOfMeasurement !== ingredient.unitOfMeasurement ||
-      data.fallBelow !== ingredient.fallBelow;
+      data.fallBelow !== ingredient.fallBelow ||
+      data.remarks !== ingredient.remarks;
 
     if (!hasChanged) {
       toast.error("No form field changed!");
@@ -112,6 +114,17 @@ export default function IngredientRow(ingredient: MedicationActiveIngredient) {
               value={form.getValues().fallBelow}
               label=""
               registerOptions={positiveNumberOptions}
+            />
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            <EditableCell
+              isEditing={isEditing}
+              name="remarks"
+              type="text"
+              value={form.getValues().remarks}
+              label=""
             />
           </span>
         </TableCell>

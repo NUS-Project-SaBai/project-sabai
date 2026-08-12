@@ -43,6 +43,7 @@ function MedicationActiveIngredientsBasePage() {
               "Active Ingredient Name",
               "Unit of Measurement",
               "Fall Below",
+              "Remarks",
               "Actions",
             ]}
           />
