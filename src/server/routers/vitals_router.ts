@@ -59,14 +59,14 @@ const createVitalsInput = z.object({
   diastolic: integerColumn("Diastolic blood pressure"), // mmHg
   heartRate: integerColumn("Heart rate"), // bpm
   hemocueCount: numericColumn("Hemocue count", { step: 0.01 }), // g/dL
-  diabetesMellitus: z.boolean().optional(),
-  urineTest: z.string().optional(),
+  diabetesMellitus: z.boolean().nullable().optional(),
+  urineTest: z.string().nullable().optional(),
   bloodGlucoseNonFasting: numericColumn("Non-fasting blood glucose", {
     step: 0.01,
   }), // mmol/L
   bloodGlucoseFasting: numericColumn("Fasting blood glucose", { step: 0.01 }), // mmol/L
   hba1c: numericColumn("HbA1c", { step: 0.01 }), // %
-  others: z.string().optional(),
+  others: z.string().nullable().optional(),
   visitId: z.number().int().positive(),
 });
 
