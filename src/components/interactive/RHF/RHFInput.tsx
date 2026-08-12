@@ -74,19 +74,15 @@ export function RHFInput({
 
   if (isCheckbox) {
     return (
-      <div
-        className={`grid grid-cols-[1fr_auto] items-center gap-4 py-3 px-3 rounded-md hover:bg-gray-50 transition ${className}`}
+      <label
+        htmlFor={name}
+        className={`grid grid-cols-[1fr_auto] items-center gap-4 py-3 px-3 rounded-md hover:bg-gray-50 transition cursor-pointer ${className}`}
       >
-        {/* LEFT: LABEL */}
-        <label
-          htmlFor={name}
-          className="text-sm font-semibold text-gray-800 justify-self-start cursor-pointer"
-        >
+        <span className="text-sm font-semibold text-gray-800 justify-self-start">
           {label}
           <IsRequiredStar isRequired={isRequired} />
-        </label>
+        </span>
 
-        {/* RIGHT: CHECKBOX (aligned in one column) */}
         <input
           id={name}
           type="checkbox"
@@ -94,7 +90,7 @@ export function RHFInput({
           {...props}
           className="h-4 w-4 accent-blue-500 cursor-pointer border-gray-300 rounded justify-self-end focus:ring-2 focus:ring-blue-400"
         />
-      </div>
+      </label>
     );
   }
 

@@ -7,6 +7,7 @@ import { PatientPhoto } from "@/components/PatientPhoto";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Mode } from "@/types/scan";
 import { Button } from "@/components/interactive/Button/Button";
+import { MdPersonSearch } from "react-icons/md";
 
 export default function MatchingPatients({
   imgDetails,
@@ -51,15 +52,21 @@ export default function MatchingPatients({
 
   if (searchPatientsByPictureQuery.data.length === 0) {
     return (
-      <div className="flex-col">
-        <h2 className="text-xl font-bold mb-4 text-center py-10">
+      <div className="flex flex-col items-center gap-3 py-6 text-center">
+        <MdPersonSearch className="text-gray-300" size={64} />
+        <h2 className="text-lg font-semibold text-gray-700">
           No matches found
         </h2>
-        <Button
-          onClick={() => setMode(Mode.REGISTERING)}
-          colour="indigo"
-          title="Register New Patient"
-        />
+        <p className="text-sm text-gray-400">
+          We couldn&apos;t find a patient matching this face.
+        </p>
+        <div className="flex gap-3 mt-4">
+          <Button
+            onClick={() => setMode(Mode.REGISTERING)}
+            colour="indigo"
+            title="Register New Patient"
+          />
+        </div>
       </div>
     );
   }
@@ -96,7 +103,7 @@ export default function MatchingPatients({
           ))}
         </tbody>
       </table>
-      <div className="flex gap-3 mt-6">
+      <div className="flex gap-3 mt-6 justify-center">
         <Button
           colour="indigo"
           onClick={() => setMode(Mode.REGISTERING)}
