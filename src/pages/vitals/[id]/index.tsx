@@ -264,12 +264,23 @@ function VitalsForm({ visitId }: { visitId: number }) {
       {/*normal body stuff*/}
       <section className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <RHFInput name="height" label="Height (cm)" type="number" />
-          <RHFInput name="weight" label="Weight (kg)" type="number" />
+          <RHFInput
+            name="height"
+            label="Height (cm)"
+            type="number"
+            step="0.1"
+          />
+          <RHFInput
+            name="weight"
+            label="Weight (kg)"
+            type="number"
+            step="0.01"
+          />
           <RHFInput
             name="temperature"
             label="Body Temperature (°C)"
             type="number"
+            step="0.1"
           />
         </div>
       </section>
@@ -297,17 +308,25 @@ function VitalsForm({ visitId }: { visitId: number }) {
             name="bloodGlucoseFasting"
             label="Fasting Blood Glucose (mmol/L)"
             type="number"
+            step="0.01"
           />
           <RHFInput
             name="bloodGlucoseNonFasting"
             label="Non-Fasting Blood Glucose (mmol/L)"
             type="number"
+            step="0.01"
           />
-          <RHFInput name="hba1c" label="HbA1c Level (%)" type="number" />
+          <RHFInput
+            name="hba1c"
+            label="HbA1c Level (%)"
+            type="number"
+            step="0.01"
+          />
           <RHFInput
             name="hemocueCount"
             label="Hemocue Hemoglobin Count (g/dL)"
             type="number"
+            step="0.01"
           />
         </div>
         <div className="mt-4">
