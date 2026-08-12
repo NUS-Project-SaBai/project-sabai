@@ -51,7 +51,7 @@ project-sabai/
 |   |-- utils/
 |   |   |-- trpc.ts            # tRPC React hooks
 |   |-- db/
-|   |   |-- schema.ts          # Drizzle schema
+|   |   |-- schema/            # Drizzle schema (per-domain files + index.ts)
 |   |   |-- drizzle.ts         # Drizzle client
 |-- supabase/
 |   |-- migrations/            # SQL migrations
@@ -67,13 +67,13 @@ Quick pointers:
 - New page: add a file in [src/pages](../src/pages).
 - New UI component: add to [src/components](../src/components).
 - New API procedure: add to a router in [src/server/routers](../src/server/routers) and mount in [src/server/routers/\_app.ts](../src/server/routers/_app.ts).
-- New DB table/column: edit [src/db/schema.ts](../src/db/schema.ts) and create a migration in [supabase/migrations](../supabase/migrations).
+- New DB table/column: edit the relevant domain file in [src/db/schema/](../src/db/schema) and create a migration in [supabase/migrations](../supabase/migrations).
 
 ## 4. Common tasks
 
 ### Add a new table or column
 
-1. Update Drizzle schema in [src/db/schema.ts](../src/db/schema.ts).
+1. Update the Drizzle schema in the relevant domain file under [src/db/schema/](../src/db/schema).
 2. Generate a migration with Drizzle Kit.
 3. Apply the migration to local Supabase.
 
