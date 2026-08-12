@@ -1,4 +1,4 @@
-import { NewVillageCode } from "@/db/schema";
+import { NewVillageCode } from "@/db/schema/villageCodes";
 
 export const DEFAULT_FORM: NewVillageCode = {
   code: "",

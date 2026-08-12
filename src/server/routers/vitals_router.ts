@@ -2,7 +2,7 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { vitals } from "@/db/schema";
+import { vitals } from "@/db/schema/vitals";
 
 /**
  * Common select fields for vitals queries to ensure consistency

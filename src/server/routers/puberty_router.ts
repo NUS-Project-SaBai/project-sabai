@@ -2,7 +2,7 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { puberty } from "@/db/schema";
+import { puberty } from "@/db/schema/vitals";
 
 /**
  * Common select fields for puberty queries to ensure consistency
