@@ -42,7 +42,11 @@ export function ConsultForm({ visitId }: { visitId: number }) {
   const methods = useForm<ConsultFormValues>({ defaultValues: BLANK_CONSULT });
   const { control, handleSubmit } = methods;
 
-  const { fields, append, remove } = useFieldArray({
+  const {
+    fields: diagnosisFields,
+    append: appendDiagnosis,
+    remove: removeDiagnosis,
+  } = useFieldArray({
     control,
     name: "diagnoses",
   });
@@ -119,11 +123,11 @@ export function ConsultForm({ visitId }: { visitId: number }) {
             title="Add Diagnosis"
             colour="emerald"
             variant="filled"
-            onClick={() => append({ details: "", category: "" })}
+            onClick={() => appendDiagnosis({ details: "", category: "" })}
             className="w-full"
           />
 
-          {fields.map((field, index) => (
+          {diagnosisFields.map((field, index) => (
             <div
               key={field.id}
               className="space-y-4 rounded-lg border border-slate-200 p-4"
@@ -132,10 +136,10 @@ export function ConsultForm({ visitId }: { visitId: number }) {
                 <p className="text-sm font-semibold text-slate-600">
                   Diagnosis {index + 1}
                 </p>
-                {fields.length > 1 && (
+                {diagnosisFields.length > 1 && (
                   <button
                     type="button"
-                    onClick={() => remove(index)}
+                    onClick={() => removeDiagnosis(index)}
                     title="Remove diagnosis"
                     className="inline-flex items-center gap-1 rounded p-1 text-sm text-red-600 transition hover:bg-red-50"
                   >
