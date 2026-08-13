@@ -64,7 +64,6 @@ export const medicationStockRouter = router({
       .select({
         id: medicationActiveIngredients.id,
         activeIngredientName: medicationActiveIngredients.name,
-        brandName: medicationBrands.name,
         unitOfMeasurement: medicationActiveIngredients.unitOfMeasurement,
         quantity: sum(medicationStock.quantity),
       })
@@ -86,7 +85,6 @@ export const medicationStockRouter = router({
       .groupBy(
         medicationActiveIngredients.id,
         medicationActiveIngredients.name,
-        medicationBrands.name,
         medicationActiveIngredients.unitOfMeasurement,
       );
 
