@@ -5,7 +5,6 @@ export type DiagnosisFormValue = {
 
 export type Medicine = {
   activeIngredientName: string;
-  brandName: string;
   unitOfMeasurement: string;
   quantity: number;
 };
