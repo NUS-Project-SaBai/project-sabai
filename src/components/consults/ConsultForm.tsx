@@ -14,10 +14,27 @@ import {
   DiagnosisCategory,
 } from "@/lib/constants/diagnosisCategories";
 import { REFERRAL_CATEGORY_OPTIONS } from "@/lib/constants/referralCategories";
+import { useState } from "react";
+import OrderModal from "./OrderModal";
 
-type ConsultFormValues = z.infer<typeof consultFormSchema>;
+type Medicine = {
+  activeIngredientName: string;
+  brandName: string;
+  unitOfMeasurement: string;
+  quantity: number;
+};
 
-const BLANK_CONSULT: ConsultFormValues = {
+export type OrderFormValue = {
+  quantity: number;
+  dosageInstructions: string;
+  medicine: Medicine;
+};
+
+export type ConsultFormValues = z.infer<typeof consultFormSchema> & {
+  orders: OrderFormValue[];
+};
+
+export const BLANK_CONSULT: ConsultFormValues = {
   pastMedicalHistory: "",
   consultation: "",
   treatmentPlan: "",
@@ -25,6 +42,7 @@ const BLANK_CONSULT: ConsultFormValues = {
   diagnoses: [{ details: "", category: "" }],
   referredFor: "Not Referred",
   referralNotes: "",
+  orders: [],
 };
 
 /**
@@ -51,6 +69,17 @@ export function ConsultForm({ visitId }: { visitId: number }) {
     control,
     name: "diagnoses",
   });
+
+  const {
+    fields: orderFields,
+    append: appendOrder,
+    remove: removeOrder,
+  } = useFieldArray({
+    control,
+    name: "orders",
+  });
+
+  const [orderModalIsOpen, setOrderModalIsOpen] = useState<boolean>(false);
 
   const utils = trpc.useUtils();
   const createConsult = trpc.consultsRouter.create.useMutation();
@@ -188,6 +217,25 @@ export function ConsultForm({ visitId }: { visitId: number }) {
             label="Remarks"
             rows={2}
             placeholder="Type your remarks here..."
+          />
+        </section>
+
+        {/* Orders */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-1">
+            <h3 className="text-sm font-semibold text-slate-700">Orders</h3>
+          </div>
+
+          {orderModalIsOpen && (
+            <OrderModal setOrderModalIsOpen={setOrderModalIsOpen} />
+          )}
+
+          <Button
+            title="Add Order"
+            colour="emerald"
+            variant="filled"
+            onClick={() => setOrderModalIsOpen(true)}
+            className="w-full"
           />
         </section>
 
