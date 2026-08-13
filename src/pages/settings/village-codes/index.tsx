@@ -7,7 +7,7 @@ import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import DeleteModal from "@/components/village-codes/DeleteModal";
 import ChangeModal from "@/components/village-codes/ChangeModal";
-import { FormFields } from "@/lib/utils/villageCodeTypes";
+import { FormFields } from "@/types/village-codes";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Button } from "@/components/interactive/Button/Button";
 

@@ -2,7 +2,7 @@ import Modal from "@/components/interactive/Modal";
 import {
   MedicationStockWithBrandAndActiveIngredient,
   StockStatus,
-} from "@/lib/utils/medication-stock";
+} from "@/types/medication-stock";
 import { Button } from "@/components/interactive/Button/Button";
 import { useState } from "react";
 import { medicationStatusValues } from "@/db/schema/pharmacy";
