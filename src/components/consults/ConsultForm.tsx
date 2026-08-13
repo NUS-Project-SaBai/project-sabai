@@ -1,6 +1,5 @@
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import toast from "react-hot-toast";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { trpc } from "@/utils/trpc";
@@ -16,34 +15,7 @@ import {
 import { REFERRAL_CATEGORY_OPTIONS } from "@/lib/constants/referralCategories";
 import { useState } from "react";
 import OrderModal from "./OrderModal";
-
-type Medicine = {
-  activeIngredientName: string;
-  brandName: string;
-  unitOfMeasurement: string;
-  quantity: number;
-};
-
-export type OrderFormValue = {
-  quantity: number;
-  dosageInstructions: string;
-  medicine: Medicine;
-};
-
-export type ConsultFormValues = z.infer<typeof consultFormSchema> & {
-  orders: OrderFormValue[];
-};
-
-export const BLANK_CONSULT: ConsultFormValues = {
-  pastMedicalHistory: "",
-  consultation: "",
-  treatmentPlan: "",
-  remarks: "",
-  diagnoses: [{ details: "", category: "" }],
-  referredFor: "Not Referred",
-  referralNotes: "",
-  orders: [],
-};
+import { BLANK_CONSULT, ConsultFormValues } from "@/types/consults";
 
 /**
  * The consultation form for a single visit. Owns its own form state.
