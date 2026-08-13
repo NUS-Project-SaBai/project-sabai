@@ -3,7 +3,7 @@ import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { withUserTransaction } from "@/db/withUserTransaction";
-import { eq, desc, ne } from "drizzle-orm";
+import { eq, desc, ne, gte, and, sum } from "drizzle-orm";
 import {
   medicationBrands,
   medicationStatusEnum,
@@ -56,6 +56,40 @@ export const medicationStockRouter = router({
       )
       .where(ne(medicationStock.quantity, 0))
       .orderBy(desc(medicationStock.id));
+    return result;
+  }),
+
+  listGroupByActiveIngredient: protectedProcedure.query(async () => {
+    const result = await db
+      .select({
+        id: medicationActiveIngredients.id,
+        activeIngredientName: medicationActiveIngredients.name,
+        brandName: medicationBrands.name,
+        unitOfMeasurement: medicationActiveIngredients.unitOfMeasurement,
+        quantity: sum(medicationStock.quantity),
+      })
+      .from(medicationStock)
+      .innerJoin(
+        medicationBrands,
+        eq(medicationStock.medicationBrandId, medicationBrands.id),
+      )
+      .innerJoin(
+        medicationActiveIngredients,
+        eq(medicationActiveIngredients.id, medicationBrands.activeIngredientId),
+      )
+      .where(
+        and(
+          eq(medicationStock.stockStatus, "active"),
+          gte(medicationStock.expiry, new Date()),
+        ),
+      )
+      .groupBy(
+        medicationActiveIngredients.id,
+        medicationActiveIngredients.name,
+        medicationBrands.name,
+        medicationActiveIngredients.unitOfMeasurement,
+      );
+
     return result;
   }),
 
