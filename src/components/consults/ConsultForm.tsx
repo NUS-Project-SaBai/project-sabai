@@ -10,10 +10,25 @@ import {
   DIAGNOSIS_CATEGORY_OPTIONS,
   DiagnosisCategory,
 } from "@/lib/constants/diagnosisCategories";
+import { useState } from "react";
+import OrderModal from "./OrderModal";
 
 export type DiagnosisFormValue = {
   details: string;
   category: string;
+};
+
+type Medicine = {
+  activeIngredientName: string;
+  brandName: string;
+  unitOfMeasurement: string;
+  quantity: number;
+};
+
+export type OrderFormValue = {
+  quantity: number;
+  dosageInstructions: string;
+  medicine: Medicine;
 };
 
 export type ConsultFormValues = {
@@ -22,6 +37,7 @@ export type ConsultFormValues = {
   treatmentPlan: string;
   remarks: string;
   diagnoses: DiagnosisFormValue[];
+  orders: OrderFormValue[];
 };
 
 export const BLANK_CONSULT: ConsultFormValues = {
@@ -30,6 +46,7 @@ export const BLANK_CONSULT: ConsultFormValues = {
   treatmentPlan: "",
   remarks: "",
   diagnoses: [{ details: "", category: "" }],
+  orders: [],
 };
 
 /**
@@ -50,6 +67,17 @@ export function ConsultForm({ visitId }: { visitId: number }) {
     control,
     name: "diagnoses",
   });
+
+  const {
+    fields: orderFields,
+    append: appendOrder,
+    remove: removeOrder,
+  } = useFieldArray({
+    control,
+    name: "orders",
+  });
+
+  const [orderModalIsOpen, setOrderModalIsOpen] = useState<boolean>(false);
 
   const utils = trpc.useUtils();
   const createConsult = trpc.consultsRouter.create.useMutation();
@@ -178,6 +206,24 @@ export function ConsultForm({ visitId }: { visitId: number }) {
             label="Remarks"
             rows={2}
             placeholder="Type your remarks here..."
+          />
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex items-center gap-1">
+            <h3 className="text-sm font-semibold text-slate-700">Orders</h3>
+          </div>
+
+          {orderModalIsOpen && (
+            <OrderModal setOrderModalIsOpen={setOrderModalIsOpen} />
+          )}
+
+          <Button
+            title="Add Order"
+            colour="emerald"
+            variant="filled"
+            onClick={() => setOrderModalIsOpen(true)}
+            className="w-full"
           />
         </section>
 
