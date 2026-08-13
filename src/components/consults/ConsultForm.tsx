@@ -12,42 +12,7 @@ import {
 } from "@/lib/constants/diagnosisCategories";
 import { useState } from "react";
 import OrderModal from "./OrderModal";
-
-export type DiagnosisFormValue = {
-  details: string;
-  category: string;
-};
-
-type Medicine = {
-  activeIngredientName: string;
-  brandName: string;
-  unitOfMeasurement: string;
-  quantity: number;
-};
-
-export type OrderFormValue = {
-  quantity: number;
-  dosageInstructions: string;
-  medicine: Medicine;
-};
-
-export type ConsultFormValues = {
-  pastMedicalHistory: string;
-  consultation: string;
-  treatmentPlan: string;
-  remarks: string;
-  diagnoses: DiagnosisFormValue[];
-  orders: OrderFormValue[];
-};
-
-export const BLANK_CONSULT: ConsultFormValues = {
-  pastMedicalHistory: "",
-  consultation: "",
-  treatmentPlan: "",
-  remarks: "",
-  diagnoses: [{ details: "", category: "" }],
-  orders: [],
-};
+import { BLANK_CONSULT, ConsultFormValues } from "@/types/consults";
 
 /**
  * The consultation form for a single visit. Owns its own form state.
