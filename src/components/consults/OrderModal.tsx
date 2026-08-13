@@ -26,25 +26,25 @@ export default function OrderModal({
 
   return (
     <Modal onClose={() => setOrderModalIsOpen(false)}>
-      <FormProvider {...form}>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit(handleSubmit)(e);
-          }}
-        >
-          <h2 className="text-xl font-bold mb-4">Add Order</h2>
-          Patient allergies placeholder
-          {isError && (
-            <h1 className="text-red-500">
-              An error has occurred while loading medicine.
-            </h1>
-          )}
-          {isLoading && (
-            <LoadingSpinner message="Loading medicine..." className="p-6" />
-          )}
-          {!isLoading && !isError && (
-            <>
+      <h2 className="text-xl font-bold mb-4">Add Order</h2>
+      Patient allergies placeholder
+      {isError && (
+        <h1 className="text-red-500">
+          An error has occurred while loading medicine.
+        </h1>
+      )}
+      {isLoading && (
+        <LoadingSpinner message="Loading medicine..." className="p-6" />
+      )}
+      {!isLoading && !isError && (
+        <>
+          <FormProvider {...form}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                form.handleSubmit(handleSubmit)(e);
+              }}
+            >
               <RHFDropdown
                 name="medicine"
                 label="Medicine:"
@@ -75,10 +75,10 @@ export default function OrderModal({
                 isRequired
               />
               <Button colour="emerald" title="Save Order" type="submit" />
-            </>
-          )}
-        </form>
-      </FormProvider>
+            </form>
+          </FormProvider>
+        </>
+      )}
     </Modal>
   );
 }
