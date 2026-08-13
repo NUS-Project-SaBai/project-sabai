@@ -3,6 +3,7 @@ import { trpc } from "@/utils/trpc";
 import { UseFieldArrayAppend } from "react-hook-form";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
+import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 
 export default function OrderModal({
   setOrderModalIsOpen,
@@ -27,16 +28,37 @@ export default function OrderModal({
         <LoadingSpinner message="Loading medicine..." className="p-6" />
       )}
       {!isLoading && !isError && (
-        <RHFDropdown
-          name="medicine"
-          label="Medicine:"
-          dropdownOptions={data!.map((elem) => ({
-            value: `${elem.id}`,
-            label: `${elem.activeIngredientName}, (${elem.unitOfMeasurement}) (Qty: ${elem.quantity})`,
-          }))}
-          className="mb-4"
-          isRequired
-        />
+        <>
+          <RHFDropdown
+            name="medicine"
+            label="Medicine:"
+            dropdownOptions={data!.map((elem) => ({
+              value: `${elem.id}`,
+              label: `${elem.activeIngredientName}, (${elem.unitOfMeasurement}) (Qty: ${elem.quantity})`,
+            }))}
+            className="mb-4"
+            isRequired
+          />
+          <RHFInput
+            name="medicineQty"
+            label="Quantity to Order"
+            type="number"
+            isRequired
+            registerOptions={{
+              valueAsNumber: true,
+              min: {
+                value: 1,
+                message: "Please input only positive values.",
+              },
+            }}
+          />
+          <RHFInput
+            name="dosageInstructions"
+            label="Dosage Instructions"
+            type="text"
+            isRequired
+          />
+        </>
       )}
     </Modal>
   );
