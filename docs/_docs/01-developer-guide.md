@@ -28,7 +28,7 @@ This guide helps orientate new developers to the project.
   - Run dev server: `pnpm dev`
   - See script details in [Appendix A: package.json scripts](#appendix-a-packagejson-scripts).
 
-See [README.md](../README.md) for full details and local credentials.
+See [README.md](https://github.com/NUS-Project-SaBai/project-sabai/blob/dev/README.md) for full details and local credentials.
 
 ## 3. Project layout
 
@@ -64,16 +64,16 @@ project-sabai/
 
 Quick pointers:
 
-- New page: add a file in [src/pages](../src/pages).
-- New UI component: add to [src/components](../src/components).
-- New API procedure: add to a router in [src/server/routers](../src/server/routers) and mount in [src/server/routers/\_app.ts](../src/server/routers/_app.ts).
-- New DB table/column: edit the relevant domain file in [src/db/schema/](../src/db/schema) and create a migration in [supabase/migrations](../supabase/migrations).
+- New page: add a file in [src/pages](https://github.com/NUS-Project-SaBai/project-sabai/tree/dev/src/pages).
+- New UI component: add to [src/components](https://github.com/NUS-Project-SaBai/project-sabai/tree/dev/src/components).
+- New API procedure: add to a router in [src/server/routers](https://github.com/NUS-Project-SaBai/project-sabai/tree/dev/src/server/routers) and mount in [src/server/routers/\_app.ts](https://github.com/NUS-Project-SaBai/project-sabai/blob/dev/src/server/routers/_app.ts).
+- New DB table/column: edit the relevant domain file in [src/db/schema/](https://github.com/NUS-Project-SaBai/project-sabai/tree/dev/src/db/schema) and create a migration in [supabase/migrations](https://github.com/NUS-Project-SaBai/project-sabai/tree/dev/supabase/migrations).
 
 ## 4. Common tasks
 
 ### Add a new table or column
 
-1. Update the Drizzle schema in the relevant domain file under [src/db/schema/](../src/db/schema).
+1. Update the Drizzle schema in the relevant domain file under [src/db/schema/](https://github.com/NUS-Project-SaBai/project-sabai/tree/dev/src/db/schema).
 2. Generate a migration with Drizzle Kit.
 3. Apply the migration to local Supabase.
 
@@ -82,25 +82,25 @@ See [Drizzle ORM docs](/docs/drizzle-orm/) for details and commands.
 ### Add a new page that calls the backend
 
 1. Add or update a tRPC procedure
-   - Create or update a router in [src/server/routers](../src/server/routers) folder.
+   - Create or update a router in [src/server/routers](https://github.com/NUS-Project-SaBai/project-sabai/tree/dev/src/server/routers) folder.
    - Use `publicProcedure` (no auth) or `protectedProcedure` (auth required).
-   - Example reference: [src/server/routers/village_codes_router.ts](../src/server/routers/village_codes_router.ts)
+   - Example reference: [src/server/routers/village_codes_router.ts](https://github.com/NUS-Project-SaBai/project-sabai/blob/dev/src/server/routers/village_codes_router.ts)
 
 2. Ensure the router is mounted
-   - Add it to the root router in [src/server/routers/\_app.ts](../src/server/routers/_app.ts).
+   - Add it to the root router in [src/server/routers/\_app.ts](https://github.com/NUS-Project-SaBai/project-sabai/blob/dev/src/server/routers/_app.ts).
 
 3. Create the page
    - Add `src/pages/my-page.tsx`.
    - We are using [hyphens instead of underscores](https://stackoverflow.com/questions/119312/urls-dash-vs-underscore) for spaces in route names
 
 4. Call the procedure from the page
-   - Use hooks from [src/utils/trpc.ts](../src/utils/trpc.ts).
+   - Use hooks from [src/utils/trpc.ts](https://github.com/NUS-Project-SaBai/project-sabai/blob/dev/src/utils/trpc.ts).
 
 See [tRPC docs](/docs/trpc/) for a full walkthrough.
 
 ### Add a new UI component
 
-- Place shared components in [src/components](../src/components).
+- Place shared components in [src/components](https://github.com/NUS-Project-SaBai/project-sabai/tree/dev/src/components).
 
 ### Run and open this documentation site
 
