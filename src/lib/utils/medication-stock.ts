@@ -42,10 +42,7 @@ function areSplitsDistinct(splits: Payload[]) {
   return true;
 }
 
-export function validateSplits(
-  splits: Payload[],
-  parent: MedicationStockWithBrandAndActiveIngredient,
-) {
+export function validateSplits(splits: Payload[], parentQty: number) {
   if (splits.length < 2) {
     return {
       success: false,
@@ -58,7 +55,7 @@ export function validateSplits(
     0,
   );
 
-  if (quantity != parent.quantity) {
+  if (quantity != parentQty) {
     return {
       success: false,
       message: "Child stock quantity does not equal parent stock quantity!",

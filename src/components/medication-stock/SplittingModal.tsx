@@ -62,7 +62,7 @@ export default function SplittingModal({
       remarks: split.remarks ?? undefined,
     }));
 
-    const validationResults = validateSplits(payload, stock);
+    const validationResults = validateSplits(payload, stock.quantity);
 
     if (validationResults.success) {
       splitMutation.mutate({ splits: payload, parentId: stock.id });
