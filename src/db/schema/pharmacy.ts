@@ -141,7 +141,8 @@ Orders Table:
 - consultId: Foreign key referencing the consult in which the order was created.
 - dosageInstructions: The dosage instructions for the order.
 - status: The order status. Can be 'PENDING', 'CANCELLED', or 'APPROVED'.
-- stockChangeId: Foreign key representing the entry in the stockChange table that displays stocks going from 'active' to 'reserved' state.
+- quantity: The order quantity.
+- createdAt: The timestamp of when the row was created.
 */
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
@@ -150,9 +151,8 @@ export const orders = pgTable("orders", {
     .references(() => consults.id),
   dosageInstructions: text("dosage_instructions").notNull(),
   status: orderStatusEnum("status").notNull().default("PENDING"),
-  stockChangeId: integer("stock_change_id")
-    .notNull()
-    .references(() => stockChanges.id),
+  quantity: integer("quantity").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export type Order = typeof orders.$inferSelect;
