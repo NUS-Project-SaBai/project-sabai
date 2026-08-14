@@ -1,6 +1,6 @@
 ---
 title: Medication Active Ingredients
-excerpt: Medication Active Ingredients Page
+excerpt: This page handles the viewing, editing, and deleting of medication active ingredients. 
 permalink: /features/medication-active-ingredients/
 ---
 

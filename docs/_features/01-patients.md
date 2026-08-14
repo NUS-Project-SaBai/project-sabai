@@ -1,6 +1,6 @@
 ---
 title: Patients
-excerpt: Patients Page
+excerpt: This page allows users to view patients.
 permalink: /features/patients/
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Medication Stock
-excerpt: Medication Stock Page
+excerpt: This page handles the viewing, editing, and splitting of medication stock.
 permalink: /features/medication-stock/
 ---
 

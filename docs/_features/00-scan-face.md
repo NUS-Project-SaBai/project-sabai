@@ -1,6 +1,6 @@
 ---
 title: Scan Face
-excerpt: Scan Face Page
+excerpt: This page handles the registration of patients by facial recognition.
 permalink: /features/scan-face/
 ---
 

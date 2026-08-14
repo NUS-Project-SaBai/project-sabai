@@ -1,6 +1,6 @@
 ---
 title: Settings
-excerpt: Settings Page
+excerpt: This page only handles the viewing, editing, and deleting of village codes currently, but will be expanded to include more settings in the future.
 permalink: /features/settings/
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Vision
-excerpt: Vision Page
+excerpt: This page manages the patient's vision, including basic vision tests and glasses fitting.
 permalink: /features/vision/
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Medication Brands
-excerpt: Medication Brands Page
+excerpt: This page handles the viewing, editing, and deleting of medication brands.
 permalink: /features/medication-brands/
 ---
 

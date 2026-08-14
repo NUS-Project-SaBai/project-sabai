@@ -1,6 +1,6 @@
 ---
 title: Vitals
-excerpt: Vitals Page
+excerpt: This page manages the patient's vitals.
 permalink: /features/vitals/
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Consults
-excerpt: Consults Page
+excerpt: This page handles the consults.
 permalink: /features/consults/
 ---
 
