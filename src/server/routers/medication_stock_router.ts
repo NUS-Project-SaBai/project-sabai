@@ -10,6 +10,7 @@ import {
   medicationActiveIngredients,
 } from "@/db/schema";
 import { TRPCError } from "@trpc/server";
+import { validateSplits } from "@/lib/utils/medication-stock";
 
 export const medicationStockRouter = router({
   list: protectedProcedure.query(async () => {
@@ -137,15 +138,12 @@ export const medicationStockRouter = router({
         .where(eq(medicationStock.id, parentId))
         .limit(1); // Guaranteed to be one result anyway
 
-      const totalSplitQty = splits.reduce(
-        (sum, split) => sum + split.quantity,
-        0,
-      );
+      const { success, message } = validateSplits(splits, parent[0].quantity);
 
-      if (parent[0].quantity != totalSplitQty) {
+      if (!success) {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Parent stock quantity not equal to splits quantity!",
+          message: message,
         });
       }
 
