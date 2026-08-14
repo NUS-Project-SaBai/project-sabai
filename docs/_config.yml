@@ -107,6 +107,9 @@ collections:
   docs:
     output: true
     permalink: /:collection/:path/
+  features:
+    output: true
+    permalink: /:collection/:path/
 
 # Defaults
 defaults:
@@ -119,6 +122,15 @@ defaults:
       toc: true
       sidebar:
         nav: "docs"
+  - scope:
+      path: ""
+      type: features
+    values:
+      layout: single
+      author_profile: false
+      toc: true
+      sidebar:
+        nav: "features"
 
 
 # Sass/SCSS
