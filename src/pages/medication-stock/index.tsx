@@ -273,11 +273,19 @@ function Row({
                 title="Edit"
               />
             )}
-            <Button
-              onClick={() => setSplittingStock(item)}
-              colour="indigo"
-              title="Split"
-            />
+            {isEditing ? (
+              <Button
+                onClick={() => setIsEditing(false)}
+                colour="red"
+                title="Cancel"
+              />
+            ) : (
+              <Button
+                onClick={() => setSplittingStock(item)}
+                colour="indigo"
+                title="Split"
+              />
+            )}
           </span>
         </TableCell>
       </FormProvider>
