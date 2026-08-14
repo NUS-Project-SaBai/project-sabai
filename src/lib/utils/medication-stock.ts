@@ -43,10 +43,18 @@ function areSplitsDistinct(splits: Payload[]) {
 }
 
 export function validateSplits(splits: Payload[], parentQty: number) {
-  if (splits.length < 2) {
+  if (splits.length === 0) {
     return {
       success: false,
-      message: "Must have at least 2 splits!",
+      message: "Submitting without a split does nothing!",
+    };
+  }
+
+  if (splits.length === 1) {
+    return {
+      success: false,
+      message:
+        "Please use the editing function instead to edit a single split!",
     };
   }
 
