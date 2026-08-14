@@ -1,4 +1,10 @@
-import { MedicationStock, medicationStatusValues } from "@/db/schema";
+import {
+  MedicationStock,
+  medicationStatusValues,
+  medicationStatusEnum,
+} from "@/db/schema";
+import z from "zod";
+import { zfd } from "zod-form-data";
 
 export type StockStatus = (typeof medicationStatusValues)[number];
 
@@ -23,12 +29,14 @@ export type MedicationStockWithBrandAndActiveIngredient = MedicationStock & {
 
 // Functions used for split stock
 
-type Payload = {
-  location: string;
-  stockStatus: StockStatus;
-  quantity: number;
-  remarks?: string;
-};
+export const splitSchema = z.object({
+  quantity: zfd.numeric(z.number().int()),
+  location: zfd.text(z.string()),
+  stockStatus: zfd.text(z.enum(medicationStatusEnum.enumValues)),
+  remarks: zfd.text(z.string().optional()),
+});
+
+export type Payload = z.infer<typeof splitSchema>;
 
 function areSplitsDistinct(splits: Payload[]) {
   const splitsSet = new Set();

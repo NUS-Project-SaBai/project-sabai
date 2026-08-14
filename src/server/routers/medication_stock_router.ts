@@ -10,7 +10,7 @@ import {
   medicationActiveIngredients,
 } from "@/db/schema";
 import { TRPCError } from "@trpc/server";
-import { validateSplits } from "@/lib/utils/medication-stock";
+import { splitSchema, validateSplits } from "@/lib/utils/medication-stock";
 
 export const medicationStockRouter = router({
   list: protectedProcedure.query(async () => {
@@ -118,16 +118,7 @@ export const medicationStockRouter = router({
     .input(
       z.object({
         parentId: zfd.numeric(z.number().int()),
-        splits: z
-          .array(
-            z.object({
-              quantity: zfd.numeric(z.number().int()),
-              location: zfd.text(z.string()),
-              stockStatus: zfd.text(z.enum(medicationStatusEnum.enumValues)),
-              remarks: zfd.text(z.string().optional()),
-            }),
-          )
-          .min(2),
+        splits: z.array(splitSchema).min(2),
       }),
     )
     .mutation(async ({ input }) => {
