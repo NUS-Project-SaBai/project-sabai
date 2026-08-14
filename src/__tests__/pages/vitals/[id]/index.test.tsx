@@ -1,7 +1,7 @@
 import PatientVitalsPage from "@/pages/vitals/[id]";
 import { trpc } from "@/utils/trpc";
 import { Toaster, toast } from "react-hot-toast";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { assertLoadingSpinner } from "@/__tests__/utils/helper-functions";
 import { useRouter } from "next/router";
@@ -182,6 +182,33 @@ describe("VitalsForm", () => {
       const toast = screen.getByRole("status");
       expect(toast).toBeInTheDocument();
       expect(toast.textContent).toBe("Vitals saved successfully!");
+    });
+  });
+
+  test("clears a previously-saved field by sending null on update", async () => {
+    const user = userEvent.setup();
+    const mutate = vi.fn();
+    mockTrpc.vitalsRouter.getByVisitId.useQuery.mockReturnValue({
+      data: MOCK_VITALS,
+      isLoading: false,
+    });
+    mockTrpc.vitalsRouter.updateByVisitId.useMutation.mockReturnValue({
+      mutate,
+      isPending: false,
+    });
+
+    renderPage();
+
+    const tempInput = await screen.findByDisplayValue(MOCK_VITALS.temperature);
+    await user.clear(tempInput);
+
+    fireEvent.submit(tempInput.closest("form")!);
+
+    // A cleared field must persist as null (explicit NULL), not be dropped.
+    await waitFor(() => {
+      expect(mutate).toHaveBeenCalledWith(
+        expect.objectContaining({ temperature: null }),
+      );
     });
   });
 

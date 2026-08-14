@@ -2,7 +2,7 @@ import {
   MedicationStock,
   medicationStatusValues,
   medicationStatusEnum,
-} from "@/db/schema";
+} from "@/db/schema/pharmacy";
 import z from "zod";
 import { zfd } from "zod-form-data";
 

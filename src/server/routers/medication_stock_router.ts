@@ -8,7 +8,7 @@ import {
   medicationStatusEnum,
   medicationStock,
   medicationActiveIngredients,
-} from "@/db/schema";
+} from "@/db/schema/pharmacy";
 import { TRPCError } from "@trpc/server";
 import { splitSchema, validateSplits } from "@/lib/utils/medication-stock";
 

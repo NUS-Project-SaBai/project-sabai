@@ -5,7 +5,7 @@ import {
 } from "@/lib/utils/medication-stock";
 import { Button } from "@/components/interactive/Button/Button";
 import { useState } from "react";
-import { medicationStatusValues } from "@/db/schema";
+import { medicationStatusValues } from "@/db/schema/pharmacy";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import { validateSplits } from "@/lib/utils/medication-stock";
