@@ -27,7 +27,7 @@ type Payload = {
   location: string;
   stockStatus: StockStatus;
   quantity: number;
-  remarks: string | undefined;
+  remarks?: string;
 };
 
 function areSplitsDistinct(splits: Payload[]) {
