@@ -275,7 +275,10 @@ function Row({
             )}
             {isEditing ? (
               <Button
-                onClick={() => setIsEditing(false)}
+                onClick={() => {
+                  setIsEditing(false);
+                  form.reset();
+                }}
                 colour="red"
                 title="Cancel"
               />
