@@ -659,4 +659,41 @@ describe("MedicationStockPage", () => {
     expect(payload).not.toHaveProperty("medicationBrandName");
     expect(payload).not.toHaveProperty("medicationActiveIngredientName");
   });
+
+  it("discards edits and resets the dirty state when Cancel is clicked", async () => {
+    const user = userEvent.setup();
+    const mutateMock = vi.fn();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationStockRouter.update.useMutation.mockReturnValue({
+      mutate: mutateMock,
+      isLoading: false,
+    });
+
+    render(<MedicationStockBasePage />);
+
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+
+    const locationInput = document.querySelector(
+      'input[name="location"]',
+    ) as HTMLInputElement;
+
+    await user.clear(locationInput);
+    await user.type(locationInput, "Temporary Shelf");
+    expect(locationInput.value).toBe("Temporary Shelf");
+
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(
+      document.querySelector('input[name="location"]'),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText(MOCK_STOCK[0].location)).toBeInTheDocument();
+    expect(mutateMock).not.toHaveBeenCalled();
+  });
 });
