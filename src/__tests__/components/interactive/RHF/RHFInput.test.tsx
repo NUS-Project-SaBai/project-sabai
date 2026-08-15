@@ -58,6 +58,28 @@ describe("RHFInput numeric validation", () => {
     expect(onKeyDown).toHaveBeenCalled();
   });
 
+  it("blocks pasting text containing 'e'/'E'", async () => {
+    const user = userEvent.setup();
+    renderNumberInput();
+
+    const input = screen.getByLabelText(/Amount/) as HTMLInputElement;
+    input.focus();
+    await user.paste("1e5");
+
+    expect(input.value).toBe("");
+  });
+
+  it("allows pasting purely numeric text", async () => {
+    const user = userEvent.setup();
+    renderNumberInput();
+
+    const input = screen.getByLabelText(/Amount/) as HTMLInputElement;
+    input.focus();
+    await user.paste("123");
+
+    expect(input.value).toBe("123");
+  });
+
   it("does not block letters for text inputs", async () => {
     const user = userEvent.setup();
     render(
