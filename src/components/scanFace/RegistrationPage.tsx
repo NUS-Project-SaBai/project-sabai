@@ -110,24 +110,19 @@ export default function RegistrationPage({
             type="date"
             isRequired
           />
-          <RHFInput
-            name="hasPoorCard"
-            label="Has POOR Card?"
-            type="checkbox"
-            className="flex flex-row-reverse"
-          />
-          <RHFInput
-            name="hasBS2Card"
-            label="Has BS2 Card?"
-            type="checkbox"
-            className="flex flex-row-reverse"
-          />
-          <RHFInput
-            name="hasSabaiCard"
-            label="Has Sabai Card?"
-            type="checkbox"
-            className="flex flex-row-reverse"
-          />
+          <div className="rounded-lg border border-gray-200 bg-gray-50 divide-y divide-gray-200">
+            <RHFInput
+              name="hasPoorCard"
+              label="Has POOR Card?"
+              type="checkbox"
+            />
+            <RHFInput name="hasBS2Card" label="Has BS2 Card?" type="checkbox" />
+            <RHFInput
+              name="hasSabaiCard"
+              label="Has Sabai Card?"
+              type="checkbox"
+            />
+          </div>
 
           {/* Submit Button */}
           <div className="flex gap-3 mt-6 justify-center">

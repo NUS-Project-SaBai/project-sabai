@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { trpc } from "@/utils/trpc";
-import { VillageCode } from "@/db/schema";
+import { VillageCode } from "@/db/schema/villageCodes";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
