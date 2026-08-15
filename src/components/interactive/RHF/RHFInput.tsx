@@ -80,6 +80,14 @@ export function RHFInput({
     props.onKeyDown?.(event);
   };
 
+  const handleNumberPaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedText = event.clipboardData.getData("text");
+    if (/[eE]/.test(pastedText)) {
+      event.preventDefault();
+    }
+    props.onPaste?.(event);
+  };
+
   if (isCheckbox) {
     return (
       <label
@@ -116,6 +124,7 @@ export function RHFInput({
         {...props}
         {...(isNumber && {
           onKeyDown: handleNumberKeyDown,
+          onPaste: handleNumberPaste,
         })}
         className={clsx([
           "border border-gray-300 rounded bg-white px-3 py-2 transition focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400",
