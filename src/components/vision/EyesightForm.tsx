@@ -6,18 +6,7 @@ import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFTextArea } from "@/components/interactive/RHF/RHFTextArea";
 import { Button } from "@/components/interactive/Button/Button";
 import toast from "react-hot-toast";
-
-export type EyesightFormValues = {
-  leftEyeDegree?: string | null;
-  rightEyeDegree?: string | null;
-  leftEyePinhole?: string | null;
-  rightEyePinhole?: string | null;
-  leftAstigmatism?: string | null;
-  rightAstigmatism?: string | null;
-  leftPrescribedGlassesDegree?: string | null;
-  rightPrescribedGlassesDegree?: string | null;
-  comments?: string | null;
-};
+import { EyesightFormValues } from "@/types/eyesight";
 
 const BLANK_EYESIGHT: EyesightFormValues = {
   leftEyeDegree: "",

@@ -2,7 +2,7 @@ import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import Modal from "@/components/interactive/Modal";
 import { NewVillageCode } from "@/db/schema/villageCodes";
-import { DEFAULT_FORM, FormFields } from "@/lib/utils/villageCodeTypes";
+import { DEFAULT_FORM, FormFields } from "@/types/village-codes";
 import {
   FormProvider,
   useForm,
