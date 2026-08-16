@@ -1,7 +1,7 @@
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import Modal from "@/components/interactive/Modal";
-import { FormFields } from "@/lib/utils/villageCodeTypes";
+import { FormFields } from "@/types/village-codes";
 import { Button } from "@/components/interactive/Button/Button";
 
 export default function DeleteModal({

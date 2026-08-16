@@ -9,7 +9,7 @@ import TableRow from "@/components/TableRow";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import { useState } from "react";
-import { MedicationStockWithBrandAndActiveIngredient } from "@/lib/utils/medication-stock";
+import { MedicationStockWithBrandAndActiveIngredient } from "@/types/medication-stock";
 
 function Header() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
