@@ -13,7 +13,7 @@ import {
   MedicationStockWithBrandAndActiveIngredient,
   StockStatus,
   stockStatusDropdown,
-} from "@/lib/utils/medication-stock";
+} from "@/types/medication-stock";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import EditableCell from "@/components/interactive/EditableCell";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
