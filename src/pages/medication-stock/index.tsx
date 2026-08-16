@@ -260,6 +260,7 @@ function Row({
                 }}
                 colour="emerald"
                 title="Save"
+                loading={updateMutation.isPending}
               />
             ) : (
               <Button
