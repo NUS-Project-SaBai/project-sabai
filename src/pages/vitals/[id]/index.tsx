@@ -354,23 +354,28 @@ function VitalsForm({ visitId }: { visitId: number }) {
         </div>
       </FormSection>
 
-      {/* Notes & diagnostics */}
+      {/* Urinalysis */}
       <FormSection
-        title="Diagnostics & Remarks"
-        description="Urinalysis findings and any additional clinical notes."
+        title="Urinalysis"
+        description="Urine test findings."
       >
-        <div className="space-y-4">
-          <RHFTextArea
-            name="urineTest"
-            label="Urinalysis Diagnostics (Leukocytes, Nitrites, Protein notes)"
-            rows={3}
-          />
-          <RHFTextArea
-            name="others"
-            label="Additional Clinical Remarks"
-            rows={3}
-          />
-        </div>
+        <RHFTextArea
+          name="urineTest"
+          label="Urinalysis Diagnostics (Leukocytes, Nitrites, Protein notes)"
+          rows={3}
+        />
+      </FormSection>
+
+      {/* Additional remarks */}
+      <FormSection
+        title="Additional Remarks"
+        description="Any additional clinical notes."
+      >
+        <RHFTextArea
+          name="others"
+          label="Additional Clinical Remarks"
+          rows={3}
+        />
       </FormSection>
 
       <div className="flex justify-end pt-2">
