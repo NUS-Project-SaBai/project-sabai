@@ -10,7 +10,8 @@ import {
   medicationActiveIngredients,
 } from "@/db/schema/pharmacy";
 import { TRPCError } from "@trpc/server";
-import { splitSchema, validateSplits } from "@/types/medication-stock";
+import { splitSchema } from "@/types/medication-stock";
+import { validateSplits } from "@/lib/utils/medication-stock";
 
 export const medicationStockRouter = router({
   list: protectedProcedure.query(async () => {
