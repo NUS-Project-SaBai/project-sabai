@@ -8,8 +8,16 @@ import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
-import { useState } from "react";
-import { MedicationStockWithBrandAndActiveIngredient } from "@/lib/utils/medication-stock";
+import { SetStateAction, useState } from "react";
+import {
+  MedicationStockWithBrandAndActiveIngredient,
+  StockStatus,
+  stockStatusDropdown,
+} from "@/types/medication-stock";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import EditableCell from "@/components/interactive/EditableCell";
+import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
+import toast from "react-hot-toast";
 
 function Header() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
@@ -67,7 +75,6 @@ function MedicationStockBasePage() {
     isError,
   } = trpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery();
 
-  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [splittingStock, setSplittingStock] =
     useState<MedicationStockWithBrandAndActiveIngredient | null>(null);
 
@@ -96,8 +103,6 @@ function MedicationStockBasePage() {
             stock={splittingStock}
           />
         )}
-        {isEditing && <span>editing</span>}
-        {/* TODO: Implement stock editing, placeholder for now*/}
         <table className="min-w-full divide-y divide-slate-200">
           <TableHeader
             headers={[
@@ -113,57 +118,11 @@ function MedicationStockBasePage() {
           />
           <tbody className="bg-white divide-y divide-slate-200">
             {stock.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {item.medicationActiveIngredientName}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {item.medicationBrandName}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {item.location}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {item.quantity}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {item.expiry?.toLocaleDateString()}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {item.stockStatus}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {item.remarks}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900 flex flex-row gap-2">
-                    <Button
-                      onClick={() => setIsEditing(true)}
-                      colour="emerald"
-                      title="Edit"
-                    />
-                    <Button
-                      onClick={() => setSplittingStock(item)}
-                      colour="indigo"
-                      title="Split"
-                    />
-                  </span>
-                </TableCell>
-              </TableRow>
+              <Row
+                key={item.id}
+                setSplittingStock={setSplittingStock}
+                item={item}
+              />
             ))}
           </tbody>
         </table>
@@ -176,6 +135,160 @@ function MedicationStockBasePage() {
       <Header />
       {renderContent()}
     </div>
+  );
+}
+
+// Only able to edit location, stockStatus and remarks.
+// All other fields are locked from editing.
+type EditFormFields = {
+  id: number;
+  location: string;
+  stockStatus: StockStatus;
+  remarks: string;
+};
+
+function Row({
+  item,
+  setSplittingStock,
+}: {
+  item: MedicationStockWithBrandAndActiveIngredient;
+  setSplittingStock: React.Dispatch<
+    SetStateAction<MedicationStockWithBrandAndActiveIngredient | null>
+  >;
+}) {
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const form = useForm<EditFormFields>({
+    values: {
+      id: item.id,
+      location: item.location,
+      stockStatus: item.stockStatus,
+      remarks: item.remarks ?? "",
+    },
+  });
+
+  const { isDirty } = form.formState;
+
+  const utils = trpc.useUtils();
+
+  const updateMutation = trpc.medicationStockRouter.update.useMutation({
+    onSuccess: () => {
+      toast.success("Successfully updated!");
+      utils.medicationStockRouter.listWithBrandAndActiveIngredient.invalidate();
+      form.reset();
+      setIsEditing(false);
+    },
+    onError: (err) => {
+      console.error(err);
+      toast.error(
+        "An error has occurred while updating the stock. Refresh and try again.",
+      );
+    },
+  });
+
+  const handleSubmit: SubmitHandler<EditFormFields> = async (data) => {
+    if (isDirty) {
+      updateMutation.mutate(data);
+    } else {
+      toast.error("No fields changed!");
+    }
+  };
+
+  return (
+    <TableRow key={item.id}>
+      <FormProvider {...form}>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {item.medicationActiveIngredientName}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {item.medicationBrandName}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            <EditableCell
+              isEditing={isEditing}
+              name="location"
+              type="text"
+              value={form.getValues().location}
+              label=""
+            />
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {item.quantity}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {item.expiry?.toLocaleDateString()}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            {isEditing ? (
+              <RHFDropdown
+                name="stockStatus"
+                label=""
+                dropdownOptions={stockStatusDropdown}
+              />
+            ) : (
+              form.getValues().stockStatus
+            )}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900">
+            <EditableCell
+              isEditing={isEditing}
+              name="remarks"
+              type="text"
+              value={form.getValues().remarks}
+              label=""
+            />
+          </span>
+        </TableCell>
+        <TableCell>
+          <span className="text-sm font-medium text-slate-900 flex flex-row gap-2">
+            {isEditing ? (
+              <Button
+                onClick={() => {
+                  form.handleSubmit(handleSubmit)();
+                }}
+                colour="emerald"
+                title="Save"
+                loading={updateMutation.isPending}
+              />
+            ) : (
+              <Button
+                onClick={() => setIsEditing(true)}
+                colour="emerald"
+                title="Edit"
+              />
+            )}
+            {isEditing ? (
+              <Button
+                onClick={() => {
+                  setIsEditing(false);
+                  form.reset();
+                }}
+                colour="red"
+                title="Cancel"
+              />
+            ) : (
+              <Button
+                onClick={() => setSplittingStock(item)}
+                colour="indigo"
+                title="Split"
+              />
+            )}
+          </span>
+        </TableCell>
+      </FormProvider>
+    </TableRow>
   );
 }
 

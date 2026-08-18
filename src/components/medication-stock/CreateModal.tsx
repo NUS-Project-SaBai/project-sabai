@@ -8,7 +8,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import {
   stockStatusDropdown,
   CreateFormFields,
-} from "@/lib/utils/medication-stock";
+} from "@/types/medication-stock";
 import { Button } from "@/components/interactive/Button/Button";
 
 export default function CreateModal({

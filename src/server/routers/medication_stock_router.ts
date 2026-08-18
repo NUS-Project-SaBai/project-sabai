@@ -2,7 +2,7 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { eq, ne } from "drizzle-orm";
+import { eq, desc, ne } from "drizzle-orm";
 import {
   medicationBrands,
   medicationStatusEnum,
@@ -10,7 +10,7 @@ import {
   medicationActiveIngredients,
 } from "@/db/schema/pharmacy";
 import { TRPCError } from "@trpc/server";
-import { splitSchema, validateSplits } from "@/lib/utils/medication-stock";
+import { splitSchema, validateSplits } from "@/types/medication-stock";
 
 export const medicationStockRouter = router({
   list: protectedProcedure.query(async () => {
@@ -51,7 +51,8 @@ export const medicationStockRouter = router({
         medicationActiveIngredients,
         eq(medicationActiveIngredients.id, medicationBrands.activeIngredientId),
       )
-      .where(ne(medicationStock.quantity, 0));
+      .where(ne(medicationStock.quantity, 0))
+      .orderBy(desc(medicationStock.id));
     return result;
   }),
 
@@ -93,9 +94,6 @@ export const medicationStockRouter = router({
     .input(
       zfd.formData({
         id: zfd.numeric(z.number().int()),
-        medicationBrandId: zfd.numeric(z.number().int().optional()),
-        quantity: zfd.numeric(z.number().int().optional()),
-        expiry: zfd.text(z.coerce.date().optional()),
         location: zfd.text(z.string().optional()),
         stockStatus: zfd.text(
           z.enum(medicationStatusEnum.enumValues).optional(),
