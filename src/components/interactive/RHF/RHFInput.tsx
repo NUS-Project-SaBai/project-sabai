@@ -14,13 +14,7 @@ type RHFInputProps = {
   >["className"];
   registerOptions?: RegisterOptions;
   type:
-    | "text"
-    | "email"
-    | "password"
-    | "number"
-    | "date"
-    | "color"
-    | "checkbox";
+    "text" | "email" | "password" | "number" | "date" | "color" | "checkbox";
 } & DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 /**
@@ -71,6 +65,28 @@ export function RHFInput({
   const fieldError = formState?.errors?.[name];
 
   const isCheckbox = type === "checkbox";
+  const isNumber = type === "number";
+
+  // For numeric inputs, block the exponent characters that <input type="number">
+  // accepts but that we don't want ("e"/"E") on keydown.
+  const blockedNumberKeys = ["e", "E"];
+
+  const handleNumberKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (blockedNumberKeys.includes(event.key)) {
+      event.preventDefault();
+    }
+    props.onKeyDown?.(event);
+  };
+
+  const handleNumberPaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedText = event.clipboardData.getData("text");
+    if (/[eE]/.test(pastedText)) {
+      event.preventDefault();
+    }
+    props.onPaste?.(event);
+  };
 
   if (isCheckbox) {
     return (
@@ -106,6 +122,10 @@ export function RHFInput({
         type={type}
         {...registerProps}
         {...props}
+        {...(isNumber && {
+          onKeyDown: handleNumberKeyDown,
+          onPaste: handleNumberPaste,
+        })}
         className={clsx([
           "border border-gray-300 rounded bg-white px-3 py-2 transition focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400",
           fieldError &&
