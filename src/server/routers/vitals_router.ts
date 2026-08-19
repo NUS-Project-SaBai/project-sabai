@@ -26,25 +26,51 @@ const selectVitalsFields = {
   visitId: vitals.visitId,
 };
 
+const toNumberOrNull = (value: unknown) => {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (trimmed === "") return null;
+    return Number(trimmed); // Returns a valid number or NaN
+  }
+
+  return value;
+};
+
 /**
- * Validator for PostgreSQL `numeric` column. Validates that the value is a
- * number at the given precision (`step` mirrors the form input's `step`), then
+ * Validator for a PostgreSQL `numeric` column. Accepts a number or numeric
+ * string, validates precision (`step` mirrors the form input's `step`), then
  * serializes back to the string that Drizzle `numeric` columns expect.
- * `label` is used in error messages
+ * A blank/cleared field is preserved as `null` (never coerced to 0).
+ * `label` is used in error messages.
  */
 const numericColumn = (label: string, { step }: { step: number }) =>
-  z.coerce
-    .number({ error: `${label} must be a number` })
-    .multipleOf(step, { error: `${label} must be in steps of ${step}` })
-    .transform((n) => n.toString())
-    .optional();
+  z
+    .union([z.number(), z.string(), z.null(), z.undefined()])
+    .transform(toNumberOrNull)
+    .pipe(
+      z
+        .number({ error: `${label} must be a number` })
+        .multipleOf(step, { error: `${label} must be in steps of ${step}` })
+        .transform((n) => n.toString())
+        .nullable()
+        .optional(),
+    );
 
-/** Validator for an integer column. */
+/** Validator for an integer column. A blank/cleared value stays `null`. */
 const integerColumn = (label: string) =>
-  z.coerce
-    .number({ error: `${label} must be a number` })
-    .int({ error: `${label} must be a whole number` })
-    .optional();
+  z
+    .union([z.number(), z.string(), z.null(), z.undefined()])
+    .transform(toNumberOrNull)
+    .pipe(
+      z
+        .number({ error: `${label} must be a number` })
+        .int({ error: `${label} must be a whole number` })
+        .nullable()
+        .optional(),
+    );
 
 /**
  * Input validation schema for creating vitals records.
