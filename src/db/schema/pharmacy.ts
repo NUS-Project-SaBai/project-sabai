@@ -7,6 +7,7 @@ import {
   pgEnum,
   integer,
   uuid,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 import { authUsers } from "./auth";
@@ -142,7 +143,6 @@ Orders Table:
 - dosageInstructions: The dosage instructions for the order.
 - status: The order status. Can be 'PENDING', 'CANCELLED', or 'APPROVED'.
 - quantity: The order quantity.
-- createdAt: The timestamp of when the row was created.
 */
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
@@ -152,8 +152,28 @@ export const orders = pgTable("orders", {
   dosageInstructions: text("dosage_instructions").notNull(),
   status: orderStatusEnum("status").notNull().default("PENDING"),
   quantity: integer("quantity").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
+
+/**
+Order Items Table:
+- orderId: The order ID of the order.
+- stockChangeId: The order ID of the stock_changes table row that contains the entry changing state from 'active' to 'reserved'
+ */
+export const orderItems = pgTable(
+  "order_items",
+  {
+    orderId: integer("order_id")
+      .notNull()
+      .references(() => orders.id),
+    stockChangeId: integer("stock_change_id")
+      .notNull()
+      .references(() => stockChanges.id),
+  },
+  (table) => [primaryKey({ columns: [table.orderId, table.stockChangeId] })],
+);
+
+export type OrderItem = typeof orderItems.$inferInsert;
+export type NewOrderItem = typeof orderItems.$inferInsert;
