@@ -96,7 +96,10 @@ export const medicationStockRouter = router({
         ),
         remarks: z.preprocess(
           // To insert null instead of empty string into the db
-          (val) => (val === "" || val === undefined ? null : val),
+          (val: string | undefined) =>
+            val === undefined || val === null || val.trim() === ""
+              ? null
+              : val.trim(),
           z.string().nullable(),
         ),
       }),
