@@ -22,8 +22,17 @@ $$ LANGUAGE plpgsql STABLE;
 CREATE OR REPLACE FUNCTION log_medication_stock_changes()
 RETURNS TRIGGER AS $$
 DECLARE
-  v_user_id UUID := get_current_user_id();
+  v_user_id UUID;
+  v_bypass TEXT;
 BEGIN
+  -- The bypass is used for seeding data in supabase/seeds
+  v_bypass := current_setting('app.bypass_triggers', true);
+  IF v_bypass = 'true' THEN
+    RETURN NEW;
+  END IF;
+
+  v_user_id := get_current_user_id();
+
   IF v_user_id IS NULL THEN
     RAISE EXCEPTION 'Action forbidden: User ID not found in auth.uid() or app.current_user_id variable.';
   END IF;
@@ -86,3 +95,5 @@ CREATE TRIGGER trigger_log_medication_stock_changes
 AFTER INSERT OR UPDATE ON medication_stock
 FOR EACH ROW
 EXECUTE FUNCTION log_medication_stock_changes();
+
+
