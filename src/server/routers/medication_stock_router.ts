@@ -94,7 +94,11 @@ export const medicationStockRouter = router({
         stockStatus: zfd.text(
           z.enum(medicationStatusEnum.enumValues).optional(),
         ),
-        remarks: zfd.text(z.string().optional()),
+        remarks: z.preprocess(
+          // To insert null instead of empty string into the db
+          (val) => (val === "" || val === undefined ? null : val),
+          z.string().nullable(),
+        ),
       }),
     )
     .mutation(async ({ input }) => {
