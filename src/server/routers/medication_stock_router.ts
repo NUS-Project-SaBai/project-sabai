@@ -2,6 +2,7 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
+import { withUserAuth } from "@/db/withAuth";
 import { eq, desc } from "drizzle-orm";
 import {
   medicationBrands,
@@ -63,12 +64,15 @@ export const medicationStockRouter = router({
         remarks: zfd.text(z.string().optional()),
       }),
     )
-    .mutation(async ({ input }) => {
-      const [newStock] = await db
-        .insert(medicationStock)
-        .values(input)
-        .returning();
-      return newStock;
+    .mutation(async ({ input, ctx }) => {
+      return await withUserAuth(ctx.user.id, async (tx) => {
+        const [newStock] = await tx
+          .insert(medicationStock)
+          .values(input)
+          .returning();
+
+        return newStock;
+      });
     }),
 
   delete: protectedProcedure
@@ -97,14 +101,16 @@ export const medicationStockRouter = router({
         remarks: zfd.text(z.string().optional()),
       }),
     )
-    .mutation(async ({ input }) => {
-      const { id, ...updateData } = input;
-      const [result] = await db
-        .update(medicationStock)
-        .set({ ...updateData })
-        .where(eq(medicationStock.id, id))
-        .returning();
+    .mutation(async ({ input, ctx }) => {
+      return await withUserAuth(ctx.user.id, async (tx) => {
+        const { id, ...updateData } = input;
+        const [result] = await tx
+          .update(medicationStock)
+          .set({ ...updateData })
+          .where(eq(medicationStock.id, id))
+          .returning();
 
-      return result ? result : null;
+        return result ? result : null;
+      });
     }),
 });
