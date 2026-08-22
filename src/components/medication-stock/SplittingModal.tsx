@@ -53,8 +53,6 @@ export default function SplittingModal({
   }
 
   function handleSubmit() {
-    // DO NOT CHANGE THIS MAP FUNCTION, OR THE PRESENCE OF THE REMARKS COLUMN (undefined). The key order is important for the implementation of areSplitsDistinct (due to use of json.stringify)
-    // DO NOT CHANGE THE PRESENCE OF THE REMARKS COLUMN. json.stringify drops undefined columns, so 2 objects, 1 with remarks key missing and another with remarks: undefined are evaluated the same way.
     const payload = splits.map((split) => ({
       location: split.location,
       stockStatus: split.stockStatus,

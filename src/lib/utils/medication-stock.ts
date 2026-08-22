@@ -1,19 +1,35 @@
 import { Payload } from "@/types/medication-stock";
 
+function splitKey(split: Payload) {
+  return JSON.stringify([
+    split.location,
+    split.stockStatus,
+    split.quantity,
+    split.remarks ?? "",
+  ]);
+}
 
 function areSplitsDistinct(splits: Payload[]) {
-  const splitsSet = new Set();
-  for (let i = 0; i < splits.length; i++) {
-    const stringified = JSON.stringify(splits[i]);
-    if (splitsSet.has(stringified)) {
+  const seenKeys = new Set<string>();
+  for (const split of splits) {
+    const key = splitKey(split);
+    if (seenKeys.has(key)) {
       return false;
     }
-    splitsSet.add(stringified);
+    seenKeys.add(key);
   }
+
   return true;
 }
 
 export function validateSplits(splits: Payload[], parentQty: number) {
+  if (!areSplitsDistinct(splits)) {
+    return {
+      success: false,
+      message: "Splits are not distinct!",
+    };
+  }
+
   if (splits.length === 0) {
     return {
       success: false,
@@ -24,13 +40,14 @@ export function validateSplits(splits: Payload[], parentQty: number) {
   if (splits.length === 1) {
     return {
       success: false,
-      message: "Please use the editing function instead to edit a single split!",
+      message:
+        "Please use the editing function instead to edit a single split!",
     };
   }
 
   const quantity = splits.reduce(
     (accumulator, current) => accumulator + current.quantity,
-    0
+    0,
   );
 
   if (quantity != parentQty) {
