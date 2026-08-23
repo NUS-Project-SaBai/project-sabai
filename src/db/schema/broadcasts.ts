@@ -24,8 +24,8 @@ Broadcasts Table:
 - severity: Drives the toast styling ('info', 'warning', 'critical').
 - createdBy: Sender's identifier.
 - createdAt: Timestamp used for ordering.
-- publishedAt: Transactional-outbox flag. NULL = committed but not yet emitted to
-  Having a timestamp = emitted. The retry relay sweeps rows where this is still NULL.
+- publishedAt: Transactional-outbox flag. NULL = committed but not yet emitted to Realtime.
+  A timestamp = emitted. The retry relay sweeps rows where this is still NULL.
 - attempts: Retry accounting. Incremented on each failed push; a row is dead-lettered
   once it exceeds the max-attempt threshold.
 */
