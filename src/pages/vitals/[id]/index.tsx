@@ -11,7 +11,7 @@ import { trpc } from "@/utils/trpc";
 import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFRadio } from "@/components/interactive/RHF/RHFRadio";
 import { RHFTextArea } from "@/components/interactive/RHF/RHFTextArea";
@@ -19,6 +19,7 @@ import { Button } from "@/components/interactive/Button/Button";
 import toast from "react-hot-toast";
 import { formatVisitDate } from "@/lib/utils/visit";
 import FormSection from "@/components/interactive/inputs/FormSection";
+import { HeightWeightChart } from "@/components/vitals/HeightWeightChart";
 
 type VitalsFormValues = {
   height?: string | null;
@@ -140,7 +141,7 @@ export default function PatientVitalsPage() {
 
             <div className="bg-slate-50/50 p-6">
               {selectedVisit ? (
-                <VitalsForm visitId={selectedVisit.id} />
+                <VitalsForm visitId={selectedVisit.id} patient={patient} />
               ) : (
                 visits &&
                 visits.length > 0 && (
@@ -157,12 +158,40 @@ export default function PatientVitalsPage() {
   );
 }
 
-function VitalsForm({ visitId }: { visitId: number }) {
+function VitalsForm({
+  visitId,
+  patient,
+}: {
+  visitId: number;
+  patient: { dateOfBirth: Date; gender: "male" | "female" };
+}) {
   const {
     reset,
     handleSubmit,
+    control,
     formState: { isDirty },
   } = useFormContext<VitalsFormValues>();
+
+  const heightValue = useWatch({ control, name: "height" });
+  const weightValue = useWatch({ control, name: "weight" });
+
+  const patientAge = useMemo(() => {
+    const now = new Date();
+    const dob = new Date(patient.dateOfBirth);
+    return Math.floor(
+      (now.getTime() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000),
+    );
+  }, [patient.dateOfBirth]);
+
+  const chartHeight = heightValue ? parseFloat(String(heightValue)) : null;
+  const chartWeight = weightValue ? parseFloat(String(weightValue)) : null;
+  const showChart =
+    chartHeight !== null &&
+    chartWeight !== null &&
+    !isNaN(chartHeight) &&
+    !isNaN(chartWeight) &&
+    chartHeight > 0 &&
+    chartWeight > 0;
 
   const { data: vitalData, isLoading: vitalsLoading } =
     trpc.vitalsRouter.getByVisitId.useQuery(
@@ -355,10 +384,7 @@ function VitalsForm({ visitId }: { visitId: number }) {
       </FormSection>
 
       {/* Urinalysis */}
-      <FormSection
-        title="Urinalysis"
-        description="Urine test findings."
-      >
+      <FormSection title="Urinalysis" description="Urine test findings.">
         <RHFTextArea
           name="urineTest"
           label="Urinalysis Diagnostics (Leukocytes, Nitrites, Protein notes)"
@@ -390,6 +416,20 @@ function VitalsForm({ visitId }: { visitId: number }) {
           />
         </div>
       </div>
+
+      {showChart && (
+        <FormSection
+          title="Growth Charts"
+          description="Height (blue) and weight (red) plotted on the NCHS growth chart for this patient's age and gender."
+        >
+          <HeightWeightChart
+            age={patientAge}
+            height={chartHeight!}
+            weight={chartWeight!}
+            gender={patient.gender}
+          />
+        </FormSection>
+      )}
     </form>
   );
 }
