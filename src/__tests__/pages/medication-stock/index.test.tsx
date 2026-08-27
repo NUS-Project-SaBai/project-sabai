@@ -85,6 +85,11 @@ describe("MedicationStockPage", () => {
       }),
     );
 
+    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
+      mutate: createSplitsMockMutation,
+      isPending: false,
+    });
+
     mockTrpc.medicationStockRouter.update.useMutation.mockReturnValue({
       mutate: updateMockMutation,
       isLoading: false,
@@ -710,11 +715,6 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: createSplitsMockMutation,
-      isPending: false,
-    });
-
     render(
       <>
         <MedicationStockBasePage />
@@ -758,11 +758,6 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: createSplitsMockMutation,
-      isPending: false,
-    });
-
     render(
       <>
         <MedicationStockBasePage />
@@ -792,11 +787,6 @@ describe("MedicationStockPage", () => {
         isLoading: false,
       },
     );
-
-    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: createSplitsMockMutation,
-      isPending: false,
-    });
 
     render(<MedicationStockBasePage />);
 
@@ -843,11 +833,6 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: createSplitsMockMutation,
-      isPending: false,
-    });
-
     render(<MedicationStockBasePage />);
 
     await user.click(await screen.findByRole("button", { name: "Split" }));
@@ -879,11 +864,6 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: createSplitsMockMutation,
-      isPending: false,
-    });
-
     render(<MedicationStockBasePage />);
 
     await user.click(await screen.findByRole("button", { name: "Split" }));
@@ -904,11 +884,6 @@ describe("MedicationStockPage", () => {
         isLoading: false,
       },
     );
-
-    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: createSplitsMockMutation,
-      isPending: false,
-    });
 
     render(<MedicationStockBasePage />);
 
@@ -931,11 +906,6 @@ describe("MedicationStockPage", () => {
         isLoading: false,
       },
     );
-
-    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: createSplitsMockMutation,
-      isPending: false,
-    });
 
     render(<MedicationStockBasePage />);
 
@@ -973,11 +943,6 @@ describe("MedicationStockPage", () => {
         isLoading: false,
       },
     );
-
-    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: createSplitsMockMutation,
-      isPending: false,
-    });
 
     render(<MedicationStockBasePage />);
 
