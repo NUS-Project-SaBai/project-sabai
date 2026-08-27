@@ -653,9 +653,9 @@ describe("MedicationStockPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 
-    expect(createMockMutation).toHaveBeenCalledTimes(1);
+    expect(updateMockMutation).toHaveBeenCalledTimes(1);
 
-    const payload = createMockMutation.mock.calls[0][0];
+    const payload = updateMockMutation.mock.calls[0][0];
 
     expect(payload).toHaveProperty("id", MOCK_STOCK[0].id);
     expect(payload).toHaveProperty("location", "Shelf 1 New Shelf");
@@ -880,7 +880,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: createMockMutation,
+      mutate: createSplitsMockMutation,
       isPending: false,
     });
 
@@ -892,7 +892,7 @@ describe("MedicationStockPage", () => {
     await user.click(screen.getByRole("button", { name: "Confirm" }));
 
     // caught by validation, mutation not called
-    expect(createMockMutation).not.toHaveBeenCalled();
+    expect(createSplitsMockMutation).not.toHaveBeenCalled();
   });
 
   it("rejects when the total quantity of child splits do not equal the quantity in the parent split", async () => {
@@ -1014,7 +1014,7 @@ describe("MedicationStockPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Confirm" }));
 
-    expect(createMockMutation).toHaveBeenCalledWith({
+    expect(createSplitsMockMutation).toHaveBeenCalledWith({
       parentId: MOCK_STOCK[0].id,
       splits: [
         {
