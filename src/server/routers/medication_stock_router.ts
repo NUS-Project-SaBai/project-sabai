@@ -122,26 +122,42 @@ export const medicationStockRouter = router({
     )
     .mutation(async ({ input }) => {
       const { splits, parentId } = input;
-      const parent = await db
-        .select()
-        .from(medicationStock)
-        .where(eq(medicationStock.id, parentId))
-        .limit(1); // Guaranteed to be one result anyway
-
-      const { success, message } = validateSplits(splits, parent[0].quantity);
-
-      if (!success) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: message,
-        });
-      }
 
       return db.transaction(async (tx) => {
+        const [parent] = await tx
+          .select()
+          .from(medicationStock)
+          .where(eq(medicationStock.id, parentId))
+          .for("update") // row-level lock
+          .limit(1);
+
+        if (!parent) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Parent stock item not found.",
+          });
+        }
+
+        if (parent.quantity === 0) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "The parent stock has already split.",
+          });
+        }
+
+        const { success, message } = validateSplits(splits, parent.quantity);
+
+        if (!success) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: message,
+          });
+        }
+
         await tx.insert(medicationStock).values(
           splits.map((s) => ({
-            medicationBrandId: parent[0].medicationBrandId,
-            expiry: parent[0].expiry,
+            medicationBrandId: parent.medicationBrandId,
+            expiry: parent.expiry,
             quantity: s.quantity,
             location: s.location,
             stockStatus: s.stockStatus,
@@ -154,6 +170,8 @@ export const medicationStockRouter = router({
           .update(medicationStock)
           .set({ quantity: 0 })
           .where(eq(medicationStock.id, parentId));
+
+        return { success: true };
       });
     }),
 });
