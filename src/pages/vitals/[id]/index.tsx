@@ -186,6 +186,8 @@ function VitalsForm({
   const chartHeight = heightValue ? parseFloat(String(heightValue)) : null;
   const chartWeight = weightValue ? parseFloat(String(weightValue)) : null;
   const showChart =
+    patientAge >= 2 &&
+    patientAge <= 18 &&
     chartHeight !== null &&
     chartWeight !== null &&
     !isNaN(chartHeight) &&

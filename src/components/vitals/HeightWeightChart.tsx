@@ -123,7 +123,9 @@ export function HeightWeightChart({ age, height, weight, gender }: Props) {
       drawLabel(ctx, xPixel, heightPixel, `${height} cm`, "blue");
     };
 
-    return () => { image.onload = null; };
+    return () => {
+      image.onload = null;
+    };
   }, [age, weight, height, gender]);
 
   if (!VALID_AGES.includes(age)) {
