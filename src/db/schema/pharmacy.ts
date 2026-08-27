@@ -175,5 +175,5 @@ export const orderItems = pgTable(
   (table) => [primaryKey({ columns: [table.orderId, table.stockChangeId] })],
 );
 
-export type OrderItem = typeof orderItems.$inferSelect
+export type OrderItem = typeof orderItems.$inferSelect;
 export type NewOrderItem = typeof orderItems.$inferInsert;
