@@ -67,6 +67,7 @@ const mockTrpc = trpc as any;
 
 let createMockMutation: ReturnType<typeof vi.fn>;
 let updateMockMutation: ReturnType<typeof vi.fn>;
+let createSplitsMockMutation: ReturnType<typeof vi.fn>;
 
 describe("MedicationStockPage", () => {
   beforeEach(() => {
@@ -75,6 +76,7 @@ describe("MedicationStockPage", () => {
 
     createMockMutation = vi.fn();
     updateMockMutation = vi.fn();
+    createSplitsMockMutation = vi.fn();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockImplementation(
       () => ({
@@ -709,7 +711,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: vi.fn(),
+      mutate: createSplitsMockMutation,
       isPending: false,
     });
 
@@ -757,7 +759,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: vi.fn(),
+      mutate: createSplitsMockMutation,
       isPending: false,
     });
 
@@ -792,7 +794,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: vi.fn(),
+      mutate: createSplitsMockMutation,
       isPending: false,
     });
 
@@ -842,7 +844,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: vi.fn(),
+      mutate: createSplitsMockMutation,
       isPending: false,
     });
 
@@ -904,7 +906,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: createMockMutation,
+      mutate: createSplitsMockMutation,
       isPending: false,
     });
 
@@ -931,7 +933,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: createMockMutation,
+      mutate: createSplitsMockMutation,
       isPending: false,
     });
 
@@ -973,7 +975,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: createMockMutation,
+      mutate: createSplitsMockMutation,
       isPending: false,
     });
 
