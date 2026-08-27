@@ -72,7 +72,9 @@ function drawLabel(
   color: string,
   crossSize = 3,
 ) {
-  const W = 75, H = 25, R = 5;
+  const W = 75,
+    H = 25,
+    R = 5;
   const x = cx + crossSize;
   const y = cy - crossSize - H / 2;
 
@@ -103,8 +105,10 @@ export function HeightWeightChart({ age, height, weight, gender }: Props) {
     const config = CHART_CONFIG[gender];
     // age axis starts at 2, weight axis at 10 kg, height axis at 80 cm
     const xPixel = config.xOrigin + (age - 2) * config.xStep;
-    const weightPixel = config.weightOrigin - (weight - 10) * config.weightScale;
-    const heightPixel = config.heightOrigin - (height - 80) * config.heightScale;
+    const weightPixel =
+      config.weightOrigin - (weight - 10) * config.weightScale;
+    const heightPixel =
+      config.heightOrigin - (height - 80) * config.heightScale;
 
     const image = new Image();
     image.crossOrigin = "Anonymous";
