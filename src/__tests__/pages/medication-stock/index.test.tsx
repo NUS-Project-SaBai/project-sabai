@@ -69,6 +69,15 @@ let createMockMutation: ReturnType<typeof vi.fn>;
 let updateMockMutation: ReturnType<typeof vi.fn>;
 let createSplitsMockMutation: ReturnType<typeof vi.fn>;
 
+function renderPage() {
+  return render(
+    <>
+      <MedicationStockBasePage />
+      <Toaster />
+    </>,
+  );
+}
+
 describe("MedicationStockPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -101,7 +110,7 @@ describe("MedicationStockPage", () => {
   });
 
   it("renders page title and breadcrumbs", () => {
-    render(<MedicationStockBasePage />);
+    renderPage();
     expect(
       screen.getByRole("heading", { name: "Medication Stock" }),
     ).toBeInTheDocument();
@@ -117,7 +126,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
+    renderPage();
 
     assertLoadingSpinner("Loading stock...");
   });
@@ -130,8 +139,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     expect(
       screen.getByText(
         "No stock found. Seed the database or add a new record.",
@@ -147,8 +155,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     const table = screen.getByRole("table");
     expect(table).toBeInTheDocument();
     assertTableContents(table, [
@@ -195,12 +202,7 @@ describe("MedicationStockPage", () => {
     mockTrpc.medicationStockRouter.create.useMutation.mockReturnValue({
       isPending: false,
     });
-
-    render(
-      <>
-        <MedicationStockBasePage />
-      </>,
-    );
+    renderPage();
 
     await user.click(screen.getByRole("button", { name: "Add Stock" }));
 
@@ -221,8 +223,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     // test cancel button
     await user.click(screen.getByRole("button", { name: "Add Stock" }));
     const dialog = await screen.findByRole("dialog");
@@ -271,12 +272,7 @@ describe("MedicationStockPage", () => {
       isPending: false,
     });
 
-    render(
-      <>
-        <MedicationStockBasePage />
-      </>,
-    );
-
+    renderPage();
     await user.click(screen.getByRole("button", { name: "Add Stock" }));
 
     const dialog = await screen.findByRole("dialog");
@@ -359,12 +355,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(
-      <>
-        <MedicationStockBasePage />
-        <Toaster />
-      </>,
-    );
+    renderPage();
 
     await user.click(screen.getByRole("button", { name: "Add Stock" }));
 
@@ -426,8 +417,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    const screen = render(<MedicationStockBasePage />);
-
+    const screen = renderPage();
     expect(document.querySelectorAll("input").length).toBe(0);
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
@@ -452,13 +442,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    const screen = render(
-      <>
-        <Toaster />
-        <MedicationStockBasePage />
-      </>,
-    );
-
+    const screen = renderPage();
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
     await user.click(screen.getByRole("button", { name: "Save" }));
@@ -488,12 +472,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    const screen = render(
-      <>
-        <Toaster />
-        <MedicationStockBasePage />
-      </>,
-    );
+    const screen = renderPage();
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
@@ -528,12 +507,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    const screen = render(
-      <>
-        <Toaster />
-        <MedicationStockBasePage />
-      </>,
-    );
+    const screen = renderPage();
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
@@ -568,12 +542,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    const screen = render(
-      <>
-        <Toaster />
-        <MedicationStockBasePage />
-      </>,
-    );
+    const screen = renderPage();
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
@@ -617,12 +586,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    const screen = render(
-      <>
-        <Toaster />
-        <MedicationStockBasePage />
-      </>,
-    );
+    const screen = renderPage();
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
@@ -649,8 +613,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
     const locationInput = document.querySelector('input[name="location"]');
@@ -682,8 +645,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
     const locationInput = document.querySelector(
@@ -714,12 +676,7 @@ describe("MedicationStockPage", () => {
         isLoading: false,
       },
     );
-
-    render(
-      <>
-        <MedicationStockBasePage />
-      </>,
-    );
+    renderPage();
 
     await user.click(screen.getByRole("button", { name: "Split" }));
 
@@ -757,12 +714,7 @@ describe("MedicationStockPage", () => {
         isLoading: false,
       },
     );
-
-    render(
-      <>
-        <MedicationStockBasePage />
-      </>,
-    );
+    renderPage();
 
     await user.click(await screen.findByRole("button", { name: "Split" }));
 
@@ -788,8 +740,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     await user.click(await screen.findByRole("button", { name: "Split" }));
     await user.click(await screen.findByRole("button", { name: "Add Split" }));
 
@@ -833,8 +784,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     await user.click(await screen.findByRole("button", { name: "Split" }));
 
     await user.click(await screen.findByRole("button", { name: "Add Split" }));
@@ -885,8 +835,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     await user.click(await screen.findByRole("button", { name: "Split" }));
 
     await user.click(await screen.findByRole("button", { name: "Add Split" }));
@@ -907,8 +856,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     await user.click(await screen.findByRole("button", { name: "Split" }));
 
     await user.click(await screen.findByRole("button", { name: "Add Split" }));
@@ -944,8 +892,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     await user.click(await screen.findByRole("button", { name: "Split" }));
 
     await user.click(await screen.findByRole("button", { name: "Add Split" }));
