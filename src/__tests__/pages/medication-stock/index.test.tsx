@@ -82,7 +82,8 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.update.useMutation.mockReturnValue({
-      mutate: vi.fn(),
+      mutate: mutateMock,
+      isLoading: false,
     });
   });
 
@@ -639,11 +640,6 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    mockTrpc.medicationStockRouter.update.useMutation.mockReturnValue({
-      mutate: mutateMock,
-      isLoading: false,
-    });
-
     render(<MedicationStockBasePage />);
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
@@ -676,11 +672,6 @@ describe("MedicationStockPage", () => {
         isLoading: false,
       },
     );
-
-    mockTrpc.medicationStockRouter.update.useMutation.mockReturnValue({
-      mutate: mutateMock,
-      isLoading: false,
-    });
 
     render(<MedicationStockBasePage />);
 
