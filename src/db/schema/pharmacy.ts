@@ -8,7 +8,10 @@ import {
   integer,
   uuid,
   primaryKey,
+  check,
 } from "drizzle-orm/pg-core";
+
+import { sql } from "drizzle-orm";
 
 import { authUsers } from "./auth";
 
@@ -144,15 +147,19 @@ Orders Table:
 - status: The order status. Can be 'PENDING', 'CANCELLED', or 'APPROVED'.
 - quantity: The order quantity.
 */
-export const orders = pgTable("orders", {
-  id: serial("id").primaryKey(),
-  consultId: integer("consult_id")
-    .notNull()
-    .references(() => consults.id),
-  dosageInstructions: text("dosage_instructions").notNull(),
-  status: orderStatusEnum("status").notNull().default("PENDING"),
-  quantity: integer("quantity").notNull(),
-});
+export const orders = pgTable(
+  "orders",
+  {
+    id: serial("id").primaryKey(),
+    consultId: integer("consult_id")
+      .notNull()
+      .references(() => consults.id),
+    dosageInstructions: text("dosage_instructions").notNull(),
+    status: orderStatusEnum("status").notNull().default("PENDING"),
+    quantity: integer("quantity").notNull(),
+  },
+  (table) => [check("quantity_check", sql`${table.quantity} > 0`)],
+);
 
 export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
