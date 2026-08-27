@@ -65,14 +65,14 @@ vi.mock("@/utils/trpc", () => ({
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockTrpc = trpc as any;
 
-let mutateMock: ReturnType<typeof vi.fn>;
+let createMockMutation: ReturnType<typeof vi.fn>;
 
 describe("MedicationStockPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     toast.removeAll();
 
-    mutateMock = vi.fn();
+    createMockMutation = vi.fn();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockImplementation(
       () => ({
@@ -82,7 +82,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.update.useMutation.mockReturnValue({
-      mutate: mutateMock,
+      mutate: vi.fn(),
       isLoading: false,
     });
   });
@@ -649,9 +649,9 @@ describe("MedicationStockPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 
-    expect(mutateMock).toHaveBeenCalledTimes(1);
+    expect(createMockMutation).toHaveBeenCalledTimes(1);
 
-    const payload = mutateMock.mock.calls[0][0];
+    const payload = createMockMutation.mock.calls[0][0];
 
     expect(payload).toHaveProperty("id", MOCK_STOCK[0].id);
     expect(payload).toHaveProperty("location", "Shelf 1 New Shelf");
@@ -691,7 +691,7 @@ describe("MedicationStockPage", () => {
       document.querySelector('input[name="location"]'),
     ).not.toBeInTheDocument();
     expect(screen.getByText(MOCK_STOCK[0].location)).toBeInTheDocument();
-    expect(mutateMock).not.toHaveBeenCalled();
+    expect(createMockMutation).not.toHaveBeenCalled();
   });
 
   // Stock splitting
@@ -876,7 +876,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: mutateMock,
+      mutate: createMockMutation,
       isPending: false,
     });
 
@@ -888,7 +888,7 @@ describe("MedicationStockPage", () => {
     await user.click(screen.getByRole("button", { name: "Confirm" }));
 
     // caught by validation, mutation not called
-    expect(mutateMock).not.toHaveBeenCalled();
+    expect(createMockMutation).not.toHaveBeenCalled();
   });
 
   it("rejects when the total quantity of child splits do not equal the quantity in the parent split", async () => {
@@ -902,7 +902,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: mutateMock,
+      mutate: createMockMutation,
       isPending: false,
     });
 
@@ -915,7 +915,7 @@ describe("MedicationStockPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Confirm" }));
 
-    expect(mutateMock).not.toHaveBeenCalled();
+    expect(createMockMutation).not.toHaveBeenCalled();
   });
 
   it("rejects when splits are not distinct from each other", async () => {
@@ -929,7 +929,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: mutateMock,
+      mutate: createMockMutation,
       isPending: false,
     });
 
@@ -957,7 +957,7 @@ describe("MedicationStockPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Confirm" }));
 
-    expect(mutateMock).not.toHaveBeenCalled();
+    expect(createMockMutation).not.toHaveBeenCalled();
   });
 
   it("creates new child stock entries in the table when the split succeeds", async () => {
@@ -971,7 +971,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
-      mutate: mutateMock,
+      mutate: createMockMutation,
       isPending: false,
     });
 
@@ -1010,7 +1010,7 @@ describe("MedicationStockPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Confirm" }));
 
-    expect(mutateMock).toHaveBeenCalledWith({
+    expect(createMockMutation).toHaveBeenCalledWith({
       parentId: MOCK_STOCK[0].id,
       splits: [
         {
