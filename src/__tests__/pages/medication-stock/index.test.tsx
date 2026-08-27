@@ -66,6 +66,7 @@ vi.mock("@/utils/trpc", () => ({
 const mockTrpc = trpc as any;
 
 let createMockMutation: ReturnType<typeof vi.fn>;
+let updateMockMutation: ReturnType<typeof vi.fn>;
 
 describe("MedicationStockPage", () => {
   beforeEach(() => {
@@ -73,6 +74,7 @@ describe("MedicationStockPage", () => {
     toast.removeAll();
 
     createMockMutation = vi.fn();
+    updateMockMutation = vi.fn();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockImplementation(
       () => ({
@@ -82,7 +84,7 @@ describe("MedicationStockPage", () => {
     );
 
     mockTrpc.medicationStockRouter.update.useMutation.mockReturnValue({
-      mutate: vi.fn(),
+      mutate: updateMockMutation,
       isLoading: false,
     });
   });
