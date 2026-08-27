@@ -111,6 +111,7 @@ export function HeightWeightChart({ age, height, weight, gender }: Props) {
       config.heightOrigin - (height - 80) * config.heightScale;
 
     const image = new Image();
+    // Required so drawImage doesn't taint the canvas if the asset moves to a CDN.
     image.crossOrigin = "Anonymous";
     image.src = config.src;
     image.onload = () => {
@@ -132,6 +133,7 @@ export function HeightWeightChart({ age, height, weight, gender }: Props) {
   }
 
   return (
+    // Dimensions must match the PNG size so drawImage fills the canvas exactly.
     <canvas
       ref={canvasRef}
       width={600}
