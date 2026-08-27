@@ -65,10 +65,14 @@ vi.mock("@/utils/trpc", () => ({
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockTrpc = trpc as any;
 
+let mutateMock: ReturnType<typeof vi.fn>;
+
 describe("MedicationStockPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     toast.removeAll();
+
+    mutateMock = vi.fn();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockImplementation(
       () => ({
@@ -627,7 +631,6 @@ describe("MedicationStockPage", () => {
 
   it("does not include locked fields in mutation payload", async () => {
     const user = userEvent.setup();
-    const mutateMock = vi.fn();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
@@ -666,7 +669,6 @@ describe("MedicationStockPage", () => {
 
   it("discards edits and resets the dirty state when Cancel is clicked", async () => {
     const user = userEvent.setup();
-    const mutateMock = vi.fn();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
@@ -874,7 +876,6 @@ describe("MedicationStockPage", () => {
 
   it("rejects when confirming the split if there are less than 2 child stock", async () => {
     const user = userEvent.setup();
-    const mutateMock = vi.fn();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
@@ -901,7 +902,6 @@ describe("MedicationStockPage", () => {
 
   it("rejects when the total quantity of child splits do not equal the quantity in the parent split", async () => {
     const user = userEvent.setup();
-    const mutateMock = vi.fn();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
@@ -929,7 +929,6 @@ describe("MedicationStockPage", () => {
 
   it("rejects when splits are not distinct from each other", async () => {
     const user = userEvent.setup();
-    const mutateMock = vi.fn();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
@@ -972,7 +971,6 @@ describe("MedicationStockPage", () => {
 
   it("creates new child stock entries in the table when the split succeeds", async () => {
     const user = userEvent.setup();
-    const mutateMock = vi.fn();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
