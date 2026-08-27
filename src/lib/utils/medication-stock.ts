@@ -23,13 +23,6 @@ function areSplitsDistinct(splits: Payload[]) {
 }
 
 export function validateSplits(splits: Payload[], parentQty: number) {
-  if (!areSplitsDistinct(splits)) {
-    return {
-      success: false,
-      message: "Splits are not distinct!",
-    };
-  }
-
   if (splits.length === 0) {
     return {
       success: false,
