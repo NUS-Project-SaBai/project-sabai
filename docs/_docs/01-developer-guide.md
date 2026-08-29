@@ -77,7 +77,7 @@ Quick pointers:
 2. Generate a migration with Drizzle Kit.
 3. Apply the migration to local Supabase.
 
-See [Drizzle ORM docs](/docs/drizzle-orm/) for details and commands.
+See [Drizzle ORM docs]({{ '/docs/drizzle-orm/' | relative_url }}) for details and commands.
 
 ### Add a new page that calls the backend
 
@@ -96,7 +96,7 @@ See [Drizzle ORM docs](/docs/drizzle-orm/) for details and commands.
 4. Call the procedure from the page
    - Use hooks from [src/utils/trpc.ts](https://github.com/NUS-Project-SaBai/project-sabai/blob/dev/src/utils/trpc.ts).
 
-See [tRPC docs](/docs/trpc/) for a full walkthrough.
+See [tRPC docs]({{ '/docs/trpc/' | relative_url }}) for a full walkthrough.
 
 ### Add a new UI component
 
@@ -112,7 +112,7 @@ the `docs/` folder:
 3. `bundle exec jekyll serve`
 4. Open <http://localhost:4000> in your browser.
 
-See [Contributing to Documentation](/docs/contributing-to-documentation/) for
+See [Contributing to Documentation]({{ '/docs/contributing-to-documentation/' | relative_url }}) for
 how to add new pages and sidebar links.
 
 ## 5. Auth model (short)
@@ -121,7 +121,7 @@ how to add new pages and sidebar links.
 - `createContext` reads cookies and provides `ctx.user`.
 - `protectedProcedure` blocks requests without a user.
 
-See [tRPC docs](/docs/trpc/) for the full flow.
+See [tRPC docs]({{ '/docs/trpc/' | relative_url }}) for the full flow.
 
 ## 6. Tips
 
