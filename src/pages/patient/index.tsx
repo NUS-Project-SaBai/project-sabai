@@ -83,7 +83,7 @@ function PatientsBasePage() {
                     </span>
                     <PatientPhoto
                       pictureUrl={patient.patientImageUrl}
-                      className="rounded-full border border-slate-200"
+                      className="rounded-lg border border-slate-200"
                     />
                   </div>
                 </TableCell>

@@ -27,26 +27,46 @@ const selectVitalsFields = {
 };
 
 /**
+ * Validator for PostgreSQL `numeric` column. Validates that the value is a
+ * number at the given precision (`step` mirrors the form input's `step`), then
+ * serializes back to the string that Drizzle `numeric` columns expect.
+ * `label` is used in error messages
+ */
+const numericColumn = (label: string, { step }: { step: number }) =>
+  z.coerce
+    .number({ error: `${label} must be a number` })
+    .multipleOf(step, { error: `${label} must be in steps of ${step}` })
+    .transform((n) => n.toString())
+    .optional();
+
+/** Validator for an integer column. */
+const integerColumn = (label: string) =>
+  z.coerce
+    .number({ error: `${label} must be a number` })
+    .int({ error: `${label} must be a whole number` })
+    .optional();
+
+/**
  * Input validation schema for creating vitals records.
- * Uses z.coerce.string() for PostgreSQL numeric fields.
+ * Numeric fields validate precision; the `step` values mirror the form input
+ * `step` and the DB `numeric(_, 2)` scale.
  */
 const createVitalsInput = z.object({
-  // `.nullish()` (not `.optional()`) so the form can send `null` to explicitly
-  // clear a field on update; `undefined` is skipped by Drizzle and would leave
-  // the previous value untouched.
-  height: z.coerce.string().nullish(), // cm
-  weight: z.coerce.string().nullish(), // kg
-  temperature: z.coerce.string().nullish(), // °C
-  systolic: z.number().int().nullish(), // mmHg
-  diastolic: z.number().int().nullish(), // mmHg
-  heartRate: z.number().int().nullish(), // bpm
-  hemocueCount: z.coerce.string().nullish(), // g/dL
-  diabetesMellitus: z.boolean().nullish(),
-  urineTest: z.string().nullish(),
-  bloodGlucoseNonFasting: z.coerce.string().nullish(), // mg/dL or mmol/L
-  bloodGlucoseFasting: z.coerce.string().nullish(), // mg/dL or mmol/L
-  hba1c: z.coerce.string().nullish(), // %
-  others: z.string().nullish(),
+  height: numericColumn("Height", { step: 0.1 }), // cm
+  weight: numericColumn("Weight", { step: 0.01 }), // kg
+  temperature: numericColumn("Body temperature", { step: 0.1 }), // °C
+  systolic: integerColumn("Systolic blood pressure"), // mmHg
+  diastolic: integerColumn("Diastolic blood pressure"), // mmHg
+  heartRate: integerColumn("Heart rate"), // bpm
+  hemocueCount: numericColumn("Hemocue count", { step: 0.01 }), // g/dL
+  diabetesMellitus: z.boolean().nullable().optional(),
+  urineTest: z.string().nullable().optional(),
+  bloodGlucoseNonFasting: numericColumn("Non-fasting blood glucose", {
+    step: 0.01,
+  }), // mmol/L
+  bloodGlucoseFasting: numericColumn("Fasting blood glucose", { step: 0.01 }), // mmol/L
+  hba1c: numericColumn("HbA1c", { step: 0.01 }), // %
+  others: z.string().nullable().optional(),
   visitId: z.number().int().positive(),
 });
 
