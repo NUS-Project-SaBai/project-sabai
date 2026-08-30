@@ -112,7 +112,7 @@ export function HeightWeightChart({ age, height, weight, gender }: Props) {
 
     const image = new Image();
     // Required so drawImage doesn't taint the canvas if the asset moves to a CDN.
-    image.crossOrigin = "Anonymous";
+    image.crossOrigin = "anonymous";
     image.src = config.src;
     image.onload = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
