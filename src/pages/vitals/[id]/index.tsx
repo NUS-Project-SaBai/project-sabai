@@ -141,7 +141,7 @@ export default function PatientVitalsPage() {
 
             <div className="bg-slate-50/50 p-6">
               {selectedVisit ? (
-                <VitalsForm visitId={selectedVisit.id} patient={patient} />
+                <VitalsForm visitId={selectedVisit.id} visitDate={selectedVisit.date} patient={patient} />
               ) : (
                 visits &&
                 visits.length > 0 && (
@@ -160,9 +160,11 @@ export default function PatientVitalsPage() {
 
 function VitalsForm({
   visitId,
+  visitDate,
   patient,
 }: {
   visitId: number;
+  visitDate: Date | string;
   patient: { dateOfBirth: Date; gender: "male" | "female" };
 }) {
   const {
@@ -176,12 +178,12 @@ function VitalsForm({
   const weightValue = useWatch({ control, name: "weight" });
 
   const patientAge = useMemo(() => {
-    const now = new Date();
+    const atDate = new Date(visitDate);
     const dob = new Date(patient.dateOfBirth);
     return Math.floor(
-      (now.getTime() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000),
+      (atDate.getTime() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000),
     );
-  }, [patient.dateOfBirth]);
+  }, [patient.dateOfBirth, visitDate]);
 
   const chartHeight = heightValue ? parseFloat(String(heightValue)) : null;
   const chartWeight = weightValue ? parseFloat(String(weightValue)) : null;
@@ -192,8 +194,8 @@ function VitalsForm({
     chartWeight !== null &&
     !isNaN(chartHeight) &&
     !isNaN(chartWeight) &&
-    chartHeight > 0 &&
-    chartWeight > 0;
+    chartHeight >= 80 &&
+    chartWeight >= 10;
 
   const { data: vitalData, isLoading: vitalsLoading } =
     trpc.vitalsRouter.getByVisitId.useQuery(
