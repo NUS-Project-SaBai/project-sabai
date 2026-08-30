@@ -2,6 +2,7 @@
 
 import { FaWindowClose } from "react-icons/fa";
 import { ReactNode, useEffect, useRef } from "react";
+import clsx from "clsx";
 import { Button } from "@/components/interactive/Button/Button";
 
 export interface ModalProps {
@@ -52,7 +53,10 @@ export default function Modal({
         onClose();
       }}
       onClose={onClose}
-      className={`inset-0 bg-white rounded-xl shadow-xl p-6 w-full ${maxWidthClassName} fixed flex min-h-60 flex-col justify-between self-center justify-self-center backdrop:fixed backdrop:inset-0 backdrop:bg-black/50`}
+      className={clsx(
+        "inset-0 bg-white rounded-xl shadow-xl p-6 w-full fixed flex min-h-60 flex-col justify-between self-center justify-self-center backdrop:fixed backdrop:inset-0 backdrop:bg-black/50",
+        maxWidthClassName,
+      )}
       onClick={(e) => e.stopPropagation()}
     >
       {title ? (
