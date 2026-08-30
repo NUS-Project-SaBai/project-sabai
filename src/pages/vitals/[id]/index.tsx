@@ -141,7 +141,11 @@ export default function PatientVitalsPage() {
 
             <div className="bg-slate-50/50 p-6">
               {selectedVisit ? (
-                <VitalsForm visitId={selectedVisit.id} visitDate={selectedVisit.date} patient={patient} />
+                <VitalsForm
+                  visitId={selectedVisit.id}
+                  visitDate={selectedVisit.date}
+                  patient={patient}
+                />
               ) : (
                 visits &&
                 visits.length > 0 && (
