@@ -284,13 +284,42 @@ export const patientsRouter = router({
         }
 
         // Best-effort cleanup of the replaced assets.
+        // Only delete if no other patient still references the same asset (image or faceprint)
         if (existing?.patientImagePublicId) {
-          await deleteFromCloudinary(existing.patientImagePublicId).catch(
-            (err) => console.error("Failed to delete old patient image:", err),
-          );
+          const [sharedImage] = await db
+            .select({ id: patients.id })
+            .from(patients)
+            .where(
+              and(
+                ne(patients.id, id),
+                eq(
+                  patients.patientImagePublicId,
+                  existing.patientImagePublicId,
+                ),
+              ),
+            )
+            .limit(1);
+          if (!sharedImage) {
+            await deleteFromCloudinary(existing.patientImagePublicId).catch(
+              (err) =>
+                console.error("Failed to delete old patient image:", err),
+            );
+          }
         }
         if (rekognitionFaceId && existing?.rekognitionFaceId) {
-          await deleteFaceprint(existing.rekognitionFaceId);
+          const [sharedFace] = await db
+            .select({ id: patients.id })
+            .from(patients)
+            .where(
+              and(
+                ne(patients.id, id),
+                eq(patients.rekognitionFaceId, existing.rekognitionFaceId),
+              ),
+            )
+            .limit(1);
+          if (!sharedFace) {
+            await deleteFaceprint(existing.rekognitionFaceId);
+          }
         }
       }
 
