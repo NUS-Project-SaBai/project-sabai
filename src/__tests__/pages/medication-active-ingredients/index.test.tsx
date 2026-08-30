@@ -242,7 +242,7 @@ describe("MedicationActiveIngredientsPage", () => {
     const user = userEvent.setup();
 
     mockTrpc.medicationActiveIngredientsRouter.update.useMutation.mockImplementation(
-      ({ onSuccess }) => {
+      ({ onSuccess }: { onSuccess: () => void }) => {
         return {
           mutate: vi.fn(() => {
             onSuccess?.(); // call it immediately when mutate is called
@@ -383,7 +383,7 @@ describe("MedicationActiveIngredientsPage", () => {
     );
 
     mockTrpc.medicationActiveIngredientsRouter.delete.useMutation.mockImplementation(
-      ({ onError }) => {
+      ({ onError }: { onError: (err: Error) => void }) => {
         return {
           mutate: vi.fn(() => {
             onError?.(mockDBError);
@@ -424,7 +424,7 @@ describe("MedicationActiveIngredientsPage", () => {
     const user = userEvent.setup();
 
     mockTrpc.medicationActiveIngredientsRouter.delete.useMutation.mockImplementation(
-      ({ onSuccess }) => {
+      ({ onSuccess }: { onSuccess: () => void }) => {
         return {
           mutate: vi.fn(() => {
             onSuccess?.();
@@ -577,7 +577,7 @@ describe("MedicationActiveIngredientsPage", () => {
     });
 
     mockTrpc.medicationActiveIngredientsRouter.create.useMutation.mockImplementation(
-      ({ onSuccess }) => {
+      ({ onSuccess }: { onSuccess: () => void }) => {
         return {
           mutate: vi.fn(() => {
             mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue(

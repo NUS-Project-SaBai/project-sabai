@@ -8,8 +8,8 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import {
   EyesightForm,
-  EyesightFormValues,
 } from "@/components/vision/EyesightForm";
+import { EyesightFormValues } from "@/types/eyesight";
 import { formatVisitDate } from "@/lib/utils/visit";
 import { formatPatientId } from "@/lib/utils/patient";
 

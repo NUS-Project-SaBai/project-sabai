@@ -87,7 +87,7 @@ export default function MatchingPatients({
               <TableCell>
                 <PatientPhoto
                   pictureUrl={patient.patientImageUrl}
-                  className="rounded-full border border-slate-200"
+                  className="rounded-lg border border-slate-200"
                 />
               </TableCell>
               <TableCell>

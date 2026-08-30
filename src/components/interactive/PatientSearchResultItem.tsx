@@ -24,7 +24,7 @@ export default function PatientSearchResultItem({
         pictureUrl={patient.patientImageUrl}
         height={40}
         width={40}
-        className="rounded-full border border-slate-200"
+        className="rounded-lg border border-slate-200"
       />
       <div className="flex min-w-0 flex-col">
         <span className="font-medium truncate">{patient.name}</span>

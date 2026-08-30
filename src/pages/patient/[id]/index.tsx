@@ -85,7 +85,7 @@ export default function PatientPage() {
               pictureUrl={patient.patientImageUrl}
               height={64}
               width={64}
-              className="h-16 w-16 rounded-full object-cover border border-slate-200"
+              className="h-16 w-16 rounded-lg object-cover border border-slate-200"
             />
             <div>
               <h1 className="text-2xl font-semibold text-slate-900">

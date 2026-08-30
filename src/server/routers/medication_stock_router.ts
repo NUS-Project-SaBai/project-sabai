@@ -2,7 +2,7 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import {
   medicationBrands,
   medicationStatusEnum,
@@ -47,7 +47,8 @@ export const medicationStockRouter = router({
       .innerJoin(
         medicationActiveIngredients,
         eq(medicationActiveIngredients.id, medicationBrands.activeIngredientId),
-      );
+      )
+      .orderBy(desc(medicationStock.id));
     return result;
   }),
 
@@ -89,14 +90,18 @@ export const medicationStockRouter = router({
     .input(
       zfd.formData({
         id: zfd.numeric(z.number().int()),
-        medicationBrandId: zfd.numeric(z.number().int().optional()),
-        quantity: zfd.numeric(z.number().int().optional()),
-        expiry: zfd.text(z.coerce.date().optional()),
         location: zfd.text(z.string().optional()),
         stockStatus: zfd.text(
           z.enum(medicationStatusEnum.enumValues).optional(),
         ),
-        remarks: zfd.text(z.string().optional()),
+        remarks: z.preprocess(
+          // To insert null instead of empty string into the db
+          (val: string | undefined) =>
+            val === undefined || val === null || val.trim() === ""
+              ? null
+              : val.trim(),
+          z.string().nullable(),
+        ),
       }),
     )
     .mutation(async ({ input }) => {

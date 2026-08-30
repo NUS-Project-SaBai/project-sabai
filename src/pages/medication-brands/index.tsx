@@ -1,5 +1,5 @@
 import { trpc } from "@/utils/trpc";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import PageHeader from "@/components/PageHeader";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
@@ -7,23 +7,15 @@ import TableCell from "@/components/TableCell";
 
 function Header() {
   return (
-    <div className="w-full mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Medication Stock", href: "/medication-stock" },
-              { label: "Medication Brands" },
-            ]}
-          />
-          <h1 className="text-3xl font-bold text-slate-900">
-            Medication Brands
-          </h1>
-          <p className="mt-2 text-slate-600">Manage medication brands.</p>
-        </div>
-      </div>
-    </div>
+    <PageHeader
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Medication Stock", href: "/medication-stock" },
+        { label: "Medication Brands" },
+      ]}
+      title="Medication Brands"
+      description="Manage medication brands."
+    />
   );
 }
 
