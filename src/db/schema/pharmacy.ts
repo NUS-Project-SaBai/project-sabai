@@ -166,7 +166,7 @@ export type NewOrder = typeof orders.$inferInsert;
 
 /**
 Order Items Table:
-- orderId: The order ID of the order.
+- orderId: The ID of the order.
 - stockChangeId: The order ID of the stock_changes table row that contains the entry changing state from 'active' to 'reserved'
  */
 export const orderItems = pgTable(
