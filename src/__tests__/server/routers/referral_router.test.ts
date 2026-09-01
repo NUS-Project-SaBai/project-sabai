@@ -1,8 +1,8 @@
 // @vitest-environment node
 //
-// Integration tests for the referral tRPC router. These run against a real
-// Postgres (the local Supabase instance on 127.0.0.1:54322) so the joins,
-// enum handling, and FK constraints are exercised for real
+// Integration tests for the referral tRPC router. These run against the
+// Postgres instance configured in .env so the joins, enum handling, and FK
+// constraints are exercised for real
 // Prereqs: `supabase start` (or `pnpm seed:db`) so migrations are applied, and at least one auth.users row (`pnpm seed:users`).
 //
 // Runs in the node environment (not jsdom) because src/lib/envVariables.ts
@@ -45,7 +45,7 @@ function callerFor(userId: string) {
 }
 
 describe("referralRouter (integration)", () => {
-  let doctorId: string;
+  let userId: string;
   let villageCodeId: number;
   let patientId: number;
   let visitId: number;
@@ -54,17 +54,17 @@ describe("referralRouter (integration)", () => {
 
   beforeAll(async () => {
     // A consult FK-references auth.users; reuse an existing seeded user.
-    const [doctor] = await db
+    const [user] = await db
       .select({ id: authUsers.id })
       .from(authUsers)
       .limit(1);
-    if (!doctor) {
+    if (!user) {
       throw new Error(
         "No auth.users row found. Run `pnpm seed:all` against local Supabase " +
           "before running the router integration tests.",
       );
     }
-    doctorId = doctor.id;
+    userId = user.id;
 
     [{ id: villageCodeId }] = await db
       .insert(villageCodes)
@@ -87,10 +87,10 @@ describe("referralRouter (integration)", () => {
 
     [{ id: consultId }] = await db
       .insert(consults)
-      .values({ doctorId, visitId })
+      .values({ doctorId: userId, visitId })
       .returning({ id: consults.id });
 
-    caller = callerFor(doctorId);
+    caller = callerFor(userId);
   });
 
   // Each test creates its own referrals; wipe them so counts stay deterministic.
@@ -133,7 +133,7 @@ describe("referralRouter (integration)", () => {
       expect(row).toBeDefined();
       expect(row!.patientId).toBe(patientId);
       expect(row!.patientName).toBe(SEED_PATIENT.name);
-      expect(row!.doctorId).toBe(doctorId);
+      expect(row!.doctorId).toBe(userId);
       expect(row!.referralNotes).toBe("urgent");
     });
   });
