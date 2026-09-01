@@ -13,10 +13,8 @@ describe("visualAcuitySchema", () => {
     "6/120", // biggest E on the SOP chart
     "6/7.5", // in database; SOP confirmation pending
     "6/15", // in database; SOP confirmation pending
-    "6/9 +2", // passed 6/9, read 2 letters of the next line
-    "6/9+2", // space is optional
-    "6/9 -2", // missed 2 letters on the 6/9 line
-    "6/9-2", // space is optional
+    "6/9+2", // passed 6/9, read 2 letters of the next line
+    "6/9-2", // missed 2 letters on the 6/9 line
     "CF",
     "HM",
     "LP",
@@ -41,6 +39,8 @@ describe("visualAcuitySchema", () => {
     "garbage",
     "6/6++",
     "6/12+", // "+" must carry a letter count
+    "6/9 +2", // whitespace before suffix not accepted
+    "6/9 -2", // whitespace before suffix not accepted
     "PL", // clinic uses LP, not PL
     "NPL", // clinic uses NLP, not NPL
     "PLL",
@@ -54,11 +54,11 @@ describe("visualAcuitySchema", () => {
     expect(visualAcuitySchema.parse("cf")).toBe("CF");
     expect(visualAcuitySchema.parse("nlp")).toBe("NLP");
     expect(visualAcuitySchema.parse(" lp ")).toBe("LP"); // trims too
-    expect(visualAcuitySchema.parse("6/9 +2")).toBe("6/9 +2"); // numeric unchanged
+    expect(visualAcuitySchema.parse("6/9+2")).toBe("6/9+2"); // numeric unchanged
   });
 
   it("trims whitespace before validation", () => {
-    expect(visualAcuitySchema.parse(" 6/9 +2 ")).toBe("6/9 +2");
+    expect(visualAcuitySchema.parse(" 6/9+2 ")).toBe("6/9+2");
   });
 
   it("treats empty string as not recorded (valid)", () => {
@@ -76,7 +76,7 @@ describe("pinholeSchema", () => {
       "6/6",
       "6/60",
       "6/120",
-      "6/9 +2",
+      "6/9+2",
       "CF",
       "HM",
       "LP",
