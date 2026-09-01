@@ -28,5 +28,38 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      #  CI boots the full local Supabase stack instead of mocking the database.
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.72.7
+
+      # `supabase start` applies the migrations in supabase/migrations.
+      - name: Start Supabase
+        run: supabase start
+
+      # Map the generated credentials onto the env var names that src/lib/envVariables.ts validates.
+      # The Cloudinary/AWS vars aren't exercised by the tests but must be non-empty
+      # to pass schema validation at import time.
+      - name: Export environment variables
+        run: |
+          eval "$(supabase status -o env)"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=${API_URL}"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${PUBLISHABLE_KEY}"
+            echo "SUPABASE_SECRET_KEY=${SECRET_KEY}"
+            echo "DATABASE_URL=${DB_URL}"
+            echo "CLOUDINARY_URL_PREFIX=https://res.cloudinary.com/ci-dummy"
+            echo "CLOUDINARY_URL=cloudinary://000000000000000:ci-dummy-secret@ci-dummy"
+            echo "AWS_ACCESS_KEY_ID=ci-dummy"
+            echo "AWS_SECRET_ACCESS_KEY=ci-dummy"
+            echo "AWS_REGION=ap-southeast-1"
+            echo "COLLECTION_ID=ci-dummy"
+          } >> "$GITHUB_ENV"
+
+      # The integration tests read an existing auth.users row for the doctor FK.
+      - name: Seed users
+        run: pnpm seed:users
+
       - name: Run Vitest
         run: pnpm vitest run
