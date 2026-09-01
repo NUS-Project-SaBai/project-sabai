@@ -121,16 +121,4 @@ export const referralRouter = router({
 
       return result || null;
     }),
-
-  // Delete a referral
-  delete: protectedProcedure
-    .input(z.object({ id: z.number().int() }))
-    .mutation(async ({ input }) => {
-      const [result] = await db
-        .delete(referrals)
-        .where(eq(referrals.id, input.id))
-        .returning({ id: referrals.id });
-
-      return { success: !!result };
-    }),
 });

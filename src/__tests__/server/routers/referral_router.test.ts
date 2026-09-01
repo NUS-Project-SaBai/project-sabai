@@ -196,19 +196,4 @@ describe("referralRouter (integration)", () => {
       ).rejects.toThrow();
     });
   });
-
-  describe("delete()", () => {
-    it("reports success only when a row was removed", async () => {
-      const created = await caller.referralRouter.create({
-        consultId,
-        referredFor: "Uveitis (Inflammation of the uvea)",
-      });
-      expect(await caller.referralRouter.delete({ id: created.id })).toEqual({
-        success: true,
-      });
-      expect(await caller.referralRouter.delete({ id: created.id })).toEqual({
-        success: false,
-      });
-    });
-  });
 });
