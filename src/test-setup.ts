@@ -3,6 +3,17 @@ import "@testing-library/jest-dom";
 // environment) can read DATABASE_URL and the other server-only vars validated
 // by src/lib/envVariables.ts. Harmless for jsdom component tests.
 import "dotenv/config";
+import { isRunningInLocalhost } from "@/lib/environmentUtils";
+
+// Guard: refuse to run node-environment (server/integration) tests against a
+// non-local database. This prevents accidental data loss if someone has
+// dev/production credentials in their .env and runs the test suite.
+if (typeof window === "undefined" && !isRunningInLocalhost()) {
+  throw new Error(
+    `Integration tests refused: DATABASE_URL does not point to localhost.\n` +
+      `Run \`supabase start\` and ensure .env points to the local instance.`,
+  );
+}
 
 // Workaround for vitest - mock HTMLDialogElement methods
 // https://github.com/jsdom/jsdom/issues/3294
