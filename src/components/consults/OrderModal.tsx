@@ -46,7 +46,7 @@ export default function OrderModal({
               }}
             >
               <RHFDropdown
-                name="medicine"
+                name="activeIngredientId"
                 label="Medicine:"
                 dropdownOptions={data!.map((elem) => ({
                   value: `${elem.id}`,

@@ -3,16 +3,10 @@ export type DiagnosisFormValue = {
   category: string;
 };
 
-export type Medicine = {
-  activeIngredientName: string;
-  unitOfMeasurement: string;
-  quantity: number;
-};
-
 export type OrderFormValue = {
   quantity: number;
   dosageInstructions: string;
-  medicine: Medicine;
+  activeIngredientId: string;
 };
 
 export type ConsultFormValues = {
