@@ -84,38 +84,6 @@ export const medicationStockRouter = router({
     return result;
   }),
 
-  listGroupByActiveIngredient: protectedProcedure.query(async () => {
-    const result = await db
-      .select({
-        id: medicationActiveIngredients.id,
-        activeIngredientName: medicationActiveIngredients.name,
-        unitOfMeasurement: medicationActiveIngredients.unitOfMeasurement,
-        quantity: sum(medicationStock.quantity),
-      })
-      .from(medicationStock)
-      .innerJoin(
-        medicationBrands,
-        eq(medicationStock.medicationBrandId, medicationBrands.id),
-      )
-      .innerJoin(
-        medicationActiveIngredients,
-        eq(medicationActiveIngredients.id, medicationBrands.activeIngredientId),
-      )
-      .where(
-        and(
-          eq(medicationStock.stockStatus, "active"),
-          gte(medicationStock.expiry, new Date()),
-        ),
-      )
-      .groupBy(
-        medicationActiveIngredients.id,
-        medicationActiveIngredients.name,
-        medicationActiveIngredients.unitOfMeasurement,
-      );
-
-    return result;
-  }),
-
   create: protectedProcedure
     .input(
       zfd.formData({
