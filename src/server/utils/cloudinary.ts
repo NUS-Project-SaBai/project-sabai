@@ -20,3 +20,24 @@ export async function uploadToCloudinary(image: File) {
 
   return `image/upload/v${uploaded.version}/${uploaded.public_id}`;
 }
+
+/**
+ * Recovers the bare public id (what the destroy API expects) from the stored
+ * `image/upload/v{version}/{public_id}` path produced by {@link uploadToCloudinary}.
+ * Any folder segments in the public id are preserved; only the
+ * `image/upload/v{version}/` prefix is stripped. If the prefix isn't present
+ * (unexpected format), the input is returned unchanged.
+ */
+export function extractCloudinaryPublicId(publicIdPath: string): string {
+  return publicIdPath.replace(/^image\/upload\/v\d+\//, "");
+}
+
+/**
+ * Deletes an image from Cloudinary given the stored public id path
+ * (the `image/upload/v{version}/{public_id}` value produced by
+ * {@link uploadToCloudinary}).
+ */
+export async function deleteFromCloudinary(publicIdPath: string) {
+  const publicId = extractCloudinaryPublicId(publicIdPath);
+  await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+}

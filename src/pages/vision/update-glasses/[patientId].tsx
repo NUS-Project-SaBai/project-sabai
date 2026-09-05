@@ -6,9 +6,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
-import {
-  EyesightForm,
-} from "@/components/vision/EyesightForm";
+import { EyesightForm } from "@/components/vision/EyesightForm";
 import { EyesightFormValues } from "@/types/eyesight";
 import { formatVisitDate } from "@/lib/utils/visit";
 import { formatPatientId } from "@/lib/utils/patient";
