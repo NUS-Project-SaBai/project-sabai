@@ -38,6 +38,13 @@ export function validateSplits(splits: SplitPayload[], parentQty: number) {
     };
   }
 
+  if (splits.length > 10) {
+    return {
+      success: false,
+      message: "Please do not exceed 10 splits!",
+    };
+  }
+
   const quantity = splits.reduce(
     (accumulator, current) => accumulator + current.quantity,
     0,

@@ -117,7 +117,7 @@ export const medicationStockRouter = router({
     .input(
       z.object({
         parentId: zfd.numeric(z.number().int()),
-        splits: z.array(splitSchema).min(2),
+        splits: z.array(splitSchema).min(2).max(10),
       }),
     )
     .mutation(async ({ input }) => {
