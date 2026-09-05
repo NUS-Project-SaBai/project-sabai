@@ -35,9 +35,7 @@ export default function SplittingModal({
     },
     onError: (err) => {
       console.error(err);
-      toast.error(
-        toast.error(err.message ?? "An error occurred while splitting stock."),
-      );
+      toast.error(err.message ?? "An error occurred while splitting stock.");
     },
   });
 
