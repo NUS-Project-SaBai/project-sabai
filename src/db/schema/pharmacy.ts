@@ -7,7 +7,11 @@ import {
   pgEnum,
   integer,
   uuid,
+  primaryKey,
+  check,
 } from "drizzle-orm/pg-core";
+
+import { sql } from "drizzle-orm";
 
 import { authUsers } from "./auth";
 
@@ -141,19 +145,42 @@ Orders Table:
 - consultId: Foreign key referencing the consult in which the order was created.
 - dosageInstructions: The dosage instructions for the order.
 - status: The order status. Can be 'PENDING', 'CANCELLED', or 'APPROVED'.
-- stockChangeId: Foreign key representing the entry in the stockChange table that displays stocks going from 'active' to 'reserved' state.
+- quantity: The order quantity.
 */
-export const orders = pgTable("orders", {
-  id: serial("id").primaryKey(),
-  consultId: integer("consult_id")
-    .notNull()
-    .references(() => consults.id),
-  dosageInstructions: text("dosage_instructions").notNull(),
-  status: orderStatusEnum("status").notNull().default("PENDING"),
-  stockChangeId: integer("stock_change_id")
-    .notNull()
-    .references(() => stockChanges.id),
-});
+export const orders = pgTable(
+  "orders",
+  {
+    id: serial("id").primaryKey(),
+    consultId: integer("consult_id")
+      .notNull()
+      .references(() => consults.id),
+    dosageInstructions: text("dosage_instructions").notNull(),
+    status: orderStatusEnum("status").notNull().default("PENDING"),
+    quantity: integer("quantity").notNull(),
+  },
+  (table) => [check("quantity_check", sql`${table.quantity} > 0`)],
+);
 
 export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
+
+/**
+Order Items Table:
+- orderId: The ID of the order.
+- stockChangeId: The order ID of the stock_changes table row that contains the entry changing state from 'active' to 'reserved'
+ */
+export const orderItems = pgTable(
+  "order_items",
+  {
+    orderId: integer("order_id")
+      .notNull()
+      .references(() => orders.id),
+    stockChangeId: integer("stock_change_id")
+      .notNull()
+      .references(() => stockChanges.id),
+  },
+  (table) => [primaryKey({ columns: [table.orderId, table.stockChangeId] })],
+);
+
+export type OrderItem = typeof orderItems.$inferSelect;
+export type NewOrderItem = typeof orderItems.$inferInsert;

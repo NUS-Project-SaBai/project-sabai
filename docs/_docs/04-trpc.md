@@ -36,7 +36,7 @@ This document explains how tRPC is configured in this project, including authent
 src/
 ├── lib/
 │   └── supabaseClient.ts      # Browser-side Supabase client
-├── middleware.ts              # Next.js middleware for session refresh
+├── proxy.ts                   # Next.js proxy for session refresh (Next 16)
 ├── pages/
 │   └── api/
 │       └── trpc/
@@ -46,7 +46,7 @@ src/
 │   ├── trpc.ts                # tRPC initialization, procedures, middleware
 │   └── routers/
 │       ├── _app.ts            # Root router (merges all sub-routers)
-│       └── villageCodeRouters.ts  # Example feature router
+│       └── village_codes_router.ts  # Example feature router
 └── utils/
     ├── trpc.ts                # tRPC React client hooks
     └── transformer.ts         # SuperJSON transformer for Date/Map/Set
@@ -61,10 +61,10 @@ src/
 │  React Component                                                        │
 │       │                                                                 │
 │       ▼                                                                 │
-│  trpc.villageCodeRouter.list.useQuery()   (from utils/trpc.ts)         │
+│  trpc.villageCodesRouter.list.useQuery()   (from utils/trpc.ts)         │
 │       │                                                                 │
 │       ▼                                                                 │
-│  httpBatchStreamLink → POST /api/trpc/villageCodeRouter.list           │
+│  httpBatchStreamLink → POST /api/trpc/villageCodesRouter.list           │
 │       │                          (cookies sent automatically)           │
 └───────┼─────────────────────────────────────────────────────────────────┘
         │
@@ -72,7 +72,7 @@ src/
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                           NEXT.JS SERVER                                │
 ├─────────────────────────────────────────────────────────────────────────┤
-│  middleware.ts                                                          │
+│  proxy.ts                                                               │
 │       │  (refreshes expired Supabase tokens, sets new cookies)          │
 │       ▼                                                                 │
 │  pages/api/trpc/[trpc].ts                                              │
@@ -81,7 +81,7 @@ src/
 │  createContext({ req, res })   →   ctx.user (from Supabase)            │
 │       │                                                                 │
 │       ▼                                                                 │
-│  appRouter → villageCodeRouter.list   (procedure executes)             │
+│  appRouter → villageCodesRouter.list   (procedure executes)             │
 │       │                                                                 │
 │       ▼                                                                 │
 │  Response (JSON) ─────────────────────────────────────────────────────▶│
@@ -130,8 +130,8 @@ httpBatchStreamLink({
 #### 3. Middleware Refreshes Session
 
 ```typescript
-// middleware.ts - runs BEFORE API routes
-export async function middleware(request: NextRequest) {
+// proxy.ts - runs BEFORE API routes
+export async function proxy(request: NextRequest) {
   const supabase = createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
       getAll() {
@@ -193,7 +193,7 @@ export const createContext = async ({ req, res }: CreateNextContextOptions) => {
 #### 5. Procedure Accesses `ctx.user`
 
 ```typescript
-// server/routers/villageCodeRouters.ts
+// server/routers/village_codes_router.ts
 list: protectedProcedure
   .input(z.object({ includeHidden: z.boolean().default(false) }))
   .query(async ({ ctx, input }) => {
@@ -268,13 +268,13 @@ export const appRouter = router({
 #### Protected Route (Auth Required)
 
 ```typescript
-// server/routers/villageCodeRouters.ts
+// server/routers/village_codes_router.ts
 import { z } from "zod";
 import { router, protectedProcedure } from "../trpc";
 import { db } from "@/db/drizzle";
 import { villageCodes } from "@/db/schema";
 
-export const villageCodeRouter = router({
+export const villageCodesRouter = router({
   list: protectedProcedure
     .input(z.object({ includeHidden: z.boolean().default(false) }))
     .query(async ({ ctx, input }) => {
@@ -309,7 +309,7 @@ export const villageCodeRouter = router({
 import { trpc } from "@/utils/trpc";
 
 function VillageCodeList() {
-  const { data, isLoading, error } = trpc.villageCodeRouter.list.useQuery({
+  const { data, isLoading, error } = trpc.villageCodesRouter.list.useQuery({
     includeHidden: false,
   });
 
@@ -334,10 +334,10 @@ import { trpc } from "@/utils/trpc";
 function CreateVillageCode() {
   const utils = trpc.useUtils();
 
-  const createMutation = trpc.villageCodeRouter.create.useMutation({
+  const createMutation = trpc.villageCodesRouter.create.useMutation({
     onSuccess: () => {
       // Invalidate and refetch the list
-      utils.villageCodeRouter.list.invalidate();
+      utils.villageCodesRouter.list.invalidate();
     },
     onError: (error) => {
       if (error.data?.code === "UNAUTHORIZED") {
@@ -368,7 +368,7 @@ function CreateVillageCode() {
 #### Error Handling
 
 ```tsx
-const { data, error } = trpc.villageCodeRouter.list.useQuery({
+const { data, error } = trpc.villageCodesRouter.list.useQuery({
   includeHidden: false,
 });
 
@@ -491,11 +491,11 @@ Used for mutations that carry **file uploads** (e.g. `patientsRouter.create`, `p
 
 1. **Cookies not being sent**
    - Check browser DevTools → Network tab → Request Headers → `Cookie`
-   - Ensure `middleware.ts` is in `src/` (not `src/pages/`)
+   - Ensure `proxy.ts` is in `src/` (not `src/pages/`)
    - Verify the middleware matcher isn't excluding `/api/trpc`
 
 2. **Middleware not running**
-   - Add a `console.log` at the top of `middleware.ts` to verify it executes
+   - Add a `console.log` at the top of `proxy.ts` to verify it executes
    - Check `matcher` config isn't too restrictive
 
 3. **Cookie parsing error**
@@ -584,9 +584,9 @@ function getBaseUrl() {
 ```typescript
 const utils = trpc.useUtils();
 
-const mutation = trpc.villageCodeRouter.create.useMutation({
+const mutation = trpc.villageCodesRouter.create.useMutation({
   onSuccess: () => {
-    utils.villageCodeRouter.list.invalidate();
+    utils.villageCodesRouter.list.invalidate();
   },
 });
 ```
@@ -653,9 +653,9 @@ myProcedure: protectedProcedure.query(({ ctx }) => {
 // Get input/output types for any procedure
 import type { RouterInput, RouterOutput } from "@/utils/trpc";
 
-type ListInput = RouterInput["villageCodeRouter"]["list"];
+type ListInput = RouterInput["villageCodesRouter"]["list"];
 // { includeHidden: boolean }
 
-type ListOutput = RouterOutput["villageCodeRouter"]["list"];
+type ListOutput = RouterOutput["villageCodesRouter"]["list"];
 // VillageCode[]
 ```
