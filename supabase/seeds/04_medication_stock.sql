@@ -1,3 +1,5 @@
+SELECT set_config('app.bypass_triggers', 'true', false);
+
 INSERT INTO medication_stock (
     medication_brand_id, 
     quantity, 
