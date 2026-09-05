@@ -85,6 +85,9 @@ export function ConsultForm({ visitId }: { visitId: number }) {
 
   return (
     <FormProvider {...methods}>
+      {orderModalIsOpen && (
+        <OrderModal setOrderModalIsOpen={setOrderModalIsOpen} />
+      )}
       <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-8">
         <h2 className="text-lg font-semibold text-slate-900">
           Doctor&apos;s Consult Form
@@ -178,10 +181,6 @@ export function ConsultForm({ visitId }: { visitId: number }) {
           <div className="flex items-center gap-1">
             <h3 className="text-sm font-semibold text-slate-700">Orders</h3>
           </div>
-
-          {orderModalIsOpen && (
-            <OrderModal setOrderModalIsOpen={setOrderModalIsOpen} />
-          )}
 
           <Button
             title="Add Order"
