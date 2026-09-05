@@ -662,7 +662,7 @@ describe("MedicationStockPage", () => {
       document.querySelector('input[name="location"]'),
     ).not.toBeInTheDocument();
     expect(screen.getByText(MOCK_STOCK[0].location)).toBeInTheDocument();
-    expect(createMockMutation).not.toHaveBeenCalled();
+    expect(updateMockMutation).not.toHaveBeenCalled();
   });
 
   // Stock splitting
@@ -843,7 +843,7 @@ describe("MedicationStockPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Confirm" }));
 
-    expect(createMockMutation).not.toHaveBeenCalled();
+    expect(createSplitsMockMutation).not.toHaveBeenCalled();
   });
 
   it("rejects when splits are not distinct from each other", async () => {
