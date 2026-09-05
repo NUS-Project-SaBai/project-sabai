@@ -134,6 +134,13 @@
       "when": 1788101707251,
       "tag": "0018_lying_nightshade",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1788621911442,
+      "tag": "0019_add_stock_changes_trigger.sql",
+      "breakpoints": true
     }
   ]
 }

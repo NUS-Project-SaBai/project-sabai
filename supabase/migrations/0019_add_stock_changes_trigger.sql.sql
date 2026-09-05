@@ -1,3 +1,4 @@
+-- Custom SQL migration file, put your code below! 
 CREATE OR REPLACE FUNCTION get_current_user_id()
 RETURNS UUID AS $$
 DECLARE
