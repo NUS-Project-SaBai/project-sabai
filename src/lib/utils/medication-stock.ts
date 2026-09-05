@@ -43,7 +43,7 @@ export function validateSplits(splits: SplitPayload[], parentQty: number) {
     0,
   );
 
-  if (quantity != parentQty) {
+  if (quantity !== parentQty) {
     return {
       success: false,
       message: "Child stock quantity does not equal parent stock quantity!",
