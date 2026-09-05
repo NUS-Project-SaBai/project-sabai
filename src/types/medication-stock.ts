@@ -27,8 +27,6 @@ export type MedicationStockWithBrandAndActiveIngredient = MedicationStock & {
   medicationActiveIngredientName: string;
 };
 
-// Functions used for split stock
-
 export const splitSchema = z.object({
   quantity: zfd.numeric(z.number().int().positive()),
   location: zfd.text(z.string()),
