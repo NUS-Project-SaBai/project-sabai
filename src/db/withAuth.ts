@@ -1,4 +1,3 @@
-// src/db/withAuth.ts
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { db } from "@/db/drizzle";
@@ -20,7 +19,6 @@ export async function withUserAuth<T>(
   userId: string,
   callback: (tx: Tx) => Promise<T>,
 ): Promise<T> {
-  console.log("with user auth called");
   return await db.transaction(async (tx) => {
     await tx.execute(
       sql`SELECT set_config('request.jwt.claims', ${JSON.stringify({ sub: userId })}, true)`,
