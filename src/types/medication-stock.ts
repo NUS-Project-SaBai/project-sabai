@@ -36,5 +36,4 @@ export const splitSchema = z.object({
   remarks: zfd.text(z.string().optional()),
 });
 
-export type Payload = z.infer<typeof splitSchema>;
-
+export type SplitPayload = z.infer<typeof splitSchema>;

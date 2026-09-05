@@ -1,6 +1,6 @@
-import { Payload } from "@/types/medication-stock";
+import { SplitPayload } from "@/types/medication-stock";
 
-function splitKey(split: Payload) {
+function splitKey(split: SplitPayload) {
   return JSON.stringify([
     split.location,
     split.stockStatus,
@@ -9,7 +9,7 @@ function splitKey(split: Payload) {
   ]);
 }
 
-function areSplitsDistinct(splits: Payload[]) {
+function areSplitsDistinct(splits: SplitPayload[]) {
   const seenKeys = new Set<string>();
   for (const split of splits) {
     const key = splitKey(split);
@@ -22,7 +22,7 @@ function areSplitsDistinct(splits: Payload[]) {
   return true;
 }
 
-export function validateSplits(splits: Payload[], parentQty: number) {
+export function validateSplits(splits: SplitPayload[], parentQty: number) {
   if (splits.length === 0) {
     return {
       success: false,
