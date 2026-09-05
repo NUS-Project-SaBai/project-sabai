@@ -120,13 +120,6 @@
       "when": 1785947411594,
       "tag": "0016_pretty_guardian",
       "breakpoints": true
-    },
-    {
-      "idx": 17,
-      "version": "7",
-      "when": 1787248995906,
-      "tag": "0017_add_stock_changes_trigger",
-      "breakpoints": true
     }
   ]
 }
