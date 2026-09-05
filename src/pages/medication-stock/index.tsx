@@ -214,6 +214,9 @@ function Row({
               type="text"
               value={form.getValues().location}
               label=""
+              registerOptions={{
+                required: true,
+              }}
             />
           </span>
         </TableCell>

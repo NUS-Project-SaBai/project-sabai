@@ -120,6 +120,20 @@
       "when": 1785947411594,
       "tag": "0016_pretty_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1788060490602,
+      "tag": "0017_slim_kinsey_walden",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1788101707251,
+      "tag": "0018_lying_nightshade",
+      "breakpoints": true
     }
   ]
 }
