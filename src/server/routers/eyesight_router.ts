@@ -2,7 +2,8 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { eyesight } from "@/db/schema/vitals";
+import { eyesight } from "@/db/schema";
+import { visualAcuitySchema, pinholeSchema } from "@/lib/validation/eyesight";
 
 /**
  * Common select fields for eyesight queries to ensure consistency
@@ -24,13 +25,16 @@ const selectEyesightFields = {
 
 /**
  * Input validation schema for creating eyesight records.
+ * Acuity (degree) and pinhole fields are format-validated via shared schemas;
+ * astigmatism and prescribed-glasses fields remain free text pending
+ * confirmation of the clinic's dioptric recording convention.
  */
 const createEyesightInput = z.object({
   visitId: z.number().int().positive(),
-  leftEyeDegree: z.string().optional(),
-  rightEyeDegree: z.string().optional(),
-  leftEyePinhole: z.string().optional(),
-  rightEyePinhole: z.string().optional(),
+  leftEyeDegree: visualAcuitySchema,
+  rightEyeDegree: visualAcuitySchema,
+  leftEyePinhole: pinholeSchema,
+  rightEyePinhole: pinholeSchema,
   leftAstigmatism: z.string().optional(),
   rightAstigmatism: z.string().optional(),
   comments: z.string().optional(),

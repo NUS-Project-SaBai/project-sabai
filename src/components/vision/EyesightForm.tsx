@@ -1,5 +1,6 @@
-import { useFormContext } from "react-hook-form";
+import { RegisterOptions, useFormContext } from "react-hook-form";
 import { useEffect } from "react";
+import { visualAcuitySchema, pinholeSchema } from "@/lib/validation/eyesight";
 import { trpc } from "@/utils/trpc";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
@@ -20,22 +21,55 @@ const BLANK_EYESIGHT: EyesightFormValues = {
   comments: "",
 };
 
+// Validate a Visual Acuity field against the shared Zod schema so the client
+// and server enforce the exact same rule. Returns true when valid, or the
+// error message string RHF should display.
+const validateVisualAcuity: RegisterOptions["validate"] = (value) => {
+  const result = visualAcuitySchema.safeParse(value ?? "");
+  return result.success || result.error.issues[0]?.message;
+};
+
+const validatePinhole: RegisterOptions["validate"] = (value) => {
+  const result = pinholeSchema.safeParse(value ?? "");
+  return result.success || result.error.issues[0]?.message;
+};
+
 const EYE_SECTIONS: {
   title: string;
-  fields: { name: keyof EyesightFormValues; label: string }[];
+  fields: {
+    name: keyof EyesightFormValues;
+    label: string;
+    registerOptions?: RegisterOptions;
+  }[];
 }[] = [
   {
     title: "Visual Acuity (Degree)",
     fields: [
-      { name: "leftEyeDegree", label: "Left Eye Degree" },
-      { name: "rightEyeDegree", label: "Right Eye Degree" },
+      {
+        name: "leftEyeDegree",
+        label: "Left Eye Degree",
+        registerOptions: { validate: validateVisualAcuity },
+      },
+      {
+        name: "rightEyeDegree",
+        label: "Right Eye Degree",
+        registerOptions: { validate: validateVisualAcuity },
+      },
     ],
   },
   {
     title: "Pinhole",
     fields: [
-      { name: "leftEyePinhole", label: "Left Eye Pinhole" },
-      { name: "rightEyePinhole", label: "Right Eye Pinhole" },
+      {
+        name: "leftEyePinhole",
+        label: "Left Eye Pinhole",
+        registerOptions: { validate: validatePinhole },
+      },
+      {
+        name: "rightEyePinhole",
+        label: "Right Eye Pinhole",
+        registerOptions: { validate: validatePinhole },
+      },
     ],
   },
   {
@@ -146,6 +180,7 @@ export function EyesightForm({
                 name={field.name}
                 label={field.label}
                 type="text"
+                registerOptions={field.registerOptions}
               />
             ))}
           </div>
