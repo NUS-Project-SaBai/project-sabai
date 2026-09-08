@@ -12,6 +12,16 @@ vi.mock("@/utils/trpc", () => ({
         useMutation: vi.fn(),
       },
     },
+    villageCodesRouter: {
+      list: {
+        useQuery: vi.fn(() => ({
+          data: [],
+          isLoading: false,
+          isError: false,
+          error: null,
+        })),
+      },
+    },
   },
 }));
 
