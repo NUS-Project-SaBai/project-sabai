@@ -8,6 +8,7 @@ import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import { useRouter } from "next/router";
+import { paths } from "@/utils/paths";
 import { Button } from "@/components/interactive/Button/Button";
 import { CiMedicalClipboard } from "react-icons/ci";
 import { PatientCode } from "@/components/PatientCode";
@@ -20,7 +21,7 @@ export default function VitalsPage() {
    * @param {number} id - The ID of the patient to update vitals for
    */
   const handlePatientVitals = (id: number) => {
-    router.push(`/vitals/${id}`);
+    router.push(paths.vitalsDetail(id));
   };
 
   // Fetch list of patients
