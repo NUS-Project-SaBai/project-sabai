@@ -148,7 +148,7 @@ export default function RegistrationPage({
             isRequired
           />
           {isPediatric && (
-            <div className="rounded-lg border border-gray-200 p-4 space-y-4">
+            <div className="rounded-lg border border-gray-500 p-4 space-y-4">
               <p className="text-sm font-semibold">Child Vitals</p>
               <RHFDropdown
                 name="scoliosis"
