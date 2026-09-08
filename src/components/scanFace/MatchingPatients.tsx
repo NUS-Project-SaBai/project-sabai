@@ -103,25 +103,34 @@ export default function MatchingPatients({
                 <Button
                   colour="emerald"
                   title={
-                    createVisitMutation.isPending ? "Creating..." : "Create Visit"
+                    createVisitMutation.isPending
+                      ? "Creating..."
+                      : "Create Visit"
                   }
                   disabled={
                     createVisitMutation.isPending || !selectedVillageCodeId
                   }
                   onClick={() => {
                     if (!selectedVillageCodeId) {
-                      toast.error("Please select a village code before creating a visit.");
+                      toast.error(
+                        "Please select a village code before creating a visit.",
+                      );
                       return;
                     }
                     createVisitMutation.mutate(
-                      { patientId: patient.id, villageCodeId: selectedVillageCodeId },
+                      {
+                        patientId: patient.id,
+                        villageCodeId: selectedVillageCodeId,
+                      },
                       {
                         onSuccess() {
                           toast.success("Visit created successfully!");
                         },
                         onError(error) {
                           console.error("Error creating visit:", error);
-                          toast.error("Failed to create visit. Please try again.");
+                          toast.error(
+                            "Failed to create visit. Please try again.",
+                          );
                         },
                       },
                     );
