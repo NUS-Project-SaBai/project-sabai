@@ -11,6 +11,7 @@ import { IoMdMenu } from "react-icons/io";
 import { LuScanFace } from "react-icons/lu";
 import { GiMedicines } from "react-icons/gi";
 import LogoTitle from "@/components/LogoTitle";
+import { paths } from "@/utils/paths";
 import SabaiLogo from "@/components/SabaiLogo";
 import VillageSelector from "@/components/VillageSelector";
 import { useClickOutside } from "@/hooks/useClickOutside";
@@ -68,23 +69,23 @@ function SidebarNavButtons() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.push("/login");
+    router.push(paths.login());
   };
 
   const navigation = [
-    { name: "Scan Face", href: "/scan-face", icon: LuScanFace },
-    { name: "Patient", href: "/patient", icon: AiOutlineUser },
-    { name: "Vitals", href: "/vitals", icon: MdMonitorHeart },
-    { name: "Vision", href: "/vision", icon: BsEyeglasses },
-    { name: "Consults", href: "/consults", icon: FaStethoscope },
+    { name: "Scan Face", href: paths.scanFace(), icon: LuScanFace },
+    { name: "Patient", href: paths.patient(), icon: AiOutlineUser },
+    { name: "Vitals", href: paths.vitals(), icon: MdMonitorHeart },
+    { name: "Vision", href: paths.vision(), icon: BsEyeglasses },
+    { name: "Consults", href: paths.consults(), icon: FaStethoscope },
     {
       name: "Medication Stock",
-      href: "/medication-stock",
+      href: paths.medicationStock(),
       icon: GiMedicines,
     },
     {
       name: "Settings",
-      href: "/settings/village-codes",
+      href: paths.settings(),
       icon: AiOutlineSetting,
     },
   ];
