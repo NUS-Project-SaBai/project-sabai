@@ -29,6 +29,11 @@ vi.mock("@/utils/trpc", () => ({
         useMutation: vi.fn(),
       },
     },
+    visitsRouter: {
+      create: {
+        useMutation: vi.fn(),
+      },
+    },
     villageCodesRouter: {
       list: {
         useQuery: vi.fn(),
@@ -55,6 +60,14 @@ describe("ScanFacePage", () => {
 
     mockTrpc.patientsRouter.create.useMutation.mockReturnValue({
       mutate: vi.fn(),
+    });
+    mockTrpc.visitsRouter.create.useMutation.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    });
+    mockTrpc.villageCodesRouter.list.useQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
     });
     mockTrpc.patientsRouter.searchPatientsByPicture.useMutation.mockReturnValue(
       {
@@ -264,7 +277,11 @@ describe("ScanFacePage", () => {
 
   it("changes the button from 'Capture' to 'Retake Photo' when button is clicked", async () => {
     const user = userEvent.setup();
-    render(<ScanFacePage />);
+    render(
+      <VillageCodeProvider>
+        <ScanFacePage />
+      </VillageCodeProvider>,
+    );
     const captureButton = screen.getByRole("button", { name: "Capture" });
     user.click(captureButton);
 
@@ -276,7 +293,11 @@ describe("ScanFacePage", () => {
 
   it("changes the image element to a video element when the 'Retake Photo' button is clicked", async () => {
     const user = userEvent.setup();
-    const { container } = render(<ScanFacePage />);
+    const { container } = render(
+      <VillageCodeProvider>
+        <ScanFacePage />
+      </VillageCodeProvider>,
+    );
     const captureButton = screen.getByRole("button", { name: "Capture" });
 
     expect(
@@ -308,7 +329,11 @@ describe("ScanFacePage", () => {
       },
     );
 
-    render(<ScanFacePage />);
+    render(
+      <VillageCodeProvider>
+        <ScanFacePage />
+      </VillageCodeProvider>,
+    );
 
     user.click(screen.getByRole("button", { name: "Capture" }));
 
@@ -328,7 +353,11 @@ describe("ScanFacePage", () => {
       },
     );
 
-    render(<ScanFacePage />);
+    render(
+      <VillageCodeProvider>
+        <ScanFacePage />
+      </VillageCodeProvider>,
+    );
 
     user.click(screen.getByRole("button", { name: "Capture" }));
 
