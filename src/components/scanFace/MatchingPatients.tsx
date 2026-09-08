@@ -107,20 +107,12 @@ export default function MatchingPatients({
                       ? "Creating..."
                       : "Create Visit"
                   }
-                  disabled={
-                    createVisitMutation.isPending || !selectedVillageCodeId
-                  }
+                  disabled={createVisitMutation.isPending}
                   onClick={() => {
-                    if (!selectedVillageCodeId) {
-                      toast.error(
-                        "Please select a village code before creating a visit.",
-                      );
-                      return;
-                    }
                     createVisitMutation.mutate(
                       {
                         patientId: patient.id,
-                        villageCodeId: selectedVillageCodeId,
+                        villageCodeId: selectedVillageCodeId!,
                       },
                       {
                         onSuccess() {
