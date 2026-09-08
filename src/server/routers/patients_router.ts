@@ -4,6 +4,7 @@ import { uploadToCloudinary } from "@/server/utils/cloudinary";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { patients, genderEnum, visits } from "@/db/schema/patients";
+import { vitals, childVitals, puberty } from "@/db/schema/vitals";
 import { villageCodes } from "@/db/schema/villageCodes";
 import serverEnv from "@/lib/envVariables";
 import { TRPCError } from "@trpc/server";
@@ -13,6 +14,7 @@ import {
   searchFaceprint,
   dataUrlToFile,
 } from "@/lib/utils/facialRecognition";
+import { calculateAge } from "@/lib/utils/patient";
 
 const cloudinaryUrlPrefix = serverEnv.CLOUDINARY_URL_PREFIX;
 
@@ -131,22 +133,45 @@ export const patientsRouter = router({
   // Create new patient
   create: protectedProcedure
     .input(
-      zfd.formData({
-        name: zfd.text(),
-        identificationNumber: zfd.text(),
-        gender: zfd.text(z.enum(genderEnum.enumValues)),
-        dateOfBirth: zfd.text(z.coerce.date()),
-        drugAllergy: zfd.text(),
-        hasPoorCard: z.boolean(),
-        hasBS2Card: z.boolean(),
-        hasSabaiCard: z.boolean(),
-        patientImage: z.string(),
-        contactNo: z.string(),
-        villageCodeId: zfd.text(z.coerce.number().int().optional()),
-      }),
+      zfd
+        .formData({
+          name: zfd.text(),
+          identificationNumber: zfd.text(),
+          gender: zfd.text(z.enum(genderEnum.enumValues)),
+          dateOfBirth: zfd.text(z.coerce.date()),
+          drugAllergy: zfd.text(),
+          hasPoorCard: z.boolean(),
+          hasBS2Card: z.boolean(),
+          hasSabaiCard: z.boolean(),
+          patientImage: z.string(),
+          contactNo: z.string(),
+          villageCodeId: zfd.text(z.coerce.number().int().optional()),
+          scoliosis: z.enum(["normal", "abnormal"]).optional(),
+          pallor: z.boolean().optional(),
+          pubarche: z.boolean().optional(),
+          pubarcheAge: z.number().int().positive().optional(),
+        })
+        .superRefine((data, ctx) => {
+          // pubarcheAge is only considered meaningful when pubarche is true
+          if (data.pubarcheAge !== undefined && data.pubarche !== true) {
+            ctx.addIssue({
+              code: "custom",
+              message: "pubarcheAge requires pubarche to be true",
+              path: ["pubarcheAge"],
+            });
+          }
+        }),
     )
     .mutation(async ({ input }) => {
-      const { villageCodeId, ...patientData } = input;
+      const {
+        villageCodeId,
+        scoliosis,
+        pallor,
+        pubarche,
+        pubarcheAge,
+        dateOfBirth,
+        ...patientData
+      } = input;
 
       if (!villageCodeId) {
         throw new TRPCError({
@@ -162,6 +187,9 @@ export const patientsRouter = router({
         });
       }
 
+      // Re-derive pediatric status server-side
+      const isPediatric = calculateAge(dateOfBirth) < 18;
+
       const patientImage: File = dataUrlToFile(
         input.patientImage,
         `${input.name}.jpg`,
@@ -174,6 +202,7 @@ export const patientsRouter = router({
 
       const newPatientInput = {
         ...patientData,
+        dateOfBirth,
         patientImagePublicId,
         rekognitionFaceId,
       };
@@ -184,11 +213,40 @@ export const patientsRouter = router({
         .returning();
 
       // Automatically create the patient's first visit
-      await db.insert(visits).values({
-        patientId: newPatient.id,
-        villageCodeId: villageCodeId,
-        date: new Date(),
-      });
+      const [newVisit] = await db
+        .insert(visits)
+        .values({
+          patientId: newPatient.id,
+          villageCodeId: villageCodeId,
+          date: new Date(),
+        })
+        .returning();
+
+      // Only persist child vitals when the patient is actually pediatric
+      // and at least one child field was provided.
+      const hasChildVitals =
+        isPediatric &&
+        (scoliosis !== undefined ||
+          pallor !== undefined ||
+          pubarche !== undefined);
+      if (hasChildVitals) {
+        await db.transaction(async (tx) => {
+          const [vitalsRecord] = await tx
+            .insert(vitals)
+            .values({ visitId: newVisit.id })
+            .returning();
+
+          await tx
+            .insert(childVitals)
+            .values({ scoliosis, pallor, vitalId: vitalsRecord.id });
+
+          if (pubarche !== undefined) {
+            await tx
+              .insert(puberty)
+              .values({ pubarche, pubarcheAge, vitalId: vitalsRecord.id });
+          }
+        });
+      }
 
       return newPatient;
     }),
