@@ -1,5 +1,7 @@
 import type { DropdownOption } from "@/components/interactive/RHF/RHFDropdown";
 
+export const CONSULT_EDIT_WINDOW_MS = 24 * 60 * 60 * 1000;
+
 /**
  * Clinical list of diagnosis categories.
  *

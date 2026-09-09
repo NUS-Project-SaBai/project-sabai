@@ -1,9 +1,43 @@
 import { z } from "zod";
 import { eq, desc, inArray } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { consults, diagnosis } from "@/db/schema/consults";
-import { createConsultInput } from "@/server/schemas/consults";
+import {
+  DIAGNOSIS_CATEGORIES,
+  CONSULT_EDIT_WINDOW_MS,
+} from "@/lib/constants/consults";
+
+/**
+ * Validation schema for a single diagnosis attached to a consult.
+ * Each diagnosis needs free-text details plus a category from the fixed
+ * clinical list.
+ */
+const diagnosisInput = z.object({
+  details: z.string().trim().min(1, "Diagnosis details are required"),
+  category: z.enum(DIAGNOSIS_CATEGORIES),
+});
+
+/**
+ * Input validation schema for creating a consult together with its diagnoses.
+ * `doctorId` is intentionally omitted — it is derived from the authenticated
+ * session, never trusted from the client.
+ */
+const consultFields = z.object({
+  pastMedicalHistory: z.string().trim().optional(),
+  consultation: z.string().trim().optional(),
+  treatmentPlan: z.string().trim().optional(),
+  remarks: z.string().trim().optional(),
+  diagnoses: z
+    .array(diagnosisInput)
+    .min(1, "At least one diagnosis is required"),
+});
+
+const createConsultInput = z.object({
+  visitId: z.number().int().positive(),
+  ...consultFields.shape,
+});
 
 export const consultsRouter = router({
   /**
@@ -60,6 +94,59 @@ export const consultsRouter = router({
         ...consult,
         diagnoses: diagnoses.filter((d) => d.consultId === consult.id),
       }));
+    }),
+
+  /**
+   * Updates an existing consult and replaces all of its diagnoses.
+   * Rejects updates on consults older than 24 hours.
+   */
+  update: protectedProcedure
+    .input(
+      z.object({ id: z.number().int().positive(), ...consultFields.shape }),
+    )
+    .mutation(async ({ input }) => {
+      const { id, diagnoses, ...fields } = input;
+
+      const [existing] = await db
+        .select({ date: consults.date })
+        .from(consults)
+        .where(eq(consults.id, id));
+
+      if (!existing) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Consult not found.",
+        });
+      }
+
+      const ageMs = Date.now() - new Date(existing.date).getTime();
+      if (ageMs > CONSULT_EDIT_WINDOW_MS) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            "This consult can no longer be edited (24-hour window has passed).",
+        });
+      }
+
+      return db.transaction(async (tx) => {
+        const [updated] = await tx
+          .update(consults)
+          .set(fields)
+          .where(eq(consults.id, id))
+          .returning();
+
+        await tx.delete(diagnosis).where(eq(diagnosis.consultId, id));
+
+        await tx.insert(diagnosis).values(
+          diagnoses.map((d) => ({
+            details: d.details,
+            category: d.category,
+            consultId: id,
+          })),
+        );
+
+        return updated;
+      });
     }),
 });
 
