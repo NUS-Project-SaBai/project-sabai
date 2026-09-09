@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { DIAGNOSIS_CATEGORIES } from "@/lib/constants/diagnosisCategories";
+import { DIAGNOSIS_CATEGORIES } from "@/lib/constants/consults";
 import { REFERRAL_CATEGORIES } from "@/lib/constants/referralCategories";
 
 export const diagnosisInput = z.object({

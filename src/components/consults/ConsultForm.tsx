@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
@@ -11,23 +12,65 @@ import { IsRequiredStar } from "@/components/IsRequiredStar";
 import {
   DIAGNOSIS_CATEGORY_OPTIONS,
   DiagnosisCategory,
-} from "@/lib/constants/diagnosisCategories";
+} from "@/lib/constants/consults";
 import { REFERRAL_CATEGORY_OPTIONS } from "@/lib/constants/referralCategories";
-import { useState } from "react";
 import OrderModal from "./OrderModal";
-import { BLANK_CONSULT, ConsultFormValues } from "@/types/consults";
+import {
+  BLANK_CONSULT,
+  ConsultFormValues,
+  ConsultWithDiagnoses,
+} from "@/types/consults";
+
+function toFormValues(consult: ConsultWithDiagnoses): ConsultFormValues {
+  return {
+    pastMedicalHistory: consult.pastMedicalHistory ?? "",
+    consultation: consult.consultation ?? "",
+    treatmentPlan: consult.treatmentPlan ?? "",
+    remarks: consult.remarks ?? "",
+    diagnoses:
+      consult.diagnoses.length > 0
+        ? consult.diagnoses.map((d) => ({
+            details: d.details,
+            category: d.category ?? "",
+          }))
+        : [{ details: "", category: "" }],
+    referredFor: "Not Referred",
+    referralNotes: "",
+    orders: [],
+  };
+}
+
+type ConsultFormProps = {
+  visitId: number;
+  editingConsult?: ConsultWithDiagnoses | null;
+  onCancelEdit?: () => void;
+};
 
 /**
  * The consultation form for a single visit.
  *
  * @param visitId - The visit this consult belongs to.
+ * @param editingConsult - When set, the form edits this consult instead of creating one.
+ * @param onCancelEdit - Called when editing is cancelled or the update succeeds.
  */
-export function ConsultForm({ visitId }: { visitId: number }) {
+export function ConsultForm({
+  visitId,
+  editingConsult,
+  onCancelEdit,
+}: ConsultFormProps) {
+  const isEditing = !!editingConsult;
+
   const methods = useForm<ConsultFormValues>({
     resolver: zodResolver(consultFormSchema),
-    defaultValues: BLANK_CONSULT,
+    defaultValues: editingConsult
+      ? toFormValues(editingConsult)
+      : BLANK_CONSULT,
   });
-  const { control, handleSubmit, watch } = methods;
+  const { control, handleSubmit, watch, reset } = methods;
+
+  useEffect(() => {
+    reset(editingConsult ? toFormValues(editingConsult) : BLANK_CONSULT);
+  }, [editingConsult, reset]);
 
   const referredFor = watch("referredFor");
   const showReferralNotes = referredFor !== "Not Referred";
@@ -54,6 +97,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
 
   const utils = trpc.useUtils();
   const createConsult = trpc.consultsRouter.create.useMutation();
+  const updateConsult = trpc.consultsRouter.update.useMutation();
   const createReferral = trpc.referralRouter.create.useMutation();
   const createOrder = trpc.ordersRouter.create.useMutation();
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -62,21 +106,41 @@ export function ConsultForm({ visitId }: { visitId: number }) {
     toast.error("Please fill in all required fields before saving.");
 
   const onSubmit = async (data: ConsultFormValues) => {
+    // Trimming and required-field checks are handled by consultFormSchema.
+    const shared = {
+      pastMedicalHistory: data.pastMedicalHistory || undefined,
+      consultation: data.consultation || undefined,
+      treatmentPlan: data.treatmentPlan || undefined,
+      remarks: data.remarks || undefined,
+      diagnoses: data.diagnoses.map((d) => ({
+        details: d.details,
+        category: d.category as DiagnosisCategory,
+      })),
+    };
+
+    // Editing only updates the consult and its diagnoses; orders and referrals
+    // are not editable here.
+    if (isEditing && editingConsult) {
+      updateConsult.mutate(
+        { id: editingConsult.id, ...shared },
+        {
+          onSuccess: () => {
+            utils.consultsRouter.getByVisitId.invalidate({ visitId });
+            toast.success("Consult updated successfully!");
+            onCancelEdit?.();
+          },
+          onError: (err) =>
+            toast.error(err.message ?? "Failed to update consult."),
+        },
+      );
+      return;
+    }
+
     setIsSaving(true);
 
     let consult;
     try {
-      consult = await createConsult.mutateAsync({
-        visitId,
-        pastMedicalHistory: data.pastMedicalHistory || undefined,
-        consultation: data.consultation || undefined,
-        treatmentPlan: data.treatmentPlan || undefined,
-        remarks: data.remarks || undefined,
-        diagnoses: data.diagnoses.map((d) => ({
-          details: d.details,
-          category: d.category as DiagnosisCategory,
-        })),
-      });
+      consult = await createConsult.mutateAsync({ visitId, ...shared });
     } catch {
       setIsSaving(false);
       toast.error("Failed to save consult.");
@@ -133,6 +197,11 @@ export function ConsultForm({ visitId }: { visitId: number }) {
     setIsSaving(false);
   };
 
+  const handleCancel = () => {
+    reset(BLANK_CONSULT);
+    onCancelEdit?.();
+  };
+
   return (
     <FormProvider {...methods}>
       {orderModalIsOpen && (
@@ -144,7 +213,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
       )}
       <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-8">
         <h2 className="text-lg font-semibold text-slate-900">
-          Doctor&apos;s Consult Form
+          {isEditing ? "Edit Consult" : "Doctor's Consult Form"}
         </h2>
 
         {/* History & Consultation */}
@@ -235,76 +304,93 @@ export function ConsultForm({ visitId }: { visitId: number }) {
         </section>
 
         {/* Orders */}
-        <section className="space-y-4">
-          <div className="flex items-center gap-1">
-            <h3 className="text-sm font-semibold text-slate-700">Orders</h3>
-          </div>
-
-          <Button
-            title="Add Order"
-            colour="emerald"
-            variant="filled"
-            onClick={() => setOrderModalIsOpen(true)}
-            className="w-full"
-          />
-
-          {orderFields.map((field, index) => (
-            <div
-              key={field.id}
-              className="flex items-start justify-between gap-4 rounded-lg border border-slate-200 p-4"
-            >
-              <div className="space-y-1">
-                <p className="text-sm font-semibold text-slate-700">
-                  {field.activeIngredientName}
-                </p>
-                <p className="text-sm text-slate-600">
-                  Quantity: {field.quantity}
-                </p>
-                <p className="text-sm text-slate-600">
-                  {field.dosageInstructions}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => removeOrder(index)}
-                title="Remove order"
-                className="inline-flex items-center gap-1 rounded p-1 text-sm text-red-600 transition hover:bg-red-50"
-              >
-                <HiOutlineTrash className="h-4 w-4" />
-                Remove
-              </button>
+        {!isEditing && (
+          <section className="space-y-4">
+            <div className="flex items-center gap-1">
+              <h3 className="text-sm font-semibold text-slate-700">Orders</h3>
             </div>
-          ))}
-        </section>
+
+            <Button
+              title="Add Order"
+              colour="emerald"
+              variant="filled"
+              onClick={() => setOrderModalIsOpen(true)}
+              className="w-full"
+            />
+
+            {orderFields.map((field, index) => (
+              <div
+                key={field.id}
+                className="flex items-start justify-between gap-4 rounded-lg border border-slate-200 p-4"
+              >
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-slate-700">
+                    {field.activeIngredientName}
+                  </p>
+                  <p className="text-sm text-slate-600">
+                    Quantity: {field.quantity}
+                  </p>
+                  <p className="text-sm text-slate-600">
+                    {field.dosageInstructions}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeOrder(index)}
+                  title="Remove order"
+                  className="inline-flex items-center gap-1 rounded p-1 text-sm text-red-600 transition hover:bg-red-50"
+                >
+                  <HiOutlineTrash className="h-4 w-4" />
+                  Remove
+                </button>
+              </div>
+            ))}
+          </section>
+        )}
 
         {/* Referral */}
-        <section className="space-y-4">
-          <h3 className="text-sm font-semibold text-slate-700">Referral</h3>
-          <RHFDropdown
-            name="referredFor"
-            label="Referred for"
-            dropdownOptions={REFERRAL_CATEGORY_OPTIONS}
-            placeholder="Not Referred"
-          />
-          {showReferralNotes && (
-            <RHFTextArea
-              name="referralNotes"
-              label="Referral Notes"
-              rows={3}
-              placeholder="Type your referral notes here..."
+        {!isEditing && (
+          <section className="space-y-4">
+            <h3 className="text-sm font-semibold text-slate-700">Referral</h3>
+            <RHFDropdown
+              name="referredFor"
+              label="Referred for"
+              dropdownOptions={REFERRAL_CATEGORY_OPTIONS}
+              placeholder="Not Referred"
             />
-          )}
-        </section>
+            {showReferralNotes && (
+              <RHFTextArea
+                name="referralNotes"
+                label="Referral Notes"
+                rows={3}
+                placeholder="Type your referral notes here..."
+              />
+            )}
+          </section>
+        )}
 
         {/* Actions */}
         <div className="flex flex-col gap-4 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-end">
+          {isEditing && (
+            <div className="w-full sm:w-44">
+              <Button
+                type="button"
+                title="Cancel"
+                colour="red"
+                variant="outline"
+                onClick={handleCancel}
+              />
+            </div>
+          )}
           <div className="w-full sm:w-44">
             <Button
               type="submit"
-              title="Save Consult"
+              title={isEditing ? "Save Changes" : "Save Consult"}
               colour="emerald"
               variant="filled"
-              loading={isSaving || createReferral.isPending}
+              loading={
+                isSaving || createReferral.isPending || updateConsult.isPending
+              }
             />
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { RouterOutput } from "@/utils/trpc";
 import { consultFormSchema } from "@/server/schemas/consults";
 
 export type ConsultFormValues = z.infer<typeof consultFormSchema>;
@@ -15,3 +16,6 @@ export const BLANK_CONSULT: ConsultFormValues = {
   referralNotes: "",
   orders: [],
 };
+
+export type ConsultWithDiagnoses =
+  RouterOutput["consultsRouter"]["getByVisitId"][number];
