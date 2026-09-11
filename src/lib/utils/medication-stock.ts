@@ -1,4 +1,5 @@
 import { SplitPayload } from "@/types/medication-stock";
+import { MAX_SPLITS } from "@/lib/constants/medicationStock";
 
 function splitKey(split: SplitPayload) {
   return JSON.stringify([
@@ -38,7 +39,7 @@ export function validateSplits(splits: SplitPayload[], parentQty: number) {
     };
   }
 
-  if (splits.length > 10) {
+  if (splits.length > MAX_SPLITS) {
     return {
       success: false,
       message: "Please do not exceed 10 splits!",

@@ -12,6 +12,7 @@ import {
 import { TRPCError } from "@trpc/server";
 import { splitSchema } from "@/types/medication-stock";
 import { validateSplits } from "@/lib/utils/medication-stock";
+import { MAX_SPLITS, MIN_SPLITS } from "@/lib/constants/medicationStock";
 
 export const medicationStockRouter = router({
   list: protectedProcedure.query(async () => {
@@ -117,7 +118,7 @@ export const medicationStockRouter = router({
     .input(
       z.object({
         parentId: zfd.numeric(z.number().int()),
-        splits: z.array(splitSchema).min(2).max(10),
+        splits: z.array(splitSchema).min(MIN_SPLITS).max(MAX_SPLITS),
       }),
     )
     .mutation(async ({ input }) => {
