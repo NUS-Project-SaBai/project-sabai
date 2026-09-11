@@ -6,6 +6,9 @@ import {
 import { Button } from "@/components/interactive/Button/Button";
 import { useState } from "react";
 import { medicationStatusValues } from "@/db/schema/pharmacy";
+import { trpc } from "@/utils/trpc";
+import toast from "react-hot-toast";
+import { validateSplits } from "@/lib/utils/medication-stock";
 
 export default function SplittingModal({
   onClose,
@@ -22,6 +25,20 @@ export default function SplittingModal({
     setSplits(splits.filter((item, index) => index !== remove));
   }
 
+  const utils = trpc.useUtils();
+
+  const splitMutation = trpc.medicationStockRouter.createSplits.useMutation({
+    onSuccess: () => {
+      toast.success("Successfully split!");
+      utils.medicationStockRouter.listWithBrandAndActiveIngredient.invalidate();
+      onClose();
+    },
+    onError: (err) => {
+      console.error(err);
+      toast.error(err.message ?? "An error occurred while splitting stock.");
+    },
+  });
+
   function updateSplit(index: number, patch: object) {
     const newSplits = splits.map((item, itemIndex) =>
       itemIndex === index
@@ -33,6 +50,24 @@ export default function SplittingModal({
     );
 
     setSplits(newSplits);
+  }
+
+  function handleSubmit() {
+    const payload = splits.map((split) => ({
+      location: split.location,
+      stockStatus: split.stockStatus,
+      quantity: split.quantity,
+      remarks: split.remarks ?? undefined,
+    }));
+
+    const validationResults = validateSplits(payload, stock.quantity);
+
+    if (validationResults.success) {
+      splitMutation.mutate({ splits: payload, parentId: stock.id });
+      return;
+    }
+
+    toast.error(validationResults.message);
   }
 
   return (
@@ -61,46 +96,82 @@ export default function SplittingModal({
             <td>Status:</td>
             <td>{stock.stockStatus}</td>
           </tr>
+          <tr>
+            <td>Remarks:</td>
+            <td>{stock.remarks}</td>
+          </tr>
         </tbody>
       </table>
       <h3 className="text-l font-bold mb-4 mt-4">Child stock details</h3>
       {splits.length === 0 && "No splits added, add a split to begin."}
-      {splits.map((split, index) => (
-        <div key={`${split.id}-${index}`}>
-          <div className="flex justify-between">
-            <h3>Split {index + 1}</h3>
-            <button onClick={() => removeSplit(index)}>-</button>
-          </div>
-          <div className="flex flex-row justify-evenly">
-            <input
-              type="text"
-              value={split.location ? split.location : ""}
-              onChange={(e) => updateSplit(index, { location: e.target.value })}
-            ></input>
-            <select
-              value={split.stockStatus!}
-              onChange={(e) => {
-                updateSplit(index, {
-                  stockStatus: e.target.value as StockStatus,
-                });
-              }}
-            >
-              {medicationStatusValues.map((status) => (
-                <option key={status}>{status}</option>
-              ))}
-            </select>
-            <input
-              type="number"
-              value={split.quantity}
-              min="1"
-              onChange={(e) =>
-                updateSplit(index, { quantity: parseInt(e.target.value) })
-              }
-            />
-          </div>
-          <hr></hr>
-        </div>
-      ))}
+      {splits.length > 0 && (
+        <table>
+          <thead className="text-center">
+            <tr>
+              <th>#</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Qty</th>
+              <th>Remarks</th>
+              <th className="pl-2">-</th>
+            </tr>
+          </thead>
+          <tbody>
+            {splits.map((split, index) => (
+              <tr key={`${split.id}-${index}`}>
+                <td>{index + 1}</td>
+                <td>
+                  <input
+                    type="text"
+                    value={split.location ? split.location : ""}
+                    onChange={(e) =>
+                      updateSplit(index, { location: e.target.value })
+                    }
+                    className="text-right"
+                  ></input>
+                </td>
+                <td>
+                  <select
+                    value={split.stockStatus!}
+                    onChange={(e) => {
+                      updateSplit(index, {
+                        stockStatus: e.target.value as StockStatus,
+                      });
+                    }}
+                  >
+                    {medicationStatusValues.map((status) => (
+                      <option key={status}>{status}</option>
+                    ))}
+                  </select>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={split.quantity}
+                    min="1"
+                    onChange={(e) =>
+                      updateSplit(index, { quantity: parseInt(e.target.value) })
+                    }
+                    className="text-right"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={split.remarks ? split.remarks : ""}
+                    onChange={(e) => {
+                      updateSplit(index, { remarks: e.target.value });
+                    }}
+                  />
+                </td>
+                <td className="pl-2">
+                  <button onClick={() => removeSplit(index)}>-</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       <Button
         title="Add Split"
         colour="indigo"
@@ -110,8 +181,8 @@ export default function SplittingModal({
       <Button
         title="Confirm"
         colour="emerald"
-        onClick={() => console.log(splits)}
-        // TODO(separate PR): validate parent qty === sum(all child qty), then bulk mutate the splits
+        onClick={handleSubmit}
+        disabled={splitMutation.isPending}
       />
     </Modal>
   );
