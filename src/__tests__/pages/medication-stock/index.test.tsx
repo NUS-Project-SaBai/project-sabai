@@ -879,7 +879,7 @@ describe("MedicationStockPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Confirm" }));
 
-    expect(createMockMutation).not.toHaveBeenCalled();
+    expect(createSplitsMockMutation).not.toHaveBeenCalled();
   });
 
   it("creates new child stock entries in the table when the split succeeds", async () => {
