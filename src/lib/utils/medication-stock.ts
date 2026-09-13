@@ -11,16 +11,7 @@ function splitKey(split: SplitPayload) {
 }
 
 function areSplitsDistinct(splits: SplitPayload[]) {
-  const seenKeys = new Set<string>();
-  for (const split of splits) {
-    const key = splitKey(split);
-    if (seenKeys.has(key)) {
-      return false;
-    }
-    seenKeys.add(key);
-  }
-
-  return true;
+  return new Set(splits.map(splitKey)).size == splits.length;
 }
 
 export function validateSplits(splits: SplitPayload[], parentQty: number) {
