@@ -65,7 +65,6 @@ vi.mock("@/utils/trpc", () => ({
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockTrpc = trpc as any;
 
-let createMockMutation: ReturnType<typeof vi.fn>;
 let updateMockMutation: ReturnType<typeof vi.fn>;
 let createSplitsMockMutation: ReturnType<typeof vi.fn>;
 
@@ -83,7 +82,6 @@ describe("MedicationStockPage", () => {
     vi.clearAllMocks();
     toast.removeAll();
 
-    createMockMutation = vi.fn();
     updateMockMutation = vi.fn();
     createSplitsMockMutation = vi.fn();
 
