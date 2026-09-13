@@ -665,6 +665,42 @@ describe("MedicationStockPage", () => {
 
   // Stock splitting
 
+  // opens the splitting modal and adds 2 distinct splits whose quantities add
+  // up to the parent stock's quantity
+  async function addValidSplits(user: ReturnType<typeof userEvent.setup>) {
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    const dialog = screen.getByRole("dialog");
+    const childSplitsTable = within(dialog).getAllByRole("table")[1];
+
+    const locationInputs = within(childSplitsTable).getAllByDisplayValue(
+      MOCK_STOCK[0].location,
+    );
+    const quantityInputs = within(childSplitsTable).getAllByDisplayValue(
+      String(MOCK_STOCK[0].quantity),
+    );
+
+    const halfQty = Math.floor(MOCK_STOCK[0].quantity / 2);
+    const remainingQty = MOCK_STOCK[0].quantity - halfQty;
+
+    // split 1 updates
+    await user.clear(locationInputs[0]);
+    await user.type(locationInputs[0], "Location A");
+    await user.clear(quantityInputs[0]);
+    await user.type(quantityInputs[0], String(halfQty));
+
+    // split 2 updates
+    await user.clear(locationInputs[1]);
+    await user.type(locationInputs[1], "Location B");
+    await user.clear(quantityInputs[1]);
+    await user.type(quantityInputs[1], String(remainingQty));
+
+    return { halfQty, remainingQty };
+  }
+
   it("opens a 'Split Stock' modal with the parent stock details, 'Add Split' button, and 'Confirm' button when the split button is clicked", async () => {
     const user = userEvent.setup();
 
@@ -904,36 +940,7 @@ describe("MedicationStockPage", () => {
     );
 
     renderPage();
-    await user.click(await screen.findByRole("button", { name: "Split" }));
-
-    await user.click(await screen.findByRole("button", { name: "Add Split" }));
-    await user.click(await screen.findByRole("button", { name: "Add Split" }));
-
-    const dialog = screen.getByRole("dialog");
-    const childSplitsTable = within(dialog).getAllByRole("table")[1];
-
-    // distinct inputs, total quantity matches parent quantity
-    const locationInputs = within(childSplitsTable).getAllByDisplayValue(
-      MOCK_STOCK[0].location,
-    );
-    const quantityInputs = within(childSplitsTable).getAllByDisplayValue(
-      String(MOCK_STOCK[0].quantity),
-    );
-
-    const halfQty = Math.floor(MOCK_STOCK[0].quantity / 2);
-    const remainingQty = MOCK_STOCK[0].quantity - halfQty;
-
-    // split 1 updates
-    await user.clear(locationInputs[0]);
-    await user.type(locationInputs[0], "Location A");
-    await user.clear(quantityInputs[0]);
-    await user.type(quantityInputs[0], String(halfQty));
-
-    // split 2 updates
-    await user.clear(locationInputs[1]);
-    await user.type(locationInputs[1], "Location B");
-    await user.clear(quantityInputs[1]);
-    await user.type(quantityInputs[1], String(remainingQty));
+    const { halfQty, remainingQty } = await addValidSplits(user);
 
     await user.click(screen.getByRole("button", { name: "Confirm" }));
 
@@ -958,5 +965,44 @@ describe("MedicationStockPage", () => {
     await waitFor(() => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
+  });
+
+  it("shows an error toast and keeps the modal open if an error occurs during the split", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    const mockError = new Error("Mock test error");
+
+    mockTrpc.medicationStockRouter.createSplits.useMutation.mockImplementation(
+      ({ onError }: { onError: (err: Error) => void }) => {
+        createSplitsMockMutation.mockImplementation(() => {
+          onError?.(mockError);
+        });
+
+        return {
+          mutate: createSplitsMockMutation,
+          isPending: false,
+        };
+      },
+    );
+
+    renderPage();
+    await addValidSplits(user);
+
+    await user.click(screen.getByRole("button", { name: "Confirm" }));
+
+    expect(createSplitsMockMutation).toHaveBeenCalled();
+
+    const toastEl = screen.getByRole("status");
+    expect(toastEl).toBeInTheDocument();
+    expect(toastEl).toHaveTextContent(mockError.message);
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 });
