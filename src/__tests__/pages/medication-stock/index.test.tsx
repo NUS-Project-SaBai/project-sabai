@@ -880,13 +880,26 @@ describe("MedicationStockPage", () => {
     expect(createSplitsMockMutation).not.toHaveBeenCalled();
   });
 
-  it("creates new child stock entries in the table when the split succeeds", async () => {
+  it("creates new child stock entries in the table and closes the modal when the split succeeds", async () => {
     const user = userEvent.setup();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
         data: MOCK_STOCK,
         isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationStockRouter.createSplits.useMutation.mockImplementation(
+      ({ onSuccess }: { onSuccess: () => void }) => {
+        createSplitsMockMutation.mockImplementation(() => {
+          onSuccess?.();
+        });
+
+        return {
+          mutate: createSplitsMockMutation,
+          isPending: false,
+        };
       },
     );
 
@@ -940,6 +953,10 @@ describe("MedicationStockPage", () => {
           remarks: MOCK_STOCK[0].remarks ?? undefined,
         },
       ],
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
   });
 });
