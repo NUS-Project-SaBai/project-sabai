@@ -278,11 +278,11 @@ describe("MedicationActiveIngredientsPage", () => {
     await user.clear(fallBelowInput);
     await user.type(fallBelowInput, "70000");
 
-    await user.clear(nameInput!);
-    await user.type(nameInput!, "valid medication name");
+    await user.clear(nameInput);
+    await user.type(nameInput, "valid medication name");
 
-    await user.clear(unitInput!);
-    await user.type(unitInput!, "bottles");
+    await user.clear(unitInput);
+    await user.type(unitInput, "bottles");
 
     expect((fallBelowInput as HTMLInputElement).valueAsNumber).toBe(70000);
     expect(nameInput.value).toBe("valid medication name");
