@@ -28,6 +28,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+
       #  CI boots the full local Supabase stack instead of mocking the database.
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1

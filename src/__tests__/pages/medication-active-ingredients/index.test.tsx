@@ -270,21 +270,23 @@ describe("MedicationActiveIngredientsPage", () => {
     expect(screen.getByRole("spinbutton")).toBeInTheDocument();
 
     const fallBelowInput = screen.getByRole("spinbutton");
-    const nameInput = container.querySelector("#name");
-    const unitInput = container.querySelector("#unitOfMeasurement");
+    const nameInput = container.querySelector("#name") as HTMLInputElement;
+    const unitInput = container.querySelector(
+      "#unitOfMeasurement",
+    ) as HTMLInputElement;
 
     await user.clear(fallBelowInput);
     await user.type(fallBelowInput, "70000");
 
-    await user.clear(nameInput!);
-    await user.type(nameInput!, "valid medication name");
+    await user.clear(nameInput);
+    await user.type(nameInput, "valid medication name");
 
-    await user.clear(unitInput!);
-    await user.type(unitInput!, "bottles");
+    await user.clear(unitInput);
+    await user.type(unitInput, "bottles");
 
     expect((fallBelowInput as HTMLInputElement).valueAsNumber).toBe(70000);
-    expect(nameInput?.value).toBe("valid medication name");
-    expect(unitInput?.value).toBe("bottles");
+    expect(nameInput.value).toBe("valid medication name");
+    expect(unitInput.value).toBe("bottles");
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 
