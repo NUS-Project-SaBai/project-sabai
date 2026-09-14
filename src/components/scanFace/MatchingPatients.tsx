@@ -8,6 +8,8 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { Mode } from "@/types/scan";
 import { Button } from "@/components/interactive/Button/Button";
 import { MdPersonSearch } from "react-icons/md";
+import { useVillageCode } from "@/lib/context/VillageCodeContext";
+import toast from "react-hot-toast";
 
 export default function MatchingPatients({
   imgDetails,
@@ -16,8 +18,10 @@ export default function MatchingPatients({
   imgDetails: string;
   setMode: React.Dispatch<React.SetStateAction<Mode>>;
 }) {
+  const { selectedVillageCodeId } = useVillageCode();
   const searchPatientsByPictureQuery =
     trpc.patientsRouter.searchPatientsByPicture.useMutation();
+  const createVisitMutation = trpc.visitsRouter.create.useMutation();
   useEffect(() => {
     searchPatientsByPictureQuery.mutate({ picture: imgDetails });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -96,8 +100,34 @@ export default function MatchingPatients({
                 </div>
               </TableCell>
               <TableCell>
-                {/* Placeholder for 'create new visit' button */}
-                Create visit
+                <Button
+                  colour="emerald"
+                  title={
+                    createVisitMutation.isPending
+                      ? "Creating..."
+                      : "Create Visit"
+                  }
+                  disabled={createVisitMutation.isPending}
+                  onClick={() => {
+                    createVisitMutation.mutate(
+                      {
+                        patientId: patient.id,
+                        villageCodeId: selectedVillageCodeId!,
+                      },
+                      {
+                        onSuccess() {
+                          toast.success("Visit created successfully!");
+                        },
+                        onError(error) {
+                          console.error("Error creating visit:", error);
+                          toast.error(
+                            "Failed to create visit. Please try again.",
+                          );
+                        },
+                      },
+                    );
+                  }}
+                />
               </TableCell>
             </TableRow>
           ))}
