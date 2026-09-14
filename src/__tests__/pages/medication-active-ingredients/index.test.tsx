@@ -285,8 +285,8 @@ describe("MedicationActiveIngredientsPage", () => {
     await user.type(unitInput!, "bottles");
 
     expect((fallBelowInput as HTMLInputElement).valueAsNumber).toBe(70000);
-    expect(nameInput?.value).toBe("valid medication name");
-    expect(unitInput?.value).toBe("bottles");
+    expect(nameInput.value).toBe("valid medication name");
+    expect(unitInput.value).toBe("bottles");
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 
