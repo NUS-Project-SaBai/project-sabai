@@ -42,7 +42,7 @@ jobs:
         id: docker-cache
         with:
           path: /tmp/supabase-images.tar.gz
-          key: supabase-docker-${{ runner.os }}-${{ hashFiles('supabase/config.toml') }}
+          key: supabase-docker-v2-${{ runner.os }}-${{ hashFiles('supabase/config.toml') }}
 
       - name: Load cached Docker images
         if: steps.docker-cache.outputs.cache-hit == 'true'
@@ -55,7 +55,7 @@ jobs:
       - name: Save Supabase Docker images
         if: steps.docker-cache.outputs.cache-hit != 'true'
         run: |
-          docker images --format '{{.Repository}}:{{.Tag}}' | grep 'ecr.aws/supabase' | xargs docker save | gzip > /tmp/supabase-images.tar.gz
+          docker images --format '{{.Repository}}:{{.Tag}}' | grep '/supabase/' | xargs docker save | gzip > /tmp/supabase-images.tar.gz
 
       # Map the generated credentials onto the env var names that src/lib/envVariables.ts validates.
       # The Cloudinary/AWS vars aren't exercised by the tests but must be non-empty
