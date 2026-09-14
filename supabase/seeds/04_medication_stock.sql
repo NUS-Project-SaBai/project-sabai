@@ -14,3 +14,5 @@ INSERT INTO medication_stock (
 (4, 120, '2026-03-20 00:00:00', 'Emergency Room Storage', 'active'),
 (5, 300, '2027-01-10 00:00:00', 'Diabetes Clinic Storage', 'active'),
 (6, 90,  '2026-08-18 00:00:00', 'Cardiology Unit Cabinet', 'active');
+
+SELECT set_config('app.bypass_triggers', 'false', false);
