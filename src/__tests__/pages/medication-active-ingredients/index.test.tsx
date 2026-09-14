@@ -270,8 +270,8 @@ describe("MedicationActiveIngredientsPage", () => {
     expect(screen.getByRole("spinbutton")).toBeInTheDocument();
 
     const fallBelowInput = screen.getByRole("spinbutton");
-    const nameInput = container.querySelector("#name");
-    const unitInput = container.querySelector("#unitOfMeasurement");
+    const nameInput = container.querySelector("#name") as HTMLInputElement;
+    const unitInput = container.querySelector("#unitOfMeasurement") as HTMLInputElement;
 
     await user.clear(fallBelowInput);
     await user.type(fallBelowInput, "70000");
