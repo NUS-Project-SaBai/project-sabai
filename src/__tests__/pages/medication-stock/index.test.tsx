@@ -7,6 +7,7 @@ import {
   screen,
   within,
   fireEvent,
+  waitFor,
 } from "@testing-library/react";
 import MedicationStockBasePage from "@/pages/medication-stock";
 import {
@@ -49,6 +50,9 @@ vi.mock("@/utils/trpc", () => ({
       update: {
         useMutation: vi.fn(),
       },
+      createSplits: {
+        useMutation: vi.fn(),
+      },
     },
     medicationBrandRouter: {
       listWithActiveIngredientName: {
@@ -61,10 +65,25 @@ vi.mock("@/utils/trpc", () => ({
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockTrpc = trpc as any;
 
+let updateMockMutation: ReturnType<typeof vi.fn>;
+let createSplitsMockMutation: ReturnType<typeof vi.fn>;
+
+function renderPage() {
+  return render(
+    <>
+      <MedicationStockBasePage />
+      <Toaster />
+    </>,
+  );
+}
+
 describe("MedicationStockPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     toast.removeAll();
+
+    updateMockMutation = vi.fn();
+    createSplitsMockMutation = vi.fn();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockImplementation(
       () => ({
@@ -73,8 +92,14 @@ describe("MedicationStockPage", () => {
       }),
     );
 
+    mockTrpc.medicationStockRouter.createSplits.useMutation.mockReturnValue({
+      mutate: createSplitsMockMutation,
+      isPending: false,
+    });
+
     mockTrpc.medicationStockRouter.update.useMutation.mockReturnValue({
-      mutate: vi.fn(),
+      mutate: updateMockMutation,
+      isLoading: false,
     });
   });
 
@@ -83,7 +108,7 @@ describe("MedicationStockPage", () => {
   });
 
   it("renders page title and breadcrumbs", () => {
-    render(<MedicationStockBasePage />);
+    renderPage();
     expect(
       screen.getByRole("heading", { name: "Medication Stock" }),
     ).toBeInTheDocument();
@@ -99,7 +124,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
+    renderPage();
 
     assertLoadingSpinner("Loading stock...");
   });
@@ -112,8 +137,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     expect(
       screen.getByText(
         "No stock found. Seed the database or add a new record.",
@@ -129,8 +153,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     const table = screen.getByRole("table");
     expect(table).toBeInTheDocument();
     assertTableContents(table, [
@@ -177,12 +200,7 @@ describe("MedicationStockPage", () => {
     mockTrpc.medicationStockRouter.create.useMutation.mockReturnValue({
       isPending: false,
     });
-
-    render(
-      <>
-        <MedicationStockBasePage />
-      </>,
-    );
+    renderPage();
 
     await user.click(screen.getByRole("button", { name: "Add Stock" }));
 
@@ -203,8 +221,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     // test cancel button
     await user.click(screen.getByRole("button", { name: "Add Stock" }));
     const dialog = await screen.findByRole("dialog");
@@ -253,12 +270,7 @@ describe("MedicationStockPage", () => {
       isPending: false,
     });
 
-    render(
-      <>
-        <MedicationStockBasePage />
-      </>,
-    );
-
+    renderPage();
     await user.click(screen.getByRole("button", { name: "Add Stock" }));
 
     const dialog = await screen.findByRole("dialog");
@@ -341,12 +353,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    render(
-      <>
-        <MedicationStockBasePage />
-        <Toaster />
-      </>,
-    );
+    renderPage();
 
     await user.click(screen.getByRole("button", { name: "Add Stock" }));
 
@@ -408,8 +415,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    const screen = render(<MedicationStockBasePage />);
-
+    const screen = renderPage();
     expect(document.querySelectorAll("input").length).toBe(0);
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
@@ -434,13 +440,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    const screen = render(
-      <>
-        <Toaster />
-        <MedicationStockBasePage />
-      </>,
-    );
-
+    const screen = renderPage();
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
     await user.click(screen.getByRole("button", { name: "Save" }));
@@ -470,12 +470,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    const screen = render(
-      <>
-        <Toaster />
-        <MedicationStockBasePage />
-      </>,
-    );
+    const screen = renderPage();
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
@@ -510,12 +505,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    const screen = render(
-      <>
-        <Toaster />
-        <MedicationStockBasePage />
-      </>,
-    );
+    const screen = renderPage();
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
@@ -550,12 +540,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    const screen = render(
-      <>
-        <Toaster />
-        <MedicationStockBasePage />
-      </>,
-    );
+    const screen = renderPage();
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
@@ -599,12 +584,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    const screen = render(
-      <>
-        <Toaster />
-        <MedicationStockBasePage />
-      </>,
-    );
+    const screen = renderPage();
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
@@ -623,7 +603,6 @@ describe("MedicationStockPage", () => {
 
   it("does not include locked fields in mutation payload", async () => {
     const user = userEvent.setup();
-    const mutateMock = vi.fn();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
@@ -632,13 +611,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    mockTrpc.medicationStockRouter.update.useMutation.mockReturnValue({
-      mutate: mutateMock,
-      isLoading: false,
-    });
-
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
     const locationInput = document.querySelector('input[name="location"]');
@@ -646,9 +619,9 @@ describe("MedicationStockPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 
-    expect(mutateMock).toHaveBeenCalledTimes(1);
+    expect(updateMockMutation).toHaveBeenCalledTimes(1);
 
-    const payload = mutateMock.mock.calls[0][0];
+    const payload = updateMockMutation.mock.calls[0][0];
 
     expect(payload).toHaveProperty("id", MOCK_STOCK[0].id);
     expect(payload).toHaveProperty("location", "Shelf 1 New Shelf");
@@ -662,7 +635,6 @@ describe("MedicationStockPage", () => {
 
   it("discards edits and resets the dirty state when Cancel is clicked", async () => {
     const user = userEvent.setup();
-    const mutateMock = vi.fn();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
@@ -671,13 +643,7 @@ describe("MedicationStockPage", () => {
       },
     );
 
-    mockTrpc.medicationStockRouter.update.useMutation.mockReturnValue({
-      mutate: mutateMock,
-      isLoading: false,
-    });
-
-    render(<MedicationStockBasePage />);
-
+    renderPage();
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
     const locationInput = document.querySelector(
@@ -694,6 +660,349 @@ describe("MedicationStockPage", () => {
       document.querySelector('input[name="location"]'),
     ).not.toBeInTheDocument();
     expect(screen.getByText(MOCK_STOCK[0].location)).toBeInTheDocument();
-    expect(mutateMock).not.toHaveBeenCalled();
+    expect(updateMockMutation).not.toHaveBeenCalled();
+  });
+
+  // Stock splitting
+
+  // opens the splitting modal and adds 2 distinct splits whose quantities add
+  // up to the parent stock's quantity
+  async function addValidSplits(user: ReturnType<typeof userEvent.setup>) {
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    const dialog = screen.getByRole("dialog");
+    const childSplitsTable = within(dialog).getAllByRole("table")[1];
+
+    const locationInputs = within(childSplitsTable).getAllByDisplayValue(
+      MOCK_STOCK[0].location,
+    );
+    const quantityInputs = within(childSplitsTable).getAllByDisplayValue(
+      String(MOCK_STOCK[0].quantity),
+    );
+
+    const halfQty = Math.floor(MOCK_STOCK[0].quantity / 2);
+    const remainingQty = MOCK_STOCK[0].quantity - halfQty;
+
+    // split 1 updates
+    await user.clear(locationInputs[0]);
+    await user.type(locationInputs[0], "Location A");
+    await user.clear(quantityInputs[0]);
+    await user.type(quantityInputs[0], String(halfQty));
+
+    // split 2 updates
+    await user.clear(locationInputs[1]);
+    await user.type(locationInputs[1], "Location B");
+    await user.clear(quantityInputs[1]);
+    await user.type(quantityInputs[1], String(remainingQty));
+
+    return { halfQty, remainingQty };
+  }
+
+  it("opens a 'Split Stock' modal with the parent stock details, 'Add Split' button, and 'Confirm' button when the split button is clicked", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+    renderPage();
+
+    await user.click(screen.getByRole("button", { name: "Split" }));
+
+    await waitFor(() => {
+      const dialog = screen.getByRole("dialog");
+      expect(screen.getByText("Split Stock")).toBeInTheDocument();
+      expect(screen.getByText("Parent stock details")).toBeInTheDocument();
+      const parentStockTable = within(dialog).getByRole("table");
+
+      // expect parent stock details to be in table format
+      assertTableContents(parentStockTable, [
+        ["Location:", MOCK_STOCK[0].location],
+        ["Active Ingredient", MOCK_STOCK[0].medicationActiveIngredientName],
+        ["Brand Name", MOCK_STOCK[0].medicationBrandName],
+        ["Quantity", String(MOCK_STOCK[0].quantity)],
+        ["Status:", MOCK_STOCK[0].stockStatus],
+        ["Remarks", MOCK_STOCK[0].remarks],
+      ]);
+      // expect buttons to be there
+      expect(
+        screen.getByRole("button", { name: "Add Split" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Confirm" }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("shows 'No splits added, add a split to begin' only when there are 0 child stocks added", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+    renderPage();
+
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    expect(
+      screen.getByText("No splits added, add a split to begin."),
+    ).toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("No splits added, add a split to begin."),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("creates a new child stock component with corresponding split indexes, with editable components for all editable fields, default values copying the parent stock, when the 'Add Split' button is clicked", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    renderPage();
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    await waitFor(() => {
+      const dialog = screen.getByRole("dialog");
+      const childSplitsTable = within(dialog).getAllByRole("table")[1];
+
+      // index starts at 1
+      expect(
+        within(childSplitsTable).getByRole("cell", { name: "1" }),
+      ).toBeInTheDocument();
+
+      // editablecell populated with default parent values
+      const locationInput = within(childSplitsTable).getByDisplayValue(
+        MOCK_STOCK[0].location,
+      );
+      const statusSelect = within(childSplitsTable).getByDisplayValue(
+        MOCK_STOCK[0].stockStatus,
+      );
+      const quantityInput = within(childSplitsTable).getByDisplayValue(
+        String(MOCK_STOCK[0].quantity),
+      );
+      const remarksInput = within(childSplitsTable).getByDisplayValue(
+        MOCK_STOCK[0].remarks,
+      );
+
+      expect(locationInput).toBeInTheDocument();
+      expect(statusSelect).toBeInTheDocument();
+      expect(quantityInput).toBeInTheDocument();
+      expect(remarksInput).toBeInTheDocument();
+    });
+  });
+
+  it("removes the split when the '-' button is clicked", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    renderPage();
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    const dialog = screen.getByRole("dialog");
+    const removeButtons = within(dialog).getAllByRole("button", { name: "-" });
+    expect(removeButtons).toHaveLength(2);
+
+    await user.click(removeButtons[0]);
+
+    await waitFor(() => {
+      const updatedRemoveButtons = within(dialog).getAllByRole("button", {
+        name: "-",
+      });
+      expect(updatedRemoveButtons).toHaveLength(1);
+    });
+  });
+
+  it("rejects when confirming the split if there are less than 2 child stock", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    render(<MedicationStockBasePage />);
+
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    await user.click(screen.getByRole("button", { name: "Confirm" }));
+
+    // caught by validation, mutation not called
+    expect(createSplitsMockMutation).not.toHaveBeenCalled();
+  });
+
+  it("rejects when the total quantity of child splits do not equal the quantity in the parent split", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    renderPage();
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    await user.click(screen.getByRole("button", { name: "Confirm" }));
+
+    expect(createSplitsMockMutation).not.toHaveBeenCalled();
+  });
+
+  it("rejects when splits are not distinct from each other", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    renderPage();
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    const dialog = screen.getByRole("dialog");
+    const childSplitsTable = within(dialog).getAllByRole("table")[1];
+    const quantityInputs = within(childSplitsTable).getAllByDisplayValue(
+      String(MOCK_STOCK[0].quantity),
+    );
+
+    const halfQuantity = Math.floor(MOCK_STOCK[0].quantity / 2);
+    await user.clear(quantityInputs[0]);
+    await user.type(quantityInputs[0], String(halfQuantity));
+    await user.clear(quantityInputs[1]);
+    await user.type(
+      quantityInputs[1],
+      String(MOCK_STOCK[0].quantity - halfQuantity),
+    );
+
+    await user.click(screen.getByRole("button", { name: "Confirm" }));
+
+    expect(createSplitsMockMutation).not.toHaveBeenCalled();
+  });
+
+  it("creates new child stock entries in the table and closes the modal when the split succeeds", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationStockRouter.createSplits.useMutation.mockImplementation(
+      ({ onSuccess }: { onSuccess: () => void }) => {
+        createSplitsMockMutation.mockImplementation(() => {
+          onSuccess?.();
+        });
+
+        return {
+          mutate: createSplitsMockMutation,
+          isPending: false,
+        };
+      },
+    );
+
+    renderPage();
+    const { halfQty, remainingQty } = await addValidSplits(user);
+
+    await user.click(screen.getByRole("button", { name: "Confirm" }));
+
+    expect(createSplitsMockMutation).toHaveBeenCalledWith({
+      parentId: MOCK_STOCK[0].id,
+      splits: [
+        {
+          location: "Location A",
+          stockStatus: MOCK_STOCK[0].stockStatus,
+          quantity: halfQty,
+          remarks: MOCK_STOCK[0].remarks ?? undefined,
+        },
+        {
+          location: "Location B",
+          stockStatus: MOCK_STOCK[0].stockStatus,
+          quantity: remainingQty,
+          remarks: MOCK_STOCK[0].remarks ?? undefined,
+        },
+      ],
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+  });
+
+  it("shows an error toast and keeps the modal open if an error occurs during the split", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    const mockError = new Error("Mock test error");
+
+    mockTrpc.medicationStockRouter.createSplits.useMutation.mockImplementation(
+      ({ onError }: { onError: (err: Error) => void }) => {
+        createSplitsMockMutation.mockImplementation(() => {
+          onError?.(mockError);
+        });
+
+        return {
+          mutate: createSplitsMockMutation,
+          isPending: false,
+        };
+      },
+    );
+
+    renderPage();
+    await addValidSplits(user);
+
+    await user.click(screen.getByRole("button", { name: "Confirm" }));
+
+    expect(createSplitsMockMutation).toHaveBeenCalled();
+
+    const toastEl = screen.getByRole("status");
+    expect(toastEl).toBeInTheDocument();
+    expect(toastEl).toHaveTextContent(mockError.message);
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 });
