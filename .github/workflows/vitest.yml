@@ -37,9 +37,10 @@ jobs:
         with:
           version: 2.72.7
 
-      # `supabase start` applies the migrations in supabase/migrations.
+      # Only start services the tests need. Skips studio, imgproxy, edge-runtime,
+      # logflare, vector, realtime, storage-api, supavisor, and mailpit
       - name: Start Supabase
-        run: supabase start
+        run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,storage-api,supavisor,mailpit
 
       # Map the generated credentials onto the env var names that src/lib/envVariables.ts validates.
       # The Cloudinary/AWS vars aren't exercised by the tests but must be non-empty
