@@ -34,32 +34,10 @@ jobs:
         with:
           version: 2.72.7
 
-      # Cache Supabase Docker images so cold runners don't re-pull on every run.
-      # Key is tied to supabase/config.toml so the cache busts when the Supabase
-      # version or service config changes.
-      - name: Cache Supabase Docker images
-        uses: actions/cache@v4
-        id: docker-cache
-        with:
-          path: /tmp/supabase-images.tar.gz
-          key: supabase-docker-v3-${{ runner.os }}-${{ hashFiles('supabase/config.toml') }}
-
-      - name: Load cached Docker images
-        if: steps.docker-cache.outputs.cache-hit == 'true'
-        run: |
-          set -euo pipefail
-          gzip -dc /tmp/supabase-images.tar.gz | docker load
-
-      # `supabase start` applies the migrations in supabase/migrations.
+      # Only start services the tests need. Skips studio, imgproxy, edge-runtime,
+      # logflare, vector, realtime, storage-api, supavisor, and mailpit
       - name: Start Supabase
-        run: supabase start
-
-      - name: Save Supabase Docker images
-        if: steps.docker-cache.outputs.cache-hit != 'true'
-        run: |
-          set -euo pipefail
-          docker images --format '{{.Repository}}:{{.Tag}}' | grep '/supabase/' | xargs -r docker save | gzip > /tmp/supabase-images.tar.gz
-          ls -lh /tmp/supabase-images.tar.gz
+        run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,storage-api,supavisor,mailpit
 
       # Map the generated credentials onto the env var names that src/lib/envVariables.ts validates.
       # The Cloudinary/AWS vars aren't exercised by the tests but must be non-empty
