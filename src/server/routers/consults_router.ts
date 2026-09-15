@@ -10,7 +10,7 @@ import { DIAGNOSIS_CATEGORIES } from "@/lib/constants/diagnosisCategories";
  * Each diagnosis needs free-text details plus a category from the fixed
  * clinical list.
  */
-const diagnosisInput = z.object({
+export const diagnosisInput = z.object({
   details: z.string().trim().min(1, "Diagnosis details are required"),
   category: z.enum(DIAGNOSIS_CATEGORIES),
 });
@@ -20,7 +20,7 @@ const diagnosisInput = z.object({
  * `doctorId` is intentionally omitted — it is derived from the authenticated
  * session, never trusted from the client.
  */
-const createConsultInput = z.object({
+export const createConsultInput = z.object({
   visitId: z.number().int().positive(),
   pastMedicalHistory: z.string().trim().optional(),
   consultation: z.string().trim().optional(),
