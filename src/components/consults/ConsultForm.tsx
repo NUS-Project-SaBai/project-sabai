@@ -4,7 +4,7 @@ import { z } from "zod";
 import toast from "react-hot-toast";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { trpc } from "@/utils/trpc";
-import { createConsultInput } from "@/server/routers/consults_router";
+import { createConsultInput } from "@/server/schemas/consults";
 import { RHFTextArea } from "@/components/interactive/RHF/RHFTextArea";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { Button } from "@/components/interactive/Button/Button";
