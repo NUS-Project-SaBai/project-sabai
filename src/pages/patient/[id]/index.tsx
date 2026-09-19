@@ -110,6 +110,7 @@ export default function PatientPage() {
             <Modal
               title="Edit Patient Details"
               onClose={() => setIsEditingPatient(false)}
+              maxWidthClassName="max-w-2xl"
             >
               <EditPatientForm
                 patient={patient}
