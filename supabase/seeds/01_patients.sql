@@ -9,6 +9,9 @@ INSERT INTO "patients" (
     "has_sabai_card",
     "patient_image_public_id"
 ) VALUES
+
+-- MARK: Adult patients for testing
+
 ('Somchai Phuket', 'ID001', '08-1234-5678', 'male', '1985-03-15', 'Penicillin', 'yes', 'no', 'yes', 'image/upload/v1765419261/zlsgdl0ah4awsqbwhym8.jpg'),
 ('Niran Chiang', 'ID002', '08-2345-6789', 'male', '1992-07-22', 'None', 'no', 'yes', 'no', 'image/upload/v1765419261/zlsgdl0ah4awsqbwhym8.jpg'),
 ('Arunee Bangkok', 'ID003', '08-3456-7890', 'female', '1988-11-30', 'Aspirin', 'yes', 'no', 'yes', 'image/upload/v1765419261/zlsgdl0ah4awsqbwhym8.jpg'),
@@ -23,4 +26,10 @@ INSERT INTO "patients" (
 ('Sattaya Amnat', 'ID012', '08-0123-4567', 'male', '1994-01-28', 'Aspirin, NSAID', 'no', 'no', 'no', 'image/upload/v1765419261/zlsgdl0ah4awsqbwhym8.jpg'),
 ('Malee Samut', 'ID013', '08-1234-5679', 'female', '1986-09-03', 'None', 'yes', 'yes', 'yes', 'image/upload/v1765419261/zlsgdl0ah4awsqbwhym8.jpg'),
 ('Chalern Pathum', 'ID014', '08-2345-6780', 'male', '1991-11-17', 'Latex', 'no', 'no', 'yes', 'image/upload/v1765419261/zlsgdl0ah4awsqbwhym8.jpg'),
-('Pairot Bangkok', 'ID015', NULL, 'male', '1979-03-22', 'None', 'yes', 'yes', 'no', 'image/upload/v1765419261/zlsgdl0ah4awsqbwhym8.jpg');
+('Pairot Bangkok', 'ID015', NULL, 'male', '1979-03-22', 'None', 'yes', 'yes', 'no', 'image/upload/v1765419261/zlsgdl0ah4awsqbwhym8.jpg'),
+
+-- MARK: Child patients for growth chart testing (ages 5, 10, 15)
+
+('Nong Lampang', 'TC001', NULL, 'female', '2021-08-27', 'None', 'no', 'no', 'no', 'image/upload/v1765419261/zlsgdl0ah4awsqbwhym8.jpg'),
+('Dek Chiang', 'TC002', NULL, 'male', '2016-08-27', 'None', 'no', 'no', 'no', 'image/upload/v1765419261/zlsgdl0ah4awsqbwhym8.jpg'),
+('Wan Udon', 'TC003', NULL, 'female', '2011-08-27', 'None', 'no', 'no', 'no', 'image/upload/v1765419261/zlsgdl0ah4awsqbwhym8.jpg');
