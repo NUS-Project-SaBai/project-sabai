@@ -1,7 +1,10 @@
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import toast from "react-hot-toast";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { trpc } from "@/utils/trpc";
+import { createConsultInput } from "@/server/schemas/consults";
 import { RHFTextArea } from "@/components/interactive/RHF/RHFTextArea";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { Button } from "@/components/interactive/Button/Button";
@@ -11,26 +14,18 @@ import {
   DiagnosisCategory,
 } from "@/lib/constants/diagnosisCategories";
 
-export type DiagnosisFormValue = {
-  details: string;
-  category: string;
-};
+// Form schema uses z.string() for category so "" is a valid blank default.
+// The server re-validates with z.enum() before any DB write.
+const consultFormSchema = createConsultInput.omit({ visitId: true }).extend({
+  diagnoses: z.array(
+    z.object({
+      details: z.string().trim().min(1, "Diagnosis details are required"),
+      category: z.string().min(1, "Please select a category"),
+    }),
+  ),
+});
 
-export type ConsultFormValues = {
-  pastMedicalHistory: string;
-  consultation: string;
-  treatmentPlan: string;
-  remarks: string;
-  diagnoses: DiagnosisFormValue[];
-};
-
-export const BLANK_CONSULT: ConsultFormValues = {
-  pastMedicalHistory: "",
-  consultation: "",
-  treatmentPlan: "",
-  remarks: "",
-  diagnoses: [{ details: "", category: "" }],
-};
+type ConsultFormValues = z.infer<typeof consultFormSchema>;
 
 /**
  * The consultation form for a single visit. Owns its own form state.
@@ -39,7 +34,16 @@ export const BLANK_CONSULT: ConsultFormValues = {
  * @param visitId - The visit this consult belongs to.
  */
 export function ConsultForm({ visitId }: { visitId: number }) {
-  const methods = useForm<ConsultFormValues>({ defaultValues: BLANK_CONSULT });
+  const methods = useForm<ConsultFormValues>({
+    resolver: zodResolver(consultFormSchema),
+    defaultValues: {
+      pastMedicalHistory: "",
+      consultation: "",
+      treatmentPlan: "",
+      remarks: "",
+      diagnoses: [{ details: "", category: "" }],
+    },
+  });
   const { control, handleSubmit } = methods;
 
   const { fields, append, remove } = useFieldArray({
@@ -54,32 +58,29 @@ export function ConsultForm({ visitId }: { visitId: number }) {
     toast.error("Please fill in all required fields before saving.");
 
   const onSubmit = (data: ConsultFormValues) => {
-    const pastMedicalHistory = data.pastMedicalHistory.trim();
-    const consultation = data.consultation.trim();
-    const diagnoses = data.diagnoses.map((d) => ({
-      details: d.details.trim(),
-      category: d.category as DiagnosisCategory,
-    }));
-
-    if (diagnoses.some((d) => !d.details || !d.category)) {
-      onInvalid();
-      return;
-    }
-
     createConsult.mutate(
       {
         visitId,
-        pastMedicalHistory: pastMedicalHistory || undefined,
-        consultation: consultation || undefined,
-        treatmentPlan: data.treatmentPlan?.trim() || undefined,
-        remarks: data.remarks?.trim() || undefined,
-        diagnoses,
+        pastMedicalHistory: data.pastMedicalHistory || undefined,
+        consultation: data.consultation || undefined,
+        treatmentPlan: data.treatmentPlan || undefined,
+        remarks: data.remarks || undefined,
+        diagnoses: data.diagnoses.map((d) => ({
+          details: d.details,
+          category: d.category as DiagnosisCategory,
+        })),
       },
       {
         onSuccess: () => {
           utils.consultsRouter.getByVisitId.invalidate({ visitId });
           toast.success("Consult has been saved successfully!");
-          methods.reset(BLANK_CONSULT);
+          methods.reset({
+            pastMedicalHistory: "",
+            consultation: "",
+            treatmentPlan: "",
+            remarks: "",
+            diagnoses: [{ details: "", category: "" }],
+          });
         },
         onError: () => toast.error("Failed to save consult."),
       },
