@@ -355,10 +355,7 @@ function VitalsForm({ visitId }: { visitId: number }) {
       </FormSection>
 
       {/* Urinalysis */}
-      <FormSection
-        title="Urinalysis"
-        description="Urine test findings."
-      >
+      <FormSection title="Urinalysis" description="Urine test findings.">
         <RHFTextArea
           name="urineTest"
           label="Urinalysis Diagnostics (Leukocytes, Nitrites, Protein notes)"
