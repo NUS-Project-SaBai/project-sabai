@@ -205,7 +205,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
               title="Save Consult"
               colour="emerald"
               variant="filled"
-              loading={createConsult.isPending}
+              loading={createConsult.isPending || createReferral.isPending}
             />
           </div>
         </div>
