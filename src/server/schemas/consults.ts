@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DIAGNOSIS_CATEGORIES } from "@/lib/constants/diagnosisCategories";
+import { REFERRAL_CATEGORIES } from "@/lib/constants/referralCategories";
 
 export const diagnosisInput = z.object({
   details: z.string().trim().min(1, "Diagnosis details are required"),
@@ -30,4 +31,6 @@ export const consultFormSchema = createConsultInput
         category: z.string().min(1, "Please select a category"),
       }),
     ),
+    referredFor: z.enum(REFERRAL_CATEGORIES).default("Not Referred"),
+    referralNotes: z.string().optional(),
   });
