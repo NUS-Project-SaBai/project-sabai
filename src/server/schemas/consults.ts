@@ -31,6 +31,6 @@ export const consultFormSchema = createConsultInput
         category: z.string().min(1, "Please select a category"),
       }),
     ),
-    referredFor: z.enum(REFERRAL_CATEGORIES).default("Not Referred"),
+    referredFor: z.enum(REFERRAL_CATEGORIES),
     referralNotes: z.string().optional(),
   });
