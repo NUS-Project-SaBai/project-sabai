@@ -18,3 +18,16 @@ export const createConsultInput = z.object({
 });
 
 export type CreateConsultInput = z.infer<typeof createConsultInput>;
+
+// Form variant: relaxes category to z.string() so "" is a valid blank default.
+// The server re-validates with z.enum() before any DB write.
+export const consultFormSchema = createConsultInput
+  .omit({ visitId: true })
+  .extend({
+    diagnoses: z.array(
+      z.object({
+        details: z.string().trim().min(1, "Diagnosis details are required"),
+        category: z.string().min(1, "Please select a category"),
+      }),
+    ),
+  });
