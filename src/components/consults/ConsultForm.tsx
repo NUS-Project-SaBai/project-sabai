@@ -1,7 +1,10 @@
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import toast from "react-hot-toast";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { trpc } from "@/utils/trpc";
+import { consultFormSchema } from "@/server/schemas/consults";
 import { RHFTextArea } from "@/components/interactive/RHF/RHFTextArea";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { Button } from "@/components/interactive/Button/Button";
@@ -11,20 +14,9 @@ import {
   DiagnosisCategory,
 } from "@/lib/constants/diagnosisCategories";
 
-export type DiagnosisFormValue = {
-  details: string;
-  category: string;
-};
+type ConsultFormValues = z.infer<typeof consultFormSchema>;
 
-export type ConsultFormValues = {
-  pastMedicalHistory: string;
-  consultation: string;
-  treatmentPlan: string;
-  remarks: string;
-  diagnoses: DiagnosisFormValue[];
-};
-
-export const BLANK_CONSULT: ConsultFormValues = {
+const BLANK_CONSULT: ConsultFormValues = {
   pastMedicalHistory: "",
   consultation: "",
   treatmentPlan: "",
@@ -39,7 +31,10 @@ export const BLANK_CONSULT: ConsultFormValues = {
  * @param visitId - The visit this consult belongs to.
  */
 export function ConsultForm({ visitId }: { visitId: number }) {
-  const methods = useForm<ConsultFormValues>({ defaultValues: BLANK_CONSULT });
+  const methods = useForm<ConsultFormValues>({
+    resolver: zodResolver(consultFormSchema),
+    defaultValues: BLANK_CONSULT,
+  });
   const { control, handleSubmit } = methods;
 
   const { fields, append, remove } = useFieldArray({
@@ -54,26 +49,17 @@ export function ConsultForm({ visitId }: { visitId: number }) {
     toast.error("Please fill in all required fields before saving.");
 
   const onSubmit = (data: ConsultFormValues) => {
-    const pastMedicalHistory = data.pastMedicalHistory.trim();
-    const consultation = data.consultation.trim();
-    const diagnoses = data.diagnoses.map((d) => ({
-      details: d.details.trim(),
-      category: d.category as DiagnosisCategory,
-    }));
-
-    if (diagnoses.some((d) => !d.details || !d.category)) {
-      onInvalid();
-      return;
-    }
-
     createConsult.mutate(
       {
         visitId,
-        pastMedicalHistory: pastMedicalHistory || undefined,
-        consultation: consultation || undefined,
-        treatmentPlan: data.treatmentPlan?.trim() || undefined,
-        remarks: data.remarks?.trim() || undefined,
-        diagnoses,
+        pastMedicalHistory: data.pastMedicalHistory || undefined,
+        consultation: data.consultation || undefined,
+        treatmentPlan: data.treatmentPlan || undefined,
+        remarks: data.remarks || undefined,
+        diagnoses: data.diagnoses.map((d) => ({
+          details: d.details,
+          category: d.category as DiagnosisCategory,
+        })),
       },
       {
         onSuccess: () => {
