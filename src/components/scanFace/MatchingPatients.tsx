@@ -1,5 +1,5 @@
 import { trpc } from "@/utils/trpc";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
@@ -7,6 +7,7 @@ import { PatientPhoto } from "@/components/PatientPhoto";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Mode } from "@/types/scan";
 import { Button } from "@/components/interactive/Button/Button";
+import Modal from "@/components/interactive/Modal";
 import { MdPersonSearch } from "react-icons/md";
 import { useVillageCode } from "@/lib/context/VillageCodeContext";
 import toast from "react-hot-toast";
@@ -19,9 +20,49 @@ export default function MatchingPatients({
   setMode: React.Dispatch<React.SetStateAction<Mode>>;
 }) {
   const { selectedVillageCodeId } = useVillageCode();
+  const [duplicateVisitConfirmation, setDuplicateVisitConfirmation] = useState<{
+    patientId: number;
+    existingVisitDate: Date | null;
+  } | null>(null);
+  const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
+  const utils = trpc.useUtils();
   const searchPatientsByPictureQuery =
     trpc.patientsRouter.searchPatientsByPicture.useMutation();
   const createVisitMutation = trpc.visitsRouter.create.useMutation();
+
+  async function handleCreateVisit(patientId: number) {
+    setIsCheckingDuplicate(true);
+    try {
+      const { hasRecentVisit, existingVisitDate } =
+        await utils.visitsRouter.hasRecentVisit.fetch({ patientId });
+      if (hasRecentVisit) {
+        setDuplicateVisitConfirmation({ patientId, existingVisitDate });
+      } else {
+        submitCreateVisit(patientId);
+      }
+    } catch {
+      submitCreateVisit(patientId);
+    } finally {
+      setIsCheckingDuplicate(false);
+    }
+  }
+
+  function submitCreateVisit(patientId: number) {
+    createVisitMutation.mutate(
+      { patientId, villageCodeId: selectedVillageCodeId! },
+      {
+        onSuccess() {
+          toast.success("Visit created successfully!");
+          setDuplicateVisitConfirmation(null);
+        },
+        onError(error) {
+          console.error("Error creating visit:", error);
+          toast.error("Failed to create visit. Please try again.");
+        },
+      },
+    );
+  }
+
   useEffect(() => {
     searchPatientsByPictureQuery.mutate({ picture: imgDetails });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,30 +144,14 @@ export default function MatchingPatients({
                 <Button
                   colour="emerald"
                   title={
-                    createVisitMutation.isPending
+                    isCheckingDuplicate || createVisitMutation.isPending
                       ? "Creating..."
                       : "Create Visit"
                   }
-                  disabled={createVisitMutation.isPending}
-                  onClick={() => {
-                    createVisitMutation.mutate(
-                      {
-                        patientId: patient.id,
-                        villageCodeId: selectedVillageCodeId!,
-                      },
-                      {
-                        onSuccess() {
-                          toast.success("Visit created successfully!");
-                        },
-                        onError(error) {
-                          console.error("Error creating visit:", error);
-                          toast.error(
-                            "Failed to create visit. Please try again.",
-                          );
-                        },
-                      },
-                    );
-                  }}
+                  disabled={
+                    isCheckingDuplicate || createVisitMutation.isPending
+                  }
+                  onClick={() => handleCreateVisit(patient.id)}
                 />
               </TableCell>
             </TableRow>
@@ -140,6 +165,39 @@ export default function MatchingPatients({
           title="Register New Patient Instead"
         />
       </div>
+      {duplicateVisitConfirmation !== null && (
+        <Modal
+          title="Duplicate Visit"
+          onClose={() => setDuplicateVisitConfirmation(null)}
+        >
+          <p className="text-slate-700 mb-6">
+            A visit already exists for this patient
+            {duplicateVisitConfirmation.existingVisitDate && (
+              <>
+                {" "}
+                at{" "}
+                {duplicateVisitConfirmation.existingVisitDate.toLocaleTimeString()}
+              </>
+            )}
+            . Are you sure you want to create another?
+          </p>
+          <div className="flex gap-3 justify-end">
+            <Button
+              colour="red"
+              title="Cancel"
+              onClick={() => setDuplicateVisitConfirmation(null)}
+            />
+            <Button
+              colour="emerald"
+              title={createVisitMutation.isPending ? "Creating..." : "Confirm"}
+              disabled={createVisitMutation.isPending}
+              onClick={() =>
+                submitCreateVisit(duplicateVisitConfirmation.patientId)
+              }
+            />
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
