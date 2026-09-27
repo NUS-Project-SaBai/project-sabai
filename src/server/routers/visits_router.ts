@@ -86,6 +86,7 @@ export const visitsRouter = router({
             gte(visits.date, windowStart),
           ),
         )
+        .orderBy(desc(visits.date))
         .limit(1);
 
       return {
