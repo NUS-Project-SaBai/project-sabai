@@ -27,7 +27,6 @@ const selectVitalsFields = {
 };
 
 const toNumberOrNull = (value: unknown) => {
-  if (value === undefined) return undefined;
   if (value === null) return null;
 
   if (typeof value === "string") {
@@ -48,29 +47,29 @@ const toNumberOrNull = (value: unknown) => {
  */
 const numericColumn = (label: string, { step }: { step: number }) =>
   z
-    .union([z.number(), z.string(), z.null(), z.undefined()])
+    .union([z.number(), z.string(), z.null()])
     .transform(toNumberOrNull)
     .pipe(
       z
         .number({ error: `${label} must be a number` })
         .multipleOf(step, { error: `${label} must be in steps of ${step}` })
         .transform((n) => n.toString())
-        .nullable()
-        .optional(),
-    );
+        .nullable(),
+    )
+    .optional();
 
 /** Validator for an integer column. A blank/cleared value stays `null`. */
 const integerColumn = (label: string) =>
   z
-    .union([z.number(), z.string(), z.null(), z.undefined()])
+    .union([z.number(), z.string(), z.null()])
     .transform(toNumberOrNull)
     .pipe(
       z
         .number({ error: `${label} must be a number` })
         .int({ error: `${label} must be a whole number` })
-        .nullable()
-        .optional(),
-    );
+        .nullable(),
+    )
+    .optional();
 
 /**
  * Input validation schema for creating vitals records.
