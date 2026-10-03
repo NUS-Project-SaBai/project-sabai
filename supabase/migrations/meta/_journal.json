@@ -134,13 +134,6 @@
       "when": 1788101707251,
       "tag": "0018_lying_nightshade",
       "breakpoints": true
-    },
-    {
-      "idx": 19,
-      "version": "7",
-      "when": 1790953690693,
-      "tag": "0019_big_magik",
-      "breakpoints": true
     }
   ]
 }
