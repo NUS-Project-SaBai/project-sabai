@@ -34,6 +34,8 @@ const serverSchema = clientSchema.extend({
   AWS_SECRET_ACCESS_KEY: z.string().min(1),
   AWS_REGION: z.string().min(1),
   COLLECTION_ID: z.string().min(1),
+  GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY: z.string().min(1),
+  GOOGLE_DRIVE_FOLDER_ID: z.string().min(1),
 });
 
 /*
