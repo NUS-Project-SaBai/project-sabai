@@ -34,8 +34,10 @@ const serverSchema = clientSchema.extend({
   AWS_SECRET_ACCESS_KEY: z.string().min(1),
   AWS_REGION: z.string().min(1),
   COLLECTION_ID: z.string().min(1),
-  GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY: z.string().min(1),
-  GOOGLE_DRIVE_FOLDER_ID: z.string().min(1),
+  // Optional so a missing Drive setup only breaks patient file features
+  // (src/server/utils/drive.ts reports it), not the whole app.
+  GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY: z.string().min(1).optional(),
+  GOOGLE_DRIVE_FOLDER_ID: z.string().min(1).optional(),
 });
 
 /*
