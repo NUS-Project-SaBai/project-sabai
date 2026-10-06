@@ -9,6 +9,7 @@ vi.mock("@/utils/trpc", () => ({
     useUtils: vi.fn(),
     consultsRouter: {
       create: { useMutation: vi.fn() },
+      update: { useMutation: vi.fn() },
     },
     referralRouter: {
       create: { useMutation: vi.fn() },
@@ -133,6 +134,10 @@ describe("ConsultForm", () => {
     mockTrpc.medicationStockRouter.listGroupByActiveIngredient.useQuery.mockReturnValue(
       { data: INGREDIENTS, isLoading: false, isError: false },
     );
+    mockTrpc.consultsRouter.update.useMutation.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    });
   });
 
   test("renders all fields and the save button", () => {
