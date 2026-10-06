@@ -4,40 +4,12 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { consults, diagnosis } from "@/db/schema/consults";
-import {
-  DIAGNOSIS_CATEGORIES,
-  CONSULT_EDIT_WINDOW_MS,
-} from "@/lib/constants/consults";
+import { CONSULT_EDIT_WINDOW_MS } from "@/lib/constants/consults";
+import { createConsultInput } from "@/server/schemas/consults";
 
-/**
- * Validation schema for a single diagnosis attached to a consult.
- * Each diagnosis needs free-text details plus a category from the fixed
- * clinical list.
- */
-const diagnosisInput = z.object({
-  details: z.string().trim().min(1, "Diagnosis details are required"),
-  category: z.enum(DIAGNOSIS_CATEGORIES),
-});
-
-/**
- * Input validation schema for creating a consult together with its diagnoses.
- * `doctorId` is intentionally omitted — it is derived from the authenticated
- * session, never trusted from the client.
- */
-const consultFields = z.object({
-  pastMedicalHistory: z.string().trim().optional(),
-  consultation: z.string().trim().optional(),
-  treatmentPlan: z.string().trim().optional(),
-  remarks: z.string().trim().optional(),
-  diagnoses: z
-    .array(diagnosisInput)
-    .min(1, "At least one diagnosis is required"),
-});
-
-const createConsultInput = z.object({
-  visitId: z.number().int().positive(),
-  ...consultFields.shape,
-});
+const updateConsultInput = createConsultInput
+  .omit({ visitId: true })
+  .extend({ id: z.number().int().positive() });
 
 export const consultsRouter = router({
   /**
@@ -101,9 +73,7 @@ export const consultsRouter = router({
    * Rejects updates on consults older than 24 hours.
    */
   update: protectedProcedure
-    .input(
-      z.object({ id: z.number().int().positive(), ...consultFields.shape }),
-    )
+    .input(updateConsultInput)
     .mutation(async ({ input }) => {
       const { id, diagnoses, ...fields } = input;
 
@@ -149,5 +119,3 @@ export const consultsRouter = router({
       });
     }),
 });
-
-export type CreateConsultInput = z.infer<typeof createConsultInput>;
