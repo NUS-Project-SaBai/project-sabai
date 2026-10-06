@@ -70,15 +70,16 @@ export const consultsRouter = router({
 
   /**
    * Updates an existing consult and replaces all of its diagnoses.
-   * Rejects updates on consults older than 24 hours.
+   * Only the doctor who wrote the consult may edit it, and only within
+   * 24 hours of creation.
    */
   update: protectedProcedure
     .input(updateConsultInput)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { id, diagnoses, ...fields } = input;
 
       const [existing] = await db
-        .select({ date: consults.date })
+        .select({ date: consults.date, doctorId: consults.doctorId })
         .from(consults)
         .where(eq(consults.id, id));
 
@@ -86,6 +87,13 @@ export const consultsRouter = router({
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Consult not found.",
+        });
+      }
+
+      if (existing.doctorId !== ctx.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only the doctor who wrote this consult can edit it.",
         });
       }
 
