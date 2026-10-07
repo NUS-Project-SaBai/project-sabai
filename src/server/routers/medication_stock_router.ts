@@ -2,7 +2,7 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { withUserAuth } from "@/db/withAuth";
+import { withUserTransaction } from "@/db/withAuth";
 import { eq, desc, ne } from "drizzle-orm";
 import {
   medicationBrands,
@@ -71,7 +71,7 @@ export const medicationStockRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      return await withUserAuth(ctx.user.id, async (tx) => {
+      return await withUserTransaction(ctx.user.id, async (tx) => {
         const [newStock] = await tx
           .insert(medicationStock)
           .values(input)
@@ -100,7 +100,7 @@ export const medicationStockRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      return await withUserAuth(ctx.user.id, async (tx) => {
+      return await withUserTransaction(ctx.user.id, async (tx) => {
         const { id, ...updateData } = input;
         const [result] = await tx
           .update(medicationStock)
@@ -122,7 +122,7 @@ export const medicationStockRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { splits, parentId } = input;
 
-      return await withUserAuth(ctx.user.id, async (tx) => {
+      return await withUserTransaction(ctx.user.id, async (tx) => {
         const [parent] = await tx
           .select()
           .from(medicationStock)

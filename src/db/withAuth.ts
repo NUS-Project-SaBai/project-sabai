@@ -15,7 +15,7 @@ export type Tx = PgTransaction<
  * Executes a Drizzle transaction with the user's Supabase ID attached.
  * This populates Supabase's `auth.uid()` inside Postgres triggers.
  */
-export async function withUserAuth<T>(
+export async function withUserTransaction<T>(
   userId: string,
   callback: (tx: Tx) => Promise<T>,
 ): Promise<T> {
