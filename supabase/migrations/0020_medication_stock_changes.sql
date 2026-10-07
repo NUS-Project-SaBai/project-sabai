@@ -15,7 +15,7 @@ BEGIN
   v_user_id := get_current_user_id();
 
   IF v_user_id IS NULL THEN
-    RAISE EXCEPTION 'Action forbidden: User ID not found in auth.uid() or app.current_user_id variable.';
+    RAISE EXCEPTION 'Action forbidden: User ID not found in auth.uid() or app.current_user_id variable. Wrap with withUserTransaction if applicable.';
   END IF;
 
   -- HANDLE INSERT
