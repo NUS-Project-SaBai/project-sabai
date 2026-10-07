@@ -81,21 +81,6 @@ export const medicationStockRouter = router({
       });
     }),
 
-  delete: protectedProcedure
-    .input(
-      zfd.formData({
-        id: zfd.numeric(z.number().int()),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const [result] = await db
-        .delete(medicationStock)
-        .where(eq(medicationStock.id, input.id))
-        .returning({ id: medicationStock.id });
-
-      return { success: !!result };
-    }),
-
   update: protectedProcedure
     .input(
       zfd.formData({
