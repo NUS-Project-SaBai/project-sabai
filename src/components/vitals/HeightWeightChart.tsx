@@ -146,8 +146,8 @@ export function HeightWeightChart({ age, height, weight, gender }: Props) {
   if (!inRange) {
     return (
       <p className="text-sm text-slate-500">
-        Growth chart only plots heights from {MIN_HEIGHT_CM} cm and weights
-        from {MIN_WEIGHT_KG} kg.
+        Growth chart only plots heights from {MIN_HEIGHT_CM} cm and weights from{" "}
+        {MIN_WEIGHT_KG} kg.
       </p>
     );
   }
@@ -158,7 +158,7 @@ export function HeightWeightChart({ age, height, weight, gender }: Props) {
       ref={canvasRef}
       width={600}
       height={800}
-      className="w-full h-auto max-w-full"
+      className="w-full h-auto"
     />
   );
 }

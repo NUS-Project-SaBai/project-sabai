@@ -23,6 +23,7 @@ import { useState } from "react";
 import Modal from "@/components/interactive/Modal";
 import EditPatientForm from "@/components/patient/EditPatientForm";
 import { HeightWeightChart } from "@/components/vitals/HeightWeightChart";
+import clsx from "clsx";
 
 type VitalsFormValues = {
   height?: string | null;
@@ -98,7 +99,7 @@ export default function PatientVitalsPage() {
 
   return (
     <div className="min-h-screen flex-1 p-4 bg-slate-50">
-      <div className="w-full mx-auto max-w-5xl">
+      <div className="w-full mx-auto max-w-5xl has-[[data-growth-chart]]:max-w-7xl">
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },
@@ -131,7 +132,7 @@ export default function PatientVitalsPage() {
             />
           </Modal>
         )}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-clip">
           <FormProvider {...methods}>
             <div className="p-6 border-b border-slate-100 bg-slate-50/50">
               {visits && visits.length > 0 ? (
@@ -315,7 +316,13 @@ function VitalsForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className={clsx(
+        "grid grid-cols-1 gap-6",
+        showChart && "min-[1128px]:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]",
+      )}
+    >
       {/* Body measurements */}
       <FormSection
         title="Body Measurements"
@@ -342,6 +349,27 @@ function VitalsForm({
           />
         </div>
       </FormSection>
+
+      {/* Growth chart: below Body Measurements on narrow screens, pinned in a
+          side column spanning every form row on wide screens. */}
+      {showChart && (
+        <div
+          className="min-[1128px]:col-start-2 min-[1128px]:row-start-1 min-[1128px]:row-span-6 self-start sticky top-4"
+          data-growth-chart
+        >
+          <FormSection
+            title="Growth Charts"
+            description="Height (blue) and weight (red) plotted on the NCHS growth chart for this patient's age and gender."
+          >
+            <HeightWeightChart
+              age={patientAge}
+              height={chartHeight}
+              weight={chartWeight}
+              gender={patient.gender}
+            />
+          </FormSection>
+        </div>
+      )}
 
       {/* Cardiovascular */}
       <FormSection
@@ -439,20 +467,6 @@ function VitalsForm({
           />
         </div>
       </div>
-
-      {showChart && (
-        <FormSection
-          title="Growth Charts"
-          description="Height (blue) and weight (red) plotted on the NCHS growth chart for this patient's age and gender."
-        >
-          <HeightWeightChart
-            age={patientAge}
-            height={chartHeight}
-            weight={chartWeight}
-            gender={patient.gender}
-          />
-        </FormSection>
-      )}
     </form>
   );
 }
