@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-const VALID_AGES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+// Lowest values printed on the chart axes; anything below plots off-chart.
+const MIN_HEIGHT_CM = 80;
+const MIN_WEIGHT_KG = 10;
 
 // Pixel offsets calibrated to match the printed grid on each chart image.
 const CHART_CONFIG = {
@@ -89,18 +91,23 @@ function drawLabel(
 
 type Props = {
   age: number;
-  height: number;
-  weight: number;
+  height: number | null;
+  weight: number | null;
   gender: "male" | "female";
 };
 
 export function HeightWeightChart({ age, height, weight, gender }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const hasValues =
+    height !== null && weight !== null && !isNaN(height) && !isNaN(weight);
+  const inRange =
+    hasValues && height >= MIN_HEIGHT_CM && weight >= MIN_WEIGHT_KG;
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx) return;
+    if (!canvas || !ctx || !inRange) return;
 
     const config = CHART_CONFIG[gender];
     // age axis starts at 2, weight axis at 10 kg, height axis at 80 cm
@@ -126,12 +133,21 @@ export function HeightWeightChart({ age, height, weight, gender }: Props) {
     return () => {
       image.onload = null;
     };
-  }, [age, weight, height, gender]);
+  }, [age, weight, height, gender, inRange]);
 
-  if (!VALID_AGES.includes(age)) {
+  if (!hasValues) {
     return (
       <p className="text-sm text-slate-500">
-        Growth chart is only available for ages 2–18.
+        Enter height and weight to plot the growth chart.
+      </p>
+    );
+  }
+
+  if (!inRange) {
+    return (
+      <p className="text-sm text-slate-500">
+        Growth chart only plots heights from {MIN_HEIGHT_CM} cm and weights
+        from {MIN_WEIGHT_KG} kg.
       </p>
     );
   }

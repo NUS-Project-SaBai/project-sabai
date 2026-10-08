@@ -214,15 +214,7 @@ function VitalsForm({
 
   const chartHeight = heightValue ? parseFloat(String(heightValue)) : null;
   const chartWeight = weightValue ? parseFloat(String(weightValue)) : null;
-  const showChart =
-    patientAge >= 2 &&
-    patientAge <= 18 &&
-    chartHeight !== null &&
-    chartWeight !== null &&
-    !isNaN(chartHeight) &&
-    !isNaN(chartWeight) &&
-    chartHeight >= 80 &&
-    chartWeight >= 10;
+  const showChart = patientAge >= 2 && patientAge <= 18;
 
   const { data: vitalData, isLoading: vitalsLoading } =
     trpc.vitalsRouter.getByVisitId.useQuery(
@@ -455,8 +447,8 @@ function VitalsForm({
         >
           <HeightWeightChart
             age={patientAge}
-            height={chartHeight!}
-            weight={chartWeight!}
+            height={chartHeight}
+            weight={chartWeight}
             gender={patient.gender}
           />
         </FormSection>
