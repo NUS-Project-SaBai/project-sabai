@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import toast from "react-hot-toast";
 import { trpc } from "@/utils/trpc";
@@ -47,6 +48,15 @@ export default function RegistrationPage({
 
   const dobValue = form.watch("dateOfBirth");
   const pubarcheValue = form.watch("pubarche");
+
+  // pubarcheAge is only valid when pubarche is "yes"; clear any stale value so
+  // it isn't submitted after pubarche is switched away from "yes".
+  useEffect(() => {
+    if (pubarcheValue !== "yes") {
+      form.setValue("pubarcheAge", undefined);
+    }
+  }, [pubarcheValue, form]);
+
   // Use "T00:00:00" to parse as local time — plain "YYYY-MM-DD" is parsed as
   // UTC midnight, which produces wrong age near the 18th-birthday boundary for
   // users west of UTC.
@@ -84,9 +94,10 @@ export default function RegistrationPage({
           pallor: data.pallor !== undefined ? data.pallor === "yes" : undefined,
           pubarche:
             data.pubarche !== undefined ? data.pubarche === "yes" : undefined,
-          pubarcheAge: data.pubarcheAge
-            ? parseInt(data.pubarcheAge, 10)
-            : undefined,
+          pubarcheAge:
+            data.pubarche === "yes" && data.pubarcheAge
+              ? parseInt(data.pubarcheAge, 10)
+              : undefined,
         }),
       },
       {
