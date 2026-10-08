@@ -195,7 +195,7 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
     });
   });
 
-  it("hides pubarcheAge field when pubarche is changed from Yes to No", async () => {
+  it("hides and clears pubarcheAge field when pubarche is changed from Yes to No", async () => {
     // Given: a pediatric patient with pubarche set to "Yes" and pubarcheAge visible
     const user = userEvent.setup();
     const { container } = renderPage();
@@ -217,6 +217,10 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
         container.querySelector('input[name="pubarcheAge"]'),
       ).toBeInTheDocument();
     });
+    await user.type(
+      container.querySelector('input[name="pubarcheAge"]')!,
+      "12",
+    );
 
     // When: pubarche is changed to "No"
     await user.click(
@@ -231,6 +235,20 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
       expect(
         container.querySelector('input[name="pubarcheAge"]'),
       ).not.toBeInTheDocument();
+    });
+
+    // And: switching back to "Yes" shows an empty pubarcheAge (value was cleared)
+    await user.click(
+      container.querySelector('button[name="pubarche-dropdown-button"]')!,
+    );
+    await user.click(
+      container.querySelector('button[name="pubarche-yes-dropdown-option"]')!,
+    );
+    await waitFor(() => {
+      expect(
+        container.querySelector<HTMLInputElement>('input[name="pubarcheAge"]')!
+          .value,
+      ).toBe("");
     });
   });
 });
