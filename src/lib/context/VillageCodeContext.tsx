@@ -7,7 +7,7 @@ import {
 } from "react";
 import { trpc } from "@/utils/trpc";
 import { useSaveOnWrite } from "@/hooks/useSaveOnWrite";
-import type { VillageCode } from "@/db/schema";
+import type { VillageCode } from "@/db/schema/villageCodes";
 
 interface VillageCodeContextValue {
   selectedVillageCodeId: number | null;

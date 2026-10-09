@@ -6,10 +6,8 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
-import {
-  EyesightForm,
-  EyesightFormValues,
-} from "@/components/vision/EyesightForm";
+import { EyesightForm } from "@/components/vision/EyesightForm";
+import { EyesightFormValues } from "@/types/eyesight";
 import { formatVisitDate } from "@/lib/utils/visit";
 import { formatPatientId } from "@/lib/utils/patient";
 
@@ -18,7 +16,9 @@ type UpdateGlassesFormValues = EyesightFormValues & { visitSelect: string };
 function UpdateGlassesPage() {
   const router = useRouter();
   const { patientId } = router.query;
-  const methods = useForm<UpdateGlassesFormValues>();
+  // "onTouched": validate acuity/pinhole fields after first blur, then live on
+  // every change,intended behavior is that  errors surface before Save and clear once input is valid
+  const methods = useForm<UpdateGlassesFormValues>({ mode: "onTouched" });
   const { setValue } = methods;
 
   const { data: patient, isLoading: patientLoading } =

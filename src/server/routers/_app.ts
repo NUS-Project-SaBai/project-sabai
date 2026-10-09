@@ -10,6 +10,9 @@ import { medicationStockRouter } from "./medication_stock_router";
 import { visitsRouter } from "./visits_router";
 import { vitalsRouter } from "./vitals_router";
 import { eyesightRouter } from "./eyesight_router";
+import { pubertyRouter } from "./puberty_router";
+import { consultsRouter } from "./consults_router";
+import { referralRouter } from "./referral_router";
 
 export const appRouter = router({
   healthcheck: publicProcedure.query(() => "yay!"),
@@ -22,6 +25,9 @@ export const appRouter = router({
   visitsRouter: visitsRouter,
   vitalsRouter: vitalsRouter,
   eyesightRouter: eyesightRouter,
+  pubertyRouter: pubertyRouter,
+  consultsRouter: consultsRouter,
+  referralRouter: referralRouter,
 });
 
 export const createCaller = createCallerFactory(appRouter);

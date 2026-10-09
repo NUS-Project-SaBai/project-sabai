@@ -1,5 +1,5 @@
 import { trpc } from "@/utils/trpc";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import PageHeader from "@/components/PageHeader";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
@@ -7,23 +7,15 @@ import TableCell from "@/components/TableCell";
 
 function Header() {
   return (
-    <div className="w-full mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Medication Stock", href: "/medication-stock" },
-              { label: "Medication Brands" },
-            ]}
-          />
-          <h1 className="text-3xl font-bold text-slate-900">
-            Medication Brands
-          </h1>
-          <p className="mt-2 text-slate-600">Manage medication brands.</p>
-        </div>
-      </div>
-    </div>
+    <PageHeader
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Medication Stock", href: "/medication-stock" },
+        { label: "Medication Brands" },
+      ]}
+      title="Medication Brands"
+      description="Manage medication brands."
+    />
   );
 }
 
@@ -54,7 +46,9 @@ function MedicationBrandsBasePage() {
     return (
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200">
-          <TableHeader headers={["Brand ID", "Name", "Active Ingredient ID"]} />
+          <TableHeader
+            headers={["Brand ID", "Name", "Remarks", "Active Ingredient ID"]}
+          />
           <tbody className="bg-white divide-y divide-slate-200">
             {brands.map((brand) => (
               <TableRow key={brand.id}>
@@ -66,6 +60,11 @@ function MedicationBrandsBasePage() {
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
                     {brand.name}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm font-medium text-slate-900">
+                    {brand.remarks}
                   </span>
                 </TableCell>
                 <TableCell>

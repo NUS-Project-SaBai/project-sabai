@@ -2,7 +2,7 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { db } from "@/db/drizzle";
 import { router, protectedProcedure } from "@/server/trpc";
-import { medicationActiveIngredients } from "@/db/schema";
+import { medicationActiveIngredients } from "@/db/schema/pharmacy";
 import { eq } from "drizzle-orm";
 
 export const medicationActiveIngredientsRouter = router({
@@ -13,6 +13,7 @@ export const medicationActiveIngredientsRouter = router({
         name: medicationActiveIngredients.name,
         unitOfMeasurement: medicationActiveIngredients.unitOfMeasurement,
         fallBelow: medicationActiveIngredients.fallBelow,
+        remarks: medicationActiveIngredients.remarks,
       })
       .from(medicationActiveIngredients)
       .orderBy(medicationActiveIngredients.id);
@@ -25,6 +26,7 @@ export const medicationActiveIngredientsRouter = router({
         name: zfd.text().nonoptional(),
         unitOfMeasurement: zfd.text().nonoptional(),
         fallBelow: zfd.numeric(z.number().int().positive()).nonoptional(),
+        remarks: zfd.text(z.string().optional()),
       }),
     )
     .mutation(async ({ input }) => {
@@ -42,6 +44,7 @@ export const medicationActiveIngredientsRouter = router({
         name: zfd.text().nonoptional(),
         unitOfMeasurement: zfd.text().nonoptional(),
         fallBelow: zfd.numeric(z.number().int().positive()).nonoptional(),
+        remarks: zfd.text(z.string().optional()),
       }),
     )
     .mutation(async ({ input }) => {

@@ -74,7 +74,7 @@ export function WebcamInput({
           <Button title="Capture" colour="emerald" onClick={webcamCapture} />
         </div>
       )}
-      <div className="mt-2 flex items-center justify-center">
+      <div className="mt-6 flex items-center justify-center">
         {!cameraIsOpen ? (
           imageDetails == null ? (
             <Button

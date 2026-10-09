@@ -1,14 +1,18 @@
 import {
   IndexFacesCommand,
   SearchFacesByImageCommand,
+  DeleteFacesCommand,
   RekognitionClient,
   SearchFacesByImageCommandInput,
   SearchFacesByImageCommandOutput,
   Image,
   IndexFacesCommandInput,
   IndexFacesCommandOutput,
+  DeleteFacesCommandInput,
 } from "@aws-sdk/client-rekognition";
 import env from "@/lib/envVariables";
+
+const client: RekognitionClient = new RekognitionClient();
 
 /**
  * Indexes faces in the AWS Collection.
@@ -22,12 +26,30 @@ export async function generateFaceprint(str: string) {
     Image: image,
   };
 
-  const client: RekognitionClient = new RekognitionClient();
   const command = new IndexFacesCommand(input);
 
   try {
     const results: IndexFacesCommandOutput = await client.send(command);
     return results.FaceRecords?.[0]?.Face?.FaceId;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+/**
+ * Removes a faceprint from the AWS Collection.
+ * @param faceId The FaceId of the faceprint to delete.
+ */
+export async function deleteFaceprint(faceId: string) {
+  const input: DeleteFacesCommandInput = {
+    CollectionId: env.COLLECTION_ID,
+    FaceIds: [faceId],
+  };
+
+  const command = new DeleteFacesCommand(input);
+
+  try {
+    await client.send(command);
   } catch (err) {
     console.error(err);
   }
@@ -45,7 +67,6 @@ export async function searchFaceprint(str: string) {
     Image: image,
     // Keep the other attributes as default
   };
-  const client: RekognitionClient = new RekognitionClient();
   const command = new SearchFacesByImageCommand(input);
   try {
     const results: SearchFacesByImageCommandOutput = await client.send(command);

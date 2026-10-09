@@ -9,7 +9,6 @@ import { Toaster, toast } from "react-hot-toast";
 import ScanFacePage from "@/pages/scan-face";
 import Webcam from "react-webcam";
 import { VillageCodeProvider } from "@/lib/context/VillageCodeContext";
-import { useState } from "react";
 
 // Mock tRPC
 vi.mock("@/utils/trpc", () => ({
@@ -26,10 +25,12 @@ vi.mock("@/utils/trpc", () => ({
       create: {
         useMutation: vi.fn(),
       },
-      findFaceMatches: {
+      searchPatientsByPicture: {
         useMutation: vi.fn(),
       },
-      listMatchingPatients: {
+    },
+    visitsRouter: {
+      create: {
         useMutation: vi.fn(),
       },
     },
@@ -60,12 +61,23 @@ describe("ScanFacePage", () => {
     mockTrpc.patientsRouter.create.useMutation.mockReturnValue({
       mutate: vi.fn(),
     });
-    mockTrpc.patientsRouter.findFaceMatches.useMutation.mockReturnValue({
+    mockTrpc.visitsRouter.create.useMutation.mockReturnValue({
       mutate: vi.fn(),
+      isPending: false,
     });
-    mockTrpc.patientsRouter.listMatchingPatients.useMutation.mockReturnValue({
-      mutate: vi.fn(),
+    mockTrpc.villageCodesRouter.list.useQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
     });
+    mockTrpc.patientsRouter.searchPatientsByPicture.useMutation.mockReturnValue(
+      {
+        mutate: vi.fn(),
+        isIdle: false,
+        isPending: false,
+        isError: false,
+        data: [],
+      },
+    );
   });
 
   afterEach(() => {
@@ -265,7 +277,11 @@ describe("ScanFacePage", () => {
 
   it("changes the button from 'Capture' to 'Retake Photo' when button is clicked", async () => {
     const user = userEvent.setup();
-    render(<ScanFacePage />);
+    render(
+      <VillageCodeProvider>
+        <ScanFacePage />
+      </VillageCodeProvider>,
+    );
     const captureButton = screen.getByRole("button", { name: "Capture" });
     user.click(captureButton);
 
@@ -277,7 +293,11 @@ describe("ScanFacePage", () => {
 
   it("changes the image element to a video element when the 'Retake Photo' button is clicked", async () => {
     const user = userEvent.setup();
-    const { container } = render(<ScanFacePage />);
+    const { container } = render(
+      <VillageCodeProvider>
+        <ScanFacePage />
+      </VillageCodeProvider>,
+    );
     const captureButton = screen.getByRole("button", { name: "Capture" });
 
     expect(
@@ -301,18 +321,19 @@ describe("ScanFacePage", () => {
   it("displays a loading spinner while locating face matches", async () => {
     const user = userEvent.setup();
 
-    mockTrpc.patientsRouter.findFaceMatches.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: true,
-      mutate: vi.fn(),
-    });
-    mockTrpc.patientsRouter.listMatchingPatients.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: false,
-      mutate: vi.fn(),
-    });
+    mockTrpc.patientsRouter.searchPatientsByPicture.useMutation.mockReturnValue(
+      {
+        data: undefined,
+        isPending: true,
+        mutate: vi.fn(),
+      },
+    );
 
-    render(<ScanFacePage />);
+    render(
+      <VillageCodeProvider>
+        <ScanFacePage />
+      </VillageCodeProvider>,
+    );
 
     user.click(screen.getByRole("button", { name: "Capture" }));
 
@@ -321,57 +342,24 @@ describe("ScanFacePage", () => {
     });
   });
 
-  it("displays a loading spinner while fetching the matching patients list", async () => {
-    const user = userEvent.setup();
-
-    mockTrpc.patientsRouter.findFaceMatches.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: false,
-      mutate: vi.fn(),
-    });
-    mockTrpc.patientsRouter.listMatchingPatients.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: true,
-      mutate: vi.fn(),
-    });
-
-    render(<ScanFacePage />);
-
-    user.click(screen.getByRole("button", { name: "Capture" }));
-
-    await waitFor(() => {
-      assertLoadingSpinner("Finding matching patients...");
-    });
-  });
-
   it("displays a message that there is no matching patients, and a button to register new patients if no matching patients", async () => {
     const user = userEvent.setup();
 
-    mockTrpc.patientsRouter.findFaceMatches.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: false,
-      mutate: vi.fn(),
-    });
-    mockTrpc.patientsRouter.listMatchingPatients.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: true,
-      mutate: vi.fn(),
-    });
+    mockTrpc.patientsRouter.searchPatientsByPicture.useMutation.mockReturnValue(
+      {
+        data: [],
+        isPending: false,
+        mutate: vi.fn(),
+      },
+    );
 
-    render(<ScanFacePage />);
+    render(
+      <VillageCodeProvider>
+        <ScanFacePage />
+      </VillageCodeProvider>,
+    );
 
     user.click(screen.getByRole("button", { name: "Capture" }));
-
-    mockTrpc.patientsRouter.findFaceMatches.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: false,
-      mutate: vi.fn(),
-    });
-    mockTrpc.patientsRouter.listMatchingPatients.useMutation.mockReturnValue({
-      data: undefined,
-      isPending: false,
-      mutate: vi.fn(),
-    });
 
     await waitFor(() => {
       expect(screen.getByText("No matches found")).toBeInTheDocument();

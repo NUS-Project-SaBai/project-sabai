@@ -18,6 +18,10 @@ import { RHFTextArea } from "@/components/interactive/RHF/RHFTextArea";
 import { Button } from "@/components/interactive/Button/Button";
 import toast from "react-hot-toast";
 import { formatVisitDate } from "@/lib/utils/visit";
+import FormSection from "@/components/interactive/inputs/FormSection";
+import { useState } from "react";
+import Modal from "@/components/interactive/Modal";
+import EditPatientForm from "@/components/patient/EditPatientForm";
 
 type VitalsFormValues = {
   height?: string | null;
@@ -41,6 +45,7 @@ export default function PatientVitalsPage() {
   const { id } = router.query;
   const methods = useForm();
   const { setValue } = methods;
+  const [isEditingPatient, setIsEditingPatient] = useState(false);
 
   // Fetch patient
   const { data: patient, isLoading: patientLoading } =
@@ -79,7 +84,7 @@ export default function PatientVitalsPage() {
   // Only check if patient is missing AFTER we are certain the query ran
   if (!patient) {
     return (
-      <div className="p-8 text-center font-semibold text-red-500">
+      <div className="p-5 text-center font-semibold text-red-500">
         Patient not found
       </div>
     );
@@ -91,7 +96,7 @@ export default function PatientVitalsPage() {
     : null;
 
   return (
-    <div className="min-h-screen flex-1 p-8 bg-slate-50">
+    <div className="min-h-screen flex-1 p-4 bg-slate-50">
       <div className="w-full mx-auto max-w-5xl">
         <Breadcrumbs
           items={[
@@ -101,17 +106,36 @@ export default function PatientVitalsPage() {
           ]}
         />
 
-        <div className="flex flex-col mb-8">
+        <div className="flex items-start justify-between gap-4 mb-8">
           <h1 className="text-3xl font-bold text-slate-900">
             Patient Vitals — {patient.name}
           </h1>
+          <Button
+            title="Edit Patient Details"
+            colour="indigo"
+            onClick={() => setIsEditingPatient(true)}
+            className="shrink-0"
+          />
         </div>
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <FormProvider {...methods}>
-              <div className="p-6 border-b border-slate-100 bg-slate-50/50">
-                {visits && visits.length > 0 ? (
-                  <div className="max-w-md">
+
+        {isEditingPatient && (
+          <Modal
+            title="Edit Patient Details"
+            onClose={() => setIsEditingPatient(false)}
+            maxWidthClassName="max-w-2xl"
+          >
+            <EditPatientForm
+              patient={patient}
+              onSuccess={() => setIsEditingPatient(false)}
+            />
+          </Modal>
+        )}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+          <FormProvider {...methods}>
+            <div className="p-6 border-b border-slate-100 bg-slate-50/50">
+              {visits && visits.length > 0 ? (
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:items-center">
+                  <div className="w-full max-w-md">
                     <RHFDropdown
                       name="visitSelect"
                       label="Choose visit"
@@ -121,33 +145,35 @@ export default function PatientVitalsPage() {
                       }))}
                     />
                   </div>
-                ) : (
-                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-700">
-                    No visits found for patient.
-                  </div>
-                )}
-              </div>
-
-              <div className="p-6">
-                {selectedVisit ? (
-                  <div className="mb-6 p-4 bg-blue-50/50 rounded-lg border border-blue-100">
-                    <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider block mb-1">
-                      Filling up vitals form for visit on{" "}
-                      {formatVisitDate(selectedVisit.date)}
+                  <div className="text-center text-sm text-slate-600">
+                    Filling up vitals form for visit on{" "}
+                    <span className="font-semibold text-slate-900">
+                      {selectedVisit
+                        ? formatVisitDate(selectedVisit.date)
+                        : "-"}
                     </span>
-                    <VitalsForm visitId={selectedVisit.id} />
                   </div>
-                ) : (
-                  visits &&
-                  visits.length > 0 && (
-                    <div className="text-center py-12 text-slate-400 font-medium border-2 border-dashed border-slate-200 rounded-xl">
-                      Please choose a visit to view vitals.
-                    </div>
-                  )
-                )}
-              </div>
-            </FormProvider>
-          </div>
+                </div>
+              ) : (
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-700">
+                  No visits found for patient.
+                </div>
+              )}
+            </div>
+
+            <div className="bg-slate-50/50 p-6">
+              {selectedVisit ? (
+                <VitalsForm visitId={selectedVisit.id} />
+              ) : (
+                visits &&
+                visits.length > 0 && (
+                  <div className="text-center py-12 text-slate-400 font-medium border-2 border-dashed border-slate-200 rounded-xl">
+                    Please choose a visit to view vitals.
+                  </div>
+                )
+              )}
+            </div>
+          </FormProvider>
         </div>
       </div>
     </div>
@@ -230,26 +256,26 @@ function VitalsForm({ visitId }: { visitId: number }) {
       return;
     }
 
+    // Send `null` (not `undefined`) for cleared fields so they are explicitly
+    // set to NULL on update — `undefined` is skipped by Drizzle and would leave
+    // the previous value untouched.
     const payload = {
       visitId: visitId,
-      height: data.height || undefined,
-      weight: data.weight || undefined,
-      temperature: data.temperature || undefined,
-      systolic: data.systolic ? Number(data.systolic) : undefined,
-      diastolic: data.diastolic ? Number(data.diastolic) : undefined,
-      heartRate: data.heartRate ? Number(data.heartRate) : undefined,
-      hemocueCount: data.hemocueCount || undefined,
-      diabetesMellitus:
-        data.diabetesMellitus === "true"
-          ? true
-          : data.diabetesMellitus === "false"
-            ? false
-            : undefined,
-      urineTest: data.urineTest || undefined,
-      bloodGlucoseNonFasting: data.bloodGlucoseNonFasting || undefined,
-      bloodGlucoseFasting: data.bloodGlucoseFasting || undefined,
-      hba1c: data.hba1c || undefined,
-      others: data.others || undefined,
+      height: data.height || null,
+      weight: data.weight || null,
+      temperature: data.temperature || null,
+      systolic: data.systolic ? Number(data.systolic) : null,
+      diastolic: data.diastolic ? Number(data.diastolic) : null,
+      heartRate: data.heartRate ? Number(data.heartRate) : null,
+      hemocueCount: data.hemocueCount || null,
+      diabetesMellitus: data.diabetesMellitus
+        ? data.diabetesMellitus === "true"
+        : null,
+      urineTest: data.urineTest || null,
+      bloodGlucoseNonFasting: data.bloodGlucoseNonFasting || null,
+      bloodGlucoseFasting: data.bloodGlucoseFasting || null,
+      hba1c: data.hba1c || null,
+      others: data.others || null,
     };
 
     if (!vitalData) {
@@ -260,22 +286,39 @@ function VitalsForm({ visitId }: { visitId: number }) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      {/*normal body stuff*/}
-      <section className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Body measurements */}
+      <FormSection
+        title="Body Measurements"
+        description="General physical measurements."
+      >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <RHFInput name="height" label="Height (cm)" type="number" />
-          <RHFInput name="weight" label="Weight (kg)" type="number" />
+          <RHFInput
+            name="height"
+            label="Height (cm)"
+            type="number"
+            step="0.1"
+          />
+          <RHFInput
+            name="weight"
+            label="Weight (kg)"
+            type="number"
+            step="0.01"
+          />
           <RHFInput
             name="temperature"
             label="Body Temperature (°C)"
             type="number"
+            step="0.1"
           />
         </div>
-      </section>
+      </FormSection>
 
-      {/*Cardiovascular */}
-      <section className="space-y-4">
+      {/* Cardiovascular */}
+      <FormSection
+        title="Cardiovascular"
+        description="Blood pressure and heart rate readings."
+      >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <RHFInput
             name="systolic"
@@ -289,28 +332,40 @@ function VitalsForm({ visitId }: { visitId: number }) {
           />
           <RHFInput name="heartRate" label="Heart Rate (BPM)" type="number" />
         </div>
-      </section>
+      </FormSection>
 
-      <section className="space-y-4">
+      {/* Blood & metabolic */}
+      <FormSection
+        title="Blood & Metabolic"
+        description="Blood glucose, haemoglobin and diabetes status."
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <RHFInput
             name="bloodGlucoseFasting"
             label="Fasting Blood Glucose (mmol/L)"
             type="number"
+            step="0.01"
           />
           <RHFInput
             name="bloodGlucoseNonFasting"
             label="Non-Fasting Blood Glucose (mmol/L)"
             type="number"
+            step="0.01"
           />
-          <RHFInput name="hba1c" label="HbA1c Level (%)" type="number" />
+          <RHFInput
+            name="hba1c"
+            label="HbA1c Level (%)"
+            type="number"
+            step="0.01"
+          />
           <RHFInput
             name="hemocueCount"
             label="Hemocue Hemoglobin Count (g/dL)"
             type="number"
+            step="0.01"
           />
         </div>
-        <div className="mt-4">
+        <div className="mt-6">
           <RHFRadio
             name="diabetesMellitus"
             label="Diabetes Mellitus History Status Flag"
@@ -320,24 +375,30 @@ function VitalsForm({ visitId }: { visitId: number }) {
             ]}
           />
         </div>
-      </section>
+      </FormSection>
 
-      <section className="space-y-4">
-        <div className="space-y-4">
-          <RHFTextArea
-            name="urineTest"
-            label="Urinalysis Diagnostics (Leukocytes, Nitrites, Protein notes)"
-            rows={3}
-          />
-          <RHFTextArea
-            name="others"
-            label="Additional Clinical Remarks"
-            rows={3}
-          />
-        </div>
-      </section>
+      {/* Urinalysis */}
+      <FormSection title="Urinalysis" description="Urine test findings.">
+        <RHFTextArea
+          name="urineTest"
+          label="Urinalysis Diagnostics (Leukocytes, Nitrites, Protein notes)"
+          rows={3}
+        />
+      </FormSection>
 
-      <div className="flex justify-end pt-4 border-t border-slate-100">
+      {/* Additional remarks */}
+      <FormSection
+        title="Additional Remarks"
+        description="Any additional clinical notes."
+      >
+        <RHFTextArea
+          name="others"
+          label="Additional Clinical Remarks"
+          rows={3}
+        />
+      </FormSection>
+
+      <div className="flex justify-end pt-2">
         <div className="w-full md:w-44">
           <Button
             type="submit"

@@ -1,15 +1,20 @@
 import { z } from "zod";
 import { zfd } from "zod-form-data";
-import { uploadToCloudinary } from "@/server/utils/cloudinary";
+import {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+} from "@/server/utils/cloudinary";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { patients, genderEnum, visits, villageCodes } from "@/db/schema";
+import { patients, genderEnum, visits } from "@/db/schema/patients";
+import { villageCodes } from "@/db/schema/villageCodes";
 import serverEnv from "@/lib/envVariables";
 import { TRPCError } from "@trpc/server";
-import { eq, desc, inArray, isNotNull } from "drizzle-orm";
+import { eq, and, ne, desc, inArray, isNotNull } from "drizzle-orm";
 import {
   generateFaceprint,
   searchFaceprint,
+  deleteFaceprint,
   dataUrlToFile,
 } from "@/lib/utils/facialRecognition";
 
@@ -199,6 +204,7 @@ export const patientsRouter = router({
         id: zfd.numeric(z.number().int()), // ID must be included for updates
         name: zfd.text(z.string().optional()),
         identificationNumber: zfd.text(z.string().optional()),
+        contactNo: zfd.text(z.string().optional()),
         gender: zfd.text(z.enum(genderEnum.enumValues).optional()),
         dateOfBirth: zfd.text(z.coerce.date().optional()),
         drugAllergy: zfd.text(z.string().optional()),
@@ -210,17 +216,116 @@ export const patientsRouter = router({
     )
     .mutation(async ({ input }) => {
       const { id, patientImage, ...updateData } = input;
-      let patientImagePublicId;
-      if (patientImage) {
-        const patientImage: File = dataUrlToFile(
-          input.patientImage!, // Temporarily add non-null operator until later refactoring
-          `${input.name}.jpg`,
-        );
-        patientImagePublicId = await uploadToCloudinary(patientImage);
+
+      if (updateData.identificationNumber !== undefined) {
+        updateData.identificationNumber =
+          updateData.identificationNumber.trim();
       }
+
+      // Reject an identificationNumber that already belongs to a different
+      // patient. This is the guard against creating duplicate IDs via updates.
+      if (updateData.identificationNumber) {
+        const [conflict] = await db
+          .select({ id: patients.id })
+          .from(patients)
+          .where(
+            and(
+              eq(
+                patients.identificationNumber,
+                updateData.identificationNumber,
+              ),
+              ne(patients.id, id),
+            ),
+          )
+          .limit(1);
+
+        if (conflict) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Another patient already has this identification number.",
+          });
+        }
+      }
+
+      let imageUpdate: {
+        patientImagePublicId?: string;
+        rekognitionFaceId?: string;
+      } = {};
+
+      // Client sends a new base64 image (recapture)
+      if (patientImage) {
+        // Reads patient's current Cloudinary image id and Rekognition face id before overwriting them
+        const [existing] = await db
+          .select({
+            patientImagePublicId: patients.patientImagePublicId,
+            rekognitionFaceId: patients.rekognitionFaceId,
+          })
+          .from(patients)
+          .where(eq(patients.id, id))
+          .limit(1);
+
+        const imageFile: File = dataUrlToFile(
+          patientImage,
+          `${input.name ?? id}.jpg`,
+        );
+
+        const [patientImagePublicId, rekognitionFaceId] = await Promise.all([
+          uploadToCloudinary(imageFile),
+          generateFaceprint(patientImage),
+        ]);
+        imageUpdate = { patientImagePublicId, rekognitionFaceId };
+
+        // No faceprint means the new photo wasn't indexed; keep the old one so
+        // the patient stays searchable by face.
+        if (!rekognitionFaceId) {
+          console.warn(
+            `Faceprint not generated for patient ${id}; new photo is not searchable by face. Keeping previous faceprint.`,
+          );
+        }
+
+        // Best-effort cleanup of the replaced assets.
+        // Only delete if no other patient still references the same asset (image or faceprint)
+        if (existing?.patientImagePublicId) {
+          const [sharedImage] = await db
+            .select({ id: patients.id })
+            .from(patients)
+            .where(
+              and(
+                ne(patients.id, id),
+                eq(
+                  patients.patientImagePublicId,
+                  existing.patientImagePublicId,
+                ),
+              ),
+            )
+            .limit(1);
+          if (!sharedImage) {
+            await deleteFromCloudinary(existing.patientImagePublicId).catch(
+              (err) =>
+                console.error("Failed to delete old patient image:", err),
+            );
+          }
+        }
+        if (rekognitionFaceId && existing?.rekognitionFaceId) {
+          const [sharedFace] = await db
+            .select({ id: patients.id })
+            .from(patients)
+            .where(
+              and(
+                ne(patients.id, id),
+                eq(patients.rekognitionFaceId, existing.rekognitionFaceId),
+              ),
+            )
+            .limit(1);
+          if (!sharedFace) {
+            await deleteFaceprint(existing.rekognitionFaceId);
+          }
+        }
+      }
+
       const [result] = await db
         .update(patients)
-        .set({ ...updateData, patientImagePublicId })
+        .set({ ...updateData, ...imageUpdate })
         .where(eq(patients.id, id))
         .returning();
 
@@ -239,58 +344,38 @@ export const patientsRouter = router({
       return { success: !!result };
     }),
 
-  // find all matches
-  findFaceMatches: protectedProcedure
+  // searchPatientsByPicture uses AWS Rekognition to find matching patients based on a provided face image.
+  // It returns an array of patients whose rekognitionFaceId matches any of the FaceIds found in the search results.
+  // NOTE: Though this endpoint does not modify any data, it is a mutation because it receives a base64-encoded image as input, which can be large.
+  // Using a mutation allows for larger payloads compared to a query.
+  searchPatientsByPicture: protectedProcedure
     .input(z.object({ picture: z.string() }))
     .mutation(async ({ input }) => {
+      // Step 1: Search for faceprint matches using the provided picture
+      let searchFaceprintResults;
       try {
-        const res = await searchFaceprint(input.picture);
-        return { data: res };
+        searchFaceprintResults = await searchFaceprint(input.picture);
+        // If there are no matches, return an empty array
+        if (!searchFaceprintResults || searchFaceprintResults.length === 0) {
+          return [];
+        }
       } catch (err) {
-        console.error(err);
-        return { data: [] };
+        // Log the error and return an empty array if the search fails
+        console.error("error searchFaceprint:", err);
+        return [];
       }
-    }),
 
-  listMatchingPatients: protectedProcedure
-    .input(
-      z.object({
-        matches: z.array(
-          z.object({
-            Face: z
-              .object({
-                FaceId: z.string().optional(),
-                BoundingBox: z
-                  .object({
-                    Width: z.number().optional(),
-                    Height: z.number().optional(),
-                    Left: z.number().optional(),
-                    Top: z.number().optional(),
-                  })
-                  .optional(),
-                ImageId: z.string().optional(),
-                Confidence: z.number().optional(),
-                IndexFacesModelVersion: z.string().optional(),
-              })
-              .optional(),
-            Similarity: z.number().optional(),
-          }),
-        ),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      if (input.matches.length === 0) return [];
-
-      // use typescript typeguard filter to avoid inArray type errors
-      const faceIds = input.matches
+      // get the FaceIds from the search results, filtering out any undefined values
+      const faceIds = searchFaceprintResults
         .map((item) => item.Face?.FaceId)
-        .filter((id): id is string => typeof id === "string");
+        .filter((id): id is string => typeof id === "string"); // use Type Predicate to ensure TypeScript knows these are strings
 
       if (faceIds.length === 0) {
         return [];
       }
 
-      const result = await db
+      // Step 2: Query the database for patients whose rekognitionFaceId matches any of the FaceIds found
+      const matchingPatients = await db
         .select({
           id: patients.id,
           name: patients.name,
@@ -308,6 +393,6 @@ export const patientsRouter = router({
         .from(patients)
         .where(inArray(patients.rekognitionFaceId, faceIds));
 
-      return result.map(getPatientWithImageUrl);
+      return matchingPatients.map(getPatientWithImageUrl);
     }),
 });

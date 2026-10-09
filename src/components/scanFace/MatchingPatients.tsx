@@ -1,81 +1,76 @@
-import { Patient } from "@/db/schema";
 import { trpc } from "@/utils/trpc";
-import { FaceMatch } from "@aws-sdk/client-rekognition";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import { PatientPhoto } from "@/components/PatientPhoto";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import toast from "react-hot-toast";
 import { Mode } from "@/types/scan";
 import { Button } from "@/components/interactive/Button/Button";
-
-type PatientWithImage = Patient & {
-  patientImageUrl: string | null;
-};
+import { MdPersonSearch } from "react-icons/md";
+import { useVillageCode } from "@/lib/context/VillageCodeContext";
+import toast from "react-hot-toast";
 
 export default function MatchingPatients({
   imgDetails,
   setMode,
 }: {
-  imgDetails: string | null;
+  imgDetails: string;
   setMode: React.Dispatch<React.SetStateAction<Mode>>;
 }) {
-  const findFaceMatchMutation = trpc.patientsRouter.findFaceMatches.useMutation(
-    {
-      onSuccess(response) {
-        const matches: FaceMatch[] = response.data!;
-        findMatchingPatientsMutation.mutate({ matches: matches });
-      },
-      onError(error) {
-        console.error(error);
-        toast.error("Error: Unable to find matching face.");
-      },
-    },
-  );
-  const findMatchingPatientsMutation =
-    trpc.patientsRouter.listMatchingPatients.useMutation({
-      onSuccess(result) {
-        setMatchingPatients(result);
-      },
-      onError(err) {
-        console.error(err);
-        toast.error("Error: Unable to find matching patients.");
-      },
-    });
-
-  const [matchingPatients, setMatchingPatients] = useState<PatientWithImage[]>(
-    [],
-  );
-
+  const { selectedVillageCodeId } = useVillageCode();
+  const searchPatientsByPictureQuery =
+    trpc.patientsRouter.searchPatientsByPicture.useMutation();
+  const createVisitMutation = trpc.visitsRouter.create.useMutation();
   useEffect(() => {
-    findFaceMatchMutation.mutate({ picture: imgDetails! });
-  }, []);
+    searchPatientsByPictureQuery.mutate({ picture: imgDetails });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imgDetails]); // suppress warning about missing dependencies because we only want to run this effect when imgDetails changes
 
-  if (findFaceMatchMutation.isPending) {
+  if (searchPatientsByPictureQuery.isError) {
+    return (
+      <div className="flex-col">
+        <h2 className="text-xl font-bold mb-4 text-center py-10">
+          The server encountered an error while trying to find matches. Please
+          try again later.
+        </h2>
+      </div>
+    );
+  }
+
+  if (searchPatientsByPictureQuery.isIdle) {
+    return (
+      <div className="flex-col">
+        <h2 className="text-xl font-bold mb-4 text-center py-10">
+          Enter a face image to find matching patients.
+        </h2>
+      </div>
+    );
+  }
+
+  if (searchPatientsByPictureQuery.isPending) {
     return (
       <LoadingSpinner message="Finding face matches..." className="p-12" />
     );
   }
 
-  if (findMatchingPatientsMutation.isPending) {
+  if (searchPatientsByPictureQuery.data.length === 0) {
     return (
-      <LoadingSpinner message="Finding matching patients..." className="p-12" />
-    );
-  }
-
-  if (matchingPatients.length === 0) {
-    return (
-      <div className="flex-col">
-        <h2 className="text-xl font-bold mb-4 text-center py-10">
+      <div className="flex flex-col items-center gap-3 py-6 text-center">
+        <MdPersonSearch className="text-gray-300" size={64} />
+        <h2 className="text-lg font-semibold text-gray-700">
           No matches found
         </h2>
-        <Button
-          onClick={() => setMode(Mode.REGISTERING)}
-          colour="indigo"
-          title="Register New Patient"
-        />
+        <p className="text-sm text-gray-400">
+          We couldn&apos;t find a patient matching this face.
+        </p>
+        <div className="flex gap-3 mt-4">
+          <Button
+            onClick={() => setMode(Mode.REGISTERING)}
+            colour="indigo"
+            title="Register New Patient"
+          />
+        </div>
       </div>
     );
   }
@@ -86,7 +81,7 @@ export default function MatchingPatients({
       <table className="min-w-full divide-y divide-slate-200">
         <TableHeader headers={["ID", "Photo", "Full Name", "Actions"]} />
         <tbody className="bg-white divide-y divide-slate-200">
-          {matchingPatients.map((patient) => (
+          {searchPatientsByPictureQuery.data.map((patient) => (
             <TableRow key={patient.id}>
               <TableCell>
                 <div className="text-sm font-medium text-slate-900">
@@ -96,7 +91,7 @@ export default function MatchingPatients({
               <TableCell>
                 <PatientPhoto
                   pictureUrl={patient.patientImageUrl}
-                  className="rounded-full border border-slate-200"
+                  className="rounded-lg border border-slate-200"
                 />
               </TableCell>
               <TableCell>
@@ -105,14 +100,40 @@ export default function MatchingPatients({
                 </div>
               </TableCell>
               <TableCell>
-                {/* Placeholder for 'create new visit' button */}
-                Create visit
+                <Button
+                  colour="emerald"
+                  title={
+                    createVisitMutation.isPending
+                      ? "Creating..."
+                      : "Create Visit"
+                  }
+                  disabled={createVisitMutation.isPending}
+                  onClick={() => {
+                    createVisitMutation.mutate(
+                      {
+                        patientId: patient.id,
+                        villageCodeId: selectedVillageCodeId!,
+                      },
+                      {
+                        onSuccess() {
+                          toast.success("Visit created successfully!");
+                        },
+                        onError(error) {
+                          console.error("Error creating visit:", error);
+                          toast.error(
+                            "Failed to create visit. Please try again.",
+                          );
+                        },
+                      },
+                    );
+                  }}
+                />
               </TableCell>
             </TableRow>
           ))}
         </tbody>
       </table>
-      <div className="flex gap-3 mt-6">
+      <div className="flex gap-3 mt-6 justify-center">
         <Button
           colour="indigo"
           onClick={() => setMode(Mode.REGISTERING)}

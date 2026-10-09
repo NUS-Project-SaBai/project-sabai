@@ -2,6 +2,7 @@ import Link from "next/link";
 import { calculateAge } from "@/lib/utils/patient";
 import { PatientPhoto } from "@/components/PatientPhoto";
 import { PatientsRouterListItem } from "@/utils/trpc-types";
+import { paths } from "@/utils/paths";
 
 interface PatientSearchResultItemProps {
   patient: PatientsRouterListItem;
@@ -12,7 +13,7 @@ interface PatientSearchResultItemProps {
 export default function PatientSearchResultItem({
   patient,
   onSelect,
-  linkPath = `/patient/${patient.id}`,
+  linkPath = paths.patientDetail(patient.id),
 }: PatientSearchResultItemProps) {
   return (
     <Link
@@ -24,7 +25,7 @@ export default function PatientSearchResultItem({
         pictureUrl={patient.patientImageUrl}
         height={40}
         width={40}
-        className="rounded-full border border-slate-200"
+        className="rounded-lg border border-slate-200"
       />
       <div className="flex min-w-0 flex-col">
         <span className="font-medium truncate">{patient.name}</span>

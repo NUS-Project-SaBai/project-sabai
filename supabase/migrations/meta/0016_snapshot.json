@@ -1,0 +1,1283 @@
+{
+  "id": "80aff4c5-a126-4a53-b9bb-490fba32d964",
+  "prevId": "ccc8b7cc-d1a9-4ef7-b136-0d29ced470f1",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "auth.users": {
+      "name": "users",
+      "schema": "auth",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.child_vitals": {
+      "name": "child_vitals",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "gross_motor": {
+          "name": "gross_motor",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "red_reflex": {
+          "name": "red_reflex",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scoliosis": {
+          "name": "scoliosis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pallor": {
+          "name": "pallor",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "oral_cavity": {
+          "name": "oral_cavity",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "heart": {
+          "name": "heart",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "abdomen": {
+          "name": "abdomen",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lungs": {
+          "name": "lungs",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hernial_orifices": {
+          "name": "hernial_orifices",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vital_id": {
+          "name": "vital_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "child_vitals_vital_id_vitals_id_fk": {
+          "name": "child_vitals_vital_id_vitals_id_fk",
+          "tableFrom": "child_vitals",
+          "tableTo": "vitals",
+          "columnsFrom": [
+            "vital_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "child_vitals_vital_id_unique": {
+          "name": "child_vitals_vital_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "vital_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.consults": {
+      "name": "consults",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "past_medical_history": {
+          "name": "past_medical_history",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "consultation": {
+          "name": "consultation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "treatment_plan": {
+          "name": "treatment_plan",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "remarks": {
+          "name": "remarks",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "doctor_id": {
+          "name": "doctor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "visit_id": {
+          "name": "visit_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "consults_doctor_id_users_id_fk": {
+          "name": "consults_doctor_id_users_id_fk",
+          "tableFrom": "consults",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "doctor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "consults_visit_id_visits_id_fk": {
+          "name": "consults_visit_id_visits_id_fk",
+          "tableFrom": "consults",
+          "tableTo": "visits",
+          "columnsFrom": [
+            "visit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.diagnosis": {
+      "name": "diagnosis",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "details": {
+          "name": "details",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "consult_id": {
+          "name": "consult_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "diagnosis_consult_id_consults_id_fk": {
+          "name": "diagnosis_consult_id_consults_id_fk",
+          "tableFrom": "diagnosis",
+          "tableTo": "consults",
+          "columnsFrom": [
+            "consult_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.eyesight": {
+      "name": "eyesight",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "visit_id": {
+          "name": "visit_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "left_eye_degree": {
+          "name": "left_eye_degree",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "right_eye_degree": {
+          "name": "right_eye_degree",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "left_eye_pinhole": {
+          "name": "left_eye_pinhole",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "right_eye_pinhole": {
+          "name": "right_eye_pinhole",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "left_astigmatism": {
+          "name": "left_astigmatism",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "right_astigmatism": {
+          "name": "right_astigmatism",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "comments": {
+          "name": "comments",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "left_prescribed_glasses_degree": {
+          "name": "left_prescribed_glasses_degree",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "right_prescribed_glasses_degree": {
+          "name": "right_prescribed_glasses_degree",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "eyesight_visit_id_visits_id_fk": {
+          "name": "eyesight_visit_id_visits_id_fk",
+          "tableFrom": "eyesight",
+          "tableTo": "visits",
+          "columnsFrom": [
+            "visit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "eyesight_visit_id_unique": {
+          "name": "eyesight_visit_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "visit_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.medication_active_ingredients": {
+      "name": "medication_active_ingredients",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "unit_of_measurement": {
+          "name": "unit_of_measurement",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fall_below": {
+          "name": "fall_below",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "remarks": {
+          "name": "remarks",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.medication_brands": {
+      "name": "medication_brands",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "active_ingredient_id": {
+          "name": "active_ingredient_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "remarks": {
+          "name": "remarks",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "medication_brands_active_ingredient_id_medication_active_ingredients_id_fk": {
+          "name": "medication_brands_active_ingredient_id_medication_active_ingredients_id_fk",
+          "tableFrom": "medication_brands",
+          "tableTo": "medication_active_ingredients",
+          "columnsFrom": [
+            "active_ingredient_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.medication_stock": {
+      "name": "medication_stock",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "medication_brand_id": {
+          "name": "medication_brand_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "expiry": {
+          "name": "expiry",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "location": {
+          "name": "location",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "stock_status": {
+          "name": "stock_status",
+          "type": "medication_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "remarks": {
+          "name": "remarks",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "medication_stock_medication_brand_id_medication_brands_id_fk": {
+          "name": "medication_stock_medication_brand_id_medication_brands_id_fk",
+          "tableFrom": "medication_stock",
+          "tableTo": "medication_brands",
+          "columnsFrom": [
+            "medication_brand_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.orders": {
+      "name": "orders",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "consult_id": {
+          "name": "consult_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dosage_instructions": {
+          "name": "dosage_instructions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "order_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PENDING'"
+        },
+        "stock_change_id": {
+          "name": "stock_change_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "orders_consult_id_consults_id_fk": {
+          "name": "orders_consult_id_consults_id_fk",
+          "tableFrom": "orders",
+          "tableTo": "consults",
+          "columnsFrom": [
+            "consult_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "orders_stock_change_id_stock_changes_id_fk": {
+          "name": "orders_stock_change_id_stock_changes_id_fk",
+          "tableFrom": "orders",
+          "tableTo": "stock_changes",
+          "columnsFrom": [
+            "stock_change_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.patients": {
+      "name": "patients",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "identification_number": {
+          "name": "identification_number",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contact_no": {
+          "name": "contact_no",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gender": {
+          "name": "gender",
+          "type": "gender",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "drug_allergy": {
+          "name": "drug_allergy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date_of_birth": {
+          "name": "date_of_birth",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "has_poor_card": {
+          "name": "has_poor_card",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "has_bs2_card": {
+          "name": "has_bs2_card",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "has_sabai_card": {
+          "name": "has_sabai_card",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "patient_image_public_id": {
+          "name": "patient_image_public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rekognition_face_id": {
+          "name": "rekognition_face_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.puberty": {
+      "name": "puberty",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "pubarche": {
+          "name": "pubarche",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pubarche_age": {
+          "name": "pubarche_age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "thelarche": {
+          "name": "thelarche",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "thelarche_age": {
+          "name": "thelarche_age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "menarche": {
+          "name": "menarche",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "menarche_age": {
+          "name": "menarche_age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "voice_change": {
+          "name": "voice_change",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "voice_change_age": {
+          "name": "voice_change_age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "testicular_growth": {
+          "name": "testicular_growth",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "testicular_growth_age": {
+          "name": "testicular_growth_age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "additional_notes": {
+          "name": "additional_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vital_id": {
+          "name": "vital_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "puberty_vital_id_vitals_id_fk": {
+          "name": "puberty_vital_id_vitals_id_fk",
+          "tableFrom": "puberty",
+          "tableTo": "vitals",
+          "columnsFrom": [
+            "vital_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "puberty_vital_id_unique": {
+          "name": "puberty_vital_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "vital_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.referrals": {
+      "name": "referrals",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "referred_for": {
+          "name": "referred_for",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "referral_notes": {
+          "name": "referral_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "referral_state": {
+          "name": "referral_state",
+          "type": "referral_state",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'New'"
+        },
+        "referral_outcome": {
+          "name": "referral_outcome",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "consult_id": {
+          "name": "consult_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "referrals_consult_id_consults_id_fk": {
+          "name": "referrals_consult_id_consults_id_fk",
+          "tableFrom": "referrals",
+          "tableTo": "consults",
+          "columnsFrom": [
+            "consult_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.stock_changes": {
+      "name": "stock_changes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "stock_id": {
+          "name": "stock_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "field": {
+          "name": "field",
+          "type": "stock_change_field_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "previous_value": {
+          "name": "previous_value",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "new_value": {
+          "name": "new_value",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "stock_changes_stock_id_medication_stock_id_fk": {
+          "name": "stock_changes_stock_id_medication_stock_id_fk",
+          "tableFrom": "stock_changes",
+          "tableTo": "medication_stock",
+          "columnsFrom": [
+            "stock_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "stock_changes_user_id_users_id_fk": {
+          "name": "stock_changes_user_id_users_id_fk",
+          "tableFrom": "stock_changes",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.village_codes": {
+      "name": "village_codes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color_hex": {
+          "name": "color_hex",
+          "type": "varchar(7)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_visible": {
+          "name": "is_visible",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "village_codes_code_unique": {
+          "name": "village_codes_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "code"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.visits": {
+      "name": "visits",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "patient_id": {
+          "name": "patient_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "village_code_id": {
+          "name": "village_code_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "visits_patient_id_patients_id_fk": {
+          "name": "visits_patient_id_patients_id_fk",
+          "tableFrom": "visits",
+          "tableTo": "patients",
+          "columnsFrom": [
+            "patient_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "visits_village_code_id_village_codes_id_fk": {
+          "name": "visits_village_code_id_village_codes_id_fk",
+          "tableFrom": "visits",
+          "tableTo": "village_codes",
+          "columnsFrom": [
+            "village_code_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.vitals": {
+      "name": "vitals",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "height": {
+          "name": "height",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weight": {
+          "name": "weight",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "temperature": {
+          "name": "temperature",
+          "type": "numeric(4, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "systolic": {
+          "name": "systolic",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "diastolic": {
+          "name": "diastolic",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "heart_rate": {
+          "name": "heart_rate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hemocue_count": {
+          "name": "hemocue_count",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "diabetes_mellitus": {
+          "name": "diabetes_mellitus",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "urine_test": {
+          "name": "urine_test",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "blood_glucose_non_fasting": {
+          "name": "blood_glucose_non_fasting",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "blood_glucose_fasting": {
+          "name": "blood_glucose_fasting",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hba1c": {
+          "name": "hba1c",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "others": {
+          "name": "others",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "visit_id": {
+          "name": "visit_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "vitals_visit_id_visits_id_fk": {
+          "name": "vitals_visit_id_visits_id_fk",
+          "tableFrom": "vitals",
+          "tableTo": "visits",
+          "columnsFrom": [
+            "visit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "vitals_visit_id_unique": {
+          "name": "vitals_visit_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "visit_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.gender": {
+      "name": "gender",
+      "schema": "public",
+      "values": [
+        "male",
+        "female"
+      ]
+    },
+    "public.medication_status": {
+      "name": "medication_status",
+      "schema": "public",
+      "values": [
+        "active",
+        "discarded",
+        "donated",
+        "dispensed",
+        "reserved"
+      ]
+    },
+    "public.order_status": {
+      "name": "order_status",
+      "schema": "public",
+      "values": [
+        "APPROVED",
+        "CANCELLED",
+        "PENDING"
+      ]
+    },
+    "public.referral_state": {
+      "name": "referral_state",
+      "schema": "public",
+      "values": [
+        "CompletedFailure",
+        "New",
+        "Seen",
+        "Outgoing",
+        "CompletedSuccess",
+        "Completed",
+        "None"
+      ]
+    },
+    "public.stock_change_field_enum": {
+      "name": "stock_change_field_enum",
+      "schema": "public",
+      "values": [
+        "location",
+        "quantity",
+        "stock_status",
+        "remarks"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

@@ -13,7 +13,8 @@ type RHFInputProps = {
     HTMLDivElement
   >["className"];
   registerOptions?: RegisterOptions;
-  type: "text" | "email" | "password" | "number" | "date" | "checkbox";
+  type:
+    "text" | "email" | "password" | "number" | "date" | "color" | "checkbox";
 } & DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 /**
@@ -30,7 +31,7 @@ type RHFInputProps = {
  * @param {boolean} [isRequired=false] - Whether the field is required for form submission
  * @param {string} [className=""] - Additional CSS classes to apply to the wrapper div
  * @param {RegisterOptions} [registerOptions={}] - Additional React Hook Form register options
- * @param {"text" | "email" | "password" | "number" | "date" | "checkbox"} type - The HTML input type, use RHFRadio for radio input, and Button type="submit" for submit buttons
+ * @param {"text" | "email" | "password" | "number" | "date" | "checkbox" | "color"} type - The HTML input type, use RHFRadio for radio input, and Button type="submit" for submit buttons
  * @param {HTMLInputElement} [props] - Additional HTML input element attributes
  *
  * @example
@@ -64,22 +65,40 @@ export function RHFInput({
   const fieldError = formState?.errors?.[name];
 
   const isCheckbox = type === "checkbox";
+  const isNumber = type === "number";
+
+  // For numeric inputs, block the exponent characters that <input type="number">
+  // accepts but that we don't want ("e"/"E") on keydown.
+  const blockedNumberKeys = ["e", "E"];
+
+  const handleNumberKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (blockedNumberKeys.includes(event.key)) {
+      event.preventDefault();
+    }
+    props.onKeyDown?.(event);
+  };
+
+  const handleNumberPaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedText = event.clipboardData.getData("text");
+    if (/[eE]/.test(pastedText)) {
+      event.preventDefault();
+    }
+    props.onPaste?.(event);
+  };
 
   if (isCheckbox) {
     return (
-      <div
-        className={`grid grid-cols-[1fr_auto] items-center gap-4 py-3 px-3 rounded-md hover:bg-gray-50 transition ${className}`}
+      <label
+        htmlFor={name}
+        className={`grid grid-cols-[1fr_auto] items-center gap-4 py-3 px-3 rounded-md hover:bg-gray-50 transition cursor-pointer ${className}`}
       >
-        {/* LEFT: LABEL */}
-        <label
-          htmlFor={name}
-          className="text-sm font-semibold text-gray-800 justify-self-start cursor-pointer"
-        >
+        <span className="text-sm font-semibold text-gray-800 justify-self-start">
           {label}
           <IsRequiredStar isRequired={isRequired} />
-        </label>
+        </span>
 
-        {/* RIGHT: CHECKBOX (aligned in one column) */}
         <input
           id={name}
           type="checkbox"
@@ -87,7 +106,7 @@ export function RHFInput({
           {...props}
           className="h-4 w-4 accent-blue-500 cursor-pointer border-gray-300 rounded justify-self-end focus:ring-2 focus:ring-blue-400"
         />
-      </div>
+      </label>
     );
   }
 
@@ -103,10 +122,15 @@ export function RHFInput({
         type={type}
         {...registerProps}
         {...props}
+        {...(isNumber && {
+          onKeyDown: handleNumberKeyDown,
+          onPaste: handleNumberPaste,
+        })}
         className={clsx([
           "border border-gray-300 rounded bg-white px-3 py-2 transition focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400",
           fieldError &&
             "border-red-400 focus:ring-red-300 focus:border-red-400",
+          type === "color" && "h-10",
         ])}
       />
 

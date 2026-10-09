@@ -15,6 +15,7 @@ const MOCK_ACTIVE_INGREDIENTS = {
     name: "Paracetamol",
     unitOfMeasurement: "mg",
     fallBelow: 3000,
+    remarks: "test",
   },
 };
 
@@ -140,9 +141,10 @@ describe("MedicationActiveIngredientsPage", () => {
         "Active Ingredient Name",
         "Unit of Measurement",
         "Fall Below",
+        "Remarks",
         "Actions",
       ],
-      ["1", "Paracetamol", "mg", "3000", "EditDelete"],
+      ["1", "Paracetamol", "mg", "3000", "test", "EditDelete"],
     ]);
   });
 
@@ -160,8 +162,8 @@ describe("MedicationActiveIngredientsPage", () => {
       '<span class="text-sm font-medium text-slate-900">Paracetamol</span>',
     );
     let nameInput = container.querySelector('input[name="name"]');
-    let unitInput = container.querySelector('input[name="unitOfMeasurement]"');
-    let fallBelowInput = container.querySelector('input[name="fallBelow]"');
+    let unitInput = container.querySelector('input[name="unitOfMeasurement"]');
+    let fallBelowInput = container.querySelector('input[name="fallBelow"]');
 
     expect(unitInput).not.toBeInTheDocument();
     expect(fallBelowInput).not.toBeInTheDocument();
@@ -240,7 +242,7 @@ describe("MedicationActiveIngredientsPage", () => {
     const user = userEvent.setup();
 
     mockTrpc.medicationActiveIngredientsRouter.update.useMutation.mockImplementation(
-      ({ onSuccess }) => {
+      ({ onSuccess }: { onSuccess: () => void }) => {
         return {
           mutate: vi.fn(() => {
             onSuccess?.(); // call it immediately when mutate is called
@@ -268,21 +270,23 @@ describe("MedicationActiveIngredientsPage", () => {
     expect(screen.getByRole("spinbutton")).toBeInTheDocument();
 
     const fallBelowInput = screen.getByRole("spinbutton");
-    const nameInput = container.querySelector("#name");
-    const unitInput = container.querySelector("#unitOfMeasurement");
+    const nameInput = container.querySelector("#name") as HTMLInputElement;
+    const unitInput = container.querySelector(
+      "#unitOfMeasurement",
+    ) as HTMLInputElement;
 
     await user.clear(fallBelowInput);
     await user.type(fallBelowInput, "70000");
 
-    await user.clear(nameInput!);
-    await user.type(nameInput!, "valid medication name");
+    await user.clear(nameInput);
+    await user.type(nameInput, "valid medication name");
 
-    await user.clear(unitInput!);
-    await user.type(unitInput!, "bottles");
+    await user.clear(unitInput);
+    await user.type(unitInput, "bottles");
 
     expect((fallBelowInput as HTMLInputElement).valueAsNumber).toBe(70000);
-    expect(nameInput?.value).toBe("valid medication name");
-    expect(unitInput?.value).toBe("bottles");
+    expect(nameInput.value).toBe("valid medication name");
+    expect(unitInput.value).toBe("bottles");
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 
@@ -381,7 +385,7 @@ describe("MedicationActiveIngredientsPage", () => {
     );
 
     mockTrpc.medicationActiveIngredientsRouter.delete.useMutation.mockImplementation(
-      ({ onError }) => {
+      ({ onError }: { onError: (err: Error) => void }) => {
         return {
           mutate: vi.fn(() => {
             onError?.(mockDBError);
@@ -422,7 +426,7 @@ describe("MedicationActiveIngredientsPage", () => {
     const user = userEvent.setup();
 
     mockTrpc.medicationActiveIngredientsRouter.delete.useMutation.mockImplementation(
-      ({ onSuccess }) => {
+      ({ onSuccess }: { onSuccess: () => void }) => {
         return {
           mutate: vi.fn(() => {
             onSuccess?.();
@@ -575,7 +579,7 @@ describe("MedicationActiveIngredientsPage", () => {
     });
 
     mockTrpc.medicationActiveIngredientsRouter.create.useMutation.mockImplementation(
-      ({ onSuccess }) => {
+      ({ onSuccess }: { onSuccess: () => void }) => {
         return {
           mutate: vi.fn(() => {
             mockTrpc.medicationActiveIngredientsRouter.list.useQuery.mockReturnValue(

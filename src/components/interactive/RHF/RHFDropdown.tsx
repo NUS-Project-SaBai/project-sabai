@@ -94,7 +94,7 @@ function RHFDropdownMenu({
   };
 
   return (
-    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-900 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+    <div className="absolute z-50 w-full mt-1 flex flex-col bg-white border border-gray-900 rounded-lg shadow-lg max-h-60 overflow-y-auto">
       {options.map((option) => (
         <button
           key={option.value}
