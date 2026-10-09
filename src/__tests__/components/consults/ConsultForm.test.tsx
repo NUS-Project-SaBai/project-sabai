@@ -90,7 +90,7 @@ describe("ConsultForm", () => {
     expect(screen.getByLabelText(/Consultation/)).toBeInTheDocument();
     expect(screen.getByText("Diagnosis 1")).toBeInTheDocument();
     expect(screen.getByLabelText(/Plan/)).toBeInTheDocument();
-    expect(screen.getByText(/Referral for/)).toBeInTheDocument();
+    expect(screen.getByText(/Referred for/)).toBeInTheDocument();
     expect(screen.getByLabelText(/Remarks/)).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Save Consult" }),

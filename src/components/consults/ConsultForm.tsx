@@ -100,6 +100,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
           Doctor&apos;s Consult Form
         </h2>
 
+        {/* History & Consultation */}
         <section className="space-y-4">
           <RHFTextArea
             name="pastMedicalHistory"
@@ -115,6 +116,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
           />
         </section>
 
+        {/* Diagnoses */}
         <section className="space-y-4">
           <div className="flex items-center gap-1">
             <h3 className="text-sm font-semibold text-slate-700">Diagnoses</h3>
@@ -169,6 +171,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
           ))}
         </section>
 
+        {/* Plan & Remarks */}
         <section className="space-y-4">
           <RHFTextArea
             name="treatmentPlan"
@@ -176,9 +179,20 @@ export function ConsultForm({ visitId }: { visitId: number }) {
             rows={3}
             placeholder="Type your plan here..."
           />
+          <RHFTextArea
+            name="remarks"
+            label="Remarks"
+            rows={2}
+            placeholder="Type your remarks here..."
+          />
+        </section>
+
+        {/* Referral */}
+        <section className="space-y-4">
+          <h3 className="text-sm font-semibold text-slate-700">Referral</h3>
           <RHFDropdown
             name="referredFor"
-            label="Referral for (optional)"
+            label="Referred for"
             dropdownOptions={REFERRAL_CATEGORY_OPTIONS}
             placeholder="Not Referred"
           />
@@ -190,14 +204,9 @@ export function ConsultForm({ visitId }: { visitId: number }) {
               placeholder="Type your referral notes here..."
             />
           )}
-          <RHFTextArea
-            name="remarks"
-            label="Remarks"
-            rows={2}
-            placeholder="Type your remarks here..."
-          />
         </section>
 
+        {/* Actions */}
         <div className="flex flex-col gap-4 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-end">
           <div className="w-full sm:w-44">
             <Button
