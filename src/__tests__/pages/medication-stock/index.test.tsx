@@ -838,6 +838,45 @@ describe("MedicationStockPage", () => {
     });
   });
 
+  it("diables Add Split button when there are more than 10 splits, then re-enables it after a split is removed", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    renderPage();
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    const addSplitButton = await screen.findByRole("button", { name: "Add Split" });
+    const limitErrorMessage = "Maximum of 10 splits reached!";
+
+    for (let i = 0; i < 9; i++) {
+      await user.click(addSplitButton);
+    }
+
+    expect(addSplitButton).toBeEnabled();
+    expect(screen.queryByText(limitErrorMessage)).not.toBeInTheDocument();
+
+    await user.click(addSplitButton);
+
+    expect(addSplitButton).toBeDisabled();
+    expect(screen.getByText(limitErrorMessage)).toBeInTheDocument();
+
+    const dialog = screen.getByRole("dialog");
+    const removeButtons = within(dialog).getAllByRole("button", { name: "-" });
+    expect(removeButtons).toHaveLength(10);
+
+    await user.click(removeButtons[0]);
+
+    expect(addSplitButton).toBeEnabled();
+    expect(screen.queryByText(limitErrorMessage)).not.toBeInTheDocument();
+    expect(within(dialog).getAllByRole("button", { name: "-" })).toHaveLength(9);
+  });
+
   it("rejects when confirming the split if there are less than 2 child stock", async () => {
     const user = userEvent.setup();
 
