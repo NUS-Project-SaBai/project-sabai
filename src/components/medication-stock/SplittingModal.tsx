@@ -9,6 +9,7 @@ import { medicationStatusValues } from "@/db/schema/pharmacy";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import { validateSplits } from "@/lib/utils/medication-stock";
+import { MAX_SPLITS } from "@/lib/constants/medicationStock";
 
 export default function SplittingModal({
   onClose,
@@ -51,6 +52,8 @@ export default function SplittingModal({
 
     setSplits(newSplits);
   }
+
+  const hasReachedMaxSplits = splits.length >= MAX_SPLITS;
 
   function handleSubmit() {
     const payload = splits.map((split) => ({
@@ -172,12 +175,19 @@ export default function SplittingModal({
           </tbody>
         </table>
       )}
-      <Button
-        title="Add Split"
-        colour="indigo"
-        onClick={() => setSplits([...splits, stock])}
-        className="my-4"
-      />
+      <div className="my-4">
+        <Button
+          title="Add Split"
+          colour="indigo"
+          onClick={() => setSplits([...splits, stock])}
+          disabled={hasReachedMaxSplits}
+        />
+        {hasReachedMaxSplits && (
+          <p className="mt-1 text-sm text-red-600" role="status">
+            Maximum of {MAX_SPLITS} splits reached!
+          </p>
+        )}
+      </div>
       <Button
         title="Confirm"
         colour="emerald"
