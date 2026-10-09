@@ -851,7 +851,9 @@ describe("MedicationStockPage", () => {
     renderPage();
     await user.click(await screen.findByRole("button", { name: "Split" }));
 
-    const addSplitButton = await screen.findByRole("button", { name: "Add Split" });
+    const addSplitButton = await screen.findByRole("button", {
+      name: "Add Split",
+    });
     const limitErrorMessage = "Maximum of 10 splits reached!";
 
     for (let i = 0; i < 9; i++) {
@@ -874,7 +876,9 @@ describe("MedicationStockPage", () => {
 
     expect(addSplitButton).toBeEnabled();
     expect(screen.queryByText(limitErrorMessage)).not.toBeInTheDocument();
-    expect(within(dialog).getAllByRole("button", { name: "-" })).toHaveLength(9);
+    expect(within(dialog).getAllByRole("button", { name: "-" })).toHaveLength(
+      9,
+    );
   });
 
   it("rejects when confirming the split if there are less than 2 child stock", async () => {
