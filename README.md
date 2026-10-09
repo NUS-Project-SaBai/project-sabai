@@ -1,5 +1,11 @@
 # Project Sa'bai
 
+## Message to open source contributors
+
+Note that this repository is for a student-run initiative and we only allow contributions from people within the organization. All pull-requests created by someone external to the organization will be closed.
+
+## Introduction
+
 This is a local-first monorepo for "Project Sa'bai". This guide focuses on getting your local development environment running.
 
 ---
