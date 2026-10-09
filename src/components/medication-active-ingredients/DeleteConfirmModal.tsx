@@ -12,10 +12,7 @@ export default function DeleteConfirmModal({
   onCancel: () => void;
 }) {
   return (
-    <Modal onClose={onCancel}>
-      <h2 className="text-xl font-bold tracking-tight text-slate-900">
-        Confirm Deletion?
-      </h2>
+    <Modal onClose={onCancel} title="Confirm Deletion?">
       <table>
         <tbody>
           <tr>

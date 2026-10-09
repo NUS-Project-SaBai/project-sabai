@@ -211,7 +211,7 @@ describe("MedicationStockPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("closes the add new stock modal when the cross button or the cancel button is clicked", async () => {
+  it("closes the add new stock modal when the Close button or the cancel button is clicked", async () => {
     const user = userEvent.setup();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
@@ -232,14 +232,14 @@ describe("MedicationStockPage", () => {
     await user.click(cancelButton);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
-    // test cross button
+    // test Close button in titled header
     await user.click(screen.getByRole("button", { name: "Add Stock" }));
     const dialogSecond = await screen.findByRole("dialog");
 
-    const crossButton = within(dialogSecond).getByRole("button", {
-      name: "",
+    const closeButton = within(dialogSecond).getByRole("button", {
+      name: "Close",
     });
-    await user.click(crossButton);
+    await user.click(closeButton);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
