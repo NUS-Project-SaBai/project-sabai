@@ -13,6 +13,7 @@ import {
   DIAGNOSIS_CATEGORY_OPTIONS,
   DiagnosisCategory,
 } from "@/lib/constants/diagnosisCategories";
+import { REFERRAL_CATEGORY_OPTIONS } from "@/lib/constants/referralCategories";
 
 type ConsultFormValues = z.infer<typeof consultFormSchema>;
 
@@ -22,6 +23,8 @@ const BLANK_CONSULT: ConsultFormValues = {
   treatmentPlan: "",
   remarks: "",
   diagnoses: [{ details: "", category: "" }],
+  referredFor: "Not Referred",
+  referralNotes: "",
 };
 
 /**
@@ -35,7 +38,10 @@ export function ConsultForm({ visitId }: { visitId: number }) {
     resolver: zodResolver(consultFormSchema),
     defaultValues: BLANK_CONSULT,
   });
-  const { control, handleSubmit } = methods;
+  const { control, handleSubmit, watch } = methods;
+
+  const referredFor = watch("referredFor");
+  const showReferralNotes = referredFor !== "Not Referred";
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -44,6 +50,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
 
   const utils = trpc.useUtils();
   const createConsult = trpc.consultsRouter.create.useMutation();
+  const createReferral = trpc.referralRouter.create.useMutation();
 
   const onInvalid = () =>
     toast.error("Please fill in all required fields before saving.");
@@ -62,10 +69,24 @@ export function ConsultForm({ visitId }: { visitId: number }) {
         })),
       },
       {
-        onSuccess: () => {
+        onSuccess: (consult) => {
           utils.consultsRouter.getByVisitId.invalidate({ visitId });
           toast.success("Consult has been saved successfully!");
           methods.reset(BLANK_CONSULT);
+
+          if (data.referredFor !== "Not Referred") {
+            createReferral.mutate(
+              {
+                consultId: consult.id,
+                referredFor: data.referredFor,
+                referralNotes: data.referralNotes?.trim() || undefined,
+              },
+              {
+                onSuccess: () => toast.success("Referral submitted!"),
+                onError: () => toast.error("Failed to create referral."),
+              },
+            );
+          }
         },
         onError: () => toast.error("Failed to save consult."),
       },
@@ -79,6 +100,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
           Doctor&apos;s Consult Form
         </h2>
 
+        {/* History & Consultation */}
         <section className="space-y-4">
           <RHFTextArea
             name="pastMedicalHistory"
@@ -94,6 +116,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
           />
         </section>
 
+        {/* Diagnoses */}
         <section className="space-y-4">
           <div className="flex items-center gap-1">
             <h3 className="text-sm font-semibold text-slate-700">Diagnoses</h3>
@@ -148,6 +171,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
           ))}
         </section>
 
+        {/* Plan & Remarks */}
         <section className="space-y-4">
           <RHFTextArea
             name="treatmentPlan"
@@ -163,6 +187,26 @@ export function ConsultForm({ visitId }: { visitId: number }) {
           />
         </section>
 
+        {/* Referral */}
+        <section className="space-y-4">
+          <h3 className="text-sm font-semibold text-slate-700">Referral</h3>
+          <RHFDropdown
+            name="referredFor"
+            label="Referred for"
+            dropdownOptions={REFERRAL_CATEGORY_OPTIONS}
+            placeholder="Not Referred"
+          />
+          {showReferralNotes && (
+            <RHFTextArea
+              name="referralNotes"
+              label="Referral Notes"
+              rows={3}
+              placeholder="Type your referral notes here..."
+            />
+          )}
+        </section>
+
+        {/* Actions */}
         <div className="flex flex-col gap-4 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-end">
           <div className="w-full sm:w-44">
             <Button
@@ -170,7 +214,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
               title="Save Consult"
               colour="emerald"
               variant="filled"
-              loading={createConsult.isPending}
+              loading={createConsult.isPending || createReferral.isPending}
             />
           </div>
         </div>
