@@ -9,7 +9,7 @@ import { medicationStatusValues } from "@/db/schema/pharmacy";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import { validateSplits } from "@/lib/utils/medication-stock";
-import { MAX_SPLITS } from "@/lib/constants/medicationStock";
+import { MAX_SPLITS, MIN_SPLITS } from "@/lib/constants/medicationStock";
 
 export default function SplittingModal({
   onClose,
@@ -106,6 +106,13 @@ export default function SplittingModal({
         </tbody>
       </table>
       <h3 className="text-l font-bold mb-4 mt-4">Child stock details</h3>
+      <p
+        className="mb-4 text-sm text-gray-600"
+        role="status"
+        aria-atomic="true"
+      >
+        {splits.length}/{MAX_SPLITS} splits added (min. {MIN_SPLITS} splits required!)
+      </p>
       {splits.length === 0 && "No splits added, add a split to begin."}
       {splits.length > 0 && (
         <table>
