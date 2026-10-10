@@ -872,9 +872,7 @@ describe("MedicationStockPage", () => {
     await user.click(addSplitButton);
     expectCount(2);
 
-    await user.click(
-      within(dialog).getAllByRole("button", { name: "-" })[0],
-    );
+    await user.click(within(dialog).getAllByRole("button", { name: "-" })[0]);
     expectCount(1);
 
     await user.click(within(dialog).getByRole("button", { name: "-" }));
