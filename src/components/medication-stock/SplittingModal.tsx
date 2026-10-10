@@ -111,7 +111,8 @@ export default function SplittingModal({
         role="status"
         aria-atomic="true"
       >
-        {splits.length}/{MAX_SPLITS} splits added (min. {MIN_SPLITS} splits required!)
+        {splits.length}/{MAX_SPLITS} splits added (min. {MIN_SPLITS} splits
+        required!)
       </p>
       {splits.length === 0 && "No splits added, add a split to begin."}
       {splits.length > 0 && (
