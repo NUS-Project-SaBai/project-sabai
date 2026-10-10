@@ -15,6 +15,7 @@ import {
   assertLoadingSpinner,
   assertTableContents,
 } from "@/__tests__/utils/helper-functions";
+import { MAX_SPLITS, MIN_SPLITS } from "@/lib/constants/medicationStock";
 
 const MOCK_STOCK = [
   {
@@ -838,7 +839,49 @@ describe("MedicationStockPage", () => {
     });
   });
 
-  it("diables Add Split button when there are more than 10 splits, then re-enables it after a split is removed", async () => {
+  it("shows the counter upfront and updates it when splits are added or removed", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    renderPage();
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    const dialog = await screen.findByRole("dialog");
+    const counter = within(dialog).getByRole("counter");
+    const addSplitButton = within(dialog).getByRole("button", {
+      name: "Add Split",
+    });
+
+    const expectCount = (count: number) => {
+      expect(counter).toHaveTextContent(
+        `${count}/${MAX_SPLITS} splits added (min. ${MIN_SPLITS} splits required!)`,
+      );
+    };
+
+    expectCount(0);
+
+    await user.click(addSplitButton);
+    expectCount(1);
+
+    await user.click(addSplitButton);
+    expectCount(2);
+
+    await user.click(
+      within(dialog).getAllByRole("button", { name: "-" })[0],
+    );
+    expectCount(1);
+
+    await user.click(within(dialog).getByRole("button", { name: "-" }));
+    expectCount(0);
+  });
+
+  it("diables Add Split button when there are exactly MAX_SPLITS splits, then re-enables it after a split is removed", async () => {
     const user = userEvent.setup();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
@@ -854,30 +897,25 @@ describe("MedicationStockPage", () => {
     const addSplitButton = await screen.findByRole("button", {
       name: "Add Split",
     });
-    const limitErrorMessage = "Maximum of 10 splits reached!";
+    const limitErrorMessage = `Maximum of ${MAX_SPLITS} splits reached!`;
 
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < MAX_SPLITS; i++) {
       await user.click(addSplitButton);
     }
-
-    expect(addSplitButton).toBeEnabled();
-    expect(screen.queryByText(limitErrorMessage)).not.toBeInTheDocument();
-
-    await user.click(addSplitButton);
 
     expect(addSplitButton).toBeDisabled();
     expect(screen.getByText(limitErrorMessage)).toBeInTheDocument();
 
     const dialog = screen.getByRole("dialog");
     const removeButtons = within(dialog).getAllByRole("button", { name: "-" });
-    expect(removeButtons).toHaveLength(10);
+    expect(removeButtons).toHaveLength(MAX_SPLITS);
 
     await user.click(removeButtons[0]);
 
     expect(addSplitButton).toBeEnabled();
     expect(screen.queryByText(limitErrorMessage)).not.toBeInTheDocument();
     expect(within(dialog).getAllByRole("button", { name: "-" })).toHaveLength(
-      9,
+      MAX_SPLITS - 1,
     );
   });
 

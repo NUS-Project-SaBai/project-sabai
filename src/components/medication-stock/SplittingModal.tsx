@@ -44,9 +44,9 @@ export default function SplittingModal({
     const newSplits = splits.map((item, itemIndex) =>
       itemIndex === index
         ? {
-            ...item,
-            ...patch,
-          }
+          ...item,
+          ...patch,
+        }
         : item,
     );
 
@@ -108,7 +108,7 @@ export default function SplittingModal({
       <h3 className="text-l font-bold mb-4 mt-4">Child stock details</h3>
       <p
         className="mb-4 text-sm text-gray-600"
-        role="status"
+        role="counter"
         aria-atomic="true"
       >
         {splits.length}/{MAX_SPLITS} splits added (min. {MIN_SPLITS} splits
