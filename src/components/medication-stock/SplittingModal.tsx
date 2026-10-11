@@ -9,6 +9,7 @@ import { medicationStatusValues } from "@/db/schema/pharmacy";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import { validateSplits } from "@/lib/utils/medication-stock";
+import { MAX_SPLITS, MIN_SPLITS } from "@/lib/constants/medicationStock";
 
 export default function SplittingModal({
   onClose,
@@ -43,14 +44,16 @@ export default function SplittingModal({
     const newSplits = splits.map((item, itemIndex) =>
       itemIndex === index
         ? {
-            ...item,
-            ...patch,
-          }
+          ...item,
+          ...patch,
+        }
         : item,
     );
 
     setSplits(newSplits);
   }
+
+  const hasReachedMaxSplits = splits.length >= MAX_SPLITS;
 
   function handleSubmit() {
     const payload = splits.map((split) => ({
@@ -103,7 +106,15 @@ export default function SplittingModal({
         </tbody>
       </table>
       <h3 className="text-l font-bold mb-4 mt-4">Child stock details</h3>
-      {splits.length === 0 && "No splits added, add a split to begin."}
+      <p
+        className="mb-4 text-sm text-gray-600"
+        role="counter"
+        aria-atomic="true"
+      >
+        {splits.length}/{MAX_SPLITS} splits added (min. {MIN_SPLITS} splits
+        required!)
+      </p>
+      {splits.length === 0 && "Add a split to begin."}
       {splits.length > 0 && (
         <table>
           <thead className="text-center">
@@ -172,12 +183,19 @@ export default function SplittingModal({
           </tbody>
         </table>
       )}
-      <Button
-        title="Add Split"
-        colour="indigo"
-        onClick={() => setSplits([...splits, stock])}
-        className="my-4"
-      />
+      <div className="my-4">
+        <Button
+          title="Add Split"
+          colour="indigo"
+          onClick={() => setSplits([...splits, stock])}
+          disabled={hasReachedMaxSplits}
+        />
+        {hasReachedMaxSplits && (
+          <p className="mt-1 text-sm text-red-600" role="status">
+            Maximum of {MAX_SPLITS} splits reached!
+          </p>
+        )}
+      </div>
       <Button
         title="Confirm"
         colour="emerald"
