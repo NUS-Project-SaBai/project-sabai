@@ -24,6 +24,7 @@ import Modal from "@/components/interactive/Modal";
 import EditPatientForm from "@/components/patient/EditPatientForm";
 import { HeightWeightChart } from "@/components/vitals/HeightWeightChart";
 import clsx from "clsx";
+import { HiExclamationTriangle } from "react-icons/hi2";
 
 // Threshold for flagging respective blood pressure conditions
 const BP_THRESHOLDS = {
@@ -437,7 +438,11 @@ function VitalsForm({
                     : "bg-danger-subtle text-danger"
                 }`}
           >
-            ⚠ {bloodPressureStatus}
+            <HiExclamationTriangle
+              aria-hidden="true"
+              className="mr-1 h-4 w-4"
+            />
+            {bloodPressureStatus}
           </span>
         )}
       </FormSection>

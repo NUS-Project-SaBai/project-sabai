@@ -237,6 +237,38 @@ describe("VitalsForm", () => {
   });
 
   test.each([
+    ["110", "70"],
+    ["110", ""],
+    ["150", ""],
+    ["", "100"],
+    ["", ""],
+  ])(
+    "shows no warning symbol for normal or incomplete readings",
+    async (systolic, diastolic) => {
+      const user = userEvent.setup();
+
+      mockTrpc.vitalsRouter.getByVisitId.useQuery.mockReturnValue({
+        data: null,
+        isLoading: false,
+      });
+
+      renderPage();
+
+      await user.type(
+        await screen.findByLabelText("Systolic Blood Pressure (mmHg)"),
+        systolic,
+      );
+      await user.type(
+        await screen.findByLabelText("Diastolic Blood Pressure (mmHg)"),
+        diastolic,
+      );
+
+      expect(screen.queryByText("Pre-HTN")).not.toBeInTheDocument();
+      expect(screen.queryByText("HTN")).not.toBeInTheDocument();
+    },
+  );
+
+  test.each([
     ["130", "80"],
     ["120", "85"],
     ["135", "75"],
@@ -259,7 +291,7 @@ describe("VitalsForm", () => {
       diastolic,
     );
 
-    expect(await screen.findByText("⚠ Pre-HTN")).toBeInTheDocument();
+    expect(await screen.findByText("Pre-HTN")).toBeInTheDocument();
   });
 
   test.each([
@@ -285,6 +317,6 @@ describe("VitalsForm", () => {
       diastolic,
     );
 
-    expect(await screen.findByText("⚠ HTN")).toBeInTheDocument();
+    expect(await screen.findByText("HTN")).toBeInTheDocument();
   });
 });
