@@ -25,12 +25,7 @@ import EditPatientForm from "@/components/patient/EditPatientForm";
 import { HeightWeightChart } from "@/components/vitals/HeightWeightChart";
 import clsx from "clsx";
 import { HiExclamationTriangle } from "react-icons/hi2";
-
-// Threshold for flagging respective blood pressure conditions
-const BP_THRESHOLDS = {
-  preHypertension: { systolic: 130, diastolic: 80 },
-  hypertension: { systolic: 140, diastolic: 90 },
-};
+import { classifyBloodPressure } from "@/lib/utils/vitals";
 
 type VitalsFormValues = {
   height?: string | null;
@@ -237,24 +232,10 @@ function VitalsForm({
       ? null
       : Number(watchedDiastolic);
 
-  let bloodPressureStatus: "Pre-HTN" | "HTN" | null = null;
-
-  // Does not flag if either value is not filled in
-  if (systolicValue !== null && diastolicValue !== null) {
-    if (
-      // Check for hypertension
-      systolicValue >= BP_THRESHOLDS.hypertension.systolic ||
-      diastolicValue >= BP_THRESHOLDS.hypertension.diastolic
-    ) {
-      bloodPressureStatus = "HTN";
-    } else if (
-      // Check for pre-hypertension
-      systolicValue >= BP_THRESHOLDS.preHypertension.systolic ||
-      diastolicValue >= BP_THRESHOLDS.preHypertension.diastolic
-    ) {
-      bloodPressureStatus = "Pre-HTN";
-    }
-  }
+  const bloodPressureStatus =
+    systolicValue !== null && diastolicValue !== null
+      ? classifyBloodPressure(systolicValue, diastolicValue)
+      : null;
 
   const { data: vitalData, isLoading: vitalsLoading } =
     trpc.vitalsRouter.getByVisitId.useQuery(
