@@ -1,9 +1,7 @@
-npx lint-staged
-
 branch_name=$(git branch --show-current)
 
 if [ "$branch_name" = "main" ] || [ "$branch_name" = "dev" ]; then
   echo "Error: Direct commits to the 'main' or 'dev' branch are not allowed."
   exit 1
 fi
-pnpm run format
+npx lint-staged
