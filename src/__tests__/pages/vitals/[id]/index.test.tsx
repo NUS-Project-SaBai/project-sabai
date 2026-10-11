@@ -254,14 +254,15 @@ describe("VitalsForm", () => {
 
       renderPage();
 
-      await user.type(
-        await screen.findByLabelText("Systolic Blood Pressure (mmHg)"),
-        systolic,
+      const systolicInput = await screen.findByLabelText(
+        "Systolic Blood Pressure (mmHg)",
       );
-      await user.type(
-        await screen.findByLabelText("Diastolic Blood Pressure (mmHg)"),
-        diastolic,
+      const diastolicInput = await screen.findByLabelText(
+        "Diastolic Blood Pressure (mmHg)",
       );
+
+      if (systolic !== "") await user.type(systolicInput, systolic);
+      if (diastolic !== "") await user.type(diastolicInput, diastolic);
 
       expect(screen.queryByText("Pre-HTN")).not.toBeInTheDocument();
       expect(screen.queryByText("HTN")).not.toBeInTheDocument();
