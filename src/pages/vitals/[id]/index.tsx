@@ -347,6 +347,19 @@ function VitalsForm({ visitId }: { visitId: number }) {
           />
           <RHFInput name="heartRate" label="Heart Rate (BPM)" type="number" />
         </div>
+
+        {bloodPressureStatus && (
+          <span
+            className={`mt-4 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset
+                ${
+                  bloodPressureStatus === "Pre-HTN"
+                    ? "bg-warning-subtle text-warning"
+                    : "bg-danger-subtle text-danger"
+                }`}
+          >
+            ⚠ {bloodPressureStatus}
+          </span>
+        )}
       </FormSection>
 
       {/* Blood & metabolic */}
@@ -393,10 +406,7 @@ function VitalsForm({ visitId }: { visitId: number }) {
       </FormSection>
 
       {/* Urinalysis */}
-      <FormSection
-        title="Urinalysis"
-        description="Urine test findings."
-      >
+      <FormSection title="Urinalysis" description="Urine test findings.">
         <RHFTextArea
           name="urineTest"
           label="Urinalysis Diagnostics (Leukocytes, Nitrites, Protein notes)"

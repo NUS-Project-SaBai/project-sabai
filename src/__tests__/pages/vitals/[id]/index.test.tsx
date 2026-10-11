@@ -235,4 +235,56 @@ describe("VitalsForm", () => {
       expect(toast.textContent).toBe("No form field changed!");
     });
   });
+
+  test.each([
+    ["130", "80"],
+    ["120", "85"],
+    ["135", "75"],
+  ])("shows Pre-HTN warning symbol", async (systolic, diastolic) => {
+    const user = userEvent.setup();
+
+    mockTrpc.vitalsRouter.getByVisitId.useQuery.mockReturnValue({
+      data: null,
+      isLoading: false,
+    });
+
+    renderPage();
+
+    await user.type(
+      await screen.findByLabelText("Systolic Blood Pressure (mmHg)"),
+      systolic,
+    );
+    await user.type(
+      await screen.findByLabelText("Diastolic Blood Pressure (mmHg)"),
+      diastolic,
+    );
+
+    expect(await screen.findByText("⚠ Pre-HTN")).toBeInTheDocument();
+  });
+
+  test.each([
+    ["140", "90"],
+    ["150", "80"],
+    ["135", "100"],
+  ])("shows HTN warning symbol", async (systolic, diastolic) => {
+    const user = userEvent.setup();
+
+    mockTrpc.vitalsRouter.getByVisitId.useQuery.mockReturnValue({
+      data: null,
+      isLoading: false,
+    });
+
+    renderPage();
+
+    await user.type(
+      await screen.findByLabelText("Systolic Blood Pressure (mmHg)"),
+      systolic,
+    );
+    await user.type(
+      await screen.findByLabelText("Diastolic Blood Pressure (mmHg)"),
+      diastolic,
+    );
+
+    expect(await screen.findByText("⚠ HTN")).toBeInTheDocument();
+  });
 });
