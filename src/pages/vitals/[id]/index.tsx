@@ -20,6 +20,12 @@ import toast from "react-hot-toast";
 import { formatVisitDate } from "@/lib/utils/visit";
 import FormSection from "@/components/interactive/inputs/FormSection";
 
+// Threshold for flagging respective blood pressure conditions
+const BP_THRESHOLDS = {
+  preHypertension: { systolic: 130, diastolic: 80 },
+  hypertension: { systolic: 140, diastolic: 90 },
+};
+
 type VitalsFormValues = {
   height?: string | null;
   weight?: string | null;
@@ -163,6 +169,38 @@ function VitalsForm({ visitId }: { visitId: number }) {
     handleSubmit,
     formState: { isDirty },
   } = useFormContext<VitalsFormValues>();
+
+  // Track input values typed by user
+  const watchedSystolic = useWatch({ name: "systolic" });
+  const watchedDiastolic = useWatch({ name: "diastolic" });
+
+  const systolicValue =
+    watchedSystolic === "" || watchedSystolic == null
+      ? null
+      : Number(watchedSystolic);
+  const diastolicValue =
+    watchedDiastolic === "" || watchedDiastolic == null
+      ? null
+      : Number(watchedDiastolic);
+
+  let bloodPressureStatus: "Pre-HTN" | "HTN" | null = null;
+
+  // Does not flag if either value is not filled in
+  if (systolicValue !== null && diastolicValue !== null) {
+    if (
+      // Check for hypertension
+      systolicValue >= BP_THRESHOLDS.hypertension.systolic ||
+      diastolicValue >= BP_THRESHOLDS.hypertension.diastolic
+    ) {
+      bloodPressureStatus = "HTN";
+    } else if (
+      // Check for pre-hypertension
+      systolicValue >= BP_THRESHOLDS.preHypertension.systolic ||
+      diastolicValue >= BP_THRESHOLDS.preHypertension.diastolic
+    ) {
+      bloodPressureStatus = "Pre-HTN";
+    }
+  }
 
   const { data: vitalData, isLoading: vitalsLoading } =
     trpc.vitalsRouter.getByVisitId.useQuery(
