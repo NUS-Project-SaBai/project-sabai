@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import { paths } from "@/utils/paths";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
@@ -139,7 +140,7 @@ function VisionPage() {
    * @param {number} patientId - The ID of the patient to update glasses for
    */
   const handleUpdateGlasses = (patientId: number) => {
-    router.push(`/vision/update-glasses/${patientId}`);
+    router.push(paths.visionUpdateGlasses(patientId));
   };
 
   function renderContent() {

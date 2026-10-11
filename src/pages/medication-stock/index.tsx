@@ -8,6 +8,7 @@ import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
+import { paths } from "@/utils/paths";
 import { SetStateAction, useState } from "react";
 import {
   MedicationStockWithBrandAndActiveIngredient,
@@ -46,7 +47,7 @@ function Header() {
           className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
         >
           <Link
-            href="/medication-brands"
+            href={paths.medicationBrands()}
             className="group flex items-center p-2 rounded-md"
           >
             <span>Manage Brands</span>
@@ -57,7 +58,7 @@ function Header() {
           className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
         >
           <Link
-            href="/medication-active-ingredients"
+            href={paths.medicationActiveIngredients()}
             className="group flex items-center p-2 rounded-md"
           >
             <span>Manage Active Ingredients</span>
