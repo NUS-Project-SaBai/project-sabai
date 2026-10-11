@@ -4,4 +4,4 @@ if [ "$branch_name" = "main" ] || [ "$branch_name" = "dev" ]; then
   echo "Error: Direct commits to the 'main' or 'dev' branch are not allowed."
   exit 1
 fi
-npx lint-staged
+pnpm lint-staged
