@@ -740,7 +740,7 @@ describe("MedicationStockPage", () => {
     });
   });
 
-  it("shows 'No splits added, add a split to begin' only when there are 0 child stocks added", async () => {
+  it("shows 'Add a split to begin' only when there are 0 child stocks added", async () => {
     const user = userEvent.setup();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
@@ -754,13 +754,13 @@ describe("MedicationStockPage", () => {
     await user.click(await screen.findByRole("button", { name: "Split" }));
 
     expect(
-      screen.getByText("No splits added, add a split to begin."),
+      screen.getByText("Add a split to begin."),
     ).toBeInTheDocument();
     await user.click(await screen.findByRole("button", { name: "Add Split" }));
 
     await waitFor(() => {
       expect(
-        screen.queryByText("No splits added, add a split to begin."),
+        screen.queryByText("Add a split to begin."),
       ).not.toBeInTheDocument();
     });
   });
@@ -879,7 +879,7 @@ describe("MedicationStockPage", () => {
     expectCount(0);
   });
 
-  it("diables Add Split button when there are exactly MAX_SPLITS splits, then re-enables it after a split is removed", async () => {
+  it("disables Add Split button when there are exactly MAX_SPLITS splits, then re-enables it after a split is removed", async () => {
     const user = userEvent.setup();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(

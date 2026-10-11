@@ -114,7 +114,7 @@ export default function SplittingModal({
         {splits.length}/{MAX_SPLITS} splits added (min. {MIN_SPLITS} splits
         required!)
       </p>
-      {splits.length === 0 && "No splits added, add a split to begin."}
+      {splits.length === 0 && "Add a split to begin."}
       {splits.length > 0 && (
         <table>
           <thead className="text-center">
