@@ -27,10 +27,7 @@ export default function DeleteModal({
   });
 
   return (
-    <Modal 
-      title="Confirm Deletion" 
-      onClose={onClose}
-    >
+    <Modal title="Confirm Deletion" onClose={onClose}>
       <p>Code: {activeForm?.code}</p>
       <p>Name: {activeForm?.name}</p>
 
