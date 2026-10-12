@@ -13,16 +13,16 @@ import { ReactNode } from "react";
 import { PatientsRouterListWithLatestVisitItem } from "@/utils/trpc-types";
 import { PatientCode } from "@/components/PatientCode";
 
-function UpdateGlassesButton({ onClick }: { onClick: () => void }) {
+function UpdateVisionButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      title="Update Glasses"
+      title="Update Vision"
       className="inline-flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white transition hover:bg-emerald-700"
     >
       <HiOutlinePencilSquare className="h-5 w-5" />
-      Update Glasses
+      Update Vision
     </button>
   );
 }
@@ -32,10 +32,10 @@ function UpdateGlassesButton({ onClick }: { onClick: () => void }) {
  */
 function PatientCard({
   patient,
-  onUpdateGlasses,
+  onUpdateVision,
 }: {
   patient: PatientsRouterListWithLatestVisitItem;
-  onUpdateGlasses: (patientId: number) => void;
+  onUpdateVision: (patientId: number) => void;
 }) {
   return (
     <div className="flex gap-10 p-4">
@@ -53,7 +53,7 @@ function PatientCard({
         <div className="break-words text-sm font-medium text-slate-900">
           {patient.name}
         </div>
-        <UpdateGlassesButton onClick={() => onUpdateGlasses(patient.id)} />
+        <UpdateVisionButton onClick={() => onUpdateVision(patient.id)} />
       </div>
     </div>
   );
@@ -64,10 +64,10 @@ function PatientCard({
  */
 function PatientTable({
   patients,
-  onUpdateGlasses,
+  onUpdateVision,
 }: {
   patients: PatientsRouterListWithLatestVisitItem[];
-  onUpdateGlasses: (patientId: number) => void;
+  onUpdateVision: (patientId: number) => void;
 }) {
   return (
     <div className="hidden overflow-x-auto md:block">
@@ -96,8 +96,8 @@ function PatientTable({
                 </span>
               </TableCell>
               <TableCell>
-                <UpdateGlassesButton
-                  onClick={() => onUpdateGlasses(patient.id)}
+                <UpdateVisionButton
+                  onClick={() => onUpdateVision(patient.id)}
                 />
               </TableCell>
             </TableRow>
@@ -136,11 +136,11 @@ function VisionPage() {
   } = trpc.patientsRouter.listWithLatestVisit.useQuery();
 
   /**
-   * Navigates to the update glasses page for a specific patient.
-   * @param {number} patientId - The ID of the patient to update glasses for
+   * Navigates to the update Vision page for a specific patient.
+   * @param {number} patientId - The ID of the patient to update Vision for
    */
-  const handleUpdateGlasses = (patientId: number) => {
-    router.push(paths.visionUpdateGlasses(patientId));
+  const handleUpdateVision = (patientId: number) => {
+    router.push(paths.visionUpdateVision(patientId));
   };
 
   function renderContent() {
@@ -168,16 +168,13 @@ function VisionPage() {
             <PatientCard
               key={patient.id}
               patient={patient}
-              onUpdateGlasses={handleUpdateGlasses}
+              onUpdateVision={handleUpdateVision}
             />
           ))}
         </div>
 
         {/* Tablet and desktop screens: full table */}
-        <PatientTable
-          patients={patients}
-          onUpdateGlasses={handleUpdateGlasses}
-        />
+        <PatientTable patients={patients} onUpdateVision={handleUpdateVision} />
       </>
     );
   }
