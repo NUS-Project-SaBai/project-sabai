@@ -36,11 +36,10 @@ export default function AddIngredientModal() {
   return (
     <>
       {modalIsOpen && (
-        <Modal 
+        <Modal
           title="Add New Active Ingredient"
           onClose={() => setModalIsOpen(false)}
         >
-
           <FormProvider {...form}>
             <form
               onSubmit={(e) => {

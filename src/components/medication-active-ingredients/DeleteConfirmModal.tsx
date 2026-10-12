@@ -12,11 +12,10 @@ export default function DeleteConfirmModal({
   onCancel: () => void;
 }) {
   return (
-    <Modal
-      title="Confirm Deletion?"
-      onClose={onCancel}
+    <Modal 
+    title="Confirm Deletion?" 
+    onClose={onCancel}
     >
-
       <table>
         <tbody>
           <tr>

@@ -45,10 +45,9 @@ export default function CreateModal({
 
   return (
     <Modal 
-      title="Add New Stock"
-      onClose={() => setModalIsOpen(false)}
+    title="Add New Stock" 
+    onClose={() => setModalIsOpen(false)}
     >
-
       <FormProvider {...form}>
         <form
           onSubmit={(e) => {

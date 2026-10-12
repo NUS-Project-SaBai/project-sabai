@@ -72,10 +72,9 @@ export default function SplittingModal({
 
   return (
     <Modal 
-      title="Split Stock"
-      onClose={onClose}
+    title="Split Stock" 
+    onClose={onClose}
     >
-      
       <h3 className="text-l font-bold mb-4">Parent stock details</h3>
       <table>
         <tbody>

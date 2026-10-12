@@ -117,11 +117,10 @@ export default function ChangeModal({
   };
 
   return (
-    <Modal 
-    title={activeForm?.id ? "Edit Village Code" : "New Village Code"}
-    onClose={onClose}
+    <Modal
+      title={activeForm?.id ? "Edit Village Code" : "New Village Code"}
+      onClose={onClose}
     >
-
       <FormProvider {...form}>
         <form
           onSubmit={(e) => {
