@@ -3,7 +3,7 @@ import {
   ButtonColour,
   ButtonVariant,
   ButtonSize,
-  getButonTwClassName,
+  getButtonTwClassName,
 } from "./buttonStyles";
 import clsx from "clsx";
 
@@ -49,7 +49,7 @@ export function Button({
       type={type}
       title={title}
       disabled={loading || disabled}
-      className={clsx(getButonTwClassName(colour, variant, size), className)}
+      className={clsx(getButtonTwClassName(colour, variant, size), className)}
     >
       {loading ? (
         <>
