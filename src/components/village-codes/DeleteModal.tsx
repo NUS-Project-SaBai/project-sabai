@@ -27,10 +27,11 @@ export default function DeleteModal({
   });
 
   return (
-    <Modal onClose={onClose}>
-      <h2 className="text-xl font-bold tracking-tight text-slate-900">
-        Confirm Deletion
-      </h2>
+    <Modal 
+      title="Confirm Deletion"
+      onClose={onClose}
+    >
+
       <p>Code: {activeForm?.code}</p>
       <p>Name: {activeForm?.name}</p>
 
