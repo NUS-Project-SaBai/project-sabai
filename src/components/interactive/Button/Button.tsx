@@ -7,6 +7,19 @@ import {
 } from "./buttonStyles";
 import clsx from "clsx";
 
+export interface ButtonProps {
+  onClick?: () => void;
+  type?: "button" | "submit" | "reset";
+  title?: string;
+  icon?: React.ReactNode;
+  colour?: ButtonColour;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  loading?: boolean;
+  disabled?: boolean;
+  className?: string;
+}
+
 /**
  * A customizable button component with support for multiple styles and variants.
  *
@@ -31,18 +44,7 @@ export function Button({
   loading = false,
   disabled = false,
   className = "",
-}: {
-  onClick?: () => void;
-  type?: "button" | "submit" | "reset";
-  title?: string;
-  icon?: React.ReactNode;
-  colour?: ButtonColour;
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  loading?: boolean;
-  disabled?: boolean;
-  className?: string;
-}) {
+}: ButtonProps) {
   return (
     <button
       onClick={onClick}
