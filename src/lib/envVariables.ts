@@ -20,21 +20,43 @@ const clientSchema = z.object({
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
 });
 
-const serverSchema = clientSchema.extend({
+const serverBaseSchema = clientSchema.extend({
   VERCEL_URL: z.string().optional(),
   PORT: z.string().default("3000"),
   SUPABASE_SECRET_KEY: z.string().min(1),
   DATABASE_URL: z.url(),
-  CLOUDINARY_URL_PREFIX: z.string().min(1),
-  CLOUDINARY_URL: z.string().min(1),
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
-  AWS_ACCESS_KEY_ID: z.string().min(1),
-  AWS_SECRET_ACCESS_KEY: z.string().min(1),
-  AWS_REGION: z.string().min(1),
-  COLLECTION_ID: z.string().min(1),
 });
+
+/*
+ * APP_MODE decides which services the app depends on:
+ * - ONLINE: patient images live in Cloudinary and face recognition uses AWS Rekognition.
+ * - OFFLINE: patient images live in the local RustFS container (infra/storage) and face
+ *   recognition uses the local face service container (services/face).
+ * Only the variables for the selected mode are required.
+ */
+const serverSchema = z.discriminatedUnion("APP_MODE", [
+  serverBaseSchema.extend({
+    APP_MODE: z.literal("ONLINE"),
+    CLOUDINARY_URL_PREFIX: z.string().min(1),
+    CLOUDINARY_URL: z.string().min(1),
+    AWS_ACCESS_KEY_ID: z.string().min(1),
+    AWS_SECRET_ACCESS_KEY: z.string().min(1),
+    AWS_REGION: z.string().min(1),
+    COLLECTION_ID: z.string().min(1),
+  }),
+  serverBaseSchema.extend({
+    APP_MODE: z.literal("OFFLINE"),
+    STORAGE_ENDPOINT: z.url(),
+    STORAGE_ACCESS_KEY: z.string().min(3),
+    STORAGE_SECRET_KEY: z.string().min(8),
+    STORAGE_BUCKET: z.string().min(3).default("sabai"),
+    FACE_SERVICE_URL: z.url(),
+    FACE_SERVICE_API_KEY: z.string().min(32),
+  }),
+]);
 
 /*
  * NEXT_PUBLIC_ vars must be passed explicitly (not via process.env spread) because
@@ -42,7 +64,7 @@ const serverSchema = clientSchema.extend({
  * spreading process.env on the client yields an empty object.
  */
 const input = isServer
-  ? process.env
+  ? { ...process.env, APP_MODE: process.env.APP_MODE || "ONLINE" }
   : {
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
@@ -63,6 +85,8 @@ if (!parsed.success) {
   );
 }
 
-const envVariables = parsed.data as z.infer<typeof serverSchema>;
+export type ServerEnv = z.infer<typeof serverSchema>;
+
+const envVariables = parsed.data as ServerEnv;
 
 export default envVariables;
