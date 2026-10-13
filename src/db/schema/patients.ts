@@ -26,7 +26,7 @@ Patients Table:
 - hasPoorCard Indicates if the patient has a POOR card or not.
 - hasBS2Card: Indicates if the patient has a BS2 card or not.
 - hasSabaiCard: Indicates if the patient has a Sabai card or not.
-- patientImagePublicId: Cloudinary public ID of the patient's image.
+- patientImagePublicId: ID of the patient's image in Cloudinary (ONLINE) or local RustFS storage (OFFLINE).
 - rekognitionFaceId: Rekognition Face ID for facial recognition.
 */
 export const patients = pgTable("patients", {
