@@ -187,7 +187,7 @@ export default function SplittingModal({
         <Button
           title="Add Split"
           colour="indigo"
-          onClick={() => setSplits([...splits, stock])}
+          onClick={() => setSplits(s => [...s, stock])}
           disabled={hasReachedMaxSplits}
         />
         {hasReachedMaxSplits && (
