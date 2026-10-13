@@ -9,6 +9,7 @@ import { medicationStatusValues } from "@/db/schema/pharmacy";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import { validateSplits } from "@/lib/utils/medication-stock";
+import ModalToast from "@/components/interactive/ModalToast";
 
 export default function SplittingModal({
   onClose,
@@ -35,7 +36,9 @@ export default function SplittingModal({
     },
     onError: (err) => {
       console.error(err);
-      toast.error(err.message ?? "An error occurred while splitting stock.");
+      toast.error(err.message ?? "An error occurred while splitting stock.", {
+        toasterId: "modal",
+      });
     },
   });
 
@@ -67,11 +70,12 @@ export default function SplittingModal({
       return;
     }
 
-    toast.error(validationResults.message);
+    toast.error(validationResults.message, { toasterId: "modal" });
   }
 
   return (
     <Modal onClose={onClose}>
+      <ModalToast />
       <h2 className="text-xl font-bold mb-4">Split Stock</h2>
       <h3 className="text-l font-bold mb-4">Parent stock details</h3>
       <table>
