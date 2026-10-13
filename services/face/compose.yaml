@@ -1,0 +1,24 @@
+services:
+  face:
+    build: .
+    image: sabai-face:latest
+    environment:
+      ConnectionStrings__qdrant: Endpoint=http://qdrant:6334
+      FaceService__ApiKey: ${FACE_SERVICE_API_KEY:?set FACE_SERVICE_API_KEY in the root .env}
+      # The dashboard from infra/observability, reachable when started through the root compose.yaml.
+      # Started on its own, telemetry is dropped silently.
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://dashboard:18889
+      OTEL_SERVICE_NAME: face
+    ports:
+      # Loopback only, so the Next.js server on this machine can reach it but the LAN can't.
+      - "127.0.0.1:5080:8080"
+    depends_on: [qdrant]
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:v1.18.0
+    volumes: [qdrant-data:/qdrant/storage]
+    restart: unless-stopped
+
+volumes:
+  qdrant-data:

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/SaBai.FaceService/SaBai.FaceService.csproj" />
+  <Project Path="tests/SaBai.FaceService.Tests/SaBai.FaceService.Tests.csproj" />
+</Solution>

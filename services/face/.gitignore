@@ -1,0 +1,5 @@
+bin/
+obj/
+.env
+models/
+*.onnx
