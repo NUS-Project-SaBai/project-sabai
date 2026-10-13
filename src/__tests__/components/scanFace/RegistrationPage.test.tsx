@@ -251,4 +251,43 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
       ).toBe("");
     });
   });
+
+  it("shows an error when pubarcheAge exceeds the patient's age", async () => {
+    // Given: a 10-year-old patient with pubarche set to "Yes"
+    const user = userEvent.setup();
+    const { container, findByText } = renderPage();
+    const dobInput = container.querySelector('input[name="dateOfBirth"]')!;
+    await user.type(dobInput, dobYearsAgo(10));
+    await waitFor(() => {
+      expect(
+        container.querySelector('button[name="pubarche-dropdown-button"]'),
+      ).toBeInTheDocument();
+    });
+    await user.click(
+      container.querySelector('button[name="pubarche-dropdown-button"]')!,
+    );
+    await user.click(
+      container.querySelector('button[name="pubarche-yes-dropdown-option"]')!,
+    );
+    await waitFor(() => {
+      expect(
+        container.querySelector('input[name="pubarcheAge"]'),
+      ).toBeInTheDocument();
+    });
+
+    // When: a pubarche age greater than the patient's age is submitted
+    await user.type(
+      container.querySelector('input[name="pubarcheAge"]')!,
+      "12",
+    );
+    await user.click(container.querySelector('button[type="submit"]')!);
+
+    // Then: a validation error is shown and the patient is not created
+    expect(
+      await findByText("Pubarche Age cannot exceed patient's age (10)"),
+    ).toBeInTheDocument();
+    expect(
+      mockTrpc.patientsRouter.create.useMutation.mock.results[0].value.mutate,
+    ).not.toHaveBeenCalled();
+  });
 });

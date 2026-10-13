@@ -60,10 +60,12 @@ export default function RegistrationPage({
   // Use "T00:00:00" to parse as local time — plain "YYYY-MM-DD" is parsed as
   // UTC midnight, which produces wrong age near the 18th-birthday boundary for
   // users west of UTC.
-  const isPediatric = dobValue
-    ? calculateAge(new Date((dobValue as unknown as string) + "T00:00:00")) <
-      PEDIATRIC_AGE_THRESHOLD
-    : false;
+  const patientAge = dobValue
+    ? calculateAge(new Date((dobValue as unknown as string) + "T00:00:00"))
+    : undefined;
+
+  const isPediatric =
+    patientAge !== undefined && patientAge < PEDIATRIC_AGE_THRESHOLD;
 
   const handleSubmit = async (data: PatientForm) => {
     if (!imgDetails) {
@@ -182,6 +184,12 @@ export default function RegistrationPage({
                   label="Pubarche Age"
                   type="number"
                   min={1}
+                  registerOptions={{
+                    max: {
+                      value: patientAge,
+                      message: `Pubarche Age cannot exceed patient's age (${patientAge})`,
+                    },
+                  }}
                 />
               )}
             </div>
