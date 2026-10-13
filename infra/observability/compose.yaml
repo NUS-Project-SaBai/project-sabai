@@ -1,0 +1,12 @@
+services:
+  dashboard:
+    # Standalone Aspire dashboard: logs, traces and metrics from any service that exports OTLP.
+    # Telemetry is kept in memory and cleared on restart.
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:13.6
+    environment:
+      DASHBOARD__FRONTEND__AUTHMODE: Unsecured
+    ports:
+      - "127.0.0.1:18888:18888" # UI
+      - "127.0.0.1:4317:18889"  # OTLP/gRPC, for processes on the host
+      - "127.0.0.1:4318:18890"  # OTLP/HTTP, for processes on the host (the Next.js server)
+    restart: unless-stopped
