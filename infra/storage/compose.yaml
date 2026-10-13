@@ -1,0 +1,22 @@
+services:
+  storage:
+    # RustFS: S3-compatible object storage for patient images when APP_MODE=OFFLINE.
+    image: rustfs/rustfs:1.0.1
+    environment:
+      RUSTFS_VOLUMES: /data/rustfs0
+      RUSTFS_ADDRESS: 0.0.0.0:9000
+      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_ACCESS_KEY: ${STORAGE_ACCESS_KEY:?set STORAGE_ACCESS_KEY in the root .env}
+      RUSTFS_SECRET_KEY: ${STORAGE_SECRET_KEY:?set STORAGE_SECRET_KEY in the root .env}
+      RUSTFS_OBS_LOGGER_LEVEL: info
+    ports:
+      # Loopback only: the Next.js server reaches it here, and browsers get images through the app.
+      - "127.0.0.1:9000:9000" # S3 API
+      - "127.0.0.1:9001:9001" # Web console
+    volumes:
+      - storage-data:/data
+    restart: unless-stopped
+
+volumes:
+  storage-data:
