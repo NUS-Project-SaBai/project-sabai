@@ -1,0 +1,10 @@
+# Offline backend services that run alongside Supabase (which `supabase start` manages separately).
+# `docker compose up -d --build` from the repo root starts everything on one network.
+# They're used by the app when APP_MODE=OFFLINE in .env.
+include:
+  - infra/observability/compose.yaml
+  # Both read their credentials from the root .env, which the Next.js server also uses.
+  - path: infra/storage/compose.yaml
+    env_file: .env
+  - path: services/face/compose.yaml
+    env_file: .env
