@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { villageCodes } from "@/db/schema/villageCodes";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, ne, and } from "drizzle-orm";
 
 export const villageCodesRouter = router({
   // 1. List all (with optional filter)
@@ -42,6 +42,22 @@ export const villageCodesRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
+      // Reject a village code that is the same as another existing village code
+      const [conflict] = await db
+        .select({ id: villageCodes.id })
+        .from(villageCodes)
+        .where(
+          eq(villageCodes.code, input.code)
+        )
+        .limit(1);
+
+      if (conflict) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Another village already has this code.",
+        });
+      }
+
       // .returning() is crucial in Postgres to get the inserted object back
       const [newCode] = await db.insert(villageCodes).values(input).returning();
       return newCode;
@@ -64,6 +80,27 @@ export const villageCodesRouter = router({
     )
     .mutation(async ({ input }) => {
       const { id, ...data } = input;
+
+      // Reject a village code that is the same as another existing village code
+      if (data.code) {
+        const [conflict] = await db
+          .select({ id: villageCodes.id })
+          .from(villageCodes)
+          .where(
+            and(
+              eq(villageCodes.code, data.code),
+              ne(villageCodes.id, id),
+            ),
+          )
+          .limit(1);
+
+        if (conflict) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Another village already has this code.",
+          });
+        }
+      }
 
       const [updated] = await db
         .update(villageCodes)
