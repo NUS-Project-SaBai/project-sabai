@@ -87,4 +87,3 @@ describe("calculateAge", () => {
     expect(calculateAge(new Date(1990, 11, 31))).toBe(33); // December 31, 1990
   });
 });
-

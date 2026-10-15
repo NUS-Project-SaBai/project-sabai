@@ -5,7 +5,7 @@ import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { files, patients } from "@/db/schema";
 import {
-  createS3UploadUrl,
+  createS3UploadPost,
   deleteFromS3,
   getS3ObjectInfo,
   getS3ViewUrl,
@@ -13,8 +13,7 @@ import {
 } from "@/server/utils/s3";
 import { ALLOWED_FILE_TYPES, MAX_FILE_SIZE_BYTES } from "@/lib/constants/files";
 
-// Rejects a file whose size or type isn't allowed. Checked both before upload and against
-// what S3 actually holds.
+// Rejects a file whose size or type isn't allowed. Checked before upload
 function fileError(size: number, contentType: string | undefined) {
   if (size === 0) return "File is empty";
   if (size > MAX_FILE_SIZE_BYTES) return "File is too large!";
@@ -58,8 +57,9 @@ export const filesRouter = router({
       );
     }),
 
-  // Step 1 of an upload: returns a presigned PUT link. The browser PUTs the file to
-  // `uploadUrl` with the same Content-Type, then calls confirmUpload with `key`.
+  // Step 1 of an upload: checks the file, then returns a presigned POST. The browser POSTs a
+  // form with every entry of `fields` followed by the file to `url`, then calls confirmUpload
+  // with `key`. S3 rejects the upload if the file is empty, too large or a different type.
   createUploadUrl: protectedProcedure
     .input(
       z.object({
@@ -80,11 +80,10 @@ export const filesRouter = router({
         .limit(1);
       if (!patient) throw badRequest(`Invalid patient ${input.patientId}`);
 
-      return createS3UploadUrl(input.patientId, input.contentType);
+      return createS3UploadPost(input.patientId, input.contentType);
     }),
 
-  // Step 2 of an upload: records the file once the browser has uploaded it, after checking
-  // what S3 actually holds (the browser controls the bytes it sent). Safe to retry.
+  // Step 2 of an upload: records the file once the browser has uploaded it.
   confirmUpload: protectedProcedure
     .input(
       z.object({
@@ -104,6 +103,7 @@ export const filesRouter = router({
       const uploaded = await getS3ObjectInfo(input.key);
       if (!uploaded)
         throw badRequest(`${input.fileName} - File was not uploaded`);
+      // S3 already enforced these limits on upload; this is a safety net.
       const error = fileError(uploaded.size, uploaded.contentType);
       if (error) {
         // It can never be recorded, so remove it.

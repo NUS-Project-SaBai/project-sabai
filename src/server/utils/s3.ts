@@ -11,12 +11,13 @@ import {
   DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
-  PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
+import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { TRPCError } from "@trpc/server";
 import env from "@/lib/envVariables";
+import { MAX_FILE_SIZE_BYTES } from "@/lib/constants/files";
 
 // How long a view link from getS3ViewUrl stays valid.
 export const VIEW_URL_EXPIRY_SECONDS = 60 * 60;
@@ -61,25 +62,28 @@ export function patientKeyPrefix(patientId: number) {
 }
 
 /**
- * Creates a presigned PUT link the browser uploads one file to.
- * @returns The new object key and the upload link.
+ * Creates a presigned POST the browser uploads one file with. S3 itself refuses the upload
+ * unless the file is 1 byte to MAX_FILE_SIZE_BYTES and sent with exactly `contentType`, so
+ * nothing that breaks the rules is ever stored.
+ * @returns The new object key, plus the `url` and form `fields` to POST the file with.
  */
-export async function createS3UploadUrl(
+export async function createS3UploadPost(
   patientId: number,
   contentType: string,
 ) {
   const key = `${patientKeyPrefix(patientId)}${randomUUID()}`;
-  const uploadUrl = await callS3("presign upload", (bucket) =>
-    getSignedUrl(
-      client,
-      new PutObjectCommand({
-        Bucket: bucket,
-        Key: key,
-        ContentType: contentType,
-      }),
-    ),
+  const { url, fields } = await callS3("presign upload", (bucket) =>
+    createPresignedPost(client, {
+      Bucket: bucket,
+      Key: key,
+      Conditions: [
+        ["content-length-range", 1, MAX_FILE_SIZE_BYTES],
+        ["eq", "$Content-Type", contentType],
+      ],
+      Fields: { "Content-Type": contentType },
+    }),
   );
-  return { key, uploadUrl };
+  return { key, url, fields };
 }
 
 /**
