@@ -12,6 +12,8 @@ import {
 import { villageCodes } from "./villageCodes";
 
 export const genderEnum = pgEnum("gender", ["male", "female"]);
+export const genderValues = genderEnum.enumValues;
+export type Gender = (typeof genderValues)[number];
 
 /*
 Patients Table:

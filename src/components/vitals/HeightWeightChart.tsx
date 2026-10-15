@@ -1,11 +1,22 @@
 "use client";
 import { useEffect, useRef } from "react";
+import type { Gender } from "@/types/patient";
 
 // Lowest values printed on the chart axes; anything below plots off-chart.
 const MIN_HEIGHT_CM = 80;
 const MIN_WEIGHT_KG = 10;
 
 // Pixel offsets calibrated to match the printed grid on each chart image.
+type ChartConfig = {
+  src: string;
+  xOrigin: number;
+  xStep: number;
+  weightOrigin: number;
+  weightScale: number;
+  heightOrigin: number;
+  heightScale: number;
+};
+
 const CHART_CONFIG = {
   male: {
     src: "/boyhwgraph.png",
@@ -25,7 +36,7 @@ const CHART_CONFIG = {
     heightOrigin: 593,
     heightScale: 4.25,
   },
-} as const;
+} as const satisfies Record<Gender, ChartConfig>;
 
 function drawRoundedRect(
   ctx: CanvasRenderingContext2D,
@@ -93,7 +104,7 @@ type Props = {
   age: number;
   height: number | null;
   weight: number | null;
-  gender: "male" | "female";
+  gender: Gender;
 };
 
 export function HeightWeightChart({ age, height, weight, gender }: Props) {

@@ -24,6 +24,7 @@ import Modal from "@/components/interactive/Modal";
 import EditPatientForm from "@/components/patient/EditPatientForm";
 import { HeightWeightChart } from "@/components/vitals/HeightWeightChart";
 import clsx from "clsx";
+import type { Gender } from "@/types/patient";
 
 type VitalsFormValues = {
   height?: string | null;
@@ -193,7 +194,7 @@ function VitalsForm({
 }: {
   visitId: number;
   visitDate: Date | string;
-  patient: { dateOfBirth: Date; gender: "male" | "female" };
+  patient: { dateOfBirth: Date; gender: Gender };
 }) {
   const {
     reset,
