@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { MAX_FILE_SIZE_BYTES } from "@/lib/constants/files";
 
 // Mutable env so each test can switch between configured and not configured.
 const env = vi.hoisted(() => ({
@@ -18,8 +19,11 @@ vi.mock("@aws-sdk/client-s3", async (importOriginal) => ({
 const getSignedUrl = vi.hoisted(() => vi.fn());
 vi.mock("@aws-sdk/s3-request-presigner", () => ({ getSignedUrl }));
 
+const createPresignedPost = vi.hoisted(() => vi.fn());
+vi.mock("@aws-sdk/s3-presigned-post", () => ({ createPresignedPost }));
+
 const {
-  createS3UploadUrl,
+  createS3UploadPost,
   getS3ObjectInfo,
   deleteFromS3,
   getS3ViewUrl,
@@ -30,6 +34,7 @@ beforeEach(() => {
   vi.restoreAllMocks();
   send.mockReset();
   getSignedUrl.mockReset();
+  createPresignedPost.mockReset();
 });
 
 describe("when S3 is configured", () => {
@@ -38,17 +43,33 @@ describe("when S3 is configured", () => {
   });
 
   it("presigns an upload under a random key in the patient's folder", async () => {
-    getSignedUrl.mockResolvedValueOnce("https://signed.example/put");
-    const { key, uploadUrl } = await createS3UploadUrl(42, "application/pdf");
+    createPresignedPost.mockResolvedValueOnce({
+      url: "https://signed.example",
+      fields: { key: "k" },
+    });
+    const { key, url, fields } = await createS3UploadPost(
+      42,
+      "application/pdf",
+    );
 
     expect(key).toMatch(/^patients\/42\/[0-9a-f-]{36}$/);
-    expect(uploadUrl).toBe("https://signed.example/put");
-    const [, command] = getSignedUrl.mock.calls[0];
-    expect(command.input).toEqual({
+    expect(url).toBe("https://signed.example");
+    expect(fields).toEqual({ key: "k" });
+    expect(createPresignedPost.mock.calls[0][1]).toMatchObject({
       Bucket: "patient-files",
       Key: key,
-      ContentType: "application/pdf",
+      Fields: { "Content-Type": "application/pdf" },
     });
+  });
+
+  it("makes S3 itself refuse empty, oversized or differently typed uploads", async () => {
+    createPresignedPost.mockResolvedValueOnce({ url: "u", fields: {} });
+    await createS3UploadPost(42, "application/pdf");
+
+    expect(createPresignedPost.mock.calls[0][1].Conditions).toEqual([
+      ["content-length-range", 1, MAX_FILE_SIZE_BYTES],
+      ["eq", "$Content-Type", "application/pdf"],
+    ]);
   });
 
   it("reports a missing upload as null rather than an error", async () => {
@@ -96,10 +117,10 @@ describe("when S3 is not configured", () => {
   });
 
   it("fails file operations with a clear message instead of crashing on import", async () => {
-    await expect(createS3UploadUrl(1, "application/pdf")).rejects.toThrow(
+    await expect(createS3UploadPost(1, "application/pdf")).rejects.toThrow(
       "S3 is not configured",
     );
-    expect(getSignedUrl).not.toHaveBeenCalled();
+    expect(createPresignedPost).not.toHaveBeenCalled();
     expect(send).not.toHaveBeenCalled();
   });
 });
@@ -112,9 +133,9 @@ describe("when the S3 API fails", () => {
 
   it.each([
     [
-      "createS3UploadUrl",
-      () => createS3UploadUrl(1, "application/pdf"),
-      getSignedUrl,
+      "createS3UploadPost",
+      () => createS3UploadPost(1, "application/pdf"),
+      createPresignedPost,
     ],
     ["getS3ObjectInfo", () => getS3ObjectInfo("key"), send],
     ["deleteFromS3", () => deleteFromS3("key"), send],
