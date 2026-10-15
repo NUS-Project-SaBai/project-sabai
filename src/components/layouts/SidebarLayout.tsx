@@ -6,10 +6,12 @@ import { AiOutlineSetting, AiOutlineUser } from "react-icons/ai";
 import { BsEyeglasses } from "react-icons/bs";
 import { MdMonitorHeart } from "react-icons/md";
 import { FaStethoscope } from "react-icons/fa";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { PiSignOutFill } from "react-icons/pi";
 import { IoMdMenu } from "react-icons/io";
 import { LuScanFace } from "react-icons/lu";
 import { GiMedicines } from "react-icons/gi";
+import { Button } from "@/components/interactive/Button/Button";
 import LogoTitle from "@/components/LogoTitle";
 import { paths } from "@/utils/paths";
 import SabaiLogo from "@/components/SabaiLogo";
@@ -22,6 +24,7 @@ interface SidebarLayoutProps {
 
 export default function SidebarLayout({ children }: SidebarLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const dropdownRef = useClickOutside<HTMLDivElement>(() =>
     setMobileSidebarOpen(false),
   );
@@ -51,12 +54,45 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
         </div>
       </div>
       {/* desktop sidebar */}
-      <div className="hidden lg:flex flex-col min-w-64 p-2 gap-6 bg-[var(--color-navbar)]">
-        <LogoTitle className="m-2" />
-        <div className="px-2">
-          <VillageSelector />
-        </div>
-        <SidebarNavButtons />
+      <div
+        className={`hidden lg:flex flex-col relative p-2 gap-6 bg-[var(--color-navbar)] transition-all duration-300 shrink-0 ${
+          isCollapsed ? "w-20" : "w-64"
+        }`}
+      >
+        {/* Collapse Toggle Button */}
+        <Button
+          variant="icon"
+          colour="white"
+          size="small"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          icon={
+            isCollapsed ? (
+              <FiChevronRight className="h-4 w-4" />
+            ) : (
+              <FiChevronLeft className="h-4 w-4" />
+            )
+          }
+          className="absolute -right-3.5 top-7 z-30 !h-7 !w-7 !p-0 !rounded-full border border-gray-600 bg-[var(--color-navbar)] !text-gray-300 hover:!text-white hover:bg-neutral-800 shadow-md"
+        />
+
+        {/* Header: Compact icon when collapsed, full title when expanded */}
+        {isCollapsed ? (
+          <div className="flex justify-center py-2">
+            <SabaiLogo />
+          </div>
+        ) : (
+          <LogoTitle className="m-2" />
+        )}
+
+        {/* Hide VillageSelector when collapsed */}
+        {!isCollapsed && (
+          <div className="px-2">
+            <VillageSelector />
+          </div>
+        )}
+
+        <SidebarNavButtons isCollapsed={isCollapsed} />
       </div>
       {/* Main Content */}
       <main className="w-full overflow-y-auto bg-neutral-75">{children}</main>
@@ -64,7 +100,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
   );
 }
 
-function SidebarNavButtons() {
+function SidebarNavButtons({ isCollapsed = false }: { isCollapsed?: boolean }) {
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -100,24 +136,34 @@ function SidebarNavButtons() {
             <Link
               key={item.name}
               href={item.href}
-              className={`group flex items-center gap-2 p-2 pl-4 rounded-md ${selected ? "bg-secondary-50" : ""} hover:bg-secondary-75 hover:shadow-md`}
+              title={isCollapsed ? item.name : undefined}
+              className={`group flex items-center gap-2 p-2 rounded-md ${
+                isCollapsed ? "justify-center" : "pl-4"
+              } ${selected ? "bg-secondary-50" : ""} hover:bg-secondary-75 hover:shadow-md`}
             >
-              <item.icon className="h-5 w-5 text-gray-500 group-hover:text-gray-800" />
-              <span className="text-gray-500 group-hover:text-gray-800">
-                {item.name}
-              </span>
+              <item.icon className="h-5 w-5 shrink-0 text-gray-500 group-hover:text-gray-800" />
+              {!isCollapsed && (
+                <span className="text-gray-500 group-hover:text-gray-800 truncate">
+                  {item.name}
+                </span>
+              )}
             </Link>
           );
         })}
       </div>
       <button
-        className={`group flex items-center gap-2 p-4 rounded-md hover:cursor-pointer`}
+        className={`group flex items-center gap-2 p-2 rounded-md hover:cursor-pointer ${
+          isCollapsed ? "justify-center" : "pl-4"
+        }`}
         onClick={handleSignOut}
+        title={isCollapsed ? "Sign out" : undefined}
       >
-        <PiSignOutFill className="h-5 w-5 text-gray-500 group-hover:text-gray-800" />
-        <span className="text-gray-500 group-hover:text-gray-800">
-          Sign out
-        </span>
+        <PiSignOutFill className="h-5 w-5 shrink-0 text-gray-500 group-hover:text-gray-800" />
+        {!isCollapsed && (
+          <span className="text-gray-500 group-hover:text-gray-800">
+            Sign out
+          </span>
+        )}
       </button>
     </div>
   );
