@@ -236,10 +236,10 @@ describe("MedicationStockPage", () => {
     await user.click(screen.getByRole("button", { name: "Add Stock" }));
     const dialogSecond = await screen.findByRole("dialog");
 
-    const crossButton = within(dialogSecond).getByRole("button", {
-      name: "",
+    const closeButton = within(dialogSecond).getByRole("button", {
+      name: "Close",
     });
-    await user.click(crossButton);
+    await user.click(closeButton);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
