@@ -17,6 +17,8 @@ type ChartConfig = {
   heightScale: number;
 };
 
+// Each gender uses separately calibrated chart axes. Typing this record
+// exhaustively makes a future enum addition fail until its chart is configured.
 const CHART_CONFIG = {
   male: {
     src: "/boyhwgraph.png",
