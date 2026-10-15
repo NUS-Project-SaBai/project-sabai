@@ -39,7 +39,7 @@ export function formatDiabetes(value: boolean | null): string {
 }
 
 /**
- * Blood pressure thresholds to categorise readings..
+ * Blood pressure thresholds to categorise readings.
  */
 export const BP_THRESHOLDS = {
   preHypertension: { systolic: 130, diastolic: 80 },
@@ -72,4 +72,16 @@ export function classifyBloodPressure(
   }
 
   return null;
+}
+
+export function describeBloodPressureThreshold(
+  status: BloodPressureStatus,
+): string | null {
+  if (status === null) return null;
+
+  if (status === "HTN") {
+    return "Flagged when systolic ≥ 140 mmHg or diastolic ≥ 90 mmHg";
+  }
+
+  return "Flagged when systolic is ≥ 130 and < 140 mmHg or diastolic is ≥ 80 and < 90 mmHg";
 }
