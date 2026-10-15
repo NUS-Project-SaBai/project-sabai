@@ -7,8 +7,8 @@ export const paths = {
   vitals: () => "/vitals",
   vitalsDetail: (patientId: number) => `/vitals/${patientId}`,
   vision: () => "/vision",
-  visionUpdateGlasses: (patientId: number) =>
-    `/vision/update-glasses/${patientId}`,
+  visionUpdateVision: (patientId: number) =>
+    `/vision/update-vision/${patientId}`,
   consults: () => "/consults",
   consultsDetail: (patientId: number) => `/consults/${patientId}`,
   medicationStock: () => "/medication-stock",
