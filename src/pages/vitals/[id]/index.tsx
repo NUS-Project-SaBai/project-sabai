@@ -24,6 +24,11 @@ import Modal from "@/components/interactive/Modal";
 import EditPatientForm from "@/components/patient/EditPatientForm";
 import { HeightWeightChart } from "@/components/vitals/HeightWeightChart";
 import clsx from "clsx";
+import { HiExclamationTriangle } from "react-icons/hi2";
+import {
+  classifyBloodPressure,
+  describeBloodPressureThreshold,
+} from "@/lib/utils/vitals";
 
 type VitalsFormValues = {
   height?: string | null;
@@ -217,6 +222,24 @@ function VitalsForm({
   const chartWeight = weightValue ? parseFloat(String(weightValue)) : null;
   const showChart = patientAge >= 2 && patientAge <= 18;
 
+  // Track input values typed by user
+  const watchedSystolic = useWatch({ name: "systolic" });
+  const watchedDiastolic = useWatch({ name: "diastolic" });
+
+  const systolicValue =
+    watchedSystolic === "" || watchedSystolic == null
+      ? null
+      : Number(watchedSystolic);
+  const diastolicValue =
+    watchedDiastolic === "" || watchedDiastolic == null
+      ? null
+      : Number(watchedDiastolic);
+
+  const bloodPressureStatus =
+    systolicValue !== null && diastolicValue !== null
+      ? classifyBloodPressure(systolicValue, diastolicValue)
+      : null;
+
   const { data: vitalData, isLoading: vitalsLoading } =
     trpc.vitalsRouter.getByVisitId.useQuery(
       { visitId: visitId },
@@ -389,6 +412,29 @@ function VitalsForm({
           />
           <RHFInput name="heartRate" label="Heart Rate (BPM)" type="number" />
         </div>
+
+        {bloodPressureStatus && (
+          <div className="mt-4 flex items-center gap-2">
+            <span
+              className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset
+                  ${
+                    bloodPressureStatus === "Pre-HTN"
+                      ? "bg-warning-subtle text-warning"
+                      : "bg-danger-subtle text-danger"
+                  }`}
+            >
+              <HiExclamationTriangle
+                aria-hidden="true"
+                className="mr-1 h-4 w-4"
+              />
+              {bloodPressureStatus}
+            </span>
+
+            <span className="text-xs text-text-muted">
+              {describeBloodPressureThreshold(bloodPressureStatus)}
+            </span>
+          </div>
+        )}
       </FormSection>
 
       {/* Blood & metabolic */}
