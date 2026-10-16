@@ -4,13 +4,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { files, patients } from "@/db/schema";
-import {
-  createS3UploadPost,
-  deleteFromS3,
-  getS3ObjectInfo,
-  getS3ViewUrl,
-  patientKeyPrefix,
-} from "@/server/utils/s3";
+import { fileStorage, patientKeyPrefix } from "@/server/utils/s3";
 import { ALLOWED_FILE_TYPES, MAX_FILE_SIZE_BYTES } from "@/lib/constants/files";
 
 // Rejects a file whose size or type isn't allowed. Checked before upload
@@ -48,7 +42,7 @@ export const filesRouter = router({
       return Promise.all(
         rows.map(async (file) => ({
           ...file,
-          fileUrl: await getS3ViewUrl(
+          fileUrl: await fileStorage.getViewUrl(
             file.s3Key,
             file.fileName,
             file.contentType,
@@ -80,7 +74,7 @@ export const filesRouter = router({
         .limit(1);
       if (!patient) throw badRequest(`Invalid patient ${input.patientId}`);
 
-      return createS3UploadPost(input.patientId, input.contentType);
+      return fileStorage.createUploadPost(input.patientId, input.contentType);
     }),
 
   // Step 2 of an upload: records the file once the browser has uploaded it.
@@ -100,14 +94,14 @@ export const filesRouter = router({
         throw badRequest("Invalid upload key");
       }
 
-      const uploaded = await getS3ObjectInfo(input.key);
+      const uploaded = await fileStorage.getObjectInfo(input.key);
       if (!uploaded)
         throw badRequest(`${input.fileName} - File was not uploaded`);
       // S3 already enforced these limits on upload; this is a safety net.
       const error = fileError(uploaded.size, uploaded.contentType);
       if (error) {
         // It can never be recorded, so remove it.
-        await deleteFromS3(input.key).catch(() => {});
+        await fileStorage.delete(input.key).catch(() => {});
         throw badRequest(`${input.fileName} - ${error}`);
       }
 
