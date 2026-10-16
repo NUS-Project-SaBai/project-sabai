@@ -18,8 +18,7 @@ import OrderModal from "./OrderModal";
 import { BLANK_CONSULT, ConsultFormValues } from "@/types/consults";
 
 /**
- * The consultation form for a single visit. Owns its own form state.
- * Remount via `key` (e.g. per visit) to get a fresh form.
+ * The consultation form for a single visit.
  *
  * @param visitId - The visit this consult belongs to.
  */
@@ -56,13 +55,18 @@ export function ConsultForm({ visitId }: { visitId: number }) {
   const utils = trpc.useUtils();
   const createConsult = trpc.consultsRouter.create.useMutation();
   const createReferral = trpc.referralRouter.create.useMutation();
+  const createOrder = trpc.ordersRouter.create.useMutation();
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const onInvalid = () =>
     toast.error("Please fill in all required fields before saving.");
 
-  const onSubmit = (data: ConsultFormValues) => {
-    createConsult.mutate(
-      {
+  const onSubmit = async (data: ConsultFormValues) => {
+    setIsSaving(true);
+
+    let consult;
+    try {
+      consult = await createConsult.mutateAsync({
         visitId,
         pastMedicalHistory: data.pastMedicalHistory || undefined,
         consultation: data.consultation || undefined,
@@ -72,36 +76,69 @@ export function ConsultForm({ visitId }: { visitId: number }) {
           details: d.details,
           category: d.category as DiagnosisCategory,
         })),
-      },
-      {
-        onSuccess: (consult) => {
-          utils.consultsRouter.getByVisitId.invalidate({ visitId });
-          toast.success("Consult has been saved successfully!");
-          methods.reset(BLANK_CONSULT);
+      });
+    } catch {
+      setIsSaving(false);
+      toast.error("Failed to save consult.");
+      return;
+    }
 
-          if (data.referredFor !== "Not Referred") {
-            createReferral.mutate(
-              {
-                consultId: consult.id,
-                referredFor: data.referredFor,
-                referralNotes: data.referralNotes?.trim() || undefined,
-              },
-              {
-                onSuccess: () => toast.success("Referral submitted!"),
-                onError: () => toast.error("Failed to create referral."),
-              },
-            );
-          }
+    if (data.referredFor !== "Not Referred") {
+      createReferral.mutate(
+        {
+          consultId: consult.id,
+          referredFor: data.referredFor,
+          referralNotes: data.referralNotes?.trim() || undefined,
         },
-        onError: () => toast.error("Failed to save consult."),
-      },
-    );
+        {
+          onSuccess: () => toast.success("Referral submitted!"),
+          onError: () => toast.error("Failed to create referral."),
+        },
+      );
+    }
+
+    // Orders are created one at a time against the saved consult. A short order later in the seq does not impact the other orders or the consult.
+    const unfilled: string[] = [];
+    for (const order of data.orders) {
+      try {
+        await createOrder.mutateAsync({
+          consultId: consult.id,
+          activeIngredientId: Number(order.activeIngredientId),
+          quantity: order.quantity,
+          dosageInstructions: order.dosageInstructions.trim(),
+        });
+      } catch (error) {
+        unfilled.push(
+          `${order.activeIngredientName} (${error instanceof Error ? error.message : "unknown error"})`,
+        );
+      }
+    }
+
+    utils.consultsRouter.getByVisitId.invalidate({ visitId });
+    if (data.orders.length > 0) {
+      utils.medicationStockRouter.invalidate();
+    }
+
+    if (unfilled.length > 0) {
+      toast.error(
+        `Consult saved, but ${unfilled.length} order(s) could not be filled: ${unfilled.join(", ")}. Please re-order from the pharmacy.`,
+        { duration: 10000 },
+      );
+    } else {
+      toast.success("Consult has been saved successfully!");
+    }
+
+    methods.reset(BLANK_CONSULT);
+    setIsSaving(false);
   };
 
   return (
     <FormProvider {...methods}>
       {orderModalIsOpen && (
-        <OrderModal setOrderModalIsOpen={setOrderModalIsOpen} />
+        <OrderModal
+          setOrderModalIsOpen={setOrderModalIsOpen}
+          onSave={appendOrder}
+        />
       )}
       <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-8">
         <h2 className="text-lg font-semibold text-slate-900">
@@ -208,6 +245,34 @@ export function ConsultForm({ visitId }: { visitId: number }) {
             onClick={() => setOrderModalIsOpen(true)}
             className="w-full"
           />
+
+          {orderFields.map((field, index) => (
+            <div
+              key={field.id}
+              className="flex items-start justify-between gap-4 rounded-lg border border-slate-200 p-4"
+            >
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-slate-700">
+                  {field.activeIngredientName}
+                </p>
+                <p className="text-sm text-slate-600">
+                  Quantity: {field.quantity}
+                </p>
+                <p className="text-sm text-slate-600">
+                  {field.dosageInstructions}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => removeOrder(index)}
+                title="Remove order"
+                className="inline-flex items-center gap-1 rounded p-1 text-sm text-red-600 transition hover:bg-red-50"
+              >
+                <HiOutlineTrash className="h-4 w-4" />
+                Remove
+              </button>
+            </div>
+          ))}
         </section>
 
         {/* Referral */}
@@ -237,7 +302,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
               title="Save Consult"
               colour="emerald"
               variant="filled"
-              loading={createConsult.isPending || createReferral.isPending}
+              loading={isSaving || createReferral.isPending}
             />
           </div>
         </div>
