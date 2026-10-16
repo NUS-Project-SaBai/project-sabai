@@ -22,13 +22,8 @@ vi.mock("@aws-sdk/s3-request-presigner", () => ({ getSignedUrl }));
 const createPresignedPost = vi.hoisted(() => vi.fn());
 vi.mock("@aws-sdk/s3-presigned-post", () => ({ createPresignedPost }));
 
-const {
-  createS3UploadPost,
-  getS3ObjectInfo,
-  deleteFromS3,
-  getS3ViewUrl,
-  VIEW_URL_EXPIRY_SECONDS,
-} = await import("@/server/utils/s3");
+const { fileStorage, VIEW_URL_EXPIRY_SECONDS } =
+  await import("@/server/utils/s3");
 
 beforeEach(() => {
   vi.restoreAllMocks();
@@ -47,7 +42,7 @@ describe("when S3 is configured", () => {
       url: "https://signed.example",
       fields: { key: "k" },
     });
-    const { key, url, fields } = await createS3UploadPost(
+    const { key, url, fields } = await fileStorage.createUploadPost(
       42,
       "application/pdf",
     );
@@ -64,7 +59,7 @@ describe("when S3 is configured", () => {
 
   it("makes S3 itself refuse empty, oversized or differently typed uploads", async () => {
     createPresignedPost.mockResolvedValueOnce({ url: "u", fields: {} });
-    await createS3UploadPost(42, "application/pdf");
+    await fileStorage.createUploadPost(42, "application/pdf");
 
     expect(createPresignedPost.mock.calls[0][1].Conditions).toEqual([
       ["content-length-range", 1, MAX_FILE_SIZE_BYTES],
@@ -77,12 +72,12 @@ describe("when S3 is configured", () => {
       Object.assign(new Error("Not Found"), { name: "NotFound" }),
     );
 
-    expect(await getS3ObjectInfo("patients/42/abc")).toBeNull();
+    expect(await fileStorage.getObjectInfo("patients/42/abc")).toBeNull();
   });
 
   it("deletes the object by key", async () => {
     send.mockResolvedValueOnce({});
-    await deleteFromS3("patients/42/abc");
+    await fileStorage.delete("patients/42/abc");
 
     expect(send.mock.calls[0][0].input).toEqual({
       Bucket: "patient-files",
@@ -92,7 +87,7 @@ describe("when S3 is configured", () => {
 
   it("presigns a view link that uses the current file name", async () => {
     getSignedUrl.mockResolvedValueOnce("https://signed.example/x");
-    const url = await getS3ViewUrl(
+    const url = await fileStorage.getViewUrl(
       "patients/42/abc",
       "Referral letter.pdf",
       "application/pdf",
@@ -117,9 +112,9 @@ describe("when S3 is not configured", () => {
   });
 
   it("fails file operations with a clear message instead of crashing on import", async () => {
-    await expect(createS3UploadPost(1, "application/pdf")).rejects.toThrow(
-      "S3 is not configured",
-    );
+    await expect(
+      fileStorage.createUploadPost(1, "application/pdf"),
+    ).rejects.toThrow("S3 is not configured");
     expect(createPresignedPost).not.toHaveBeenCalled();
     expect(send).not.toHaveBeenCalled();
   });
@@ -133,15 +128,15 @@ describe("when the S3 API fails", () => {
 
   it.each([
     [
-      "createS3UploadPost",
-      () => createS3UploadPost(1, "application/pdf"),
+      "createUploadPost",
+      () => fileStorage.createUploadPost(1, "application/pdf"),
       createPresignedPost,
     ],
-    ["getS3ObjectInfo", () => getS3ObjectInfo("key"), send],
-    ["deleteFromS3", () => deleteFromS3("key"), send],
+    ["getObjectInfo", () => fileStorage.getObjectInfo("key"), send],
+    ["delete", () => fileStorage.delete("key"), send],
     [
-      "getS3ViewUrl",
-      () => getS3ViewUrl("key", "a.pdf", "application/pdf"),
+      "getViewUrl",
+      () => fileStorage.getViewUrl("key", "a.pdf", "application/pdf"),
       getSignedUrl,
     ],
   ])(
