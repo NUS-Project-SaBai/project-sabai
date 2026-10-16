@@ -10,6 +10,7 @@ export type OrderFormValue = {
   quantity: number;
   dosageInstructions: string;
   activeIngredientId: string;
+  activeIngredientName: string; // only so that the pending order list has name it
 };
 
 export type ConsultFormValues = z.infer<typeof consultFormSchema> & {
