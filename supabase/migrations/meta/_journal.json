@@ -134,6 +134,20 @@
       "when": 1788101707251,
       "tag": "0018_lying_nightshade",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1789351698047,
+      "tag": "0019_get_current_user_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1789352149543,
+      "tag": "0020_medication_stock_changes",
+      "breakpoints": true
     }
   ]
 }
