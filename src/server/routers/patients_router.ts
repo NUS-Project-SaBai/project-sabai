@@ -6,7 +6,7 @@ import {
 } from "@/server/utils/cloudinary";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { patients, genderEnum, visits } from "@/db/schema/patients";
+import { patients, genderValues, visits } from "@/db/schema/patients";
 import { vitals, childVitals, puberty } from "@/db/schema/vitals";
 import { villageCodes } from "@/db/schema/villageCodes";
 import serverEnv from "@/lib/envVariables";
@@ -141,7 +141,7 @@ export const patientsRouter = router({
         .formData({
           name: zfd.text(),
           identificationNumber: zfd.text(),
-          gender: zfd.text(z.enum(genderEnum.enumValues)),
+          gender: zfd.text(z.enum(genderValues)),
           dateOfBirth: zfd.text(z.coerce.date()),
           drugAllergy: zfd.text(),
           hasPoorCard: z.boolean(),
@@ -263,7 +263,7 @@ export const patientsRouter = router({
         name: zfd.text(z.string().optional()),
         identificationNumber: zfd.text(z.string().optional()),
         contactNo: zfd.text(z.string().optional()),
-        gender: zfd.text(z.enum(genderEnum.enumValues).optional()),
+        gender: zfd.text(z.enum(genderValues).optional()),
         dateOfBirth: zfd.text(z.coerce.date().optional()),
         drugAllergy: zfd.text(z.string().optional()),
         hasPoorCard: z.boolean().optional(),

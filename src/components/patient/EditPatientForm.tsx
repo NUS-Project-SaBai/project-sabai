@@ -7,6 +7,7 @@ import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { Button } from "@/components/interactive/Button/Button";
 import { toDateInputValue } from "@/lib/utils/patient";
+import { genderDropdown, type Gender } from "@/types/patient";
 
 type Patient = NonNullable<RouterOutput["patientsRouter"]["getById"]>;
 
@@ -14,7 +15,7 @@ type EditPatientFormValues = {
   name: string;
   identificationNumber: string;
   contactNo: string;
-  gender: "male" | "female";
+  gender: Gender;
   drugAllergy: string;
   dateOfBirth: string;
   hasPoorCard: boolean;
@@ -115,10 +116,7 @@ export default function EditPatientForm({
           <RHFDropdown
             name="gender"
             label="Gender"
-            dropdownOptions={[
-              { label: "Male", value: "male" },
-              { label: "Female", value: "female" },
-            ]}
+            dropdownOptions={genderDropdown}
             isRequired
           />
           <RHFInput

@@ -8,6 +8,7 @@ import { Mode } from "@/types/scan";
 import { useVillageCode } from "@/lib/context/VillageCodeContext";
 import { Button } from "@/components/interactive/Button/Button";
 import { calculateAge } from "@/lib/utils/patient";
+import { genderDropdown, type Gender } from "@/types/patient";
 import {
   PEDIATRIC_AGE_THRESHOLD,
   SCOLIOSIS_OPTIONS,
@@ -19,7 +20,7 @@ export type PatientForm = {
   name: string;
   identificationNumber: string;
   contactNo: string;
-  gender: "male" | "female";
+  gender: Gender;
   drugAllergy: string;
   dateOfBirth: Date;
   hasPoorCard: boolean;
@@ -142,10 +143,7 @@ export default function RegistrationPage({
           <RHFDropdown
             name="gender"
             label="Gender"
-            dropdownOptions={[
-              { label: "Male", value: "male" },
-              { label: "Female", value: "female" },
-            ]}
+            dropdownOptions={genderDropdown}
             isRequired
           />
           <RHFInput
