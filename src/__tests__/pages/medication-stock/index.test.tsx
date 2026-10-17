@@ -15,6 +15,7 @@ import {
   assertLoadingSpinner,
   assertTableContents,
 } from "@/__tests__/utils/helper-functions";
+import { MAX_SPLITS, MIN_SPLITS } from "@/lib/constants/medicationStock";
 
 const MOCK_STOCK = [
   {
@@ -739,7 +740,7 @@ describe("MedicationStockPage", () => {
     });
   });
 
-  it("shows 'No splits added, add a split to begin' only when there are 0 child stocks added", async () => {
+  it("shows 'Add a split to begin' only when there are 0 child stocks added", async () => {
     const user = userEvent.setup();
 
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
@@ -753,13 +754,13 @@ describe("MedicationStockPage", () => {
     await user.click(await screen.findByRole("button", { name: "Split" }));
 
     expect(
-      screen.getByText("No splits added, add a split to begin."),
+      screen.getByText("Add a split to begin."),
     ).toBeInTheDocument();
     await user.click(await screen.findByRole("button", { name: "Add Split" }));
 
     await waitFor(() => {
       expect(
-        screen.queryByText("No splits added, add a split to begin."),
+        screen.queryByText("Add a split to begin."),
       ).not.toBeInTheDocument();
     });
   });
@@ -836,6 +837,84 @@ describe("MedicationStockPage", () => {
       });
       expect(updatedRemoveButtons).toHaveLength(1);
     });
+  });
+
+  it("shows the counter upfront and updates it when splits are added or removed", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    renderPage();
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    const dialog = await screen.findByRole("dialog");
+    const counter = within(dialog).getByRole("counter");
+    const addSplitButton = within(dialog).getByRole("button", {
+      name: "Add Split",
+    });
+
+    const expectCount = (count: number) => {
+      expect(counter).toHaveTextContent(
+        `${count}/${MAX_SPLITS} splits added (min. ${MIN_SPLITS} splits required!)`,
+      );
+    };
+
+    expectCount(0);
+
+    await user.click(addSplitButton);
+    expectCount(1);
+
+    await user.click(addSplitButton);
+    expectCount(2);
+
+    await user.click(within(dialog).getAllByRole("button", { name: "-" })[0]);
+    expectCount(1);
+
+    await user.click(within(dialog).getByRole("button", { name: "-" }));
+    expectCount(0);
+  });
+
+  it("disables Add Split button when there are exactly MAX_SPLITS splits, then re-enables it after a split is removed", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: MOCK_STOCK,
+        isLoading: false,
+      },
+    );
+
+    renderPage();
+    await user.click(await screen.findByRole("button", { name: "Split" }));
+
+    const addSplitButton = await screen.findByRole("button", {
+      name: "Add Split",
+    });
+    const limitErrorMessage = `Maximum of ${MAX_SPLITS} splits reached!`;
+
+    for (let i = 0; i < MAX_SPLITS; i++) {
+      await user.click(addSplitButton);
+    }
+
+    expect(addSplitButton).toBeDisabled();
+    expect(screen.getByText(limitErrorMessage)).toBeInTheDocument();
+
+    const dialog = screen.getByRole("dialog");
+    const removeButtons = within(dialog).getAllByRole("button", { name: "-" });
+    expect(removeButtons).toHaveLength(MAX_SPLITS);
+
+    await user.click(removeButtons[0]);
+
+    expect(addSplitButton).toBeEnabled();
+    expect(screen.queryByText(limitErrorMessage)).not.toBeInTheDocument();
+    expect(within(dialog).getAllByRole("button", { name: "-" })).toHaveLength(
+      MAX_SPLITS - 1,
+    );
   });
 
   it("rejects when confirming the split if there are less than 2 child stock", async () => {
