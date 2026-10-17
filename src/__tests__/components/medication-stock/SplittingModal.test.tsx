@@ -119,9 +119,7 @@ describe("SplittingModal", () => {
     await screen.findByRole("dialog");
 
     // Then the empty state message is visible
-    expect(
-      screen.getByText("No splits added, add a split to begin."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Add a split to begin.")).toBeInTheDocument();
   });
 
   it("does not show the empty state once a split is added", async () => {
@@ -129,9 +127,7 @@ describe("SplittingModal", () => {
     const user = userEvent.setup();
     renderModal();
     await screen.findByRole("dialog");
-    expect(
-      screen.getByText("No splits added, add a split to begin."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Add a split to begin.")).toBeInTheDocument();
 
     // When the user clicks "Add Split"
     await user.click(screen.getByRole("button", { name: "Add Split" }));
@@ -139,7 +135,7 @@ describe("SplittingModal", () => {
     // Then the empty state message disappears
     await waitFor(() => {
       expect(
-        screen.queryByText("No splits added, add a split to begin."),
+        screen.queryByText("Add a split to begin."),
       ).not.toBeInTheDocument();
     });
   });
