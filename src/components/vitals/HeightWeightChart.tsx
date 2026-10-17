@@ -6,7 +6,6 @@ import type { Gender } from "@/types/patient";
 const MIN_HEIGHT_CM = 80;
 const MIN_WEIGHT_KG = 10;
 
-// Pixel offsets calibrated to match the printed grid on each chart image.
 type ChartConfig = {
   src: string;
   xOrigin: number;
@@ -17,8 +16,8 @@ type ChartConfig = {
   heightScale: number;
 };
 
-// Each gender uses separately calibrated chart axes. Typing this record
-// exhaustively makes a future enum addition fail until its chart is configured.
+// Pixel offsets are calibrated to each printed chart. Typing this record
+// exhaustively ensures a future gender is configured before it can compile.
 const CHART_CONFIG = {
   male: {
     src: "/boyhwgraph.png",
