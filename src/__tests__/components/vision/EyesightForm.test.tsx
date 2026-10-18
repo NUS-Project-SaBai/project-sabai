@@ -199,6 +199,54 @@ describe("EyesightForm", () => {
     expect(createMutate).not.toHaveBeenCalled();
   });
 
+  test.each([
+    { label: /left eye pinhole/i, field: "leftEyePinhole" },
+    { label: /right eye pinhole/i, field: "rightEyePinhole" },
+  ])("accepts NI in the $field field", async ({ label, field }) => {
+    // Given: the form is loaded with no existing record
+    mockTrpc.eyesightRouter.getByVisitId.useQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    });
+    const user = userEvent.setup();
+    renderForm();
+
+    // When: the user enters NI (no improvement) in a pinhole field and submits
+    await user.type(screen.getByLabelText(label), "NI");
+    await user.click(screen.getByRole("button", { name: /save records/i }));
+
+    // Then: create is called with NI and no validation error is shown
+    await waitFor(() => expect(createMutate).toHaveBeenCalledTimes(1));
+    expect(createMutate).toHaveBeenCalledWith(
+      expect.objectContaining({ [field]: "NI" }),
+      expect.anything(),
+    );
+    expect(screen.queryByText(/must be VA notation/i)).not.toBeInTheDocument();
+  });
+
+  test.each([
+    { label: /left eye degree/i, field: "leftEyeDegree" },
+    { label: /right eye degree/i, field: "rightEyeDegree" },
+  ])("rejects NI in the $field field", async ({ label }) => {
+    // Given: the form is loaded with no existing record
+    mockTrpc.eyesightRouter.getByVisitId.useQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    });
+    const user = userEvent.setup();
+    renderForm();
+
+    // When: the user enters NI in a degree field, where it is pinhole-only, and submits
+    await user.type(screen.getByLabelText(label), "NI");
+    await user.click(screen.getByRole("button", { name: /save records/i }));
+
+    // Then: the degree validation message appears and no mutation is called
+    await waitFor(() => {
+      expect(screen.getByText(/must be VA notation/i)).toBeInTheDocument();
+    });
+    expect(createMutate).not.toHaveBeenCalled();
+  });
+
   test("disables save button while a mutation is pending", () => {
     // Given: the form is loaded and a mutation is in flight
     mockTrpc.eyesightRouter.getByVisitId.useQuery.mockReturnValue({
