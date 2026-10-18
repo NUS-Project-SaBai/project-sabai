@@ -2,6 +2,7 @@ import {
   formatPatientCode,
   formatPatientId,
   toDateInputValue,
+  calculateAge,
 } from "@/lib/utils/patient";
 
 describe("formatPatientId", () => {
@@ -61,3 +62,29 @@ describe("toDateInputValue", () => {
     expect(toDateInputValue(new Date(NaN))).toBe("");
   });
 });
+
+describe("calculateAge", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("returns the correct age when birthday has already passed this year", () => {
+    vi.setSystemTime(new Date(2024, 5, 15)); // June 15, 2024
+    expect(calculateAge(new Date(1990, 2, 10))).toBe(34); // March 10, 1990
+  });
+
+  it("returns the correct age when birthday is today", () => {
+    vi.setSystemTime(new Date(2024, 5, 15)); // June 15, 2024
+    expect(calculateAge(new Date(1990, 5, 15))).toBe(34); // June 15, 1990
+  });
+
+  it("subtracts one year when birthday has not yet passed this year", () => {
+    vi.setSystemTime(new Date(2024, 5, 15)); // June 15, 2024
+    expect(calculateAge(new Date(1990, 11, 31))).toBe(33); // December 31, 1990
+  });
+});
+
