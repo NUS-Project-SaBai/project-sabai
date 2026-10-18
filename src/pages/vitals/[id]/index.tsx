@@ -24,6 +24,7 @@ import Modal from "@/components/interactive/Modal";
 import EditPatientForm from "@/components/patient/EditPatientForm";
 import { HeightWeightChart } from "@/components/vitals/HeightWeightChart";
 import clsx from "clsx";
+import type { Gender } from "@/types/patient";
 import { HiExclamationTriangle } from "react-icons/hi2";
 import {
   classifyBloodPressure,
@@ -198,7 +199,7 @@ function VitalsForm({
 }: {
   visitId: number;
   visitDate: Date | string;
-  patient: { dateOfBirth: Date; gender: "male" | "female" };
+  patient: { dateOfBirth: Date; gender: Gender };
 }) {
   const {
     reset,

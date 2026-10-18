@@ -15,7 +15,7 @@ export type ButtonVariant = "filled" | "outline" | "text" | "icon";
 
 export type ButtonSize = "small" | "medium" | "large";
 
-export const getButonTwClassName = (
+export const getButtonTwClassName = (
   colour: ButtonColour,
   variant: ButtonVariant,
   size: ButtonSize | undefined = undefined,
