@@ -79,9 +79,12 @@ export function describeBloodPressureThreshold(
 ): string | null {
   if (status === null) return null;
 
+  const { systolic: preSystolic, diastolic: preDiastolic } = BP_THRESHOLDS.preHypertension;
+  const { systolic: htnSystolic, diastolic: htnDiastolic } = BP_THRESHOLDS.hypertension;
+
   if (status === "HTN") {
-    return "Flagged when systolic ≥ 140 mmHg or diastolic ≥ 90 mmHg";
+    return `Flagged when systolic ≥ ${htnSystolic} mmHg or diastolic ≥ ${htnDiastolic} mmHg`;
   }
 
-  return "Flagged when systolic is ≥ 130 and < 140 mmHg or diastolic is ≥ 80 and < 90 mmHg";
+  return `Flagged when systolic is ≥ ${preSystolic} and < ${htnSystolic} mmHg or diastolic is ≥ ${preDiastolic} and < ${htnDiastolic} mmHg`;
 }
