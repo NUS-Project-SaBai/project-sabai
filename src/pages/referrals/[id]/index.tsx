@@ -46,7 +46,7 @@ function ReferralDetailsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [outcomeDraft, setOutcomeDraft] = useState("");
 
-  const saveOutcome = trpc.referralRouter.updateState.useMutation({
+  const saveOutcome = trpc.referralRouter.updateOutcome.useMutation({
     onSuccess: async () => {
       await Promise.all([
         utils.referralRouter.getById.invalidate({ id: referralId }),
@@ -159,7 +159,6 @@ function ReferralDetailsPage() {
                     onClick={() =>
                       saveOutcome.mutate({
                         id: referral.id,
-                        referralState: referral.referralState,
                         referralOutcome: outcomeDraft,
                       })
                     }

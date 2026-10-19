@@ -10,6 +10,7 @@ import {
   referralStateEnum,
 } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 import { getPatientWithImageUrl } from "@/server/utils/cloudinary";
 
 const referralStateSchema = z.enum(referralStateEnum.enumValues);
@@ -118,6 +119,37 @@ export const referralRouter = router({
         .where(eq(referrals.id, id))
         .returning();
 
-      return result || null;
+      if (!result) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Referral not found",
+        });
+      }
+      return result;
+    }),
+
+  // Update only the outcome, so saving it can never overwrite a status that
+  // changed since the caller loaded the referral
+  updateOutcome: protectedProcedure
+    .input(
+      z.object({
+        id: z.number().int(),
+        referralOutcome: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const [result] = await db
+        .update(referrals)
+        .set({ referralOutcome: input.referralOutcome })
+        .where(eq(referrals.id, input.id))
+        .returning();
+
+      if (!result) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Referral not found",
+        });
+      }
+      return result;
     }),
 });
