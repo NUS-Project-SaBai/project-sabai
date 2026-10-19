@@ -1,5 +1,6 @@
 import "dotenv/config"; // Cloudinary SDK automatically loads CLOUDINARY_URL environment variable from .env file
 import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
+import serverEnv from "@/lib/envVariables";
 
 cloudinary.config({
   secure: true,
@@ -41,3 +42,23 @@ export async function deleteFromCloudinary(publicIdPath: string) {
   const publicId = extractCloudinaryPublicId(publicIdPath);
   await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
 }
+
+const cloudinaryUrlPrefix = serverEnv.CLOUDINARY_URL_PREFIX;
+
+/**
+ * Transforms a patient object by adding a complete image URL.
+ *
+ * @param patient - The patient object to transform
+ * @returns A new patient object with the `patientImageUrl` property added. If the patient has a `patientImagePublicId`,
+ *          the URL is constructed as `{cloudinaryUrl}/{patientImagePublicId}`. Otherwise, `patientImageUrl` is `null`.
+ */
+export const getPatientWithImageUrl = <
+  T extends { patientImagePublicId: string | null },
+>(
+  patient: T,
+) => ({
+  ...patient,
+  patientImageUrl: patient.patientImagePublicId
+    ? `${cloudinaryUrlPrefix}/${patient.patientImagePublicId}`
+    : null,
+});
