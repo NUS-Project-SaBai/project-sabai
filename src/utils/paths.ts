@@ -11,6 +11,8 @@ export const paths = {
     `/vision/update-vision/${patientId}`,
   consults: () => "/consults",
   consultsDetail: (patientId: number) => `/consults/${patientId}`,
+  referrals: () => "/referrals",
+  referralsDetail: (referralId: number) => `/referrals/${referralId}`,
   medicationStock: () => "/medication-stock",
   medicationBrands: () => "/medication-brands",
   medicationActiveIngredients: () => "/medication-active-ingredients",
