@@ -24,17 +24,21 @@ export default function SettingsPage() {
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {settingsItems.map((item) => (
-            <Link
+            <div
               key={item.name}
-              href={item.href}
-              className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-indigo-300 hover:shadow-md transition"
+              className="relative p-6 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-indigo-300 hover:shadow-md has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-indigo-500 transition"
             >
               <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
-                <item.icon className="h-6 w-6 text-indigo-800" />
-                {item.name}
+                <item.icon aria-hidden className="h-6 w-6 text-indigo-800" />
+                <Link
+                  href={item.href}
+                  className="after:absolute after:inset-0 focus:outline-none"
+                >
+                  {item.name}
+                </Link>
               </h2>
               <p className="mt-1 text-sm text-slate-600">{item.description}</p>
-            </Link>
+            </div>
           ))}
         </div>
       </div>

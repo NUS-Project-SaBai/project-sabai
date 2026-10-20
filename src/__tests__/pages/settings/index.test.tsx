@@ -10,7 +10,7 @@ describe("SettingsPage", () => {
       screen.getByRole("heading", { name: "Settings" }),
     ).toBeInTheDocument();
     assertBreadcrumbs(["Home", "Settings"]);
-    expect(screen.getByRole("link", { name: /Village Codes/ })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Village Codes" })).toHaveAttribute(
       "href",
       "/settings/village-codes",
     );
