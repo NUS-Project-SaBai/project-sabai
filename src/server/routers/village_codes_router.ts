@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { villageCodes } from "@/db/schema/villageCodes";
-import { eq, desc, ne, and } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 export const villageCodesRouter = router({
   // 1. List all (with optional filter)
@@ -42,25 +42,25 @@ export const villageCodesRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      // Reject a village code that is the same as another existing village code
-      const [conflict] = await db
-        .select({ id: villageCodes.id })
-        .from(villageCodes)
-        .where(
-          eq(villageCodes.code, input.code)
-        )
-        .limit(1);
+      try {
+        // .returning() is crucial in Postgres to get the inserted object back
+        const [newCode] = await db.insert(villageCodes).values(input).returning();
+        return newCode;
+      } catch (error) {
+        const dbError = error as {
+          code?: string;
+          cause?: { code?: string };
+        };
 
-      if (conflict) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: "Another village already has this code.",
-        });
+        if ((dbError.cause?.code ?? dbError.code) === "23505") {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Another village already has this code.",
+          });
+        }
+
+        throw error;
       }
-
-      // .returning() is crucial in Postgres to get the inserted object back
-      const [newCode] = await db.insert(villageCodes).values(input).returning();
-      return newCode;
     }),
 
   // 4. Update
@@ -81,41 +81,36 @@ export const villageCodesRouter = router({
     .mutation(async ({ input }) => {
       const { id, ...data } = input;
 
-      // Reject a village code that is the same as another existing village code
-      if (data.code) {
-        const [conflict] = await db
-          .select({ id: villageCodes.id })
-          .from(villageCodes)
-          .where(
-            and(
-              eq(villageCodes.code, data.code),
-              ne(villageCodes.id, id),
-            ),
-          )
-          .limit(1);
+      try {
+        const [updated] = await db
+          .update(villageCodes)
+          .set(data)
+          .where(eq(villageCodes.id, id))
+          .returning();
 
-        if (conflict) {
+        if (!updated) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Village code not found",
+          });
+        }
+
+        return updated;
+      } catch (error) {
+        const dbError = error as {
+          code?: string;
+          cause?: { code?: string };
+        };
+
+        if ((dbError.cause?.code ?? dbError.code) === "23505") {
           throw new TRPCError({
             code: "CONFLICT",
             message: "Another village already has this code.",
           });
         }
+
+        throw error;
       }
-
-      const [updated] = await db
-        .update(villageCodes)
-        .set(data)
-        .where(eq(villageCodes.id, id))
-        .returning();
-
-      if (!updated) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Village code not found",
-        });
-      }
-
-      return updated;
     }),
 
   // 5. Delete
