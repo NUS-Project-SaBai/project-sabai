@@ -108,14 +108,19 @@ function ConsultsPage() {
             )}
           </div>
 
-          <div className="p-6">
+          <div className="overflow-hidden">
             {selectedVisitId ? (
-              <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                <aside className="min-w-0 lg:border-r lg:border-slate-100 lg:pr-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 lg:h-[calc(100vh-280px)]">
+                <aside className="min-w-0 overflow-y-auto p-6 lg:border-r lg:border-slate-100">
                   <VisitSummaryPanel visitId={selectedVisitId} />
                   <PreviousConsults visitId={selectedVisitId} />
                 </aside>
-                <ConsultForm key={selectedVisitId} visitId={selectedVisitId} />
+                <div className="overflow-y-auto p-6">
+                  <ConsultForm
+                    key={selectedVisitId}
+                    visitId={selectedVisitId}
+                  />
+                </div>
               </div>
             ) : (
               visits &&
