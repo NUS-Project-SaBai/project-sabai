@@ -42,9 +42,25 @@ export const villageCodesRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      // .returning() is crucial in Postgres to get the inserted object back
-      const [newCode] = await db.insert(villageCodes).values(input).returning();
-      return newCode;
+      try {
+        // .returning() is crucial in Postgres to get the inserted object back
+        const [newCode] = await db.insert(villageCodes).values(input).returning();
+        return newCode;
+      } catch (error) {
+        const dbError = error as {
+          code?: string;
+          cause?: { code?: string };
+        };
+
+        if ((dbError.cause?.code ?? dbError.code) === "23505") {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Another village already has this code.",
+          });
+        }
+
+        throw error;
+      }
     }),
 
   // 4. Update
@@ -65,11 +81,28 @@ export const villageCodesRouter = router({
     .mutation(async ({ input }) => {
       const { id, ...data } = input;
 
-      const [updated] = await db
-        .update(villageCodes)
-        .set(data)
-        .where(eq(villageCodes.id, id))
-        .returning();
+      let updated;
+      try {
+        [updated] = await db
+          .update(villageCodes)
+          .set(data)
+          .where(eq(villageCodes.id, id))
+          .returning();
+      } catch (error) {
+        const dbError = error as {
+          code?: string;
+          cause?: { code?: string };
+        };
+
+        if ((dbError.cause?.code ?? dbError.code) === "23505") {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Another village already has this code.",
+          });
+        }
+
+        throw error;
+      }
 
       if (!updated) {
         throw new TRPCError({
