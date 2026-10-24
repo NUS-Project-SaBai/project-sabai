@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "@/server/trpc";
-import { withUserAuth } from "@/db/withAuth";
+import { withUserTransaction } from "@/db/withUserTransaction";
 import { eq, and, gt, gte, asc, inArray, sql } from "drizzle-orm";
 import {
   medicationBrands,
@@ -39,7 +39,7 @@ export const ordersRouter = router({
   create: protectedProcedure
     .input(createOrderInput)
     .mutation(async ({ input, ctx }) => {
-      return await withUserAuth(ctx.user.id, async (tx) => {
+      return await withUserTransaction(ctx.user.id, async (tx) => {
         // The brand filter is a subquery rather than a join to keep FOR UPDATE
         // off the medication_brands rows.
         const candidates = await tx

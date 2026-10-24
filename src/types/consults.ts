@@ -1,21 +1,9 @@
 import { z } from "zod";
 import { consultFormSchema } from "@/server/schemas/consults";
 
-export type DiagnosisFormValue = {
-  details: string;
-  category: string;
-};
+export type ConsultFormValues = z.infer<typeof consultFormSchema>;
 
-export type OrderFormValue = {
-  quantity: number;
-  dosageInstructions: string;
-  activeIngredientId: string;
-  activeIngredientName: string; // only so that the pending order list has name it
-};
-
-export type ConsultFormValues = z.infer<typeof consultFormSchema> & {
-  orders: OrderFormValue[];
-};
+export type OrderFormValue = ConsultFormValues["orders"][number];
 
 export const BLANK_CONSULT: ConsultFormValues = {
   pastMedicalHistory: "",
