@@ -38,10 +38,10 @@ export default function Modal({
 
   useEffect(() => {
     const dialog = dialogRef.current;
-    if (dialog) {
-      requestAnimationFrame(() => {
-        dialog.showModal();
-      });
+    // showModal has to run after the dialog is in the document. Skip when it
+    // is already open so a strict-mode remount does not throw.
+    if (dialog && !dialog.hasAttribute("open")) {
+      dialog.showModal();
     }
   }, []);
 
