@@ -8,8 +8,7 @@ const settingsItems = [
     name: "Village Codes",
     href: paths.settingsVillageCodes(),
     icon: MdOutlineLocationOn,
-    description:
-      "Add, edit or hide village codes and the colours used to tag patients.",
+    description: "Manage village codes.",
   },
 ];
 
