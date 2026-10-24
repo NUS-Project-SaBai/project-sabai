@@ -1,5 +1,5 @@
 import { WebcamInput } from "@/components/interactive/inputs/WebcamInput";
-import Manual from "@/components/Manual";
+import LinkExistingPatient from "@/components/scanFace/LinkExistingPatient";
 import MatchingPatients from "@/components/scanFace/MatchingPatients";
 import RegistrationPage from "@/components/scanFace/RegistrationPage";
 import { useState } from "react";
@@ -48,7 +48,13 @@ function ScanFacePage() {
           />
         )}
 
-        {mode === Mode.MANUAL && imgDetails && <Manual />}
+        {mode === Mode.MANUAL && imgDetails && (
+          <LinkExistingPatient
+            imgDetails={imgDetails}
+            setImgDetails={setImgDetails}
+            setMode={setMode}
+          />
+        )}
       </div>
     </div>
   );

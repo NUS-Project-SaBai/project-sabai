@@ -13,8 +13,8 @@ The Scan Face page captures the patient's face and is the first step in the clin
 After a patient's picture is in the camera view, clicking the 'Capture' button at the bottom of the view will take their picture. The button will then turn into a red 'Retake Photo' button.
 
 A loading spinner appears while the application searches for patients matching the current picture taken. 
-- If there are no matching patients, the screen shows 'No matches found' and a purple 'Register New Patient' appears on the bottom left corner. Clicking the button displays a registration form on the screen. See [Registering New Patients](#registering-new-patients) for more information.
-- If there are matching patients, the screen shows 'Found matches:' and a table with the matching patients. The table displays the ID, photo, name, and an actions column, which will, in the future, contain a button that creates a visit. A button appears on the bottom left of the screen with text 'Register New Patient Instead' for false matches.
+- If there are no matching patients, the screen shows 'No matches found' and a purple 'Register New Patient' appears on the bottom left corner. Clicking the button displays a registration form on the screen. See [Registering New Patients](#registering-new-patients) for more information. A 'Link Existing Patient' button sits beside it for returning patients the camera did not recognize. See [Linking an existing patient](#linking-an-existing-patient).
+- If there are matching patients, the screen shows 'Found matches:' and a table with the matching patients. The table displays the ID, photo, name, and an actions column with a button that creates a visit. 'Link Existing Patient' and 'Register New Patient Instead' appear below the table when the match is the wrong person.
 
 ## Registering New Patients 
 
@@ -37,7 +37,12 @@ Clicking "Create New Patient" with any field missing/without any image captured 
 
 If all fields are valid, the patient is registered and a visit is also automatically created for them at the time of registration.
 
-## Upcoming Features
+## Linking an existing patient
 
-- For repeat patients where the facial recognition system is unable to recognize them (especially children), there would be another button in order to manually select the patient through a regular search system. The patient's picture would then be updated with the currently captured picture.
-- The table that displays matching patients would have the button at the side where a visit can be created by clicking on the button.
+'Link Existing Patient' is for a returning patient whose face was not recognized. It opens a search bar that matches on patient name, patient ID, or identification number.
+
+Patients that match the search are listed with an 'Update face' button. Clicking it replaces that patient's stored photo with the picture just taken and creates a visit for the selected village. The button stays disabled while the save is in progress. A success or error message is shown when it finishes.
+
+If a visit was already created for that patient in the last minute, the page asks for confirmation before creating another.
+
+'Match Instead' returns to the face-match results.

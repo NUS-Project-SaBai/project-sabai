@@ -22,6 +22,115 @@ import { calculateAge } from "@/lib/utils/patient";
 
 const cloudinaryUrlPrefix = serverEnv.CLOUDINARY_URL_PREFIX;
 
+type ReplacementImage = {
+  imageUpdate: {
+    patientImagePublicId: string;
+    rekognitionFaceId?: string;
+  };
+  previous: {
+    patientImagePublicId: string;
+    rekognitionFaceId: string | null;
+  };
+};
+
+/**
+ * Uploads a replacement photo and faceprint. Returns null when the patient
+ * does not exist. `rekognitionFaceId` is omitted when the new photo could not
+ * be indexed, so the previous faceprint stays in place.
+ *
+ * Previous assets are not deleted here. Call `deleteReplacedPatientAssets`
+ * only after the new ids have been saved, so a failed write keeps the old photo.
+ */
+async function uploadReplacementPatientImage(
+  id: number,
+  patientImage: string,
+  fileName: string,
+): Promise<ReplacementImage | null> {
+  const [existing] = await db
+    .select({
+      patientImagePublicId: patients.patientImagePublicId,
+      rekognitionFaceId: patients.rekognitionFaceId,
+    })
+    .from(patients)
+    .where(eq(patients.id, id))
+    .limit(1);
+
+  if (!existing) {
+    return null;
+  }
+
+  const imageFile: File = dataUrlToFile(patientImage, fileName);
+
+  const [patientImagePublicId, rekognitionFaceId] = await Promise.all([
+    uploadToCloudinary(imageFile),
+    generateFaceprint(patientImage),
+  ]);
+
+  // No faceprint means the new photo wasn't indexed; keep the old one so
+  // the patient stays searchable by face.
+  if (!rekognitionFaceId) {
+    console.warn(
+      `Faceprint not generated for patient ${id}; new photo is not searchable by face. Keeping previous faceprint.`,
+    );
+  }
+
+  return {
+    imageUpdate: {
+      patientImagePublicId,
+      ...(rekognitionFaceId ? { rekognitionFaceId } : {}),
+    },
+    previous: existing,
+  };
+}
+
+/** Best-effort cleanup. Skips an asset another patient still references. */
+async function deleteReplacedPatientAssets(
+  id: number,
+  previous: ReplacementImage["previous"],
+  next: ReplacementImage["imageUpdate"],
+) {
+  if (
+    previous.patientImagePublicId &&
+    previous.patientImagePublicId !== next.patientImagePublicId
+  ) {
+    const [sharedImage] = await db
+      .select({ id: patients.id })
+      .from(patients)
+      .where(
+        and(
+          ne(patients.id, id),
+          eq(patients.patientImagePublicId, previous.patientImagePublicId),
+        ),
+      )
+      .limit(1);
+    if (!sharedImage) {
+      await deleteFromCloudinary(previous.patientImagePublicId).catch((err) =>
+        console.error("Failed to delete old patient image:", err),
+      );
+    }
+  }
+
+  if (
+    next.rekognitionFaceId &&
+    previous.rekognitionFaceId &&
+    previous.rekognitionFaceId !== next.rekognitionFaceId
+  ) {
+    const [sharedFace] = await db
+      .select({ id: patients.id })
+      .from(patients)
+      .where(
+        and(
+          ne(patients.id, id),
+          eq(patients.rekognitionFaceId, previous.rekognitionFaceId),
+        ),
+      )
+      .limit(1);
+    if (!sharedFace) {
+      await deleteFaceprint(previous.rekognitionFaceId);
+    }
+  }
+}
+
 /**
  * Transforms a patient object by adding a complete image URL.
  *
@@ -305,89 +414,94 @@ export const patientsRouter = router({
         }
       }
 
-      let imageUpdate: {
-        patientImagePublicId?: string;
-        rekognitionFaceId?: string;
-      } = {};
+      let uploaded: ReplacementImage | null = null;
 
       // Client sends a new base64 image (recapture)
       if (patientImage) {
-        // Reads patient's current Cloudinary image id and Rekognition face id before overwriting them
-        const [existing] = await db
-          .select({
-            patientImagePublicId: patients.patientImagePublicId,
-            rekognitionFaceId: patients.rekognitionFaceId,
-          })
-          .from(patients)
-          .where(eq(patients.id, id))
-          .limit(1);
-
-        const imageFile: File = dataUrlToFile(
+        uploaded = await uploadReplacementPatientImage(
+          id,
           patientImage,
           `${input.name ?? id}.jpg`,
         );
-
-        const [patientImagePublicId, rekognitionFaceId] = await Promise.all([
-          uploadToCloudinary(imageFile),
-          generateFaceprint(patientImage),
-        ]);
-        imageUpdate = { patientImagePublicId, rekognitionFaceId };
-
-        // No faceprint means the new photo wasn't indexed; keep the old one so
-        // the patient stays searchable by face.
-        if (!rekognitionFaceId) {
-          console.warn(
-            `Faceprint not generated for patient ${id}; new photo is not searchable by face. Keeping previous faceprint.`,
-          );
-        }
-
-        // Best-effort cleanup of the replaced assets.
-        // Only delete if no other patient still references the same asset (image or faceprint)
-        if (existing?.patientImagePublicId) {
-          const [sharedImage] = await db
-            .select({ id: patients.id })
-            .from(patients)
-            .where(
-              and(
-                ne(patients.id, id),
-                eq(
-                  patients.patientImagePublicId,
-                  existing.patientImagePublicId,
-                ),
-              ),
-            )
-            .limit(1);
-          if (!sharedImage) {
-            await deleteFromCloudinary(existing.patientImagePublicId).catch(
-              (err) =>
-                console.error("Failed to delete old patient image:", err),
-            );
-          }
-        }
-        if (rekognitionFaceId && existing?.rekognitionFaceId) {
-          const [sharedFace] = await db
-            .select({ id: patients.id })
-            .from(patients)
-            .where(
-              and(
-                ne(patients.id, id),
-                eq(patients.rekognitionFaceId, existing.rekognitionFaceId),
-              ),
-            )
-            .limit(1);
-          if (!sharedFace) {
-            await deleteFaceprint(existing.rekognitionFaceId);
-          }
-        }
       }
 
       const [result] = await db
         .update(patients)
-        .set({ ...updateData, ...imageUpdate })
+        .set({ ...updateData, ...uploaded?.imageUpdate })
         .where(eq(patients.id, id))
         .returning();
 
+      if (result && uploaded) {
+        await deleteReplacedPatientAssets(
+          id,
+          uploaded.previous,
+          uploaded.imageUpdate,
+        );
+      }
+
       return result ? getPatientWithImageUrl(result) : null;
+    }),
+
+  // Replace a patient's face photo with a newly captured picture and open a visit.
+  // Used when facial recognition does not find a returning patient.
+  updateFace: protectedProcedure
+    .input(
+      z.object({
+        id: z.number().int(),
+        patientImage: z.string().min(1),
+        villageCodeId: z.number().int(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const uploaded = await uploadReplacementPatientImage(
+        input.id,
+        input.patientImage,
+        `${input.id}.jpg`,
+      );
+
+      if (!uploaded) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Patient not found.",
+        });
+      }
+
+      const saved = await db.transaction(async (tx) => {
+        const [updatedPatient] = await tx
+          .update(patients)
+          .set(uploaded.imageUpdate)
+          .where(eq(patients.id, input.id))
+          .returning();
+
+        if (!updatedPatient) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Patient not found.",
+          });
+        }
+
+        const [newVisit] = await tx
+          .insert(visits)
+          .values({
+            patientId: input.id,
+            villageCodeId: input.villageCodeId,
+            date: new Date(),
+          })
+          .returning();
+
+        return {
+          patient: getPatientWithImageUrl(updatedPatient),
+          visit: newVisit,
+        };
+      });
+
+      await deleteReplacedPatientAssets(
+        input.id,
+        uploaded.previous,
+        uploaded.imageUpdate,
+      );
+
+      return saved;
     }),
 
   // Delete patient

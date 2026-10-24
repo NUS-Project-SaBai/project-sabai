@@ -70,11 +70,12 @@ export default function MatchingPatients({
 
   if (searchPatientsByPictureQuery.isError) {
     return (
-      <div className="flex-col">
+      <div className="flex flex-col items-center gap-4">
         <h2 className="text-xl font-bold mb-4 text-center py-10">
           The server encountered an error while trying to find matches. Please
           try again later.
         </h2>
+        <LinkExistingPatientButton setMode={setMode} />
       </div>
     );
   }
@@ -106,6 +107,7 @@ export default function MatchingPatients({
           We couldn&apos;t find a patient matching this face.
         </p>
         <div className="flex gap-3 mt-4">
+          <LinkExistingPatientButton setMode={setMode} />
           <Button
             onClick={() => setMode(Mode.REGISTERING)}
             colour="indigo"
@@ -159,6 +161,7 @@ export default function MatchingPatients({
         </tbody>
       </table>
       <div className="flex gap-3 mt-6 justify-center">
+        <LinkExistingPatientButton setMode={setMode} />
         <Button
           colour="indigo"
           onClick={() => setMode(Mode.REGISTERING)}
@@ -199,5 +202,20 @@ export default function MatchingPatients({
         </Modal>
       )}
     </div>
+  );
+}
+
+function LinkExistingPatientButton({
+  setMode,
+}: {
+  setMode: React.Dispatch<React.SetStateAction<Mode>>;
+}) {
+  return (
+    <Button
+      colour="white"
+      variant="outline"
+      title="Link Existing Patient"
+      onClick={() => setMode(Mode.MANUAL)}
+    />
   );
 }
