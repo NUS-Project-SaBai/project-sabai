@@ -30,13 +30,13 @@ export default function PatientSearchResultItem({
       />
       <div className="flex min-w-0 flex-col">
         <span className="font-medium truncate">{patient.name}</span>
-        <span className="text-xs text-neutral-500">
-          ID:{" "}
+        <span className="flex items-center gap-1 text-xs text-neutral-700">
+          ID:
           <PatientCode
             villageCode={patient.villageCode}
             villageColorHex={patient.villageColorHex}
             id={patient.id}
-          />{" "}
+          />
           • {calculateAge(patient.dateOfBirth)} yrs • {patient.gender}
         </span>
       </div>
