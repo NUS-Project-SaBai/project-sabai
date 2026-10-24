@@ -739,10 +739,12 @@ describe("ScanFacePage", () => {
       await screen.findByRole("button", { name: "Update face" }),
     );
 
-    expect(await screen.findByText(/Are you sure/)).toBeInTheDocument();
+    const confirmButton = await screen.findByRole("button", {
+      name: "Confirm",
+    });
     expect(mutate).not.toHaveBeenCalled();
 
-    await user.click(screen.getByRole("button", { name: "Confirm" }));
+    await user.click(confirmButton);
     expect(mutate).toHaveBeenCalledWith(
       {
         id: 12,
