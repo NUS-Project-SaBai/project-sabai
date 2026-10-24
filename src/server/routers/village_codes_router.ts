@@ -81,21 +81,13 @@ export const villageCodesRouter = router({
     .mutation(async ({ input }) => {
       const { id, ...data } = input;
 
+      let updated;
       try {
-        const [updated] = await db
+        [updated] = await db
           .update(villageCodes)
           .set(data)
           .where(eq(villageCodes.id, id))
           .returning();
-
-        if (!updated) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Village code not found",
-          });
-        }
-
-        return updated;
       } catch (error) {
         const dbError = error as {
           code?: string;
@@ -111,6 +103,15 @@ export const villageCodesRouter = router({
 
         throw error;
       }
+
+      if (!updated) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Village code not found",
+        });
+      }
+
+      return updated;
     }),
 
   // 5. Delete
