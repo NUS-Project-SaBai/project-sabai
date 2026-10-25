@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { Broadcast } from "@/db/schema/broadcasts";
 import { publishBroadcast } from "@/server/utils/realtime";
 
 // Keep this unit test independent of local Supabase credentials.
@@ -11,6 +12,16 @@ vi.mock("@/lib/envVariables", () => ({
 
 describe("publishBroadcast", () => {
   const fetchMock = vi.fn<typeof fetch>();
+  const payload = {
+    id: 42,
+    title: "Clinic update",
+    body: "The clinic schedule has changed.",
+    severity: "info",
+    createdBy: "Test User",
+    createdAt: new Date("2026-10-24T00:00:00.000Z"),
+    publishedAt: null,
+    attempts: 0,
+  } satisfies Broadcast;
 
   beforeEach(() => {
     vi.stubGlobal("fetch", fetchMock);
@@ -23,12 +34,6 @@ describe("publishBroadcast", () => {
 
   it("publishes a private broadcast with the correct request", async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
-
-    const payload = {
-      id: 42,
-      title: "Clinic update",
-      severity: "info",
-    };
 
     await publishBroadcast({
       topic: "notifications",
@@ -69,7 +74,7 @@ describe("publishBroadcast", () => {
       publishBroadcast({
         topic: "notifications",
         event: "new",
-        payload: { id: 42 },
+        payload,
       }),
     ).rejects.toThrow("Failed to publish broadcast (503): service unavailable");
   });
