@@ -1,9 +1,11 @@
+import type { Broadcast } from "@/db/schema/broadcasts";
 import envVariables from "@/lib/envVariables";
 
+// Add another object variant with `|` when a new topic/event contract is introduced.
 type PublishBroadcastParams = {
-  topic: string;
-  event: string;
-  payload: unknown;
+  topic: "notifications";
+  event: "new";
+  payload: Broadcast;
 };
 
 export async function publishBroadcast({
