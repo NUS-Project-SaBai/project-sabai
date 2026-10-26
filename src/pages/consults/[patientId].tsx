@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
+import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -132,6 +133,11 @@ function ConsultsPage() {
   );
 }
 
-ConsultsPage.getLayout = (page: React.ReactNode) => withDefaultLayout(page);
+ConsultsPage.getLayout = (page: React.ReactNode) =>
+  withDefaultLayout(
+    <PatientTopMenuLayout getPatientLink={(id) => `/consults/${id}`}>
+      {page}
+    </PatientTopMenuLayout>,
+  );
 
 export default ConsultsPage;
