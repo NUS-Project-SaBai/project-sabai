@@ -183,8 +183,6 @@ function VisionPage() {
   return <Wrapper>{renderContent()}</Wrapper>;
 }
 
-VisionPage.getLayout = (page: ReactNode) => withDefaultLayout(page);
-
 VisionPage.getLayout = (page: React.ReactNode) =>
   withDefaultLayout(
     <PatientTopMenuLayout
