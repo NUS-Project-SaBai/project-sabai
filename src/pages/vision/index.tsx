@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { paths } from "@/utils/paths";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
+import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
 import { PatientPhoto } from "@/components/PatientPhoto";
@@ -183,5 +184,14 @@ function VisionPage() {
 }
 
 VisionPage.getLayout = (page: ReactNode) => withDefaultLayout(page);
+
+VisionPage.getLayout = (page: React.ReactNode) =>
+  withDefaultLayout(
+    <PatientTopMenuLayout
+      getPatientLink={(id) => `/vision/update-vision/${id}`}
+    >
+      {page}
+    </PatientTopMenuLayout>,
+  );
 
 export default VisionPage;
