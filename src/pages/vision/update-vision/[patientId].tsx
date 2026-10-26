@@ -146,6 +146,12 @@ function UpdateVisionPage() {
 }
 
 UpdateVisionPage.getLayout = (page: React.ReactNode) =>
-  withDefaultLayout(<PatientTopMenuLayout>{page}</PatientTopMenuLayout>);
+  withDefaultLayout(
+    <PatientTopMenuLayout
+      getPatientLink={(id) => `/vision/update-vision/${id}`}
+    >
+      {page}
+    </PatientTopMenuLayout>,
+  );
 
 export default UpdateVisionPage;
