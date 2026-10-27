@@ -12,7 +12,7 @@ function fileError(size: number, contentType: string | undefined) {
   if (size === 0) return "File is empty";
   if (size > MAX_FILE_SIZE_BYTES) return "File is too large!";
   if (!(ALLOWED_FILE_TYPES as readonly unknown[]).includes(contentType))
-    return "Only PDF, JPEG and PNG files are allowed";
+    return "Only PDF, JPEG, PNG and DOCX files are allowed";
   return null;
 }
 
