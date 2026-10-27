@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "@/server/trpc";
 import { withUserTransaction } from "@/db/withUserTransaction";
-import { eq, and, gt, gte, asc, inArray, sql } from "drizzle-orm";
+import { eq, and, gt, gte, asc, inArray } from "drizzle-orm";
 import {
   medicationBrands,
   medicationStock,
@@ -31,10 +31,8 @@ export const ordersRouter = router({
    *  - the final stock, if only partly consumed, is split the same way
    *    `medicationStockRouter.createSplits` (parent set to 0, qty of child stocks = qty of parent stock)
    *
-   * The children are inserted as `active` and only then updated to
-   * `reserved`. Inserting them as `reserved` outright would make the trigger
-   * log '' -> 'reserved' instead of 'active' -> 'reserved', and `order_items`
-   * is defined as pointing at the active -> reserved row.
+   * Each reserved stock is recorded in `order_items`. Reserved stock is not
+   * editable, so its quantity is the amount it contributed to the order.
    */
   create: protectedProcedure
     .input(createOrderInput)
@@ -112,7 +110,7 @@ export const ordersRouter = router({
                 expiry: stock.expiry,
                 quantity: take,
                 location: stock.location,
-                stockStatus: "active" as const,
+                stockStatus: "reserved" as const,
                 remarks: stock.remarks,
               },
               {
@@ -132,11 +130,6 @@ export const ordersRouter = router({
             .set({ quantity: 0 })
             .where(eq(medicationStock.id, stock.id));
 
-          await tx
-            .update(medicationStock)
-            .set({ stockStatus: "reserved" })
-            .where(eq(medicationStock.id, reservedChild.id));
-
           reservedStockIds.push(reservedChild.id);
         }
 
@@ -149,29 +142,11 @@ export const ordersRouter = router({
           })
           .returning();
 
-        // The active -> reserved rows the trigger just wrote for this order.
-        const reservationChanges = await tx.execute<{ id: number }>(sql`
-          SELECT DISTINCT ON (stock_id) id
-          FROM stock_changes
-          WHERE stock_id IN ${reservedStockIds}
-            AND field = 'stock_status'
-            AND previous_value = 'active' AND new_value = 'reserved'
-          ORDER BY stock_id, id DESC
-        `);
-
-        if (reservationChanges.length !== reservedStockIds.length) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: `Expected ${reservedStockIds.length} stock change(s) for this order but found ${reservationChanges.length}.`,
-          });
-        }
-
-        await tx.insert(orderItems).values(
-          reservationChanges.map((change) => ({
-            orderId: order.id,
-            stockChangeId: change.id,
-          })),
-        );
+        await tx
+          .insert(orderItems)
+          .values(
+            reservedStockIds.map((stockId) => ({ orderId: order.id, stockId })),
+          );
 
         return order;
       });
