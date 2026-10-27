@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { useEffect } from "react";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
+import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -144,6 +145,13 @@ function UpdateVisionPage() {
   );
 }
 
-UpdateVisionPage.getLayout = (page: React.ReactNode) => withDefaultLayout(page);
+UpdateVisionPage.getLayout = (page: React.ReactNode) =>
+  withDefaultLayout(
+    <PatientTopMenuLayout
+      getPatientLink={(id) => `/vision/update-vision/${id}`}
+    >
+      {page}
+    </PatientTopMenuLayout>,
+  );
 
 export default UpdateVisionPage;
