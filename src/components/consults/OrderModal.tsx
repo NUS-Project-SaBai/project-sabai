@@ -110,6 +110,11 @@ export default function OrderModal({
               label="Dosage Instructions"
               type="text"
               isRequired
+              registerOptions={{
+                // `required` accepts whitespace, which the server rejects after trimming
+                validate: (value: string) =>
+                  value.trim() !== "" || "Missing Dosage Instructions!",
+              }}
               className="mb-4"
             />
             <Button colour="emerald" title="Save Order" type="submit" />
