@@ -11,12 +11,22 @@ import { Button } from "@/components/interactive/Button/Button";
 export default function OrderModal({
   setOrderModalIsOpen,
   onSave,
+  stagedOrders,
 }: {
   setOrderModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onSave: (order: OrderFormValue) => void;
+  stagedOrders: OrderFormValue[];
 }) {
   const { data, isLoading, isError } =
     trpc.medicationStockRouter.listGroupByActiveIngredient.useQuery();
+
+  // Staged orders are only reserved once the consult is saved, so they are
+  // subtracted here to keep the total ordered within the available stock.
+  const remainingFor = (ingredient: { id: number; quantity: string | null }) =>
+    Number(ingredient.quantity ?? 0) -
+    stagedOrders
+      .filter((order) => order.activeIngredientId === `${ingredient.id}`)
+      .reduce((total, order) => total + order.quantity, 0);
 
   const form = useForm<OrderFormValue>({
     defaultValues: {
@@ -32,9 +42,9 @@ export default function OrderModal({
     );
     if (!selected) return;
 
-    const available = Number(selected.quantity ?? 0);
+    const available = remainingFor(selected);
 
-    // A soft check only
+    // A soft check only; the orders router enforces stock on submit
     if (values.quantity > available) {
       form.setError("quantity", {
         message: `Only ${available} ${selected.unitOfMeasurement} available.`,
@@ -76,7 +86,7 @@ export default function OrderModal({
               label="Medicine:"
               dropdownOptions={(data ?? []).map((elem) => ({
                 value: `${elem.id}`,
-                label: `${elem.activeIngredientName}, (${elem.unitOfMeasurement}) (Qty: ${elem.quantity})`,
+                label: `${elem.activeIngredientName}, (${elem.unitOfMeasurement}) (Qty: ${remainingFor(elem)})`,
               }))}
               className="mb-4"
               isRequired

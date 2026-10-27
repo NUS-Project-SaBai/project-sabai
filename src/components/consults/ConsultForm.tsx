@@ -138,6 +138,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
         <OrderModal
           setOrderModalIsOpen={setOrderModalIsOpen}
           onSave={appendOrder}
+          stagedOrders={orderFields}
         />
       )}
       <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-8">
