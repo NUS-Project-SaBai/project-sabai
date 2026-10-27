@@ -88,6 +88,7 @@ async function selectReferralCategory(
 async function addOrder(
   user: ReturnType<typeof userEvent.setup>,
   quantity: number,
+  dosageInstructions = "Twice daily",
 ) {
   await user.click(screen.getByRole("button", { name: "Add Order" }));
   // Modal opens the <dialog> inside a requestAnimationFrame, so wait for it —
@@ -95,11 +96,12 @@ async function addOrder(
   await user.click(
     await screen.findByRole("button", { name: "Select an option" }),
   );
-  await user.click(
-    screen.getByRole("button", { name: "Paracetamol, (tablets) (Qty: 50)" }),
-  );
+  await user.click(screen.getByRole("button", { name: /^Paracetamol,/ }));
   await user.type(screen.getByLabelText(/Quantity to Order/), `${quantity}`);
-  await user.type(screen.getByLabelText(/Dosage Instructions/), "Twice daily");
+  await user.type(
+    screen.getByLabelText(/Dosage Instructions/),
+    dosageInstructions,
+  );
   await user.click(screen.getByRole("button", { name: "Save Order" }));
 }
 
@@ -313,6 +315,43 @@ describe("ConsultForm", () => {
     expect(
       screen.getByRole("button", { name: "Save Order" }),
     ).toBeInTheDocument();
+  });
+
+  test("rejects whitespace-only dosage instructions", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    await addOrder(user, 10, "   ");
+
+    await waitFor(() =>
+      expect(
+        screen.getByText("Missing Dosage Instructions!"),
+      ).toBeInTheDocument(),
+    );
+    // the modal stays open and nothing is staged
+    expect(
+      screen.getByRole("button", { name: "Save Order" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/^Quantity: /)).not.toBeInTheDocument();
+  });
+
+  test("counts staged orders against the available stock", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    await addOrder(user, 30);
+    await addOrder(user, 30);
+
+    await waitFor(() =>
+      expect(
+        screen.getByText("Only 20 tablets available."),
+      ).toBeInTheDocument(),
+    );
+    // the dropdown shows what is left after the staged order
+    expect(
+      screen.getByRole("button", { name: "Paracetamol, (tablets) (Qty: 20)" }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText(/^Quantity: /)).toHaveLength(1);
   });
 
   test("keeps the consult and warns when an order cannot be filled", async () => {
