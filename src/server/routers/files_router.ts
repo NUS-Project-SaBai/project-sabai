@@ -56,17 +56,24 @@ export const filesRouter = router({
   // with `key`. S3 rejects the upload if the file is empty, too large or a different type.
   createUploadUrl: protectedProcedure
     .input(
-      z.object({
-        patientId: z.number().int(),
-        fileName: z.string().trim().min(1, "No name provided"),
-        contentType: z.string(),
-        size: z.number().int(),
-      }),
+      z
+        .object({
+          patientId: z.number().int(),
+          fileName: z.string().trim().min(1, "No name provided"),
+          contentType: z.string(),
+          size: z.number().int(),
+        })
+        .superRefine((input, ctx) => {
+          const error = fileError(input.size, input.contentType);
+          if (error) {
+            ctx.addIssue({
+              code: "custom",
+              message: `${input.fileName} - ${error}`,
+            });
+          }
+        }),
     )
     .mutation(async ({ input }) => {
-      const error = fileError(input.size, input.contentType);
-      if (error) throw badRequest(`${input.fileName} - ${error}`);
-
       const [patient] = await db
         .select({ id: patients.id })
         .from(patients)
@@ -80,20 +87,26 @@ export const filesRouter = router({
   // Step 2 of an upload: records the file once the browser has uploaded it.
   confirmUpload: protectedProcedure
     .input(
-      z.object({
-        patientId: z.number().int(),
-        // Only keys createUploadUrl issues.
-        key: z.string().regex(/^patients\/\d+\/[0-9a-f-]{36}$/),
-        fileName: z.string().trim().min(1),
-        description: z.string().default(""),
-      }),
+      z
+        .object({
+          patientId: z.number().int(),
+          // Only keys createUploadUrl issues.
+          key: z
+            .string()
+            .regex(
+              /^patients\/\d+\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+            ),
+          fileName: z.string().trim().min(1),
+          description: z.string().default(""),
+        })
+        .superRefine((input, ctx) => {
+          // A client can't claim another patient's upload.
+          if (!input.key.startsWith(patientKeyPrefix(input.patientId))) {
+            ctx.addIssue({ code: "custom", message: "Invalid upload key" });
+          }
+        }),
     )
     .mutation(async ({ input }) => {
-      // A client can't claim another patient's upload.
-      if (!input.key.startsWith(patientKeyPrefix(input.patientId))) {
-        throw badRequest("Invalid upload key");
-      }
-
       const uploaded = await fileStorage.getObjectInfo(input.key);
       if (!uploaded)
         throw badRequest(`${input.fileName} - File was not uploaded`);
