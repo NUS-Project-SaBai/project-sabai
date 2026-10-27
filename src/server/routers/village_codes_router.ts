@@ -5,6 +5,21 @@ import { db } from "@/db/drizzle";
 import { villageCodes } from "@/db/schema/villageCodes";
 import { eq, desc } from "drizzle-orm";
 
+function handleVillageCodeError(error: unknown): never {
+  const dbError = error as {
+    code?: string;
+    cause?: { code?: string };
+  };
+
+  if ((dbError.cause?.code ?? dbError.code) === "23505") {
+    throw new TRPCError({
+      code: "CONFLICT",
+      message: "Another village already has this code.",
+    });
+  }
+  throw error;
+}
+
 export const villageCodesRouter = router({
   // 1. List all (with optional filter)
   list: protectedProcedure
@@ -47,19 +62,7 @@ export const villageCodesRouter = router({
         const [newCode] = await db.insert(villageCodes).values(input).returning();
         return newCode;
       } catch (error) {
-        const dbError = error as {
-          code?: string;
-          cause?: { code?: string };
-        };
-
-        if ((dbError.cause?.code ?? dbError.code) === "23505") {
-          throw new TRPCError({
-            code: "CONFLICT",
-            message: "Another village already has this code.",
-          });
-        }
-
-        throw error;
+        handleVillageCodeError(error);
       }
     }),
 
@@ -89,19 +92,7 @@ export const villageCodesRouter = router({
           .where(eq(villageCodes.id, id))
           .returning();
       } catch (error) {
-        const dbError = error as {
-          code?: string;
-          cause?: { code?: string };
-        };
-
-        if ((dbError.cause?.code ?? dbError.code) === "23505") {
-          throw new TRPCError({
-            code: "CONFLICT",
-            message: "Another village already has this code.",
-          });
-        }
-
-        throw error;
+        handleVillageCodeError(error);
       }
 
       if (!updated) {
