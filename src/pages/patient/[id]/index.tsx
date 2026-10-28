@@ -1,7 +1,6 @@
 import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import { PatientPhoto } from "@/components/PatientPhoto";
 import PatientDetailSkeleton from "@/components/PatientDetailSkeleton";
-import { calculateAge } from "@/lib/utils/patient";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
@@ -9,6 +8,8 @@ import { useState } from "react";
 import Modal from "@/components/interactive/Modal";
 import EditPatientForm from "@/components/patient/EditPatientForm";
 import { Button } from "@/components/interactive/Button/Button";
+import { calculateAge, formatPatientId } from "@/lib/utils/patient";
+import { genderDropdown } from "@/types/patient";
 
 function parsePatientId(id: string | string[] | undefined) {
   if (typeof id !== "string") {
@@ -61,24 +62,28 @@ export default function PatientPage() {
   }
 
   const details = [
-    { label: "ID", value: patient.id.toString() },
+    { label: "ID", value: formatPatientId(patient.id) },
     { label: "Name", value: patient.name },
     {
       label: "Identification Number",
       value: patient.identificationNumber || "-",
     },
     { label: "Contact Number", value: patient.contactNo || "-" },
-    { label: "Gender", value: patient.gender },
+    {
+      label: "Gender",
+      value:
+        genderDropdown.find((g) => g.value === patient.gender)?.label ??
+        patient.gender,
+    },
     {
       label: "Date of Birth",
       value: new Date(patient.dateOfBirth).toLocaleDateString(),
     },
     { label: "Age", value: `${calculateAge(patient.dateOfBirth)} years` },
     { label: "Drug Allergy", value: patient.drugAllergy },
-    { label: "POOR", value: patient.hasPoorCard },
-    { label: "BS2", value: patient.hasBS2Card },
-    { label: "Sabai Card", value: patient.hasSabaiCard },
-    { label: "Patient Image URL", value: patient.patientImageUrl },
+    { label: "POOR", value: patient.hasPoorCard ? "Yes" : "No" },
+    { label: "BS2", value: patient.hasBS2Card ? "Yes" : "No" },
+    { label: "Sabai Card", value: patient.hasSabaiCard ? "Yes" : "No" },
   ];
 
   return (
