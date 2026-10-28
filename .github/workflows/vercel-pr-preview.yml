@@ -23,7 +23,7 @@ jobs:
         with:
           version: 10
           run_install: false
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - name: Install Vercel CLI
         run: pnpm add --global vercel@latest
       - name: Pull Vercel Environment Information
