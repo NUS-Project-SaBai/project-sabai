@@ -11,6 +11,7 @@ import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
 import { eq } from "drizzle-orm";
 import { appRouter } from "@/server/routers/_app";
 import { db } from "@/db/drizzle";
+import serverEnv from "@/lib/envVariables";
 import type { Context } from "@/server/context";
 import {
   referrals,
@@ -38,6 +39,15 @@ const VILLAGE_CODE = {
   name: "SATBB Village",
   colorHex: "#C0392B",
 };
+
+// A second village the seed patient is seen at after the referral visit.
+const LATER_VILLAGE_CODE = {
+  code: "SATBL",
+  name: "SATBL Village",
+  colorHex: "#2E86C1",
+};
+
+const EXPECTED_IMAGE_URL = `${serverEnv.CLOUDINARY_URL_PREFIX}/${SEED_PATIENT.patientImagePublicId}`;
 
 // protectedProcedure only reads ctx.user, so a minimal context is enough.
 function callerFor(userId: string) {
@@ -136,6 +146,61 @@ describe("referralRouter (integration)", () => {
       expect(row!.doctorId).toBe(userId);
       expect(row!.referralNotes).toBe("urgent");
     });
+
+    // The list page shows the patient photo and village-coloured patient code.
+    it("includes patient photo and village code", async () => {
+      await caller.referralRouter.create({ consultId, referredFor: "ENT" });
+      const rows = await caller.referralRouter.list();
+      const row = rows.find((r) => r.consultId === consultId);
+      expect(row).toBeDefined();
+      expect(row!.patientImagePublicId).toBe(SEED_PATIENT.patientImagePublicId);
+      expect(row!.patientImageUrl).toBe(EXPECTED_IMAGE_URL);
+      expect(row!.villageCodeId).toBe(villageCodeId);
+      expect(row!.villageCode).toBe(VILLAGE_CODE.code);
+      expect(row!.villageColorHex).toBe(VILLAGE_CODE.colorHex);
+    });
+
+    it("returns newest referrals first", async () => {
+      const first = await caller.referralRouter.create({
+        consultId,
+        referredFor: "First",
+      });
+      const second = await caller.referralRouter.create({
+        consultId,
+        referredFor: "Second",
+      });
+      const rows = await caller.referralRouter.list();
+      const ids = rows
+        .filter((r) => r.consultId === consultId)
+        .map((r) => r.id);
+      expect(ids).toEqual([second.id, first.id]);
+    });
+
+    // The patient code reflects where the referral was made, even after the
+    // patient is seen at another village.
+    it("uses the village code of the referral's visit, not the latest visit", async () => {
+      await caller.referralRouter.create({ consultId, referredFor: "ENT" });
+      const [{ id: laterVillageCodeId }] = await db
+        .insert(villageCodes)
+        .values(LATER_VILLAGE_CODE)
+        .returning({ id: villageCodes.id });
+      const [{ id: laterVisitId }] = await db
+        .insert(visits)
+        .values({ patientId, villageCodeId: laterVillageCodeId })
+        .returning({ id: visits.id });
+
+      try {
+        const rows = await caller.referralRouter.list();
+        const row = rows.find((r) => r.consultId === consultId);
+        expect(row!.villageCodeId).toBe(villageCodeId);
+        expect(row!.villageCode).toBe(VILLAGE_CODE.code);
+      } finally {
+        await db.delete(visits).where(eq(visits.id, laterVisitId));
+        await db
+          .delete(villageCodes)
+          .where(eq(villageCodes.id, laterVillageCodeId));
+      }
+    });
   });
 
   describe("getById()", () => {
@@ -148,6 +213,10 @@ describe("referralRouter (integration)", () => {
       expect(found).not.toBeNull();
       expect(found!.id).toBe(created.id);
       expect(found!.patientName).toBe(SEED_PATIENT.name);
+      expect(found!.patientImageUrl).toBe(EXPECTED_IMAGE_URL);
+      expect(found!.villageCodeId).toBe(villageCodeId);
+      expect(found!.villageCode).toBe(VILLAGE_CODE.code);
+      expect(found!.villageColorHex).toBe(VILLAGE_CODE.colorHex);
 
       expect(await caller.referralRouter.getById({ id: -1 })).toBeNull();
     });
