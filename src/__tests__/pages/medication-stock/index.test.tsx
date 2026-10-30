@@ -181,6 +181,68 @@ describe("MedicationStockPage", () => {
     ]);
   });
 
+  it("highlights low stock rows in red", () => {
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: [{ ...MOCK_STOCK[0], isLowStock: true }],
+        isLoading: false,
+      },
+    );
+
+    renderPage();
+    const row = screen.getByRole("cell", { name: "Shelf 1" }).closest("tr");
+    expect(row).toHaveClass("bg-red-50", "hover:!bg-red-100");
+  });
+
+  it("does not highlight rows without a low-stock flag", () => {
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: [{ ...MOCK_STOCK[0], isLowStock: false }],
+        isLoading: false,
+      },
+    );
+
+    renderPage();
+    const row = screen.getByRole("cell", { name: "Shelf 1" }).closest("tr");
+    expect(row).not.toHaveClass("bg-red-50");
+    expect(row).not.toHaveClass("hover:!bg-red-100");
+  });
+
+  it("highlights only flagged rows when displaying mixed stock", () => {
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: [
+          {
+            ...MOCK_STOCK[0],
+            id: 1,
+            location: "Low stock shelf",
+            isLowStock: true,
+          },
+          {
+            ...MOCK_STOCK[0],
+            id: 2,
+            location: "Normal stock shelf",
+            isLowStock: false,
+          },
+        ],
+        isLoading: false,
+      },
+    );
+
+    renderPage();
+
+    const lowStockRow = screen
+      .getByRole("cell", { name: "Low stock shelf" })
+      .closest("tr");
+    const normalStockRow = screen
+      .getByRole("cell", { name: "Normal stock shelf" })
+      .closest("tr");
+
+    expect(lowStockRow).toHaveClass("bg-red-50", "hover:!bg-red-100");
+    expect(normalStockRow).not.toHaveClass("bg-red-50");
+    expect(normalStockRow).not.toHaveClass("hover:!bg-red-100");
+  });
+
   it("opens a modal to add new stock when the Add Stock button is clicked", async () => {
     const user = userEvent.setup();
 
@@ -753,9 +815,7 @@ describe("MedicationStockPage", () => {
 
     await user.click(await screen.findByRole("button", { name: "Split" }));
 
-    expect(
-      screen.getByText("Add a split to begin."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Add a split to begin.")).toBeInTheDocument();
     await user.click(await screen.findByRole("button", { name: "Add Split" }));
 
     await waitFor(() => {
