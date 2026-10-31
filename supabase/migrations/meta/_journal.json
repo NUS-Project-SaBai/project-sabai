@@ -155,6 +155,13 @@
       "when": 1792599965058,
       "tag": "0021_medication_stock_changes",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793067176486,
+      "tag": "0022_order_items_stock_id",
+      "breakpoints": true
     }
   ]
 }
