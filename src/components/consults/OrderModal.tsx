@@ -75,12 +75,7 @@ export default function OrderModal({
       )}
       {!isLoading && !isError && (
         <FormProvider {...form}>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              form.handleSubmit(handleSubmit)(e);
-            }}
-          >
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
             <RHFDropdown
               name="activeIngredientId"
               label="Medicine:"
