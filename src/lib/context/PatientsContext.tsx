@@ -1,8 +1,8 @@
 import { createContext, useContext, useMemo, ReactNode } from "react";
 import { trpc } from "@/utils/trpc";
-import { PatientsRouterListItem } from "@/utils/trpc-types";
+import { PatientsRouterListWithLatestVisitItem } from "@/utils/trpc-types";
 
-type PatientsById = Record<number, PatientsRouterListItem>;
+type PatientsById = Record<number, PatientsRouterListWithLatestVisitItem>;
 
 interface PatientsContextType {
   patientsById: PatientsById;
@@ -19,7 +19,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
     data: patients = [],
     isLoading,
     isRefetching,
-  } = trpc.patientsRouter.list.useQuery();
+  } = trpc.patientsRouter.listWithLatestVisit.useQuery();
 
   // put patients into object for quick access and mutation by id
   const patientsById = useMemo<PatientsById>(() => {

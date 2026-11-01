@@ -13,6 +13,45 @@ export function formatPatientCode(villageCode: string | null, id: number) {
   return `${villageCode ?? ""}${formatPatientId(id)}`;
 }
 
+/**
+ * Decides whether a patient should show up for the text typed in the patient search.
+ *
+ * Name and identification number are matched as case-insensitive substrings. The
+ * displayed patient code (e.g. "PC0012", or just "0012" with no village) is matched
+ * the same way, but only when the text contains a digit, so letters-only text such
+ * as "ca" doesn't pull in every patient from a village with that code.
+ */
+export function matchesPatientSearch(
+  patient: {
+    id: number;
+    name: string;
+    identificationNumber: string | null;
+    villageCode: string | null;
+  },
+  searchText: string,
+) {
+  const query = searchText.trim().toLowerCase();
+
+  if (!query) {
+    return false;
+  }
+
+  if (patient.name.toLowerCase().includes(query)) {
+    return true;
+  }
+
+  if (patient.identificationNumber?.toLowerCase().includes(query)) {
+    return true;
+  }
+
+  return (
+    /\d/.test(query) &&
+    formatPatientCode(patient.villageCode, patient.id)
+      .toLowerCase()
+      .includes(query)
+  );
+}
+
 export function calculateAge(dateOfBirth: Date) {
   const birthDate = new Date(dateOfBirth);
   const now = new Date();

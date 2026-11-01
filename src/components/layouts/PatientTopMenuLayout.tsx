@@ -3,6 +3,7 @@ import SearchInput from "@/components/interactive/inputs/SearchInput";
 import { usePatients } from "@/lib/context/PatientsContext";
 import PatientSearchResults from "@/components/interactive/PatientSearchResults";
 import useDebounce from "@/hooks/useDebounce";
+import { matchesPatientSearch } from "@/lib/utils/patient";
 
 interface PatientTopMenuLayoutProps {
   children: ReactNode;
@@ -18,24 +19,13 @@ export default function PatientTopMenuLayout({
   const { patientsById, isLoading, isRefetching } = usePatients();
 
   const filteredPatients = useMemo(() => {
-    const normalizedSearchText = debouncedSearchText.trim().toLowerCase();
-
-    if (!normalizedSearchText) {
+    if (!debouncedSearchText.trim()) {
       return [];
     }
 
-    return Object.values(patientsById).filter((patient) => {
-      const normalizedId = patient.id.toString();
-      const normalizedName = patient.name.toLowerCase();
-      const normalizedIdentificationNumber =
-        patient.identificationNumber?.toLowerCase() ?? "";
-
-      return (
-        normalizedId.includes(normalizedSearchText) ||
-        normalizedName.includes(normalizedSearchText) ||
-        normalizedIdentificationNumber.includes(normalizedSearchText)
-      );
-    });
+    return Object.values(patientsById).filter((patient) =>
+      matchesPatientSearch(patient, debouncedSearchText),
+    );
   }, [patientsById, debouncedSearchText]);
 
   return (

@@ -1,9 +1,9 @@
 import PatientSearchResultItem from "@/components/interactive/PatientSearchResultItem";
-import { PatientsRouterListItem } from "@/utils/trpc-types";
+import { PatientsRouterListWithLatestVisitItem } from "@/utils/trpc-types";
 
 interface PatientSearchResultsProps {
   searchText: string;
-  filteredPatients: PatientsRouterListItem[];
+  filteredPatients: PatientsRouterListWithLatestVisitItem[];
   isLoading: boolean;
   isRefetching: boolean;
   onSelect: () => void;
