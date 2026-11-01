@@ -115,6 +115,7 @@ export function ConsultForm({ visitId }: { visitId: number }) {
     }
 
     utils.consultsRouter.getByVisitId.invalidate({ visitId });
+    // Placing an order reserves and splits medication_stock rows, so invalidate the stock page
     if (data.orders.length > 0) {
       utils.medicationStockRouter.invalidate();
     }
