@@ -41,28 +41,6 @@ const getPatientWithImageUrl = <
 });
 
 export const patientsRouter = router({
-  // List all of patients (no visit data)
-  list: protectedProcedure.query(async () => {
-    const result = await db
-      .select({
-        id: patients.id,
-        name: patients.name,
-        identificationNumber: patients.identificationNumber,
-        contactNo: patients.contactNo,
-        gender: patients.gender,
-        dateOfBirth: patients.dateOfBirth,
-        hasPoorCard: patients.hasPoorCard,
-        hasBS2Card: patients.hasBS2Card,
-        drugAllergy: patients.drugAllergy,
-        hasSabaiCard: patients.hasSabaiCard,
-        patientImagePublicId: patients.patientImagePublicId,
-        rekognitionFaceId: patients.rekognitionFaceId,
-      })
-      .from(patients);
-
-    return result.map(getPatientWithImageUrl);
-  }),
-
   // List all patients, along with village info from their most recent visit
   listWithLatestVisit: protectedProcedure.query(async () => {
     // DISTINCT ON keeps one row per patient, the latest by visit date

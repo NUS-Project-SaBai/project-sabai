@@ -9,6 +9,13 @@ import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import { formatPatientId } from "@/lib/utils/patient";
+import type { PatientsRouterListWithLatestVisitOutput } from "@/utils/trpc-types";
+
+function selectPatientsForTable(
+  patients: PatientsRouterListWithLatestVisitOutput,
+) {
+  return [...patients].sort((a, b) => a.id - b.id);
+}
 
 function Wrapper({ children }: { children: ReactNode }) {
   return (
@@ -37,12 +44,13 @@ function Wrapper({ children }: { children: ReactNode }) {
 }
 
 function PatientsBasePage() {
-  // 1. Fetch data
   const {
     data: patients,
     isLoading,
     isError,
-  } = trpc.patientsRouter.list.useQuery();
+  } = trpc.patientsRouter.listWithLatestVisit.useQuery(undefined, {
+    select: selectPatientsForTable,
+  });
 
   function renderContent() {
     if (isError) {
