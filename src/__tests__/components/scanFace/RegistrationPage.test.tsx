@@ -7,6 +7,9 @@ import { Mode } from "@/types/scan";
 
 vi.mock("@/utils/trpc", () => ({
   trpc: {
+    useUtils: vi.fn(() => ({
+      patientsRouter: { invalidate: vi.fn() },
+    })),
     patientsRouter: {
       create: {
         useMutation: vi.fn(),
