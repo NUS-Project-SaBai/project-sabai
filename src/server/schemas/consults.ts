@@ -36,7 +36,7 @@ export const consultFormSchema = createConsultInput
     // Pending orders are validated in OrderModal and again by the orders router on submit.
     orders: z.array(
       z.object({
-        quantity: z.number(),
+        quantity: z.number().int().positive(),
         dosageInstructions: z.string(),
         activeIngredientId: z.string(),
         activeIngredientName: z.string(), // only so that the pending order list has name it
