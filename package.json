@@ -44,7 +44,7 @@
     "react-hot-toast": "^2.6.0",
     "react-webcam": "^7.2.0",
     "superjson": "^2.2.6",
-    "zod": "^4.3.6",
+    "zod": "^4.6.6",
     "zod-form-data": "^3.0.1"
   },
   "devDependencies": {
