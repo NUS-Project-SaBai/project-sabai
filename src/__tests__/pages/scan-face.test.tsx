@@ -35,12 +35,10 @@ const mockUseVillageCode = useVillageCode as any;
 vi.mock("@/utils/trpc", () => ({
   trpc: {
     useUtils: vi.fn(() => ({
-      // TODO: to check on the invalidation here
       patientsRouter: {
-        list: {
-          invalidate: vi.fn(),
-        },
+        invalidate: vi.fn(),
       },
+      visitsRouter: { invalidate: vi.fn() },
     })),
     patientsRouter: {
       create: {

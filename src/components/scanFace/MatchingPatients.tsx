@@ -28,7 +28,12 @@ export default function MatchingPatients({
   const utils = trpc.useUtils();
   const searchPatientsByPictureQuery =
     trpc.patientsRouter.searchPatientsByPicture.useMutation();
-  const createVisitMutation = trpc.visitsRouter.create.useMutation();
+  const createVisitMutation = trpc.visitsRouter.create.useMutation({
+    onSuccess() {
+      void utils.patientsRouter.invalidate();
+      void utils.visitsRouter.invalidate();
+    },
+  });
 
   async function handleCreateVisit(patientId: number) {
     setIsCheckingDuplicate(true);

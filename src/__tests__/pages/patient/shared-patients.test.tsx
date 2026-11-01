@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TRPCClientError, type TRPCLink } from "@trpc/client";
 import { createTRPCReact, getQueryKey } from "@trpc/react-query";
 import { observable } from "@trpc/server/observable";
+import { useState } from "react";
 import {
   cleanup,
   fireEvent,
@@ -11,12 +12,22 @@ import {
   within,
 } from "@testing-library/react";
 import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
+import EditPatientForm from "@/components/patient/EditPatientForm";
+import RegistrationPage from "@/components/scanFace/RegistrationPage";
+import MatchingPatients from "@/components/scanFace/MatchingPatients";
 import PatientsBasePage from "@/pages/patient";
 import type { AppRouter } from "@/server/routers/_app";
 import type {
   PatientsRouterListWithLatestVisitItem,
   PatientsRouterListWithLatestVisitOutput,
 } from "@/utils/trpc-types";
+
+vi.mock("@/lib/context/VillageCodeContext", () => ({
+  useVillageCode: () => ({ selectedVillageCodeId: 2 }),
+}));
+vi.mock("@/components/interactive/inputs/WebcamInput", () => ({
+  WebcamInput: () => null,
+}));
 
 const testTrpc = createTRPCReact<AppRouter>();
 const patient: PatientsRouterListWithLatestVisitItem = {
@@ -45,6 +56,7 @@ const clients: QueryClient[] = [];
 
 function renderSharedPage(
   handleOperation: (path: string, input: unknown) => unknown | Promise<unknown>,
+  extraContent?: React.ReactNode,
 ) {
   const requests: string[] = [];
   const link: TRPCLink<AppRouter> =
@@ -79,6 +91,7 @@ function renderSharedPage(
       <testTrpc.Provider client={client} queryClient={queryClient}>
         <PatientTopMenuLayout>
           <PatientsBasePage />
+          {extraContent}
         </PatientTopMenuLayout>
       </testTrpc.Provider>
     </QueryClientProvider>,
@@ -104,6 +117,21 @@ function tableNames() {
     .getAllByRole("row")
     .slice(1)
     .map((row) => within(row).getAllByRole("cell")[1].textContent);
+}
+
+function PatientDetailName() {
+  const { data } = testTrpc.patientsRouter.getById.useQuery({ id: 1 });
+  return <output aria-label="Patient detail name">{data?.name}</output>;
+}
+
+function DismissibleEditForm() {
+  const [open, setOpen] = useState(true);
+  return (
+    <>
+      <button onClick={() => setOpen(false)}>Close edit form</button>
+      {open && <EditPatientForm patient={patient} />}
+    </>
+  );
 }
 
 afterEach(() => {
@@ -218,4 +246,176 @@ describe("shared patient query", () => {
     }
     expect(requests).toEqual(["patientsRouter.listWithLatestVisit"]);
   }, 20000);
+
+  it("refreshes the table and current search when a patient is edited", async () => {
+    let patients = [patient];
+    const { requests, queryClient, container } = renderSharedPage(
+      (path, input) => {
+        if (path === "patientsRouter.update") {
+          patients = [{ ...patient, name: (input as { name: string }).name }];
+          return patients[0];
+        }
+        if (path === "patientsRouter.getById") return patients[0];
+        return patients;
+      },
+      <>
+        <EditPatientForm patient={patient} />
+        <PatientDetailName />
+      </>,
+    );
+    await screen.findByRole("table");
+    searchFor("Somchai");
+    await waitFor(() => expect(searchResultIds()).toEqual([1]));
+    fireEvent.change(container.querySelector('input[name="name"]')!, {
+      target: { value: "Nok" },
+    });
+    fireEvent.submit(container.querySelector("form")!);
+    await waitFor(() => expect(tableNames()).toEqual(["Nok"]));
+    await waitFor(() =>
+      expect(screen.getByLabelText("Patient detail name")).toHaveTextContent(
+        "Nok",
+      ),
+    );
+    expect(
+      await screen.findByText("No matching patients found."),
+    ).toBeInTheDocument();
+    expect(
+      queryClient.getQueryData<PatientsRouterListWithLatestVisitOutput>(
+        patientListKey,
+      )?.[0].name,
+    ).toBe("Nok");
+    expect(
+      requests.filter((path) => path === "patientsRouter.listWithLatestVisit"),
+    ).toHaveLength(2);
+  });
+
+  it("adds a newly registered patient to both consumers", async () => {
+    let patients = [patient];
+    const { container } = renderSharedPage(
+      (path, input) => {
+        if (path === "patientsRouter.create") {
+          const created = {
+            ...patient,
+            id: 20,
+            name: (input as { name: string }).name,
+          };
+          patients = [created, ...patients];
+          return created;
+        }
+        return patients;
+      },
+      <RegistrationPage
+        imgDetails="data:image/jpeg;base64,test"
+        setImgDetails={vi.fn()}
+        setMode={vi.fn()}
+      />,
+    );
+    await screen.findByRole("table");
+    searchFor("PC");
+    await waitFor(() => expect(searchResultIds()).toEqual([1]));
+    const values = {
+      name: "New Patient",
+      identificationNumber: "NEW20",
+      contactNo: "1234567",
+      drugAllergy: "None",
+      dateOfBirth: "1990-01-01",
+    };
+    for (const [name, value] of Object.entries(values)) {
+      fireEvent.change(container.querySelector(`input[name="${name}"]`)!, {
+        target: { value },
+      });
+    }
+    fireEvent.click(
+      container.querySelector('button[name="gender-dropdown-button"]')!,
+    );
+    fireEvent.click(
+      container.querySelector('button[name="gender-male-dropdown-option"]')!,
+    );
+    fireEvent.submit(container.querySelector("form")!);
+    await waitFor(() =>
+      expect(tableNames()).toEqual(["Somchai Phuket", "New Patient"]),
+    );
+    await waitFor(() => expect(searchResultIds()).toEqual([1, 20]));
+  });
+
+  it("refreshes shared data if the edit form closes before the save finishes", async () => {
+    let patients = [patient];
+    let finishSave!: () => void;
+    const pending = new Promise<PatientsRouterListWithLatestVisitItem>(
+      (resolve) => {
+        finishSave = () => {
+          patients = [{ ...patient, name: "Nok" }];
+          resolve(patients[0]);
+        };
+      },
+    );
+    const { container, requests } = renderSharedPage(
+      (path) => {
+        if (path === "patientsRouter.update") return pending;
+        if (path === "patientsRouter.getById") return patients[0];
+        return patients;
+      },
+      <>
+        <DismissibleEditForm />
+        <PatientDetailName />
+      </>,
+    );
+    await screen.findByRole("table");
+    searchFor("Somchai");
+    await waitFor(() => expect(searchResultIds()).toEqual([1]));
+    fireEvent.change(container.querySelector('input[name="name"]')!, {
+      target: { value: "Nok" },
+    });
+    fireEvent.submit(container.querySelector("form")!);
+    await waitFor(() => expect(requests).toContain("patientsRouter.update"));
+    fireEvent.click(screen.getByRole("button", { name: "Close edit form" }));
+    expect(container.querySelector("form")).not.toBeInTheDocument();
+    finishSave();
+    await waitFor(() => expect(tableNames()).toEqual(["Nok"]));
+    await waitFor(() =>
+      expect(screen.getByLabelText("Patient detail name")).toHaveTextContent(
+        "Nok",
+      ),
+    );
+    expect(
+      await screen.findByText("No matching patients found."),
+    ).toBeInTheDocument();
+  });
+
+  it("updates village searches after a new visit changes the latest village", async () => {
+    let patients = [patient];
+    const { requests, queryClient } = renderSharedPage(
+      (path) => {
+        if (path === "patientsRouter.searchPatientsByPicture") return [patient];
+        if (path === "visitsRouter.hasRecentVisit")
+          return { hasRecentVisit: false, existingVisitDate: null };
+        if (path === "visitsRouter.create") {
+          patients = [{ ...patient, villageCode: "CA" }];
+          return { id: 99, patientId: 1, villageCodeId: 2, date: new Date() };
+        }
+        return patients;
+      },
+      <MatchingPatients
+        imgDetails="data:image/jpeg;base64,test"
+        setMode={vi.fn()}
+      />,
+    );
+    await screen.findByRole("button", { name: "Create Visit" });
+    searchFor("PC");
+    await waitFor(() => expect(searchResultIds()).toEqual([1]));
+    fireEvent.click(screen.getByRole("button", { name: "Create Visit" }));
+    expect(
+      await screen.findByText("No matching patients found."),
+    ).toBeInTheDocument();
+    expect(
+      queryClient.getQueryData<PatientsRouterListWithLatestVisitOutput>(
+        patientListKey,
+      )?.[0].villageCode,
+    ).toBe("CA");
+    searchFor("CA");
+    await waitFor(() => expect(searchResultIds()).toEqual([1]));
+    expect(
+      requests.filter((path) => path === "patientsRouter.listWithLatestVisit"),
+    ).toHaveLength(2);
+  });
 });
