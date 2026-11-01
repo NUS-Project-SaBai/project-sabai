@@ -108,9 +108,9 @@ export function ConsultForm({ visitId }: { visitId: number }) {
           dosageInstructions: order.dosageInstructions.trim(),
         });
       } catch (error) {
-        unfilled.push(
-          `${order.activeIngredientName} (${error instanceof Error ? error.message : "unknown error"})`,
-        );
+        const message =
+          error instanceof Error ? error.message : "unknown error";
+        unfilled.push(`${order.activeIngredientName} (${message})`);
       }
     }
 
