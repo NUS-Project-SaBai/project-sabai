@@ -38,7 +38,7 @@ export default function OrderModal({
 
   const handleSubmit: SubmitHandler<OrderFormValue> = (values) => {
     const selected = data?.find(
-      (elem) => `${elem.id}` === values.activeIngredientId,
+      (ingredient) => `${ingredient.id}` === values.activeIngredientId,
     );
     if (!selected) return;
 
@@ -79,9 +79,9 @@ export default function OrderModal({
             <RHFDropdown
               name="activeIngredientId"
               label="Medicine:"
-              dropdownOptions={(data ?? []).map((elem) => ({
-                value: `${elem.id}`,
-                label: `${elem.activeIngredientName}, (${elem.unitOfMeasurement}) (Qty: ${remainingFor(elem)})`,
+              dropdownOptions={(data ?? []).map((ingredient) => ({
+                value: `${ingredient.id}`,
+                label: `${ingredient.activeIngredientName}, (${ingredient.unitOfMeasurement}) (Qty: ${remainingFor(ingredient)})`,
               }))}
               className="mb-4"
               isRequired
