@@ -6,6 +6,7 @@ interface PatientSearchResultsProps {
   filteredPatients: PatientsRouterListWithLatestVisitItem[];
   isLoading: boolean;
   isRefetching: boolean;
+  isError: boolean;
   onSelect: () => void;
   getPatientLink?: (patientId: number) => string;
 }
@@ -15,10 +16,10 @@ export default function PatientSearchResults({
   filteredPatients,
   isLoading,
   isRefetching,
+  isError,
   onSelect,
   getPatientLink,
 }: PatientSearchResultsProps) {
-  // const debouncedSearchText = useDebounce(searchText, 300);
   if (searchText.trim() === "") {
     return null;
   }
@@ -27,6 +28,10 @@ export default function PatientSearchResults({
     <div className="absolute top-full left-0 right-0 px-2 py-1 bg-neutral-50 border border-neutral-100 rounded-md shadow-lg">
       {isLoading || isRefetching ? (
         <p className="text-sm text-neutral-500">Loading patients...</p>
+      ) : isError ? (
+        <p className="text-sm text-red-500">
+          Unable to load patients. Please try again.
+        </p>
       ) : filteredPatients.length === 0 ? (
         <p className="text-sm text-neutral-500">No matching patients found.</p>
       ) : (
