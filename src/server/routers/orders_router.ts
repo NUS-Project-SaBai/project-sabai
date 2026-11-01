@@ -7,9 +7,9 @@ import {
   medicationStock,
   orders,
   orderItems,
-  type MedicationStock,
 } from "@/db/schema/pharmacy";
 import { TRPCError } from "@trpc/server";
+import { allocateStock } from "@/lib/utils/medication-stock";
 
 /**
  * Input for placing an order from the consult form.
@@ -65,29 +65,16 @@ export const ordersRouter = router({
           .orderBy(asc(medicationStock.expiry), asc(medicationStock.id))
           .for("update"); // lock
 
-        let outstanding = input.quantity;
-        const wholeStockIds: number[] = [];
-        let partial: { stock: MedicationStock; take: number } | null = null;
+        const allocation = allocateStock(candidates, input.quantity);
 
-        for (const stock of candidates) {
-          if (outstanding === 0) break;
-
-          if (stock.quantity <= outstanding) {
-            wholeStockIds.push(stock.id);
-            outstanding -= stock.quantity;
-          } else {
-            partial = { stock, take: outstanding };
-            outstanding = 0;
-          }
-        }
-
-        if (outstanding > 0) {
+        if (!allocation.success) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: `Insufficient stock: ${input.quantity - outstanding} of ${input.quantity} available.`,
+            message: allocation.message,
           });
         }
 
+        const { wholeStockIds, partial } = allocation;
         const reservedStockIds: number[] = [];
 
         if (wholeStockIds.length > 0) {
