@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { AiOutlineSetting, AiOutlineUser } from "react-icons/ai";
 import { BsEyeglasses } from "react-icons/bs";
 import { MdMonitorHeart } from "react-icons/md";
-import { FaStethoscope } from "react-icons/fa";
+import { FaStethoscope, FaTooth } from "react-icons/fa";
 import { PiSignOutFill } from "react-icons/pi";
 import { IoMdMenu } from "react-icons/io";
 import { LuScanFace } from "react-icons/lu";
@@ -77,6 +77,7 @@ function SidebarNavButtons() {
     { name: "Patient", href: paths.patient(), icon: AiOutlineUser },
     { name: "Vitals", href: paths.vitals(), icon: MdMonitorHeart },
     { name: "Vision", href: paths.vision(), icon: BsEyeglasses },
+    { name: "Dental", href: paths.dental(), icon: FaTooth },
     { name: "Consults", href: paths.consults(), icon: FaStethoscope },
     {
       name: "Medication Stock",
