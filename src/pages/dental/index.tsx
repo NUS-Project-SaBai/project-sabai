@@ -12,7 +12,7 @@ export default function DentalPage() {
         title="Dental"
         description="Dental module coming soon."
       />
-      <p className="mt-2 text-slate-600">Dental module place here.</p>
+      <p className="mt-2 text-slate-600">Manage dental patients here.</p>
     </div>
   );
 }
