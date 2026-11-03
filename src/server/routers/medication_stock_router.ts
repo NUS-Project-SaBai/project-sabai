@@ -3,7 +3,7 @@ import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { withUserTransaction } from "@/db/withUserTransaction";
-import { eq, desc, ne } from "drizzle-orm";
+import { eq, desc, ne, gte, and, sum } from "drizzle-orm";
 import {
   medicationBrands,
   medicationStatusEnum,
@@ -77,6 +77,38 @@ export const medicationStockRouter = router({
         item.stockStatus === "active" &&
         (totals.get(item.medicationActiveIngredientId) ?? 0) <= item.fallBelow,
     }));
+  }),
+
+  listGroupByActiveIngredient: protectedProcedure.query(async () => {
+    const result = await db
+      .select({
+        id: medicationActiveIngredients.id,
+        activeIngredientName: medicationActiveIngredients.name,
+        unitOfMeasurement: medicationActiveIngredients.unitOfMeasurement,
+        quantity: sum(medicationStock.quantity),
+      })
+      .from(medicationStock)
+      .innerJoin(
+        medicationBrands,
+        eq(medicationStock.medicationBrandId, medicationBrands.id),
+      )
+      .innerJoin(
+        medicationActiveIngredients,
+        eq(medicationActiveIngredients.id, medicationBrands.activeIngredientId),
+      )
+      .where(
+        and(
+          eq(medicationStock.stockStatus, "active"),
+          gte(medicationStock.expiry, new Date()),
+        ),
+      )
+      .groupBy(
+        medicationActiveIngredients.id,
+        medicationActiveIngredients.name,
+        medicationActiveIngredients.unitOfMeasurement,
+      );
+
+    return result;
   }),
 
   create: protectedProcedure

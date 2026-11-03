@@ -167,7 +167,7 @@ export type NewOrder = typeof orders.$inferInsert;
 /**
 Order Items Table:
 - orderId: The ID of the order.
-- stockChangeId: The order ID of the stock_changes table row that contains the entry changing state from 'active' to 'reserved'
+- stockId: The ID of the medication_stock row reserved for the order.
  */
 export const orderItems = pgTable(
   "order_items",
@@ -175,11 +175,11 @@ export const orderItems = pgTable(
     orderId: integer("order_id")
       .notNull()
       .references(() => orders.id),
-    stockChangeId: integer("stock_change_id")
+    stockId: integer("stock_id")
       .notNull()
-      .references(() => stockChanges.id),
+      .references(() => medicationStock.id),
   },
-  (table) => [primaryKey({ columns: [table.orderId, table.stockChangeId] })],
+  (table) => [primaryKey({ columns: [table.orderId, table.stockId] })],
 );
 
 export type OrderItem = typeof orderItems.$inferSelect;
