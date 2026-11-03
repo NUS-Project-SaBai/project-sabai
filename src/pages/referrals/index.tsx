@@ -1,6 +1,10 @@
 import { ReactNode, useMemo, useState } from "react";
 import Link from "next/link";
-import { HiOutlineEye, HiOutlinePencilSquare } from "react-icons/hi2";
+import {
+  HiChevronDown,
+  HiOutlineEye,
+  HiOutlinePencilSquare,
+} from "react-icons/hi2";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 import PageHeader from "@/components/PageHeader";
 import { PatientPhoto } from "@/components/PatientPhoto";
@@ -97,14 +101,14 @@ function ReferralsPage() {
                 <TableCell>
                   <PatientPhoto
                     pictureUrl={referral.patientImageUrl}
-                    className="h-16 w-16 rounded-lg border border-slate-200 object-cover"
+                    className="h-12 w-12 rounded-lg border border-slate-200 object-cover sm:h-16 sm:w-16"
                   />
                 </TableCell>
                 <TableCell>
-                  <div className="space-y-1 text-sm">
+                  <div className="w-28 space-y-1 whitespace-normal text-sm sm:w-auto">
                     <p className="inline-flex items-center gap-2 font-medium text-slate-900">
                       <span
-                        className="h-3 w-3 rounded-full"
+                        className="h-3 w-3 shrink-0 rounded-full"
                         style={{ backgroundColor: referral.villageColorHex }}
                         title={referral.villageCode}
                       />
@@ -123,25 +127,25 @@ function ReferralsPage() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="flex w-44 flex-col gap-2">
+                  <div className="flex w-24 flex-col gap-2 sm:w-44">
                     <Link
                       href={paths.referralsDetail(referral.id)}
-                      className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white transition hover:bg-emerald-700"
+                      className="inline-flex items-center justify-center gap-2 whitespace-normal rounded-lg bg-emerald-600 px-2 py-2 text-center text-xs text-white transition hover:bg-emerald-700 sm:px-3 sm:text-sm"
                     >
-                      <HiOutlinePencilSquare className="h-5 w-5" />
+                      <HiOutlinePencilSquare className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
                       Referral Details
                     </Link>
                     <Link
                       href={paths.consultsDetail(referral.patientId)}
-                      className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-800 transition hover:bg-slate-50"
+                      className="inline-flex items-center justify-center gap-2 whitespace-normal rounded-lg border border-slate-300 px-2 py-2 text-center text-xs text-slate-800 transition hover:bg-slate-50 sm:px-3 sm:text-sm"
                     >
-                      <HiOutlineEye className="h-5 w-5" />
+                      <HiOutlineEye className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
                       Go to consult
                     </Link>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="w-48">
+                  <div className="w-24 sm:w-48">
                     <ReferralStateDropdown
                       referralId={referral.id}
                       referralState={referral.referralState}
@@ -166,18 +170,21 @@ function ReferralsPage() {
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
         <label className="flex items-center gap-2 text-sm text-slate-700">
           Village
-          <select
-            value={villageFilter}
-            onChange={(e) => setVillageFilter(e.target.value)}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            <option value={ALL_VILLAGES}>All villages</option>
-            {villageCodes?.map((village) => (
-              <option key={village.id} value={village.id}>
-                {village.code} ({village.name})
-              </option>
-            ))}
-          </select>
+          <span className="relative inline-flex">
+            <select
+              value={villageFilter}
+              onChange={(e) => setVillageFilter(e.target.value)}
+              className="cursor-pointer appearance-none rounded-lg border border-slate-300 bg-white py-2 pl-3 pr-9 text-sm text-slate-900 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              <option value={ALL_VILLAGES}>All villages</option>
+              {villageCodes?.map((village) => (
+                <option key={village.id} value={village.id}>
+                  {village.code} ({village.name})
+                </option>
+              ))}
+            </select>
+            <HiChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          </span>
         </label>
         <SearchInput searchText={searchText} setSearchText={setSearchText} />
       </div>
