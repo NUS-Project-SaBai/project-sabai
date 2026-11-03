@@ -259,7 +259,9 @@ function Row({
           </span>
         </TableCell>
         <TableCell>
-          {item.stockStatus !== "dispensed" && (
+          {item.stockStatus == "reserved" ? (
+            <span> Manage in Orders page</span>
+          ) : item.stockStatus !== "dispensed" ? (
             <span className="text-sm font-medium text-slate-900 flex flex-row gap-2">
               {isEditing ? (
                 <Button
@@ -294,7 +296,7 @@ function Row({
                 />
               )}
             </span>
-          )}
+          ) : null}
         </TableCell>
       </FormProvider>
     </TableRow>
