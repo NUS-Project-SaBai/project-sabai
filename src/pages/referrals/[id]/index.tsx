@@ -159,7 +159,7 @@ function ReferralDetailsPage() {
                     onClick={() =>
                       saveOutcome.mutate({
                         id: referral.id,
-                        referralOutcome: outcomeDraft,
+                        referralOutcome: outcomeDraft.trim(),
                       })
                     }
                   />
