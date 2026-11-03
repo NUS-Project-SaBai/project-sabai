@@ -165,7 +165,7 @@ function ReferralDetailsPage() {
                   />
                   <Button
                     title="Cancel"
-                    variant="outline"
+                    colour="red"
                     disabled={saveOutcome.isPending}
                     onClick={() => setIsEditing(false)}
                   />
@@ -178,23 +178,22 @@ function ReferralDetailsPage() {
                     <span className="text-slate-500">No outcome recorded</span>
                   )}
                 </p>
-                <button
-                  type="button"
+                <Button
+                  title="Edit outcome"
+                  colour="indigo"
                   onClick={startEditing}
-                  className="shrink-0 cursor-pointer rounded-lg border border-slate-300 px-4 py-2 text-slate-800 transition hover:border-slate-400 hover:bg-slate-200 hover:text-slate-950"
-                >
-                  Edit outcome
-                </button>
+                  className="shrink-0"
+                />
               </div>
             )}
           </DetailRow>
           <DetailRow label="Consultation">
             <Link
               href={paths.consultsDetail(referral.patientId)}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-800 transition hover:bg-slate-50"
+              className="inline-flex items-center gap-2 rounded-lg border border-indigo-600 px-3 py-2 text-sm text-indigo-600 transition hover:bg-indigo-50"
             >
               <HiOutlineEye className="h-5 w-5" />
-              Go to consult
+              Go to patient&apos;s consults
             </Link>
           </DetailRow>
         </dl>
