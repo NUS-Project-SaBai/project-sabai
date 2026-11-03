@@ -1,15 +1,15 @@
-import type { Referral } from "@/db/schema/referrals";
-
-export type ReferralState = Referral["referralState"];
-
-// Display order for the status dropdown, following the referral lifecycle.
-// Kept separate from referralStateEnum so client bundles don't pull in drizzle.
+// Single source of truth for referral states, shared by referralStateEnum
+// (src/db/schema/referrals.ts) and the status dropdown. Order matters here:
+// changing it changes the Postgres enum's declaration order and generates
+// a migration.
 export const REFERRAL_STATES = [
-  "None",
+  "CompletedFailure",
   "New",
   "Seen",
   "Outgoing",
-  "Completed",
   "CompletedSuccess",
-  "CompletedFailure",
-] as const satisfies readonly ReferralState[];
+  "Completed",
+  "None",
+] as const;
+
+export type ReferralState = (typeof REFERRAL_STATES)[number];
