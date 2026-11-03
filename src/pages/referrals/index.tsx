@@ -91,8 +91,8 @@ function ReferralsPage() {
             headers={[
               "Photo",
               "Referral Summary",
-              "Actions",
               "Referral Status",
+              "Actions",
             ]}
           />
           <tbody className="divide-y divide-slate-200 bg-white">
@@ -127,6 +127,14 @@ function ReferralsPage() {
                   </div>
                 </TableCell>
                 <TableCell>
+                  <div className="w-24 sm:w-48">
+                    <ReferralStateDropdown
+                      referralId={referral.id}
+                      referralState={referral.referralState}
+                    />
+                  </div>
+                </TableCell>
+                <TableCell>
                   <div className="flex w-24 flex-col gap-2 sm:w-44">
                     <Link
                       href={paths.referralsDetail(referral.id)}
@@ -142,14 +150,6 @@ function ReferralsPage() {
                       <HiOutlineEye className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
                       Go to consult
                     </Link>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="w-24 sm:w-48">
-                    <ReferralStateDropdown
-                      referralId={referral.id}
-                      referralState={referral.referralState}
-                    />
                   </div>
                 </TableCell>
               </TableRow>
