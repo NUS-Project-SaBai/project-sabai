@@ -122,6 +122,31 @@ export const medicationStockRouter = router({
     .mutation(async ({ input, ctx }) => {
       return await withUserTransaction(ctx.user.id, async (tx) => {
         const { id, ...updateData } = input;
+
+        const [prevStock] = await tx
+          .select()
+          .from(medicationStock)
+          .where(eq(medicationStock.id, id))
+          .for("update")
+          .limit(1);
+
+        if (!prevStock) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Stock item not found.",
+          });
+        }
+
+        if (
+          prevStock.stockStatus === "reserved" ||
+          prevStock.stockStatus === "dispensed"
+        ) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Cannot update a stock with reserved or dispensed status.",
+          });
+        }
+
         const [result] = await tx
           .update(medicationStock)
           .set({ ...updateData })
@@ -161,6 +186,16 @@ export const medicationStockRouter = router({
           throw new TRPCError({
             code: "CONFLICT",
             message: "The parent stock has already split.",
+          });
+        }
+
+        if (
+          parent.stockStatus === "reserved" ||
+          parent.stockStatus === "dispensed"
+        ) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Cannot split a stock with reserved or dispensed status.",
           });
         }
 
