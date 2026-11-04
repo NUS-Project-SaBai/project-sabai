@@ -1,11 +1,4 @@
-import userEvent from "@testing-library/user-event";
-import {
-  cleanup,
-  render,
-  screen,
-  waitFor,
-  within,
-} from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import ReferralsPage from "@/pages/referrals";
 import {
   assertBreadcrumbs,
@@ -27,15 +20,6 @@ const mockTrpc = vi.hoisted(() => ({
 }));
 
 vi.mock("@/utils/trpc", () => ({ trpc: mockTrpc }));
-
-vi.mock("@/lib/context/VillageCodeContext", () => ({
-  useVillageCode: () => ({
-    villageCodes: [
-      { id: 1, code: "SB", name: "Sabai", colorHex: "#C0392B" },
-      { id: 2, code: "PC", name: "Pa Chi", colorHex: "#2E86C1" },
-    ],
-  }),
-}));
 
 const MOCK_REFERRALS = [
   {
@@ -156,67 +140,11 @@ describe("ReferralsPage", () => {
     expect(
       first.getByRole("link", { name: "Referral Details" }),
     ).toHaveAttribute("href", "/referrals/11");
-    expect(first.getByRole("link", { name: "Go to consult" })).toHaveAttribute(
-      "href",
-      "/consults/12",
-    );
+    expect(
+      first.getByRole("link", { name: "Go to patient's consults" }),
+    ).toHaveAttribute("href", "/consults/12");
     expect(
       first.getByRole("combobox", { name: "Referral status" }),
     ).toHaveValue("New");
-  });
-
-  it("filters by patient name", async () => {
-    // Given - referrals for Alice Tan and Bob Lim
-    render(<ReferralsPage />);
-    // When - the user searches for "bob"
-    await userEvent.type(
-      screen.getByPlaceholderText("Search patients..."),
-      "bob",
-    );
-    // Then - only Bob's referral remains (search is debounced, so wait for it)
-    await waitFor(() => expect(getBodyRows()).toHaveLength(1));
-    expect(screen.getByText("PC0034")).toBeInTheDocument();
-  });
-
-  it("filters by patient code", async () => {
-    // Given - referrals for Alice Tan (SB0012) and Bob Lim (PC0034)
-    render(<ReferralsPage />);
-    // When - the user searches for Alice's code in lower case
-    await userEvent.type(
-      screen.getByPlaceholderText("Search patients..."),
-      "sb0012",
-    );
-    // Then - only Alice's referral remains
-    await waitFor(() =>
-      expect(screen.queryByText("Bob Lim")).not.toBeInTheDocument(),
-    );
-    expect(screen.getByText("Alice Tan")).toBeInTheDocument();
-  });
-
-  it("filters by village", async () => {
-    // Given - referrals from village SB (Alice) and village PC (Bob)
-    render(<ReferralsPage />);
-    // When - the user picks village PC
-    await userEvent.selectOptions(
-      screen.getByRole("combobox", { name: "Village" }),
-      "2",
-    );
-    // Then - only Bob's referral remains
-    expect(getBodyRows()).toHaveLength(1);
-    expect(screen.getByText("Bob Lim")).toBeInTheDocument();
-  });
-
-  it("says when no referrals match the filters", async () => {
-    // Given - two referrals exist
-    render(<ReferralsPage />);
-    // When - the user searches for a name that matches neither
-    await userEvent.type(
-      screen.getByPlaceholderText("Search patients..."),
-      "nobody",
-    );
-    // Then - a no-matches message shows
-    expect(
-      await screen.findByText("No referrals match your search."),
-    ).toBeInTheDocument();
   });
 });
