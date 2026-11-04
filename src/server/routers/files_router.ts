@@ -1,0 +1,172 @@
+import { z } from "zod";
+import { TRPCError } from "@trpc/server";
+import { and, desc, eq } from "drizzle-orm";
+import { router, protectedProcedure } from "@/server/trpc";
+import { db } from "@/db/drizzle";
+import { files, patients } from "@/db/schema";
+import { fileStorage, patientKeyPrefix } from "@/server/utils/s3";
+import { ALLOWED_FILE_TYPES, MAX_FILE_SIZE_BYTES } from "@/lib/constants/files";
+
+// Rejects a file whose size or type isn't allowed. Checked before upload
+function fileError(size: number, contentType: string | undefined) {
+  if (size === 0) return "File is empty";
+  if (size > MAX_FILE_SIZE_BYTES) return "File is too large!";
+  if (!(ALLOWED_FILE_TYPES as readonly unknown[]).includes(contentType))
+    return "Only PDF, JPEG, PNG and DOCX files are allowed";
+  return null;
+}
+
+function badRequest(message: string) {
+  return new TRPCError({ code: "BAD_REQUEST", message });
+}
+
+function throwIfMissing(row: unknown, id: number) {
+  if (!row) {
+    throw new TRPCError({ code: "NOT_FOUND", message: `File ${id} not found` });
+  }
+}
+
+export const filesRouter = router({
+  // A patient's files, newest first, each with a view link that expires after an hour.
+  // Refetch rather than storing the links.
+  listByPatientId: protectedProcedure
+    .input(z.object({ patientId: z.number().int() }))
+    .query(async ({ input }) => {
+      const rows = await db
+        .select()
+        .from(files)
+        .where(
+          and(eq(files.patientId, input.patientId), eq(files.isDeleted, false)),
+        )
+        .orderBy(desc(files.createdAt));
+      return Promise.all(
+        rows.map(async (file) => ({
+          ...file,
+          fileUrl: await fileStorage.getViewUrl(
+            file.s3Key,
+            file.fileName,
+            file.contentType,
+          ),
+        })),
+      );
+    }),
+
+  // Step 1 of an upload: checks the file, then returns a presigned POST. The browser POSTs a
+  // form with every entry of `fields` followed by the file to `url`, then calls confirmUpload
+  // with `key`. S3 rejects the upload if the file is empty, too large or a different type.
+  createUploadUrl: protectedProcedure
+    .input(
+      z
+        .object({
+          patientId: z.number().int(),
+          fileName: z.string().trim().min(1, "No name provided"),
+          contentType: z.string(),
+          size: z.number().int(),
+        })
+        .superRefine((input, ctx) => {
+          const error = fileError(input.size, input.contentType);
+          if (error) {
+            ctx.addIssue({
+              code: "custom",
+              message: `${input.fileName} - ${error}`,
+            });
+          }
+        }),
+    )
+    .mutation(async ({ input }) => {
+      const [patient] = await db
+        .select({ id: patients.id })
+        .from(patients)
+        .where(eq(patients.id, input.patientId))
+        .limit(1);
+      if (!patient) throw badRequest(`Invalid patient ${input.patientId}`);
+
+      return fileStorage.createUploadPost(input.patientId, input.contentType);
+    }),
+
+  // Step 2 of an upload: records the file once the browser has uploaded it.
+  confirmUpload: protectedProcedure
+    .input(
+      z
+        .object({
+          patientId: z.number().int(),
+          // Only keys createUploadUrl issues.
+          key: z
+            .string()
+            .regex(
+              /^patients\/\d+\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+            ),
+          fileName: z.string().trim().min(1),
+          description: z.string().default(""),
+        })
+        .superRefine((input, ctx) => {
+          // A client can't claim another patient's upload.
+          if (!input.key.startsWith(patientKeyPrefix(input.patientId))) {
+            ctx.addIssue({ code: "custom", message: "Invalid upload key" });
+          }
+        }),
+    )
+    .mutation(async ({ input }) => {
+      const uploaded = await fileStorage.getObjectInfo(input.key);
+      if (!uploaded)
+        throw badRequest(`${input.fileName} - File was not uploaded`);
+      // S3 already enforced these limits on upload; this is a safety net.
+      const error = fileError(uploaded.size, uploaded.contentType);
+      if (error) {
+        // It can never be recorded, so remove it.
+        await fileStorage.delete(input.key).catch(() => {});
+        throw badRequest(`${input.fileName} - ${error}`);
+      }
+
+      await db
+        .insert(files)
+        .values({
+          patientId: input.patientId,
+          s3Key: input.key,
+          // Checked by fileError above.
+          contentType: uploaded.contentType!,
+          fileName: input.fileName,
+          description: input.description,
+        })
+        // A retried confirm leaves the existing row as it is.
+        .onConflictDoNothing({ target: files.s3Key });
+    }),
+
+  // Rename a file or change its description. The S3 object is untouched; view links
+  // pick up the new name.
+  update: protectedProcedure
+    .input(
+      z
+        .object({
+          id: z.number().int(),
+          fileName: z.string().trim().min(1).optional(),
+          description: z.string().optional(),
+        })
+        .refine(
+          (d) => d.fileName !== undefined || d.description !== undefined,
+          {
+            message: "Provide a fileName or description to update",
+          },
+        ),
+    )
+    .mutation(async ({ input: { id, ...changes } }) => {
+      const [row] = await db
+        .update(files)
+        .set(changes)
+        .where(eq(files.id, id))
+        .returning({ id: files.id });
+      throwIfMissing(row, id);
+    }),
+
+  // Soft delete only: the row is hidden and the S3 object is kept.
+  delete: protectedProcedure
+    .input(z.object({ id: z.number().int() }))
+    .mutation(async ({ input }) => {
+      const [row] = await db
+        .update(files)
+        .set({ isDeleted: true })
+        .where(eq(files.id, input.id))
+        .returning({ id: files.id });
+      throwIfMissing(row, input.id);
+    }),
+});
