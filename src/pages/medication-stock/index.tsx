@@ -260,7 +260,10 @@ function Row({
         </TableCell>
         <TableCell>
           {item.stockStatus == "reserved" ? (
-            <span> Manage in Orders page</span>
+            <span className="text-sm font-medium text-slate-900">
+              {" "}
+              Manage in Orders page
+            </span>
           ) : item.stockStatus !== "dispensed" ? (
             <span className="text-sm font-medium text-slate-900 flex flex-row gap-2">
               {isEditing ? (

@@ -91,6 +91,16 @@ export const medicationStockRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
+      if (
+        input.stockStatus === "reserved" ||
+        input.stockStatus === "dispensed"
+      ) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Cannot create a stock with reserved or dispensed status.",
+        });
+      }
+
       return await withUserTransaction(ctx.user.id, async (tx) => {
         const [newStock] = await tx
           .insert(medicationStock)
@@ -144,6 +154,16 @@ export const medicationStockRouter = router({
           throw new TRPCError({
             code: "CONFLICT",
             message: "Cannot update a stock with reserved or dispensed status.",
+          });
+        }
+
+        if (
+          input.stockStatus === "reserved" ||
+          input.stockStatus === "dispensed"
+        ) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Cannot update a stock to reserved or dispensed status.",
           });
         }
 

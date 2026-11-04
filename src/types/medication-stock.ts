@@ -1,14 +1,11 @@
-import {
-  MedicationStock,
-  medicationStatusValues,
-  medicationStatusEnum,
-} from "@/db/schema/pharmacy";
+import { MedicationStock, medicationStatusValues } from "@/db/schema/pharmacy";
+import { stockPageStatusValues } from "@/lib/constants/medicationStock";
 import z from "zod";
 import { zfd } from "zod-form-data";
 
 export type StockStatus = (typeof medicationStatusValues)[number];
 
-export const stockStatusDropdown = medicationStatusValues.map((status) => ({
+export const stockStatusDropdown = stockPageStatusValues.map((status) => ({
   label: status,
   value: status,
 }));
@@ -31,8 +28,15 @@ export type MedicationStockWithBrandAndActiveIngredient = MedicationStock & {
 export const splitSchema = z.object({
   quantity: zfd.numeric(z.number().int().positive()),
   location: zfd.text(z.string()),
-  stockStatus: zfd.text(z.enum(medicationStatusEnum.enumValues)),
+  stockStatus: zfd.text(z.enum(stockPageStatusValues)),
   remarks: zfd.text(z.string().optional()),
 });
 
 export type SplitPayload = z.infer<typeof splitSchema>;
+
+export type SplitChild = Omit<
+  MedicationStockWithBrandAndActiveIngredient,
+  "stockStatus"
+> & {
+  stockStatus: SplitPayload["stockStatus"];
+};

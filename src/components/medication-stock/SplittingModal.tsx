@@ -1,15 +1,19 @@
 import Modal from "@/components/interactive/Modal";
 import {
   MedicationStockWithBrandAndActiveIngredient,
-  StockStatus,
+  SplitPayload,
+  SplitChild,
 } from "@/types/medication-stock";
 import { Button } from "@/components/interactive/Button/Button";
 import { useState } from "react";
-import { medicationStatusValues } from "@/db/schema/pharmacy";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import { validateSplits } from "@/lib/utils/medication-stock";
-import { MAX_SPLITS, MIN_SPLITS } from "@/lib/constants/medicationStock";
+import {
+  MAX_SPLITS,
+  MIN_SPLITS,
+  stockPageStatusValues,
+} from "@/lib/constants/medicationStock";
 
 export default function SplittingModal({
   onClose,
@@ -18,9 +22,7 @@ export default function SplittingModal({
   onClose: () => void;
   stock: MedicationStockWithBrandAndActiveIngredient;
 }) {
-  const [splits, setSplits] = useState<
-    MedicationStockWithBrandAndActiveIngredient[]
-  >([]);
+  const [splits, setSplits] = useState<SplitChild[]>([]);
 
   function removeSplit(remove: number) {
     setSplits(splits.filter((item, index) => index !== remove));
@@ -40,13 +42,13 @@ export default function SplittingModal({
     },
   });
 
-  function updateSplit(index: number, patch: object) {
+  function updateSplit(index: number, patch: Partial<SplitChild>) {
     const newSplits = splits.map((item, itemIndex) =>
       itemIndex === index
         ? {
-          ...item,
-          ...patch,
-        }
+            ...item,
+            ...patch,
+          }
         : item,
     );
 
@@ -145,11 +147,12 @@ export default function SplittingModal({
                     value={split.stockStatus!}
                     onChange={(e) => {
                       updateSplit(index, {
-                        stockStatus: e.target.value as StockStatus,
+                        stockStatus: e.target
+                          .value as SplitPayload["stockStatus"],
                       });
                     }}
                   >
-                    {medicationStatusValues.map((status) => (
+                    {stockPageStatusValues.map((status) => (
                       <option key={status}>{status}</option>
                     ))}
                   </select>
@@ -186,7 +189,16 @@ export default function SplittingModal({
         <Button
           title="Add Split"
           colour="indigo"
-          onClick={() => setSplits(s => [...s, stock])}
+          onClick={() => {
+            const status = stock.stockStatus;
+            if (status == "reserved" || status == "dispensed") {
+              return;
+            }
+            setSplits((previous) => [
+              ...previous,
+              { ...stock, stockStatus: status },
+            ]);
+          }}
           disabled={hasReachedMaxSplits}
         />
         {hasReachedMaxSplits && (
