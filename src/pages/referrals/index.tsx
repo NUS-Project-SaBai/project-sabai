@@ -1,27 +1,19 @@
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode } from "react";
 import Link from "next/link";
-import {
-  HiChevronDown,
-  HiOutlineEye,
-  HiOutlinePencilSquare,
-} from "react-icons/hi2";
+import { HiOutlineEye, HiOutlinePencilSquare } from "react-icons/hi2";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
+import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import PageHeader from "@/components/PageHeader";
 import { PatientPhoto } from "@/components/PatientPhoto";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
-import SearchInput from "@/components/interactive/inputs/SearchInput";
 import { ReferralStateDropdown } from "@/components/referrals/ReferralStateDropdown";
-import { useVillageCode } from "@/lib/context/VillageCodeContext";
-import useDebounce from "@/hooks/useDebounce";
 import { formatPatientCode } from "@/lib/utils/patient";
 import { formatVisitDate } from "@/lib/utils/visit";
 import { trpc } from "@/utils/trpc";
 import { paths } from "@/utils/paths";
-
-const ALL_VILLAGES = "all";
 
 function ReferralsPage() {
   const {
@@ -29,35 +21,6 @@ function ReferralsPage() {
     isLoading,
     isError,
   } = trpc.referralRouter.list.useQuery();
-  const { villageCodes } = useVillageCode();
-
-  const [searchText, setSearchText] = useState("");
-  const [villageFilter, setVillageFilter] = useState(ALL_VILLAGES);
-  const debouncedSearchText = useDebounce(searchText, 300);
-
-  const filteredReferrals = useMemo(() => {
-    const query = debouncedSearchText.trim().toLowerCase();
-
-    return (referrals ?? []).filter((referral) => {
-      if (
-        villageFilter !== ALL_VILLAGES &&
-        referral.villageCodeId !== Number(villageFilter)
-      ) {
-        return false;
-      }
-      if (!query) return true;
-
-      const patientCode = formatPatientCode(
-        referral.villageCode,
-        referral.patientId,
-      ).toLowerCase();
-      return (
-        patientCode.includes(query) ||
-        referral.patientId.toString().includes(query) ||
-        referral.patientName.toLowerCase().includes(query)
-      );
-    });
-  }, [referrals, villageFilter, debouncedSearchText]);
 
   function renderContent() {
     if (isError) {
@@ -76,14 +39,6 @@ function ReferralsPage() {
       );
     }
 
-    if (filteredReferrals.length === 0) {
-      return (
-        <div className="p-12 text-center text-slate-500">
-          No referrals match your search.
-        </div>
-      );
-    }
-
     return (
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200">
@@ -96,7 +51,7 @@ function ReferralsPage() {
             ]}
           />
           <tbody className="divide-y divide-slate-200 bg-white">
-            {filteredReferrals.map((referral) => (
+            {referrals.map((referral) => (
               <TableRow key={referral.id}>
                 <TableCell>
                   <PatientPhoto
@@ -148,7 +103,7 @@ function ReferralsPage() {
                       className="inline-flex items-center justify-center gap-2 whitespace-normal rounded-lg border border-slate-300 px-2 py-2 text-center text-xs text-slate-800 transition hover:bg-slate-50 sm:px-3 sm:text-sm"
                     >
                       <HiOutlineEye className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
-                      Go to consult
+                      Go to patient&apos;s consults
                     </Link>
                   </div>
                 </TableCell>
@@ -167,27 +122,6 @@ function ReferralsPage() {
         title="Referrals"
         description="Track patients referred for further care."
       />
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <label className="flex items-center gap-2 text-sm text-slate-700">
-          Village
-          <span className="relative inline-flex">
-            <select
-              value={villageFilter}
-              onChange={(e) => setVillageFilter(e.target.value)}
-              className="cursor-pointer appearance-none rounded-lg border border-slate-300 bg-white py-2 pl-3 pr-9 text-sm text-slate-900 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            >
-              <option value={ALL_VILLAGES}>All villages</option>
-              {villageCodes?.map((village) => (
-                <option key={village.id} value={village.id}>
-                  {village.code} ({village.name})
-                </option>
-              ))}
-            </select>
-            <HiChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-          </span>
-        </label>
-        <SearchInput searchText={searchText} setSearchText={setSearchText} />
-      </div>
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         {renderContent()}
       </div>
@@ -195,6 +129,30 @@ function ReferralsPage() {
   );
 }
 
-ReferralsPage.getLayout = (page: ReactNode) => withDefaultLayout(page);
+function ReferralsLayout({ children }: { children: ReactNode }) {
+  const { data: referrals } = trpc.referralRouter.list.useQuery();
+
+  const getPatientLink = (patientId: number) => {
+    const latestReferral = referrals
+      ?.filter((referral) => referral.patientId === patientId)
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )[0];
+
+    return latestReferral
+      ? paths.referralsDetail(latestReferral.id)
+      : paths.patientDetail(patientId);
+  };
+
+  return (
+    <PatientTopMenuLayout getPatientLink={getPatientLink}>
+      {children}
+    </PatientTopMenuLayout>
+  );
+}
+
+ReferralsPage.getLayout = (page: ReactNode) =>
+  withDefaultLayout(<ReferralsLayout>{page}</ReferralsLayout>);
 
 export default ReferralsPage;
