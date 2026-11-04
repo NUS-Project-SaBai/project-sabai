@@ -114,7 +114,7 @@ function MedicationStockBasePage() {
       <div className="mt-8">
         <button
           type="submit"
-          className={`flex-1 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 mr-3`}
+          className={`mb-2 flex-1 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 mr-3`}
         >
           <Link
             href={paths.medicationBrands()}
