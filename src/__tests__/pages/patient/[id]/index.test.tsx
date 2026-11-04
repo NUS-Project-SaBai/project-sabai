@@ -4,9 +4,9 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useRouter } from "next/router";
 
-
-// Mock data 
-vi.mock("next/router", () => ({   // returns id 
+// Mock data
+vi.mock("next/router", () => ({
+  // returns id
   useRouter: vi.fn(),
 }));
 
@@ -14,7 +14,7 @@ vi.mock("@/components/layouts/withDefaultLayout", () => ({
   default: (page: React.ReactNode) => page,
 }));
 
-vi.mock("@/components/layouts/PatientTopMenuLayout", () => ({ 
+vi.mock("@/components/layouts/PatientTopMenuLayout", () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
@@ -23,8 +23,7 @@ vi.mock("@/components/PatientDetailSkeleton", () => ({
   default: () => <div data-testid="patient-detail-skeleton" />,
 }));
 
-
-// tests only cover how this page opens and closes it. But does not test the logic of the ediut form 
+// tests only cover how this page opens and closes it. But does not test the logic of the ediut form
 vi.mock("@/components/patient/EditPatientForm", () => ({
   default: ({ onSuccess }: { onSuccess: () => void }) => (
     <div data-testid="edit-patient-form">
@@ -125,6 +124,49 @@ describe("PatientPage", () => {
 
     expect(screen.getByText("Patient not found")).toBeInTheDocument();
     expect(screen.getByText("No patient exists for ID: 1")).toBeInTheDocument();
+  });
+
+  test("formats DOB and visit dates", () => {
+    mockVisitsQuery({ data: MOCK_VISITS, isLoading: false });
+    render(<PatientPage />);
+    expect(detailValue("Date of Birth")).toHaveTextContent("15/03/1985");
+    expect(screen.getByText("01/07/2024")).toBeInTheDocument();
+    expect(screen.getByText("15/06/2024")).toBeInTheDocument();
+  });
+
+  test("keeps visit date and time in the local timezone across a UTC boundary", () => {
+    const previous = process.env.TZ;
+    process.env.TZ = "Asia/Singapore";
+    try {
+      mockVisitsQuery({
+        data: [{ ...MOCK_VISITS[0], date: new Date("2024-06-30T18:30:00Z") }],
+        isLoading: false,
+      });
+      render(<PatientPage />);
+      expect(screen.getByText("01/07/2024")).toBeInTheDocument();
+      expect(
+        screen.getByText(new Date("2024-06-30T18:30:00Z").toLocaleTimeString()),
+      ).toBeInTheDocument();
+    } finally {
+      if (previous === undefined) delete process.env.TZ;
+      else process.env.TZ = previous;
+    }
+  });
+
+  test("renders visits when the runtime reports an unrecognized timezone", () => {
+    const original = Intl.DateTimeFormat.prototype.resolvedOptions;
+    const spy = vi
+      .spyOn(Intl.DateTimeFormat.prototype, "resolvedOptions")
+      .mockImplementation(function (this: Intl.DateTimeFormat) {
+        return { ...original.call(this), timeZone: "Etc/Unknown" };
+      });
+    try {
+      mockVisitsQuery({ data: MOCK_VISITS, isLoading: false });
+      render(<PatientPage />);
+      expect(screen.getByText("01/07/2024")).toBeInTheDocument();
+    } finally {
+      spy.mockRestore();
+    }
   });
 
   describe("patient details", () => {

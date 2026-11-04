@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/utils/date";
 import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import { PatientPhoto } from "@/components/PatientPhoto";
 import PatientDetailSkeleton from "@/components/PatientDetailSkeleton";
@@ -86,7 +87,7 @@ export default function PatientPage() {
     },
     {
       label: "Date of Birth",
-      value: new Date(patient.dateOfBirth).toLocaleDateString(),
+      value: formatDate(patient.dateOfBirth),
     },
     { label: "Age", value: `${calculateAge(patient.dateOfBirth)} years` },
     { label: "Drug Allergy", value: patient.drugAllergy },
@@ -196,7 +197,7 @@ export default function PatientPage() {
 
                   <div className="text-right">
                     <p className="text-sm font-medium text-slate-900">
-                      {new Date(visit.date).toLocaleDateString()}
+                      {formatDate(visit.date, { timeZone: null })}
                     </p>
                     <p className="text-xs text-slate-500">
                       {new Date(visit.date).toLocaleTimeString()}
