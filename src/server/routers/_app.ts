@@ -29,7 +29,7 @@ export const appRouter = router({
   pubertyRouter: pubertyRouter,
   consultsRouter: consultsRouter,
   referralRouter: referralRouter,
-  broadcasts: broadcastsRouter,
+  broadcastsRouter: broadcastsRouter,
 });
 
 export const createCaller = createCallerFactory(appRouter);

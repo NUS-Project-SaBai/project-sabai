@@ -24,7 +24,7 @@ const unauthenticatedCaller = appRouter.createCaller({
   user: null,
 } as unknown as Context);
 
-describe("broadcasts.list (integration)", () => {
+describe("broadcastsRouter.list (integration)", () => {
   let fixtureIds: number[] = [];
 
   beforeAll(async () => {
@@ -50,7 +50,7 @@ describe("broadcasts.list (integration)", () => {
   });
 
   it("returns broadcasts newest first", async () => {
-    const rows = await caller.broadcasts.list({
+    const rows = await caller.broadcastsRouter.list({
       limit: 200,
       since: fixtureIds[0] - 1,
     });
@@ -59,7 +59,7 @@ describe("broadcasts.list (integration)", () => {
   });
 
   it("returns broadcasts up to the requested limit", async () => {
-    const rows = await caller.broadcasts.list({
+    const rows = await caller.broadcastsRouter.list({
       limit: 5,
       since: fixtureIds[0] - 1,
     });
@@ -70,7 +70,7 @@ describe("broadcasts.list (integration)", () => {
   });
 
   it("defaults to 50 rows when no input is provided", async () => {
-    const rows = await caller.broadcasts.list();
+    const rows = await caller.broadcastsRouter.list();
 
     expect(rows.map(({ id }) => id)).toEqual(
       [...fixtureIds].reverse().slice(0, 50),
@@ -78,7 +78,7 @@ describe("broadcasts.list (integration)", () => {
   });
 
   it("defaults to 50 rows when limit is omitted", async () => {
-    const rows = await caller.broadcasts.list({
+    const rows = await caller.broadcastsRouter.list({
       since: fixtureIds[0] - 1,
     });
 
@@ -90,7 +90,7 @@ describe("broadcasts.list (integration)", () => {
   it("returns only rows with IDs greater than since", async () => {
     const since = fixtureIds[25];
 
-    const rows = await caller.broadcasts.list({
+    const rows = await caller.broadcastsRouter.list({
       limit: 200,
       since,
     });
@@ -101,16 +101,18 @@ describe("broadcasts.list (integration)", () => {
   });
 
   it("rejects unauthenticated callers", async () => {
-    await expect(unauthenticatedCaller.broadcasts.list()).rejects.toMatchObject(
-      {
-        code: "UNAUTHORIZED",
-      },
-    );
+    await expect(
+      unauthenticatedCaller.broadcastsRouter.list(),
+    ).rejects.toMatchObject({
+      code: "UNAUTHORIZED",
+    });
   });
 
   it.each([0, 201, 1.5])("rejects invalid limit %s", async (limit) => {
-    await expect(caller.broadcasts.list({ limit })).rejects.toMatchObject({
-      code: "BAD_REQUEST",
-    });
+    await expect(caller.broadcastsRouter.list({ limit })).rejects.toMatchObject(
+      {
+        code: "BAD_REQUEST",
+      },
+    );
   });
 });
