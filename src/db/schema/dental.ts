@@ -11,33 +11,20 @@ import {
 
 import { visits } from "./patients";
 
-const yesNoUnknownValues = ["yes", "no", "unknown"] as const;
-const brushingFrequencyValues = [
-  "once",
-  "twice",
-  "3+ times",
-  "occasionally",
-  "never",
-] as const;
-const sugarConsumptionValues = ["low", "moderate", "high"] as const;
-const facialSymmetryValues = ["normal", "asymmetrical"] as const;
-const absentPresentValues = ["absent", "present"] as const;
-const absentPresentNotAssessedValues = [
-  "absent",
-  "present",
-  "not assessed",
-] as const;
-const normalLimitedValues = ["normal", "limited"] as const;
-const oralHygieneValues = ["good", "fair", "poor"] as const;
-const plaqueValues = ["none", "mild", "moderate", "heavy"] as const;
-const healthyInflamedBleedingValues = [
-  "healthy",
-  "inflamed",
-  "bleeding",
-] as const;
-const cariesValues = ["absent", "non-cavitated", "cavitated"] as const;
-const malocclusionValues = ["not suspected", "suspected"] as const;
-const doneNotDoneValues = ["done", "not done"] as const;
+import {
+  absentPresentNotAssessedValues,
+  brushingFrequencyValues,
+  cariesValues,
+  doneNotDoneValues,
+  facialSymmetryValues,
+  healthyInflamedBleedingValues,
+  malocclusionValues,
+  normalLimitedValues,
+  oralHygieneValues,
+  plaqueValues,
+  sugarConsumptionValues,
+  yesNoUnknownValues,
+} from "@/lib/constants/dental";
 
 export const yesNoUnknownEnum = pgEnum(
   "dental_yes_no_unknown",
@@ -54,10 +41,6 @@ export const sugarConsumptionEnum = pgEnum(
 export const facialSymmetryEnum = pgEnum(
   "dental_facial_symmetry",
   facialSymmetryValues,
-);
-export const absentPresentEnum = pgEnum(
-  "dental_absent_present",
-  absentPresentValues,
 );
 export const absentPresentNotAssessedEnum = pgEnum(
   "dental_absent_present_not_assessed",
@@ -88,6 +71,7 @@ export const dental = pgTable("dental", {
 
   // Dental history
   previousDentalVisit: yesNoUnknownEnum("previous_dental_visit"),
+  extraction: boolean("extraction"),
   previousDentalTreatment: yesNoUnknownEnum("previous_dental_treatment"),
   toothache: boolean("toothache"),
   dentalTrauma: boolean("dental_trauma"),
@@ -104,19 +88,19 @@ export const dental = pgTable("dental", {
 
   // Clinical examination: extraoral
   facialSymmetry: facialSymmetryEnum("facial_symmetry"),
-  facialSwelling: absentPresentEnum("facial_swelling"),
+  facialSwelling: boolean("facial_swelling"),
   lymphadenopathy: absentPresentNotAssessedEnum("lymphadenopathy"),
   mouthOpening: normalLimitedEnum("mouth_opening"),
 
   // Clinical examination: intraoral
   oralHygiene: oralHygieneEnum("oral_hygiene"),
   plaque: plaqueEnum("plaque"),
-  calculus: absentPresentEnum("calculus"),
+  calculus: boolean("calculus"),
   gingivalCondition: healthyInflamedBleedingEnum("gingival_condition"),
   caries: cariesEnum("caries"),
-  missingTeeth: absentPresentEnum("missing_teeth"),
-  fracturedTeeth: absentPresentEnum("fractured_teeth"),
-  mucosalLesions: absentPresentEnum("mucosal_lesions"),
+  missingTeeth: boolean("missing_teeth"),
+  fracturedTeeth: boolean("fractured_teeth"),
+  mucosalLesions: boolean("mucosal_lesions"),
   malocclusion: malocclusionEnum("malocclusion"),
 
   // Treatment provided (the mockup's date fields are intentionally excluded)
