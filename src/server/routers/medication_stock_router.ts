@@ -44,6 +44,8 @@ export const medicationStockRouter = router({
         remarks: medicationStock.remarks,
         medicationBrandName: medicationBrands.name,
         medicationActiveIngredientName: medicationActiveIngredients.name,
+        medicationActiveIngredientId: medicationActiveIngredients.id,
+        fallBelow: medicationActiveIngredients.fallBelow,
       })
       .from(medicationStock)
       .innerJoin(
@@ -56,7 +58,25 @@ export const medicationStockRouter = router({
       )
       .where(ne(medicationStock.quantity, 0))
       .orderBy(desc(medicationStock.id));
-    return result;
+
+    const totals = new Map<number, number>();
+    for (const item of result) {
+      if (item.stockStatus !== "active") {
+        continue;
+      }
+      const currentTotal = totals.get(item.medicationActiveIngredientId) || 0;
+      totals.set(
+        item.medicationActiveIngredientId,
+        currentTotal + item.quantity,
+      );
+    }
+
+    return result.map((item) => ({
+      ...item,
+      isLowStock:
+        item.stockStatus === "active" &&
+        (totals.get(item.medicationActiveIngredientId) ?? 0) <= item.fallBelow,
+    }));
   }),
 
   create: protectedProcedure

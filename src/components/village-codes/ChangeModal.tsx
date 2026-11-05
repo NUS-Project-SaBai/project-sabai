@@ -80,7 +80,11 @@ export default function ChangeModal({
     },
     onError: (err) => {
       console.error(err);
-      toast.error("Unable to create village code.");
+      toast.error(
+        err.data?.code === "CONFLICT"
+          ? err.message
+          : "Unable to create village code.",
+      );
     },
   });
 
@@ -93,7 +97,11 @@ export default function ChangeModal({
     },
     onError: (err) => {
       console.error(err);
-      toast.error("Unable to update village code.");
+      toast.error(
+        err.data?.code === "CONFLICT"
+          ? err.message
+          : "Unable to update village code.",
+      );
     },
   });
 
