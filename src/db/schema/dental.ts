@@ -128,3 +128,15 @@ export const dental = pgTable("dental", {
 
 export type Dental = typeof dental.$inferSelect;
 export type NewDental = typeof dental.$inferInsert;
+
+// Dental Diagnosis Table
+export const dentalDiagnosis = pgTable("dental_diagnosis", {
+  id: serial("id").primaryKey(),
+  dentalId: integer("dental_id")
+    .notNull()
+    .references(() => dental.id),
+  description: text("description").notNull(),
+});
+
+export type DentalDiagnosis = typeof dentalDiagnosis.$inferSelect;
+export type NewDentalDiagnosis = typeof dentalDiagnosis.$inferInsert;
