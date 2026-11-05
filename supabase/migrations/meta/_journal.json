@@ -169,6 +169,13 @@
       "when": 1793849926966,
       "tag": "0023_deep_big_bertha",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1793885774233,
+      "tag": "0024_dental_diagnosis",
+      "breakpoints": true
     }
   ]
 }
