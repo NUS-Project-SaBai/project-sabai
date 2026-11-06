@@ -11,7 +11,7 @@ import { trpc } from "@/utils/trpc";
 import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFRadio } from "@/components/interactive/RHF/RHFRadio";
 import { RHFTextArea } from "@/components/interactive/RHF/RHFTextArea";
@@ -19,6 +19,17 @@ import { Button } from "@/components/interactive/Button/Button";
 import toast from "react-hot-toast";
 import { formatVisitDate } from "@/lib/utils/visit";
 import FormSection from "@/components/interactive/inputs/FormSection";
+import { useState } from "react";
+import Modal from "@/components/interactive/Modal";
+import EditPatientForm from "@/components/patient/EditPatientForm";
+import { HeightWeightChart } from "@/components/vitals/HeightWeightChart";
+import clsx from "clsx";
+import type { Gender } from "@/types/patient";
+import { HiExclamationTriangle } from "react-icons/hi2";
+import {
+  classifyBloodPressure,
+  describeBloodPressureThreshold,
+} from "@/lib/utils/vitals";
 
 type VitalsFormValues = {
   height?: string | null;
@@ -42,6 +53,7 @@ export default function PatientVitalsPage() {
   const { id } = router.query;
   const methods = useForm();
   const { setValue } = methods;
+  const [isEditingPatient, setIsEditingPatient] = useState(false);
 
   // Fetch patient
   const { data: patient, isLoading: patientLoading } =
@@ -93,7 +105,7 @@ export default function PatientVitalsPage() {
 
   return (
     <div className="min-h-screen flex-1 p-4 bg-slate-50">
-      <div className="w-full mx-auto max-w-5xl">
+      <div className="w-full mx-auto max-w-5xl has-[[data-growth-chart]]:max-w-7xl">
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },
@@ -102,12 +114,31 @@ export default function PatientVitalsPage() {
           ]}
         />
 
-        <div className="flex flex-col mb-8">
+        <div className="flex items-start justify-between gap-4 mb-8">
           <h1 className="text-3xl font-bold text-slate-900">
             Patient Vitals — {patient.name}
           </h1>
+          <Button
+            title="Edit Patient Details"
+            colour="indigo"
+            onClick={() => setIsEditingPatient(true)}
+            className="shrink-0"
+          />
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+
+        {isEditingPatient && (
+          <Modal
+            title="Edit Patient Details"
+            onClose={() => setIsEditingPatient(false)}
+            maxWidthClassName="max-w-2xl"
+          >
+            <EditPatientForm
+              patient={patient}
+              onSuccess={() => setIsEditingPatient(false)}
+            />
+          </Modal>
+        )}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-clip">
           <FormProvider {...methods}>
             <div className="p-6 border-b border-slate-100 bg-slate-50/50">
               {visits && visits.length > 0 ? (
@@ -140,7 +171,11 @@ export default function PatientVitalsPage() {
 
             <div className="bg-slate-50/50 p-6">
               {selectedVisit ? (
-                <VitalsForm visitId={selectedVisit.id} />
+                <VitalsForm
+                  visitId={selectedVisit.id}
+                  visitDate={selectedVisit.date}
+                  patient={patient}
+                />
               ) : (
                 visits &&
                 visits.length > 0 && (
@@ -157,12 +192,54 @@ export default function PatientVitalsPage() {
   );
 }
 
-function VitalsForm({ visitId }: { visitId: number }) {
+function VitalsForm({
+  visitId,
+  visitDate,
+  patient,
+}: {
+  visitId: number;
+  visitDate: Date | string;
+  patient: { dateOfBirth: Date; gender: Gender };
+}) {
   const {
     reset,
     handleSubmit,
+    control,
     formState: { isDirty },
   } = useFormContext<VitalsFormValues>();
+
+  const heightValue = useWatch({ control, name: "height" });
+  const weightValue = useWatch({ control, name: "weight" });
+
+  const patientAge = useMemo(() => {
+    const atDate = new Date(visitDate);
+    const dob = new Date(patient.dateOfBirth);
+    return Math.floor(
+      (atDate.getTime() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000),
+    );
+  }, [patient.dateOfBirth, visitDate]);
+
+  const chartHeight = heightValue ? parseFloat(String(heightValue)) : null;
+  const chartWeight = weightValue ? parseFloat(String(weightValue)) : null;
+  const showChart = patientAge >= 2 && patientAge <= 18;
+
+  // Track input values typed by user
+  const watchedSystolic = useWatch({ name: "systolic" });
+  const watchedDiastolic = useWatch({ name: "diastolic" });
+
+  const systolicValue =
+    watchedSystolic === "" || watchedSystolic == null
+      ? null
+      : Number(watchedSystolic);
+  const diastolicValue =
+    watchedDiastolic === "" || watchedDiastolic == null
+      ? null
+      : Number(watchedDiastolic);
+
+  const bloodPressureStatus =
+    systolicValue !== null && diastolicValue !== null
+      ? classifyBloodPressure(systolicValue, diastolicValue)
+      : null;
 
   const { data: vitalData, isLoading: vitalsLoading } =
     trpc.vitalsRouter.getByVisitId.useQuery(
@@ -263,7 +340,13 @@ function VitalsForm({ visitId }: { visitId: number }) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className={clsx(
+        "grid grid-cols-1 gap-6",
+        showChart && "min-[1128px]:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]",
+      )}
+    >
       {/* Body measurements */}
       <FormSection
         title="Body Measurements"
@@ -291,6 +374,27 @@ function VitalsForm({ visitId }: { visitId: number }) {
         </div>
       </FormSection>
 
+      {/* Growth chart: below Body Measurements on narrow screens, pinned in a
+          side column spanning every form row on wide screens. */}
+      {showChart && (
+        <div
+          className="min-[1128px]:col-start-2 min-[1128px]:row-start-1 min-[1128px]:row-span-6 self-start sticky top-4"
+          data-growth-chart
+        >
+          <FormSection
+            title="Growth Charts"
+            description="Height (blue) and weight (red) plotted on the NCHS growth chart for this patient's age and gender."
+          >
+            <HeightWeightChart
+              age={patientAge}
+              height={chartHeight}
+              weight={chartWeight}
+              gender={patient.gender}
+            />
+          </FormSection>
+        </div>
+      )}
+
       {/* Cardiovascular */}
       <FormSection
         title="Cardiovascular"
@@ -309,6 +413,29 @@ function VitalsForm({ visitId }: { visitId: number }) {
           />
           <RHFInput name="heartRate" label="Heart Rate (BPM)" type="number" />
         </div>
+
+        {bloodPressureStatus && (
+          <div className="mt-4 flex items-center gap-2">
+            <span
+              className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset
+                  ${
+                    bloodPressureStatus === "Pre-HTN"
+                      ? "bg-warning-subtle text-warning"
+                      : "bg-danger-subtle text-danger"
+                  }`}
+            >
+              <HiExclamationTriangle
+                aria-hidden="true"
+                className="mr-1 h-4 w-4"
+              />
+              {bloodPressureStatus}
+            </span>
+
+            <span className="text-xs text-text-muted">
+              {describeBloodPressureThreshold(bloodPressureStatus)}
+            </span>
+          </div>
+        )}
       </FormSection>
 
       {/* Blood & metabolic */}
@@ -355,10 +482,7 @@ function VitalsForm({ visitId }: { visitId: number }) {
       </FormSection>
 
       {/* Urinalysis */}
-      <FormSection
-        title="Urinalysis"
-        description="Urine test findings."
-      >
+      <FormSection title="Urinalysis" description="Urine test findings.">
         <RHFTextArea
           name="urineTest"
           label="Urinalysis Diagnostics (Leukocytes, Nitrites, Protein notes)"

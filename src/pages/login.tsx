@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
+import { paths } from "@/utils/paths";
 
 function useLogin() {
   const router = useRouter();
@@ -24,7 +25,7 @@ function useLogin() {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push("/");
+      router.push(paths.home());
     }
   };
 

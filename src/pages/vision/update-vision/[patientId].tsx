@@ -2,25 +2,24 @@ import { useRouter } from "next/router";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { useEffect } from "react";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
+import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
-import {
-  EyesightForm,
-} from "@/components/vision/EyesightForm";
+import { EyesightForm } from "@/components/vision/EyesightForm";
 import { EyesightFormValues } from "@/types/eyesight";
 import { formatVisitDate } from "@/lib/utils/visit";
 import { formatPatientId } from "@/lib/utils/patient";
 
-type UpdateGlassesFormValues = EyesightFormValues & { visitSelect: string };
+type UpdateVisionFormValues = EyesightFormValues & { visitSelect: string };
 
-function UpdateGlassesPage() {
+function UpdateVisionPage() {
   const router = useRouter();
   const { patientId } = router.query;
   // "onTouched": validate acuity/pinhole fields after first blur, then live on
   // every change,intended behavior is that  errors surface before Save and clear once input is valid
-  const methods = useForm<UpdateGlassesFormValues>({ mode: "onTouched" });
+  const methods = useForm<UpdateVisionFormValues>({ mode: "onTouched" });
   const { setValue } = methods;
 
   const { data: patient, isLoading: patientLoading } =
@@ -77,14 +76,14 @@ function UpdateGlassesPage() {
           items={[
             { label: "Home", href: "/" },
             { label: "Vision", href: "/vision" },
-            { label: `Update Glasses — ${patient.name}` },
+            { label: `Update Vision — ${patient.name}` },
           ]}
         />
 
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">
-              Update Glasses — {patient.name}
+              Update Vision — {patient.name}
             </h1>
             <p className="mt-2 text-slate-600">
               Patient ID: {formatPatientId(patient.id)}
@@ -146,7 +145,13 @@ function UpdateGlassesPage() {
   );
 }
 
-UpdateGlassesPage.getLayout = (page: React.ReactNode) =>
-  withDefaultLayout(page);
+UpdateVisionPage.getLayout = (page: React.ReactNode) =>
+  withDefaultLayout(
+    <PatientTopMenuLayout
+      getPatientLink={(id) => `/vision/update-vision/${id}`}
+    >
+      {page}
+    </PatientTopMenuLayout>,
+  );
 
-export default UpdateGlassesPage;
+export default UpdateVisionPage;

@@ -25,6 +25,7 @@ export type CreateFormFields = {
 export type MedicationStockWithBrandAndActiveIngredient = MedicationStock & {
   medicationBrandName: string;
   medicationActiveIngredientName: string;
+  isLowStock: boolean;
 };
 
 export const splitSchema = z.object({

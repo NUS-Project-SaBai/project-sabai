@@ -1,0 +1,21 @@
+export const paths = {
+  home: () => "/",
+  login: () => "/login",
+  patient: () => "/patient",
+  patientDetail: (patientId: number) => `/patient/${patientId}`,
+  scanFace: () => "/scan-face",
+  vitals: () => "/vitals",
+  vitalsDetail: (patientId: number) => `/vitals/${patientId}`,
+  vision: () => "/vision",
+  dental: () => "/dental",
+  visionUpdateVision: (patientId: number) =>
+    `/vision/update-vision/${patientId}`,
+  consults: () => "/consults",
+  consultsDetail: (patientId: number) => `/consults/${patientId}`,
+  medicationStock: () => "/medication-stock",
+  medicationBrands: () => "/medication-brands",
+  medicationActiveIngredients: () => "/medication-active-ingredients",
+  orders: () => "/orders",
+  settings: () => "/settings",
+  settingsVillageCodes: () => "/settings/village-codes",
+};

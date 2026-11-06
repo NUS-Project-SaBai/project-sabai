@@ -1,38 +1,24 @@
 import { z } from "zod";
 import { zfd } from "zod-form-data";
-import { uploadToCloudinary } from "@/server/utils/cloudinary";
+import {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+  getPatientWithImageUrl,
+} from "@/server/utils/cloudinary";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { patients, genderEnum, visits } from "@/db/schema/patients";
+import { patients, genderValues, visits } from "@/db/schema/patients";
+import { vitals, childVitals, puberty } from "@/db/schema/vitals";
 import { villageCodes } from "@/db/schema/villageCodes";
-import serverEnv from "@/lib/envVariables";
 import { TRPCError } from "@trpc/server";
-import { eq, desc, inArray, isNotNull } from "drizzle-orm";
+import { eq, and, ne, desc, inArray, isNotNull } from "drizzle-orm";
 import {
   generateFaceprint,
   searchFaceprint,
+  deleteFaceprint,
   dataUrlToFile,
 } from "@/lib/utils/facialRecognition";
-
-const cloudinaryUrlPrefix = serverEnv.CLOUDINARY_URL_PREFIX;
-
-/**
- * Transforms a patient object by adding a complete image URL.
- *
- * @param patient - The patient object to transform
- * @returns A new patient object with the `patientImageUrl` property added. If the patient has a `patientImagePublicId`,
- *          the URL is constructed as `{cloudinaryUrl}/{patientImagePublicId}`. Otherwise, `patientImageUrl` is `null`.
- */
-const getPatientWithImageUrl = <
-  T extends { patientImagePublicId: string | null },
->(
-  patient: T,
-) => ({
-  ...patient,
-  patientImageUrl: patient.patientImagePublicId
-    ? `${cloudinaryUrlPrefix}/${patient.patientImagePublicId}`
-    : null,
-});
+import { calculateAge } from "@/lib/utils/patient";
 
 export const patientsRouter = router({
   // List all of patients (no visit data)
@@ -131,22 +117,45 @@ export const patientsRouter = router({
   // Create new patient
   create: protectedProcedure
     .input(
-      zfd.formData({
-        name: zfd.text(),
-        identificationNumber: zfd.text(),
-        gender: zfd.text(z.enum(genderEnum.enumValues)),
-        dateOfBirth: zfd.text(z.coerce.date()),
-        drugAllergy: zfd.text(),
-        hasPoorCard: z.boolean(),
-        hasBS2Card: z.boolean(),
-        hasSabaiCard: z.boolean(),
-        patientImage: z.string(),
-        contactNo: z.string(),
-        villageCodeId: zfd.text(z.coerce.number().int().optional()),
-      }),
+      zfd
+        .formData({
+          name: zfd.text(),
+          identificationNumber: zfd.text(),
+          gender: zfd.text(z.enum(genderValues)),
+          dateOfBirth: zfd.text(z.coerce.date()),
+          drugAllergy: zfd.text(),
+          hasPoorCard: z.boolean(),
+          hasBS2Card: z.boolean(),
+          hasSabaiCard: z.boolean(),
+          patientImage: z.string(),
+          contactNo: z.string(),
+          villageCodeId: zfd.text(z.coerce.number().int().optional()),
+          scoliosis: z.enum(["normal", "abnormal"]).optional(),
+          pallor: z.boolean().optional(),
+          pubarche: z.boolean().optional(),
+          pubarcheAge: z.number().int().positive().optional(),
+        })
+        .superRefine((data, ctx) => {
+          // pubarcheAge is only considered meaningful when pubarche is true
+          if (data.pubarcheAge !== undefined && data.pubarche !== true) {
+            ctx.addIssue({
+              code: "custom",
+              message: "pubarcheAge requires pubarche to be true",
+              path: ["pubarcheAge"],
+            });
+          }
+        }),
     )
     .mutation(async ({ input }) => {
-      const { villageCodeId, ...patientData } = input;
+      const {
+        villageCodeId,
+        scoliosis,
+        pallor,
+        pubarche,
+        pubarcheAge,
+        dateOfBirth,
+        ...patientData
+      } = input;
 
       if (!villageCodeId) {
         throw new TRPCError({
@@ -162,6 +171,9 @@ export const patientsRouter = router({
         });
       }
 
+      // Re-derive pediatric status server-side
+      const isPediatric = calculateAge(dateOfBirth) < 18;
+
       const patientImage: File = dataUrlToFile(
         input.patientImage,
         `${input.name}.jpg`,
@@ -174,6 +186,7 @@ export const patientsRouter = router({
 
       const newPatientInput = {
         ...patientData,
+        dateOfBirth,
         patientImagePublicId,
         rekognitionFaceId,
       };
@@ -184,11 +197,40 @@ export const patientsRouter = router({
         .returning();
 
       // Automatically create the patient's first visit
-      await db.insert(visits).values({
-        patientId: newPatient.id,
-        villageCodeId: villageCodeId,
-        date: new Date(),
-      });
+      const [newVisit] = await db
+        .insert(visits)
+        .values({
+          patientId: newPatient.id,
+          villageCodeId: villageCodeId,
+          date: new Date(),
+        })
+        .returning();
+
+      // Only persist child vitals when the patient is actually pediatric
+      // and at least one child field was provided.
+      const hasChildVitals =
+        isPediatric &&
+        (scoliosis !== undefined ||
+          pallor !== undefined ||
+          pubarche !== undefined);
+      if (hasChildVitals) {
+        await db.transaction(async (tx) => {
+          const [vitalsRecord] = await tx
+            .insert(vitals)
+            .values({ visitId: newVisit.id })
+            .returning();
+
+          await tx
+            .insert(childVitals)
+            .values({ scoliosis, pallor, vitalId: vitalsRecord.id });
+
+          if (pubarche !== undefined) {
+            await tx
+              .insert(puberty)
+              .values({ pubarche, pubarcheAge, vitalId: vitalsRecord.id });
+          }
+        });
+      }
 
       return newPatient;
     }),
@@ -200,7 +242,8 @@ export const patientsRouter = router({
         id: zfd.numeric(z.number().int()), // ID must be included for updates
         name: zfd.text(z.string().optional()),
         identificationNumber: zfd.text(z.string().optional()),
-        gender: zfd.text(z.enum(genderEnum.enumValues).optional()),
+        contactNo: zfd.text(z.string().optional()),
+        gender: zfd.text(z.enum(genderValues).optional()),
         dateOfBirth: zfd.text(z.coerce.date().optional()),
         drugAllergy: zfd.text(z.string().optional()),
         hasPoorCard: z.boolean().optional(),
@@ -211,17 +254,116 @@ export const patientsRouter = router({
     )
     .mutation(async ({ input }) => {
       const { id, patientImage, ...updateData } = input;
-      let patientImagePublicId;
-      if (patientImage) {
-        const patientImage: File = dataUrlToFile(
-          input.patientImage!, // Temporarily add non-null operator until later refactoring
-          `${input.name}.jpg`,
-        );
-        patientImagePublicId = await uploadToCloudinary(patientImage);
+
+      if (updateData.identificationNumber !== undefined) {
+        updateData.identificationNumber =
+          updateData.identificationNumber.trim();
       }
+
+      // Reject an identificationNumber that already belongs to a different
+      // patient. This is the guard against creating duplicate IDs via updates.
+      if (updateData.identificationNumber) {
+        const [conflict] = await db
+          .select({ id: patients.id })
+          .from(patients)
+          .where(
+            and(
+              eq(
+                patients.identificationNumber,
+                updateData.identificationNumber,
+              ),
+              ne(patients.id, id),
+            ),
+          )
+          .limit(1);
+
+        if (conflict) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Another patient already has this identification number.",
+          });
+        }
+      }
+
+      let imageUpdate: {
+        patientImagePublicId?: string;
+        rekognitionFaceId?: string;
+      } = {};
+
+      // Client sends a new base64 image (recapture)
+      if (patientImage) {
+        // Reads patient's current Cloudinary image id and Rekognition face id before overwriting them
+        const [existing] = await db
+          .select({
+            patientImagePublicId: patients.patientImagePublicId,
+            rekognitionFaceId: patients.rekognitionFaceId,
+          })
+          .from(patients)
+          .where(eq(patients.id, id))
+          .limit(1);
+
+        const imageFile: File = dataUrlToFile(
+          patientImage,
+          `${input.name ?? id}.jpg`,
+        );
+
+        const [patientImagePublicId, rekognitionFaceId] = await Promise.all([
+          uploadToCloudinary(imageFile),
+          generateFaceprint(patientImage),
+        ]);
+        imageUpdate = { patientImagePublicId, rekognitionFaceId };
+
+        // No faceprint means the new photo wasn't indexed; keep the old one so
+        // the patient stays searchable by face.
+        if (!rekognitionFaceId) {
+          console.warn(
+            `Faceprint not generated for patient ${id}; new photo is not searchable by face. Keeping previous faceprint.`,
+          );
+        }
+
+        // Best-effort cleanup of the replaced assets.
+        // Only delete if no other patient still references the same asset (image or faceprint)
+        if (existing?.patientImagePublicId) {
+          const [sharedImage] = await db
+            .select({ id: patients.id })
+            .from(patients)
+            .where(
+              and(
+                ne(patients.id, id),
+                eq(
+                  patients.patientImagePublicId,
+                  existing.patientImagePublicId,
+                ),
+              ),
+            )
+            .limit(1);
+          if (!sharedImage) {
+            await deleteFromCloudinary(existing.patientImagePublicId).catch(
+              (err) =>
+                console.error("Failed to delete old patient image:", err),
+            );
+          }
+        }
+        if (rekognitionFaceId && existing?.rekognitionFaceId) {
+          const [sharedFace] = await db
+            .select({ id: patients.id })
+            .from(patients)
+            .where(
+              and(
+                ne(patients.id, id),
+                eq(patients.rekognitionFaceId, existing.rekognitionFaceId),
+              ),
+            )
+            .limit(1);
+          if (!sharedFace) {
+            await deleteFaceprint(existing.rekognitionFaceId);
+          }
+        }
+      }
+
       const [result] = await db
         .update(patients)
-        .set({ ...updateData, patientImagePublicId })
+        .set({ ...updateData, ...imageUpdate })
         .where(eq(patients.id, id))
         .returning();
 

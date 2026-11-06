@@ -1,7 +1,9 @@
 import { ReactNode } from "react";
 import { useRouter } from "next/router";
+import { paths } from "@/utils/paths";
 import { HiOutlinePencilSquare } from "react-icons/hi2";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
+import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
 import { PatientPhoto } from "@/components/PatientPhoto";
@@ -20,7 +22,7 @@ function ConsultsPage() {
   } = trpc.patientsRouter.listWithLatestVisit.useQuery();
 
   const startConsult = (patientId: number) =>
-    router.push(`/consults/${patientId}`);
+    router.push(paths.consultsDetail(patientId));
 
   function renderContent() {
     if (isError) {
@@ -106,6 +108,11 @@ function ConsultsPage() {
   );
 }
 
-ConsultsPage.getLayout = (page: ReactNode) => withDefaultLayout(page);
+ConsultsPage.getLayout = (page: React.ReactNode) =>
+  withDefaultLayout(
+    <PatientTopMenuLayout getPatientLink={(id) => `/consults/${id}`}>
+      {page}
+    </PatientTopMenuLayout>,
+  );
 
 export default ConsultsPage;

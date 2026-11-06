@@ -47,11 +47,8 @@ export default function CreateModal({
 
 
   return (
-    <Modal onClose={() => setModalIsOpen(false)}>
+    <Modal title="Add New Stock" onClose={() => setModalIsOpen(false)}>
       <ModalToast />
-      <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-4">
-        Add New Stock
-      </h2>
       <FormProvider {...form}>
         <form
           onSubmit={(e) => {

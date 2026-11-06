@@ -35,11 +35,11 @@ export default function ChangeModal({
   const currentValues = isEditing
     ? activeForm
     : {
-        name: formData.name,
-        code: formData.code,
-        colorHex: formData.colorHex,
-        isVisible: formData.isVisible,
-      };
+      name: formData.name,
+      code: formData.code,
+      colorHex: formData.colorHex,
+      isVisible: formData.isVisible,
+    };
 
   const form = useForm<FormFields>({
     values: currentValues,
@@ -81,8 +81,11 @@ export default function ChangeModal({
     },
     onError: (err) => {
       console.error(err);
-      toast.error("Unable to create village code.", 
-        {toasterId: "modal"}
+      toast.error(
+        err.data?.code === "CONFLICT"
+          ? err.message
+          : "Unable to create village code.",
+        { toasterId: "modal" },
       );
     },
   });
@@ -96,8 +99,11 @@ export default function ChangeModal({
     },
     onError: (err) => {
       console.error(err);
-      toast.error("Unable to update village code.", 
-        {toasterId: "modal"}
+      toast.error(
+        err.data?.code === "CONFLICT"
+          ? err.message
+          : "Unable to update village code.",
+        { toasterId: "modal" },
       );
     },
   });
@@ -124,11 +130,11 @@ export default function ChangeModal({
   };
 
   return (
-    <Modal onClose={onClose}>
+    <Modal
+      title={activeForm?.id ? "Edit Village Code" : "New Village Code"}
+      onClose={onClose}
+    >
       <ModalToast />
-      <h2 className="text-xl font-bold mb-4">
-        {activeForm?.id ? "Edit Village Code" : "New Village Code"}
-      </h2>
       <FormProvider {...form}>
         <form
           onSubmit={(e) => {
