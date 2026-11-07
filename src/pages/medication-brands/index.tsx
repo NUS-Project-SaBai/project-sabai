@@ -2,8 +2,7 @@ import { trpc } from "@/utils/trpc";
 import PageHeader from "@/components/PageHeader";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import TableHeader from "@/components/TableHeader";
-import TableRow from "@/components/TableRow";
-import TableCell from "@/components/TableCell";
+import BrandRow from "@/components/medication-brands/BrandRow";
 
 function Header() {
   return (
@@ -57,33 +56,7 @@ function MedicationBrandsBasePage() {
           />
           <tbody className="bg-white divide-y divide-slate-200">
             {brands.map((brand) => (
-              <TableRow key={brand.id}>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {brand.id}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {brand.name}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {brand.activeIngredientName}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {brand.unitOfMeasurement}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {brand.remarks}
-                  </span>
-                </TableCell>
-              </TableRow>
+              <BrandRow key={brand.id} {...brand} />
             ))}
           </tbody>
         </table>

@@ -26,6 +26,7 @@ export const medicationBrandRouter = router({
       .select({
         id: medicationBrands.id,
         name: medicationBrands.name,
+        activeIngredientId: medicationBrands.activeIngredientId,
         activeIngredientName: medicationActiveIngredients.name,
         unitOfMeasurement: medicationActiveIngredients.unitOfMeasurement,
         remarks: medicationBrands.remarks,
