@@ -35,7 +35,8 @@ export const medicationBrandRouter = router({
       .innerJoin(
         medicationActiveIngredients,
         eq(medicationActiveIngredients.id, medicationBrands.activeIngredientId),
-      );
+      )
+      .orderBy(medicationBrands.id);
 
     return result;
   }),
@@ -43,9 +44,9 @@ export const medicationBrandRouter = router({
   create: protectedProcedure
     .input(
       zfd.formData({
-        name: zfd.text(z.string().nonoptional()),
+        name: zfd.text().nonoptional(),
         activeIngredientId: zfd.numeric(z.number().int()),
-        remarks: zfd.text().nonoptional(),
+        remarks: zfd.text(z.string().optional()),
       }),
     )
     .mutation(async ({ input }) => {
@@ -59,10 +60,10 @@ export const medicationBrandRouter = router({
   update: protectedProcedure
     .input(
       zfd.formData({
-        id: zfd.numeric(z.number().int()).nonoptional(),
-        name: zfd.text().optional(),
+        id: zfd.numeric(z.number().int()),
+        name: zfd.text().nonoptional(),
         activeIngredientId: zfd.numeric(z.number().int()),
-        remarks: zfd.text(),
+        remarks: zfd.text(z.string().optional()),
       }),
     )
     .mutation(async ({ input }) => {
@@ -72,8 +73,7 @@ export const medicationBrandRouter = router({
         .set(updateData)
         .where(eq(medicationBrands.id, id))
         .returning();
-
-      return result ?? null;
+      return result;
     }),
 
   delete: protectedProcedure
@@ -83,7 +83,7 @@ export const medicationBrandRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      const result = await db
+      const [result] = await db
         .delete(medicationBrands)
         .where(eq(medicationBrands.id, input.id))
         .returning({ id: medicationBrands.id });

@@ -47,11 +47,12 @@ function MedicationBrandsBasePage() {
         <table className="min-w-full divide-y divide-slate-200">
           <TableHeader
             headers={[
-              "BRAND ID",
-              "BRAND NAME",
-              "ACTIVE INGREDIENT NAME",
-              "UNIT OF MEASUREMENT",
+              "Brand ID",
+              "Brand Name",
+              "Active Ingredient Name",
+              "Unit of Measurement",
               "Remarks",
+              "Actions",
             ]}
           />
           <tbody className="bg-white divide-y divide-slate-200">
