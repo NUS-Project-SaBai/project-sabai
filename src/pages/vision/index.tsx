@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { paths } from "@/utils/paths";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
+import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
 import { PatientPhoto } from "@/components/PatientPhoto";
@@ -110,7 +111,7 @@ function PatientTable({
 
 function Wrapper({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen flex-1 p-4 sm:p-6">
+    <div className="min-h-screen flex-1 p-8">
       <Breadcrumbs
         items={[{ label: "Home", href: "/" }, { label: "Vision" }]}
       />
@@ -182,6 +183,13 @@ function VisionPage() {
   return <Wrapper>{renderContent()}</Wrapper>;
 }
 
-VisionPage.getLayout = (page: ReactNode) => withDefaultLayout(page);
+VisionPage.getLayout = (page: React.ReactNode) =>
+  withDefaultLayout(
+    <PatientTopMenuLayout
+      getPatientLink={(id) => `/vision/update-vision/${id}`}
+    >
+      {page}
+    </PatientTopMenuLayout>,
+  );
 
 export default VisionPage;

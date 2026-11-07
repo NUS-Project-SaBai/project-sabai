@@ -10,6 +10,7 @@ import ChangeModal from "@/components/village-codes/ChangeModal";
 import { FormFields } from "@/types/village-codes";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Button } from "@/components/interactive/Button/Button";
+import { paths } from "@/utils/paths";
 
 function Content({
   showHidden,
@@ -101,11 +102,11 @@ function VillageCodesPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 p-8">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl">
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },
-            { label: "Settings" },
+            { label: "Settings", href: paths.settings() },
             { label: "Village Codes" },
           ]}
         />
@@ -128,7 +129,7 @@ function VillageCodesPage() {
             />
           </div>
         </div>
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-5xl">
           {mode === "editing" && (
             <ChangeModal onClose={closeModal} activeForm={activeForm} />
           )}

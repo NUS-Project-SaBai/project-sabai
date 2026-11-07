@@ -2,6 +2,7 @@ import {
   computeBmi,
   formatBloodPressure,
   formatDiabetes,
+  classifyBloodPressure,
 } from "@/lib/utils/vitals";
 
 describe("computeBmi", () => {
@@ -48,5 +49,21 @@ describe("formatDiabetes", () => {
 
   it("maps null to the not-asked placeholder", () => {
     expect(formatDiabetes(null)).toBe("Not Applicable");
+  });
+});
+
+describe("classifyBloodPressure", () => {
+  it("returns null for normal readings", () => {
+    expect(classifyBloodPressure(120, 70)).toBeNull();
+  });
+
+  it("returns Pre-HTN when either reading reaches its threshold", () => {
+    expect(classifyBloodPressure(130, 70)).toBe("Pre-HTN");
+    expect(classifyBloodPressure(120, 80)).toBe("Pre-HTN");
+  });
+
+  it("returns HTN when either reading reaches its threshold", () => {
+    expect(classifyBloodPressure(140, 70)).toBe("HTN");
+    expect(classifyBloodPressure(120, 90)).toBe("HTN");
   });
 });

@@ -7,6 +7,7 @@ export const paths = {
   vitals: () => "/vitals",
   vitalsDetail: (patientId: number) => `/vitals/${patientId}`,
   vision: () => "/vision",
+  dental: () => "/dental",
   visionUpdateVision: (patientId: number) =>
     `/vision/update-vision/${patientId}`,
   consults: () => "/consults",
@@ -14,5 +15,7 @@ export const paths = {
   medicationStock: () => "/medication-stock",
   medicationBrands: () => "/medication-brands",
   medicationActiveIngredients: () => "/medication-active-ingredients",
-  settings: () => "/settings/village-codes",
+  orders: () => "/orders",
+  settings: () => "/settings",
+  settingsVillageCodes: () => "/settings/village-codes",
 };

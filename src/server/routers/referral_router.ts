@@ -6,64 +6,63 @@ import {
   consults,
   visits,
   patients,
+  villageCodes,
   referralStateEnum,
 } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { getPatientWithImageUrl } from "@/server/utils/cloudinary";
 
 const referralStateSchema = z.enum(referralStateEnum.enumValues);
 
-export const referralRouter = router({
-  // List all referrals enriched with patient, doctor, and date
-  list: protectedProcedure.query(async () => {
-    const result = await db
-      .select({
-        id: referrals.id,
-        referredFor: referrals.referredFor,
-        referralNotes: referrals.referralNotes,
-        referralState: referrals.referralState,
-        referralOutcome: referrals.referralOutcome,
-        consultId: referrals.consultId,
-        createdAt: referrals.createdAt,
-        consultDate: consults.date,
-        doctorId: consults.doctorId,
-        patientId: patients.id,
-        patientName: patients.name,
-      })
-      .from(referrals)
-      .innerJoin(consults, eq(referrals.consultId, consults.id))
-      .innerJoin(visits, eq(consults.visitId, visits.id))
-      .innerJoin(patients, eq(visits.patientId, patients.id))
-      .orderBy(desc(referrals.createdAt));
+// Referral joined to its consult, visit, patient, and the village code of the
+// visit the referral was made at (not the patient's latest visit).
+const enrichedReferralQuery = () =>
+  db
+    .select({
+      id: referrals.id,
+      referredFor: referrals.referredFor,
+      referralNotes: referrals.referralNotes,
+      referralState: referrals.referralState,
+      referralOutcome: referrals.referralOutcome,
+      consultId: referrals.consultId,
+      createdAt: referrals.createdAt,
+      consultDate: consults.date,
+      doctorId: consults.doctorId,
+      patientId: patients.id,
+      patientName: patients.name,
+      patientImagePublicId: patients.patientImagePublicId,
+      villageCodeId: visits.villageCodeId,
+      villageCode: villageCodes.code,
+      villageColorHex: villageCodes.colorHex,
+    })
+    .from(referrals)
+    .innerJoin(consults, eq(referrals.consultId, consults.id))
+    .innerJoin(visits, eq(consults.visitId, visits.id))
+    .innerJoin(patients, eq(visits.patientId, patients.id))
+    .innerJoin(villageCodes, eq(visits.villageCodeId, villageCodes.id))
+    .$dynamic();
 
-    return result;
+export const referralRouter = router({
+  // List all referrals enriched with patient, village, and consult details, newest first
+  list: protectedProcedure.query(async () => {
+    // id breaks ties between referrals created at the same timestamp.
+    const result = await enrichedReferralQuery().orderBy(
+      desc(referrals.createdAt),
+      desc(referrals.id),
+    );
+
+    return result.map(getPatientWithImageUrl);
   }),
 
   // Get a single referral by ID with full enrichment
   getById: protectedProcedure
     .input(z.object({ id: z.number().int() }))
     .query(async ({ input }) => {
-      const [result] = await db
-        .select({
-          id: referrals.id,
-          referredFor: referrals.referredFor,
-          referralNotes: referrals.referralNotes,
-          referralState: referrals.referralState,
-          referralOutcome: referrals.referralOutcome,
-          consultId: referrals.consultId,
-          createdAt: referrals.createdAt,
-          consultDate: consults.date,
-          doctorId: consults.doctorId,
-          patientId: patients.id,
-          patientName: patients.name,
-        })
-        .from(referrals)
-        .innerJoin(consults, eq(referrals.consultId, consults.id))
-        .innerJoin(visits, eq(consults.visitId, visits.id))
-        .innerJoin(patients, eq(visits.patientId, patients.id))
+      const [result] = await enrichedReferralQuery()
         .where(eq(referrals.id, input.id))
         .limit(1);
 
-      return result || null;
+      return result ? getPatientWithImageUrl(result) : null;
     }),
 
   // Get all referrals for a consult

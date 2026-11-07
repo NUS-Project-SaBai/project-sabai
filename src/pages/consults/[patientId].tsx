@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
+import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -66,7 +67,7 @@ function ConsultsPage() {
 
   return (
     <div className="min-h-screen flex-1 bg-slate-50 p-8">
-      <div className="mx-auto w-full max-w-7xl">
+      <div className="w-full max-w-7xl">
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },
@@ -132,6 +133,11 @@ function ConsultsPage() {
   );
 }
 
-ConsultsPage.getLayout = (page: React.ReactNode) => withDefaultLayout(page);
+ConsultsPage.getLayout = (page: React.ReactNode) =>
+  withDefaultLayout(
+    <PatientTopMenuLayout getPatientLink={(id) => `/consults/${id}`}>
+      {page}
+    </PatientTopMenuLayout>,
+  );
 
 export default ConsultsPage;

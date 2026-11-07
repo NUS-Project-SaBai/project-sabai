@@ -134,6 +134,48 @@
       "when": 1788101707251,
       "tag": "0018_lying_nightshade",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792478004549,
+      "tag": "0019_notifications_realtime_select_policy",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1792599964058,
+      "tag": "0020_get_current_user_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1792599965058,
+      "tag": "0021_medication_stock_changes",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793704445975,
+      "tag": "0022_massive_johnny_blaze",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1793849926966,
+      "tag": "0023_deep_big_bertha",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1793885774233,
+      "tag": "0024_dental_diagnosis",
+      "breakpoints": true
     }
   ]
 }

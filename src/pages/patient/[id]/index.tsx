@@ -11,6 +11,8 @@ import EditPatientForm from "@/components/patient/EditPatientForm";
 import { Button } from "@/components/interactive/Button/Button";
 import { calculateAge, formatPatientId } from "@/lib/utils/patient";
 import { genderDropdown } from "@/types/patient";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { paths } from "@/utils/paths";
 
 function parsePatientId(id: string | string[] | undefined) {
   if (typeof id !== "string") {
@@ -49,6 +51,13 @@ export default function PatientPage() {
     return (
       <div className="min-h-screen flex-1 p-8">
         <div className="w-full mx-auto">
+          <Breadcrumbs
+            items={[
+              { label: "Home", href: paths.home() },
+              { label: "Patients", href: paths.patient() },
+              { label: "Not found" },
+            ]}
+          />
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
             <h1 className="text-2xl font-semibold text-slate-900 mb-2">
               Patient not found
@@ -90,6 +99,13 @@ export default function PatientPage() {
   return (
     <div className="min-h-screen flex-1 p-8">
       <div className="w-full mx-auto">
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: paths.home() },
+            { label: "Patients", href: paths.patient() },
+            { label: patient.name },
+          ]}
+        />
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center gap-4 mb-6">
             <PatientPhoto
