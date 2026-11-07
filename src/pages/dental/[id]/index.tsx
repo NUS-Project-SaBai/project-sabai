@@ -23,30 +23,22 @@ export default function PatientDentalPage() {
     );
   }
 
-  const patientId =
-    typeof id === "string" && /^\d+$/.test(id) ? Number(id) : NaN;
-  if (
-    !Number.isSafeInteger(patientId) ||
-    patientId <= 0 ||
-    patientId > 2147483647
-  ) {
-    return (
-      <div className="p-8 text-center font-semibold text-red-500">
-        Patient not found
-      </div>
-    );
-  }
-
-  return <PatientDentalContent key={patientId} patientId={patientId} />;
+  return <PatientDentalContent key={String(id)} id={id} />;
 }
 
-function PatientDentalContent({ patientId }: { patientId: number }) {
+function PatientDentalContent({ id }: { id: string | string[] | undefined }) {
   const methods = useForm<{ visitSelect: string }>({
     defaultValues: { visitSelect: "" },
   });
   const { setValue, getValues } = methods;
-  const patientQuery = trpc.patientsRouter.getById.useQuery({ id: patientId });
-  const visitsQuery = trpc.visitsRouter.getByPatientId.useQuery({ patientId });
+  const patientQuery = trpc.patientsRouter.getById.useQuery(
+    { id: Number(id) },
+    { enabled: !!id },
+  );
+  const visitsQuery = trpc.visitsRouter.getByPatientId.useQuery(
+    { patientId: Number(id) },
+    { enabled: !!id },
+  );
   const visits = visitsQuery.data;
   const selectedVisitValue = useWatch({
     control: methods.control,

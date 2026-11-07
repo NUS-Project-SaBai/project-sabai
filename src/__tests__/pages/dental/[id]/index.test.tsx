@@ -95,16 +95,20 @@ test("shows the no-visits state", () => {
   ).toBeInTheDocument();
 });
 
-test.each(["0", "abc", "2147483648"])(
-  "rejects invalid patient ID %s without querying",
-  (id) => {
-    router.mockReturnValue({
-      query: { id },
-      isReady: true,
-    } as unknown as ReturnType<typeof useRouter>);
-    render(<PatientDentalPage />);
-    expect(screen.getByText("Patient not found")).toBeInTheDocument();
-    expect(patientQuery).not.toHaveBeenCalled();
-    expect(visitsQuery).not.toHaveBeenCalled();
-  },
-);
+test("passes the numeric URL ID to both queries", () => {
+  render(<PatientDentalPage />);
+  expect(patientQuery).toHaveBeenCalledWith({ id: 1 }, { enabled: true });
+  expect(visitsQuery).toHaveBeenCalledWith({ patientId: 1 }, { enabled: true });
+});
+
+test("shows an error when a patient query fails", () => {
+  patientQuery.mockReturnValue({
+    data: undefined,
+    isLoading: false,
+    isError: true,
+  } as unknown as ReturnType<typeof patientQuery>);
+  render(<PatientDentalPage />);
+  expect(
+    screen.getByText(/Unable to load patient and visits/),
+  ).toBeInTheDocument();
+});
