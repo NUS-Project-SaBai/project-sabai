@@ -91,7 +91,7 @@ function ConsultsPage() {
   }
 
   return (
-    <div className="min-h-screen flex-1 p-4 sm:p-6">
+    <div className="min-h-screen flex-1 p-8">
       <Breadcrumbs
         items={[{ label: "Home", href: "/" }, { label: "Consults" }]}
       />
