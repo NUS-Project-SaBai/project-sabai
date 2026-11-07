@@ -181,6 +181,65 @@ describe("MedicationStockPage", () => {
     ]);
   });
 
+  it("does not show Edit or Split buttons for dispensed stock", () => {
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: [{ ...MOCK_STOCK[0], stockStatus: "dispensed" }],
+        isLoading: false,
+      },
+    );
+
+    renderPage();
+
+    expect(screen.getByRole("cell", { name: "dispensed" })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Edit" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Split" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Manage in Orders page")).not.toBeInTheDocument();
+  });
+
+  it("shows management text instead of Edit and Split buttons for reserved stock", () => {
+    mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+      {
+        data: [{ ...MOCK_STOCK[0], stockStatus: "reserved" }],
+        isLoading: false,
+      },
+    );
+
+    renderPage();
+
+    expect(screen.getByText("Manage in Orders page")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Edit" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Split" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it.each(["active", "discarded", "donated"] as const)(
+    "shows Edit and Split buttons for %s stock",
+    (status) => {
+      mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
+        {
+          data: [{ ...MOCK_STOCK[0], stockStatus: status }],
+          isLoading: false,
+        },
+      );
+
+      renderPage();
+
+      expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Split" })).toBeInTheDocument();
+      expect(
+        screen.queryByText("Manage in Orders page"),
+      ).not.toBeInTheDocument();
+    },
+  );
+
   it("highlights low stock rows in red", () => {
     mockTrpc.medicationStockRouter.listWithBrandAndActiveIngredient.useQuery.mockReturnValue(
       {
@@ -272,6 +331,44 @@ describe("MedicationStockPage", () => {
     expect(
       screen.getByRole("heading", { name: "Add New Stock" }),
     ).toBeInTheDocument();
+  });
+
+  it("only offers active, discarded and donated statuses when adding stock", async () => {
+    const user = userEvent.setup();
+
+    mockTrpc.medicationBrandRouter.listWithActiveIngredientName.useQuery.mockReturnValue(
+      {
+        data: [],
+        isLoading: false,
+      },
+    );
+
+    mockTrpc.medicationStockRouter.create.useMutation.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    });
+
+    renderPage();
+
+    await user.click(screen.getByRole("button", { name: "Add Stock" }));
+
+    const dialog = await screen.findByRole("dialog");
+    const statusButton = dialog.querySelector(
+      'button[name="stockStatus-dropdown-button"]',
+    );
+
+    expect(statusButton).toBeInTheDocument();
+    await user.click(statusButton!);
+
+    const options = dialog.querySelectorAll(
+      'button[name^="stockStatus-"][name$="-dropdown-option"]',
+    );
+
+    expect(Array.from(options, (option) => option.textContent)).toEqual([
+      "active",
+      "discarded",
+      "donated",
+    ]);
   });
 
   it("closes the add new stock modal when the cross button or the cancel button is clicked", async () => {
@@ -492,6 +589,31 @@ describe("MedicationStockPage", () => {
     ).toBeInTheDocument();
 
     expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
+  });
+
+  it("only offers active, discarded and donated statuses when editing stock", async () => {
+    const user = userEvent.setup();
+
+    renderPage();
+
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+
+    const statusButton = document.querySelector(
+      'button[name="stockStatus-dropdown-button"]',
+    );
+
+    expect(statusButton).toBeInTheDocument();
+    await user.click(statusButton!);
+
+    const options = document.querySelectorAll(
+      'button[name^="stockStatus-"][name$="-dropdown-option"]',
+    );
+
+    expect(Array.from(options, (option) => option.textContent)).toEqual([
+      "active",
+      "discarded",
+      "donated",
+    ]);
   });
 
   it("disallows saves if the Save button is clicked when no fields are dirty", async () => {
