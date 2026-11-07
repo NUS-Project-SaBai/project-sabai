@@ -133,12 +133,9 @@ function ReferralsLayout({ children }: { children: ReactNode }) {
   const { data: referrals } = trpc.referralRouter.list.useQuery();
 
   const getPatientLink = (patientId: number) => {
-    const latestReferral = referrals
-      ?.filter((referral) => referral.patientId === patientId)
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )[0];
+    const latestReferral = referrals?.find(
+      (referral) => referral.patientId === patientId,
+    );
 
     return latestReferral
       ? paths.referralsDetail(latestReferral.id)
