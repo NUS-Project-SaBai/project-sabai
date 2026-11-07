@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import EditableCell from "@/components/interactive/EditableCell";
+import DeleteConfirmModal from "@/components/medication-brands/DeleteConfirmModal";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { Button } from "@/components/interactive/Button/Button";
 import type { MedicationBrand } from "@/db/schema";
@@ -17,6 +18,7 @@ type BrandRowProps = MedicationBrand & {
 
 export default function BrandRow(brand: BrandRowProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const form = useForm<EditFormFields>({
     values: {
@@ -51,6 +53,19 @@ export default function BrandRow(brand: BrandRowProps) {
       toast.error("An error has occurred.");
       console.error(err);
       form.reset();
+    },
+  });
+
+  const deleteMutation = trpc.medicationBrandRouter.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Successfully deleted.");
+      utils.medicationBrandRouter.listWithActiveIngredientName.invalidate();
+    },
+    onError: () => {
+      toast.error(
+        "Error! Check that there are no stock records that depend on this brand.",
+      );
+      setIsDeleting(false);
     },
   });
 
@@ -146,29 +161,46 @@ export default function BrandRow(brand: BrandRowProps) {
         </TableCell>
 
         <TableCell>
-          <div className="flex items-center gap-2">
+          <div className="flex items-left gap-2">
             {isEditing ? (
-              <>
-                <Button
-                  colour="emerald"
-                  disabled={isSubmitting}
-                  onClick={() => form.handleSubmit(handleSubmit)()}
-                  title={isSubmitting ? "Saving..." : "Save"}
-                />
-                <Button
-                  onClick={() => {
-                    form.reset();
-                    setIsEditing(false);
-                  }}
-                  colour="red"
-                  title="Cancel"
-                />
-              </>
+              <Button
+                colour="emerald"
+                disabled={isSubmitting}
+                onClick={() => form.handleSubmit(handleSubmit)()}
+                title={isSubmitting ? "Saving..." : "Save"}
+              />
             ) : (
               <Button
                 colour="emerald"
                 onClick={() => setIsEditing(!isEditing)}
                 title="Edit"
+              />
+            )}
+
+            {isEditing ? (
+              <Button
+                onClick={() => {
+                  form.reset();
+                  setIsEditing(false);
+                }}
+                colour="red"
+                title="Cancel"
+              />
+            ) : (
+              <Button
+                onClick={() => {
+                  setIsDeleting(true);
+                }}
+                colour="red"
+                title="Delete"
+              />
+            )}
+
+            {isDeleting && (
+              <DeleteConfirmModal
+                onCancel={() => setIsDeleting(false)}
+                onConfirm={() => deleteMutation.mutate({ id: brand.id })}
+                brand={brand}
               />
             )}
           </div>

@@ -3,6 +3,7 @@ import PageHeader from "@/components/PageHeader";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import TableHeader from "@/components/TableHeader";
 import BrandRow from "@/components/medication-brands/BrandRow";
+import AddBrandModal from "@/components/medication-brands/AddBrandModal";
 
 function Header() {
   return (
@@ -14,6 +15,7 @@ function Header() {
       ]}
       title="Medication Brands"
       description="Manage medication brands."
+      actions={<AddBrandModal />}
     />
   );
 }
