@@ -13,6 +13,7 @@ import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { useSaveOnWrite } from "@/hooks/useSaveOnWrite";
 import { useEffect } from "react";
 import { Button } from "@/components/interactive/Button/Button";
+import ModalToast from "@/components/interactive/ModalToast";
 
 export default function ChangeModal({
   onClose,
@@ -80,8 +81,12 @@ export default function ChangeModal({
     },
     onError: (err) => {
       console.error(err);
-      toast.error(err.data?.code === "CONFLICT"
-        ? err.message : "Unable to create village code.");
+      toast.error(
+        err.data?.code === "CONFLICT"
+          ? err.message
+          : "Unable to create village code.",
+        { toasterId: "modal" },
+      );
     },
   });
 
@@ -94,8 +99,12 @@ export default function ChangeModal({
     },
     onError: (err) => {
       console.error(err);
-      toast.error(err.data?.code === "CONFLICT"
-        ? err.message : "Unable to update village code.");
+      toast.error(
+        err.data?.code === "CONFLICT"
+          ? err.message
+          : "Unable to update village code.",
+        { toasterId: "modal" },
+      );
     },
   });
 
@@ -114,7 +123,9 @@ export default function ChangeModal({
         id: activeForm!.id!, // Non-null assertion operator because handleEdit only gets called by handleSubmit which already does the check
       });
     } else {
-      toast.error("Fields not changed!");
+      toast.error("Fields not changed!", 
+        {toasterId: "modal"}
+      );
     }
   };
 
@@ -123,6 +134,7 @@ export default function ChangeModal({
       title={activeForm?.id ? "Edit Village Code" : "New Village Code"}
       onClose={onClose}
     >
+      <ModalToast />
       <FormProvider {...form}>
         <form
           onSubmit={(e) => {
