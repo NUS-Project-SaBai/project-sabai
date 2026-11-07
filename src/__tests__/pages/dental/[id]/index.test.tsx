@@ -83,6 +83,43 @@ test("selects the newest visit and preserves a manual choice on refetch, then re
   expect(screen.getByRole("heading", { name: /Jane Doe/ })).toBeInTheDocument();
 });
 
+test("shows a loading message while the router is not ready", () => {
+  router.mockReturnValue({
+    query: {},
+    isReady: false,
+  } as unknown as ReturnType<typeof useRouter>);
+
+  render(<PatientDentalPage />);
+
+  expect(screen.getByText("Loading patient and visits...")).toBeInTheDocument();
+  expect(patientQuery).not.toHaveBeenCalled();
+  expect(visitsQuery).not.toHaveBeenCalled();
+});
+
+test("shows a loading message while patient data is loading", () => {
+  patientQuery.mockReturnValue({
+    data: undefined,
+    isLoading: true,
+    isError: false,
+  } as unknown as ReturnType<typeof patientQuery>);
+
+  render(<PatientDentalPage />);
+
+  expect(screen.getByText("Loading patient and visits...")).toBeInTheDocument();
+});
+
+test("shows a loading message while visits data is loading", () => {
+  visitsQuery.mockReturnValue({
+    data: undefined,
+    isLoading: true,
+    isError: false,
+  } as unknown as ReturnType<typeof visitsQuery>);
+
+  render(<PatientDentalPage />);
+
+  expect(screen.getByText("Loading patient and visits...")).toBeInTheDocument();
+});
+
 test("shows the no-visits state", () => {
   visitsQuery.mockReturnValue({
     data: [],
