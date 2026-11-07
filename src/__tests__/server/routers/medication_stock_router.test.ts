@@ -195,7 +195,7 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
           stockStatus: "reserved",
         }),
       ).rejects.toMatchObject({
-        code: "CONFLICT",
+        code: "BAD_REQUEST",
       });
 
       expect(await testStockRows()).toHaveLength(0);
@@ -209,7 +209,7 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
           stockStatus: "dispensed",
         }),
       ).rejects.toMatchObject({
-        code: "CONFLICT",
+        code: "BAD_REQUEST",
       });
 
       expect(await testStockRows()).toHaveLength(0);
@@ -375,7 +375,7 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
             remarks: SEED_STOCK.remarks,
           }),
         ).rejects.toMatchObject({
-          code: "CONFLICT",
+          code: "BAD_REQUEST",
         });
 
         expect(await testStockRows()).toEqual([stock]);

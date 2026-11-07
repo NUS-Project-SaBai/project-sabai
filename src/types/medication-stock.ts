@@ -40,3 +40,9 @@ export type SplitChild = Omit<
 > & {
   stockStatus: SplitPayload["stockStatus"];
 };
+
+export const StockStatusSchema = z
+  .enum(medicationStatusValues)
+  .refine((status) => status !== "reserved" && status !== "dispensed", {
+    message: "Stock status cannot be reserved or dispensed.",
+  });

@@ -6,12 +6,11 @@ import { withUserTransaction } from "@/db/withUserTransaction";
 import { eq, desc, ne } from "drizzle-orm";
 import {
   medicationBrands,
-  medicationStatusEnum,
   medicationStock,
   medicationActiveIngredients,
 } from "@/db/schema/pharmacy";
 import { TRPCError } from "@trpc/server";
-import { splitSchema } from "@/types/medication-stock";
+import { splitSchema, StockStatusSchema } from "@/types/medication-stock";
 import { validateSplits } from "@/lib/utils/medication-stock";
 import { MAX_SPLITS, MIN_SPLITS } from "@/lib/constants/medicationStock";
 
@@ -86,21 +85,11 @@ export const medicationStockRouter = router({
         quantity: zfd.numeric(z.number().int()),
         expiry: zfd.text(z.coerce.date()),
         location: zfd.text(),
-        stockStatus: zfd.text(z.enum(medicationStatusEnum.enumValues)),
+        stockStatus: zfd.text(StockStatusSchema),
         remarks: zfd.text(z.string().optional()),
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      if (
-        input.stockStatus === "reserved" ||
-        input.stockStatus === "dispensed"
-      ) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: "Cannot create a stock with reserved or dispensed status.",
-        });
-      }
-
       return await withUserTransaction(ctx.user.id, async (tx) => {
         const [newStock] = await tx
           .insert(medicationStock)
@@ -116,9 +105,7 @@ export const medicationStockRouter = router({
       zfd.formData({
         id: zfd.numeric(z.number().int()),
         location: zfd.text(z.string().optional()),
-        stockStatus: zfd.text(
-          z.enum(medicationStatusEnum.enumValues).optional(),
-        ),
+        stockStatus: zfd.text(StockStatusSchema.optional()),
         remarks: z.preprocess(
           // To insert null instead of empty string into the db
           (val: string | undefined) =>
@@ -154,16 +141,6 @@ export const medicationStockRouter = router({
           throw new TRPCError({
             code: "CONFLICT",
             message: "Cannot update a stock with reserved or dispensed status.",
-          });
-        }
-
-        if (
-          input.stockStatus === "reserved" ||
-          input.stockStatus === "dispensed"
-        ) {
-          throw new TRPCError({
-            code: "CONFLICT",
-            message: "Cannot update a stock to reserved or dispensed status.",
           });
         }
 

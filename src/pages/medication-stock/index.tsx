@@ -259,7 +259,7 @@ function Row({
           </span>
         </TableCell>
         <TableCell>
-          {item.stockStatus == "reserved" ? (
+          {item.stockStatus === "reserved" ? (
             <span className="text-sm font-medium text-slate-900">
               {" "}
               Manage in Orders page

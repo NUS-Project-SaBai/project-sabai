@@ -191,7 +191,7 @@ export default function SplittingModal({
           colour="indigo"
           onClick={() => {
             const status = stock.stockStatus;
-            if (status == "reserved" || status == "dispensed") {
+            if (status === "reserved" || status === "dispensed") {
               return;
             }
             setSplits((previous) => [
