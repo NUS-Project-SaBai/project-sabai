@@ -27,6 +27,8 @@ export const medicationBrandRouter = router({
         id: medicationBrands.id,
         name: medicationBrands.name,
         activeIngredientName: medicationActiveIngredients.name,
+        unitOfMeasurement: medicationActiveIngredients.unitOfMeasurement,
+        remarks: medicationBrands.remarks,
       })
       .from(medicationBrands)
       .innerJoin(

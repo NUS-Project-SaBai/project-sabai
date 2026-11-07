@@ -24,7 +24,7 @@ function MedicationBrandsBasePage() {
     data: brands,
     isLoading,
     isError,
-  } = trpc.medicationBrandRouter.list.useQuery();
+  } = trpc.medicationBrandRouter.listWithActiveIngredientName.useQuery();
 
   function renderContent() {
     if (isError) {
@@ -47,7 +47,13 @@ function MedicationBrandsBasePage() {
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200">
           <TableHeader
-            headers={["Brand ID", "Name", "Remarks", "Active Ingredient ID"]}
+            headers={[
+              "BRAND ID",
+              "BRAND NAME",
+              "ACTIVE INGREDIENT NAME",
+              "UNIT OF MEASUREMENT",
+              "Remarks",
+            ]}
           />
           <tbody className="bg-white divide-y divide-slate-200">
             {brands.map((brand) => (
@@ -64,12 +70,17 @@ function MedicationBrandsBasePage() {
                 </TableCell>
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
-                    {brand.remarks}
+                    {brand.activeIngredientName}
                   </span>
                 </TableCell>
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
-                    {brand.activeIngredientId}
+                    {brand.unitOfMeasurement}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm font-medium text-slate-900">
+                    {brand.remarks}
                   </span>
                 </TableCell>
               </TableRow>
