@@ -1,7 +1,7 @@
+import { formatDate } from "@/lib/utils/date";
 import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import { PatientPhoto } from "@/components/PatientPhoto";
 import PatientDetailSkeleton from "@/components/PatientDetailSkeleton";
-import { calculateAge } from "@/lib/utils/patient";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
@@ -9,6 +9,8 @@ import { useState } from "react";
 import Modal from "@/components/interactive/Modal";
 import EditPatientForm from "@/components/patient/EditPatientForm";
 import { Button } from "@/components/interactive/Button/Button";
+import { calculateAge, formatPatientId } from "@/lib/utils/patient";
+import { genderDropdown } from "@/types/patient";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { paths } from "@/utils/paths";
 
@@ -70,24 +72,28 @@ export default function PatientPage() {
   }
 
   const details = [
-    { label: "ID", value: patient.id.toString() },
+    { label: "ID", value: formatPatientId(patient.id) },
     { label: "Name", value: patient.name },
     {
       label: "Identification Number",
       value: patient.identificationNumber || "-",
     },
     { label: "Contact Number", value: patient.contactNo || "-" },
-    { label: "Gender", value: patient.gender },
+    {
+      label: "Gender",
+      value:
+        genderDropdown.find((g) => g.value === patient.gender)?.label ??
+        patient.gender,
+    },
     {
       label: "Date of Birth",
-      value: new Date(patient.dateOfBirth).toLocaleDateString(),
+      value: formatDate(patient.dateOfBirth),
     },
     { label: "Age", value: `${calculateAge(patient.dateOfBirth)} years` },
     { label: "Drug Allergy", value: patient.drugAllergy },
-    { label: "POOR", value: patient.hasPoorCard },
-    { label: "BS2", value: patient.hasBS2Card },
-    { label: "Sabai Card", value: patient.hasSabaiCard },
-    { label: "Patient Image URL", value: patient.patientImageUrl },
+    { label: "POOR", value: patient.hasPoorCard ? "Yes" : "No" },
+    { label: "BS2", value: patient.hasBS2Card ? "Yes" : "No" },
+    { label: "Sabai Card", value: patient.hasSabaiCard ? "Yes" : "No" },
   ];
 
   return (
@@ -191,7 +197,7 @@ export default function PatientPage() {
 
                   <div className="text-right">
                     <p className="text-sm font-medium text-slate-900">
-                      {new Date(visit.date).toLocaleDateString()}
+                      {formatDate(visit.date, { timeZone: null })}
                     </p>
                     <p className="text-xs text-slate-500">
                       {new Date(visit.date).toLocaleTimeString()}
