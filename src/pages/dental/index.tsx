@@ -1,4 +1,6 @@
 import PageHeader from "@/components/PageHeader";
+import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
+import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 import { paths } from "@/utils/paths";
 
 export default function DentalPage() {
@@ -10,9 +12,15 @@ export default function DentalPage() {
           { label: "Dental" },
         ]}
         title="Dental"
-        description="Dental module coming soon."
+        description="Manage dental patients here"
       />
-      <p className="mt-2 text-slate-600">Manage dental patients here.</p>
     </div>
   );
 }
+
+DentalPage.getLayout = (page: React.ReactNode) =>
+  withDefaultLayout(
+    <PatientTopMenuLayout getPatientLink={(id) => `/dental/${id}`}>
+      {page}
+    </PatientTopMenuLayout>,
+  );
