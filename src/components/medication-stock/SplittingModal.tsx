@@ -44,9 +44,9 @@ export default function SplittingModal({
     const newSplits = splits.map((item, itemIndex) =>
       itemIndex === index
         ? {
-          ...item,
-          ...patch,
-        }
+            ...item,
+            ...patch,
+          }
         : item,
     );
 
@@ -83,11 +83,11 @@ export default function SplittingModal({
             <td>{stock.location}</td>
           </tr>
           <tr>
-            <td>Active Ingredient</td>
+            <td>Active Ingredient:</td>
             <td>{stock.medicationActiveIngredientName}</td>
           </tr>
           <tr>
-            <td>Brand Name</td>
+            <td>Brand Name:</td>
             <td>{stock.medicationBrandName}</td>
           </tr>
           <tr>
@@ -100,7 +100,13 @@ export default function SplittingModal({
           </tr>
           <tr>
             <td>Remarks:</td>
-            <td>{stock.remarks}</td>
+            <td>
+              {stock.remarks ? (
+                stock.remarks
+              ) : (
+                <span className="text-sm text-gray-500">No remarks added</span>
+              )}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -186,7 +192,7 @@ export default function SplittingModal({
         <Button
           title="Add Split"
           colour="indigo"
-          onClick={() => setSplits(s => [...s, stock])}
+          onClick={() => setSplits((s) => [...s, stock])}
           disabled={hasReachedMaxSplits}
         />
         {hasReachedMaxSplits && (
