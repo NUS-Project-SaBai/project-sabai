@@ -59,7 +59,10 @@ export const villageCodesRouter = router({
     .mutation(async ({ input }) => {
       try {
         // .returning() is crucial in Postgres to get the inserted object back
-        const [newCode] = await db.insert(villageCodes).values(input).returning();
+        const [newCode] = await db
+          .insert(villageCodes)
+          .values(input)
+          .returning();
         return newCode;
       } catch (error) {
         handleVillageCodeError(error);
