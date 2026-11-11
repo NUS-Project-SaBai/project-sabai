@@ -6,12 +6,16 @@ import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { Button } from "@/components/interactive/Button/Button";
 import { trpc } from "@/utils/trpc";
 import type { AddFormFields } from "./types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { brandFormSchema } from "@/server/schemas/medicationBrands";
 import IngredientDropdown from "./IngredientDropdown";
 
 export default function AddBrandModal() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
 
-  const form = useForm<AddFormFields>();
+  const form = useForm<AddFormFields>({
+    resolver: zodResolver(brandFormSchema),
+  });
 
   const utils = trpc.useUtils();
 

@@ -7,6 +7,10 @@ import {
   medicationActiveIngredients,
   medicationBrands,
 } from "@/db/schema/pharmacy";
+import {
+  createBrandInput,
+  updateBrandInput,
+} from "@/server/schemas/medicationBrands";
 
 export const medicationBrandRouter = router({
   list: protectedProcedure.query(async () => {
@@ -42,13 +46,7 @@ export const medicationBrandRouter = router({
   }),
 
   create: protectedProcedure
-    .input(
-      zfd.formData({
-        name: zfd.text().nonoptional(),
-        activeIngredientId: zfd.numeric(z.number().int()),
-        remarks: zfd.text(z.string().optional()),
-      }),
-    )
+    .input(createBrandInput)
     .mutation(async ({ input }) => {
       const [newMedicationBrand] = await db
         .insert(medicationBrands)
@@ -58,14 +56,7 @@ export const medicationBrandRouter = router({
     }),
 
   update: protectedProcedure
-    .input(
-      zfd.formData({
-        id: zfd.numeric(z.number().int()),
-        name: zfd.text().nonoptional(),
-        activeIngredientId: zfd.numeric(z.number().int()),
-        remarks: zfd.text(z.string().optional()),
-      }),
-    )
+    .input(updateBrandInput)
     .mutation(async ({ input }) => {
       const { id, ...updateData } = input;
       const [result] = await db

@@ -9,6 +9,8 @@ import { Button } from "@/components/interactive/Button/Button";
 import type { MedicationBrand } from "@/db/schema";
 import { trpc } from "@/utils/trpc";
 import type { EditFormFields } from "./types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { editBrandFormSchema } from "@/server/schemas/medicationBrands";
 import IngredientDropdown from "./IngredientDropdown";
 
 type BrandRowProps = MedicationBrand & {
@@ -21,6 +23,7 @@ export default function BrandRow(brand: BrandRowProps) {
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const form = useForm<EditFormFields>({
+    resolver: zodResolver(editBrandFormSchema),
     values: {
       id: brand.id,
       name: brand.name,
