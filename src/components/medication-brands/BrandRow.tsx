@@ -75,7 +75,7 @@ export default function BrandRow(brand: BrandRowProps) {
     const hasChanged =
       data.name !== brand.name ||
       Number(data.activeIngredientId) !== brand.activeIngredientId ||
-      data.remarks !== brand.remarks;
+      (data.remarks ?? "") !== (brand.remarks ?? "");
 
     if (!hasChanged) {
       toast.error("No form field changed!");

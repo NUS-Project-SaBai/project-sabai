@@ -78,7 +78,7 @@ export default function AddBrandModal() {
 
               <RHFInput name="remarks" label="Remarks" type="text" />
 
-              <div className="flex flex-row gap-2">
+              <div className="mt-4 flex flex-row gap-2">
                 <Button
                   colour="emerald"
                   type="submit"

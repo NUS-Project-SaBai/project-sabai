@@ -23,7 +23,7 @@ export default function DeleteConfirmModal({
             <td>{brand.name}</td>
           </tr>
           <tr>
-            <td>Active Ingredient:</td>
+            <td className="pr-4">Active Ingredient:</td>
             <td>{brand.activeIngredientName}</td>
           </tr>
           <tr>
@@ -31,8 +31,10 @@ export default function DeleteConfirmModal({
             <td>{brand.unitOfMeasurement}</td>
           </tr>
           <tr>
-            <td>Remarks:</td>
-            <td>{brand.remarks}</td>
+            <td className="align-top">Remarks:</td>
+            <td className="whitespace-normal overflow-wrap anywhere]">
+              {brand.remarks}
+            </td>
           </tr>
         </tbody>
       </table>
