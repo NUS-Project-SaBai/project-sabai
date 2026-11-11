@@ -44,9 +44,9 @@ export default function SplittingModal({
     const newSplits = splits.map((item, itemIndex) =>
       itemIndex === index
         ? {
-          ...item,
-          ...patch,
-        }
+            ...item,
+            ...patch,
+          }
         : item,
     );
 
@@ -186,7 +186,7 @@ export default function SplittingModal({
         <Button
           title="Add Split"
           colour="indigo"
-          onClick={() => setSplits(s => [...s, stock])}
+          onClick={() => setSplits((s) => [...s, stock])}
           disabled={hasReachedMaxSplits}
         />
         {hasReachedMaxSplits && (
