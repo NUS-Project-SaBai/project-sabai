@@ -5,11 +5,11 @@ import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import EditableCell from "@/components/interactive/EditableCell";
 import DeleteConfirmModal from "@/components/medication-brands/DeleteConfirmModal";
-import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { Button } from "@/components/interactive/Button/Button";
 import type { MedicationBrand } from "@/db/schema";
 import { trpc } from "@/utils/trpc";
 import type { EditFormFields } from "./types";
+import IngredientDropdown from "./IngredientDropdown";
 
 type BrandRowProps = MedicationBrand & {
   activeIngredientName: string;
@@ -112,26 +112,13 @@ export default function BrandRow(brand: BrandRowProps) {
 
         <TableCell>
           {isEditing ? (
-            isLoading ? (
-              <span>Loading active ingredients...</span>
-            ) : isError ? (
-              <span className="text-red-500">
-                Unable to load active ingredients.
-              </span>
-            ) : !ingredients?.length ? (
-              <span>No active ingredients available.</span>
-            ) : (
-              <div className="text-sm font-medium text-slate-900">
-                <RHFDropdown
-                  name="activeIngredientId"
-                  label=""
-                  dropdownOptions={ingredients.map((ingredient) => ({
-                    value: String(ingredient.id),
-                    label: ingredient.name,
-                  }))}
-                />
-              </div>
-            )
+            <div className="text-sm font-medium text-slate-900">
+              <IngredientDropdown
+                ingredients={ingredients}
+                isLoading={isLoading}
+                isError={isError}
+              />
+            </div>
           ) : (
             <span className="text-sm font-medium text-slate-900">
               {brand.activeIngredientName}

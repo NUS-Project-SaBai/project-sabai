@@ -3,10 +3,10 @@ import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
 import toast from "react-hot-toast";
 import Modal from "@/components/interactive/Modal";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
-import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { Button } from "@/components/interactive/Button/Button";
 import { trpc } from "@/utils/trpc";
 import type { AddFormFields } from "./types";
+import IngredientDropdown from "./IngredientDropdown";
 
 export default function AddBrandModal() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
@@ -50,31 +50,18 @@ export default function AddBrandModal() {
           <FormProvider {...form}>
             <form
               onSubmit={(e) => {
-                e.preventDefault();
                 form.handleSubmit(handleSubmit)(e);
               }}
             >
               <RHFInput name="name" label="Name" type="text" />
 
-              {isLoading ? (
-                <span>Loading active ingredients...</span>
-              ) : isError ? (
-                <span className="text-red-500">
-                  Unable to load active ingredients.
-                </span>
-              ) : !ingredients?.length ? (
-                <span>No active ingredients available.</span>
-              ) : (
-                <RHFDropdown
-                  name="activeIngredientId"
-                  label="Active Ingredient"
-                  isRequired
-                  dropdownOptions={ingredients.map((ingredient) => ({
-                    value: String(ingredient.id),
-                    label: ingredient.name,
-                  }))}
-                />
-              )}
+              <IngredientDropdown
+                ingredients={ingredients}
+                isLoading={isLoading}
+                isError={isError}
+                label="Active Ingredient"
+                isRequired={true}
+              />
 
               <RHFInput name="remarks" label="Remarks" type="text" />
 
