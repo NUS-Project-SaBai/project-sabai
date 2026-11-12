@@ -13,9 +13,13 @@ export function formatPatientCode(villageCode: string | null, id: number) {
   return `${villageCode ?? ""}${formatPatientId(id)}`;
 }
 
-export function calculateAge(dateOfBirth: Date) {
+/**
+ * Age in whole years on a given date (today by default).
+ * @param asOf - Date to measure the age at, e.g. the date a referral was made.
+ */
+export function calculateAge(dateOfBirth: Date, asOf: Date = new Date()) {
   const birthDate = new Date(dateOfBirth);
-  const now = new Date();
+  const now = new Date(asOf);
 
   let age = now.getFullYear() - birthDate.getFullYear();
   const monthDifference = now.getMonth() - birthDate.getMonth();
