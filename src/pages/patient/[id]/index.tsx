@@ -22,11 +22,7 @@ export default function PatientPage() {
   const router = useRouter();
   const patientId = parsePatientId(router.query.id);
 
-  const {
-    data: patient,
-    isLoading,
-    isRefetching,
-  } = trpc.patientsRouter.getById.useQuery(
+  const { data: patient, isLoading } = trpc.patientsRouter.getById.useQuery(
     { id: patientId ?? 0 },
     { enabled: !!patientId },
   );
@@ -37,7 +33,7 @@ export default function PatientPage() {
       { enabled: !!patientId },
     );
 
-  if (!router.isReady || !patientId || isLoading || isRefetching) {
+  if (!router.isReady || !patientId || isLoading) {
     return <PatientDetailSkeleton />;
   }
 
