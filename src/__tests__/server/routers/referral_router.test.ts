@@ -212,6 +212,11 @@ describe("referralRouter (integration)", () => {
       expect(found).not.toBeNull();
       expect(found!.id).toBe(created.id);
       expect(found!.patientName).toBe(SEED_PATIENT.name);
+      expect(found!.patientDateOfBirth).toEqual(SEED_PATIENT.dateOfBirth);
+      expect(found!.patientContactNo).toBeNull();
+      expect(found!.patientHasPoorCard).toBe(SEED_PATIENT.hasPoorCard);
+      expect(found!.patientHasBS2Card).toBe(SEED_PATIENT.hasBS2Card);
+      expect(found!.patientHasSabaiCard).toBe(SEED_PATIENT.hasSabaiCard);
       expect(found!.patientImageUrl).toBe(EXPECTED_IMAGE_URL);
       expect(found!.villageCodeId).toBe(villageCodeId);
       expect(found!.villageCode).toBe(VILLAGE_CODE.code);
