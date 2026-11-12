@@ -22,6 +22,13 @@ const mockTrpc = vi.hoisted(() => ({
     getById: { useQuery: vi.fn() },
     updateState: { useMutation: vi.fn() },
     updateOutcome: { useMutation: vi.fn() },
+    updateBooth: { useMutation: vi.fn() },
+  },
+  referralPartnersRouter: {
+    list: { useQuery: vi.fn(() => ({ data: [] })) },
+  },
+  usersRouter: {
+    list: { useQuery: vi.fn(() => ({ data: [] })) },
   },
 }));
 
@@ -51,6 +58,13 @@ const MOCK_REFERRAL = {
   villageCodeId: 1,
   villageCode: "SB",
   villageColorHex: "#C0392B",
+  referredToId: null,
+  memberInChargeId: null,
+  guardiansContacted: null,
+  classOfService: null,
+  descriptionOfService: null,
+  patientSummaryFromScreening: null,
+  remarksAtBooth: null,
 };
 
 function mockReferral(referral: Record<string, unknown> | null) {
@@ -82,6 +96,10 @@ describe("ReferralDetailsPage", () => {
       isPending: false,
     });
     mockTrpc.referralRouter.updateOutcome.useMutation.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    });
+    mockTrpc.referralRouter.updateBooth.useMutation.mockReturnValue({
       mutate: vi.fn(),
       isPending: false,
     });
@@ -153,6 +171,15 @@ describe("ReferralDetailsPage", () => {
     expect(getOverviewValue("Referral Notes")).toHaveTextContent(
       "No notes entered",
     );
+  });
+
+  it("shows the referral booth section collapsed below patient details", () => {
+    // Given - a referral is opened
+    render(<ReferralDetailsPage />);
+    // Then - the booth section is there but starts collapsed
+    expect(
+      screen.getByRole("button", { name: "Referral Booth" }),
+    ).toHaveAttribute("aria-expanded", "false");
   });
 
   it("shows a not found message when the referral does not exist", () => {
