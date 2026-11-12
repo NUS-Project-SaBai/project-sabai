@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import { HiOutlineEye, HiOutlinePencilSquare } from "react-icons/hi2";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
-import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import PageHeader from "@/components/PageHeader";
 import { PatientPhoto } from "@/components/PatientPhoto";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -10,6 +9,7 @@ import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import { ReferralStateDropdown } from "@/components/referrals/ReferralStateDropdown";
+import ReferralsLayout from "@/components/referrals/ReferralsLayout";
 import { formatPatientCode } from "@/lib/utils/patient";
 import { formatVisitDate } from "@/lib/utils/visit";
 import { trpc } from "@/utils/trpc";
@@ -126,26 +126,6 @@ function ReferralsPage() {
         {renderContent()}
       </div>
     </div>
-  );
-}
-
-function ReferralsLayout({ children }: { children: ReactNode }) {
-  const { data: referrals } = trpc.referralRouter.list.useQuery();
-
-  const getPatientLink = (patientId: number) => {
-    const latestReferral = referrals?.find(
-      (referral) => referral.patientId === patientId,
-    );
-
-    return latestReferral
-      ? paths.referralsDetail(latestReferral.id)
-      : paths.patientDetail(patientId);
-  };
-
-  return (
-    <PatientTopMenuLayout getPatientLink={getPatientLink}>
-      {children}
-    </PatientTopMenuLayout>
   );
 }
 
