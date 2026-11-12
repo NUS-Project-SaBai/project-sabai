@@ -19,6 +19,7 @@ import {
   visits,
   patients,
   villageCodes,
+  referralPartners,
 } from "@/db/schema";
 import { getLinkedTestUser } from "./testUsers";
 
@@ -306,6 +307,120 @@ describe("referralRouter (integration)", () => {
       const update = caller.referralRouter.updateOutcome({
         id: -1,
         referralOutcome: "x",
+      });
+      // Then - it fails with NOT_FOUND instead of silently succeeding
+      await expect(update).rejects.toMatchObject({ code: "NOT_FOUND" });
+    });
+  });
+
+  describe("updateBooth()", () => {
+    let partnerId: string;
+
+    beforeAll(async () => {
+      [{ id: partnerId }] = await db
+        .insert(referralPartners)
+        .values({ name: "Booth Test Hospital" })
+        .returning({ id: referralPartners.id });
+    });
+
+    // Referrals are wiped by the outer afterEach first, so the partner is free.
+    afterAll(async () => {
+      await db
+        .delete(referralPartners)
+        .where(eq(referralPartners.id, partnerId));
+    });
+
+    it("saves the booth fields without touching other sections", async () => {
+      // Given - a referral with a status and outcome already set
+      const created = await caller.referralRouter.create({
+        consultId,
+        referredFor: "Ortho",
+      });
+      await caller.referralRouter.updateState({
+        id: created.id,
+        referralState: "Seen",
+        referralOutcome: "Waiting on scan",
+      });
+      // When - the booth section is saved
+      const updated = await caller.referralRouter.updateBooth({
+        id: created.id,
+        referredToId: partnerId,
+        memberInChargeId: userId,
+        guardiansContacted: "Yes",
+        classOfService: "ImagingDiagnostics",
+        descriptionOfService: "  X-ray of left arm  ",
+        patientSummaryFromScreening: "Fell from a tree",
+        remarksAtBooth: "Mother will attend",
+      });
+      // Then - the booth fields are saved (trimmed) and the rest is unchanged
+      expect(updated).toMatchObject({
+        referredToId: partnerId,
+        memberInChargeId: userId,
+        guardiansContacted: "Yes",
+        classOfService: "ImagingDiagnostics",
+        descriptionOfService: "X-ray of left arm",
+        patientSummaryFromScreening: "Fell from a tree",
+        remarksAtBooth: "Mother will attend",
+        referralState: "Seen",
+        referralOutcome: "Waiting on scan",
+      });
+      // And - getById returns them for the booth form
+      const found = await caller.referralRouter.getById({ id: created.id });
+      expect(found).toMatchObject({
+        referredToId: partnerId,
+        memberInChargeId: userId,
+        guardiansContacted: "Yes",
+        classOfService: "ImagingDiagnostics",
+      });
+    });
+
+    it("clears fields sent as null or blank text", async () => {
+      // Given - a referral with booth details saved
+      const created = await caller.referralRouter.create({
+        consultId,
+        referredFor: "Ortho",
+      });
+      await caller.referralRouter.updateBooth({
+        id: created.id,
+        referredToId: partnerId,
+        memberInChargeId: userId,
+        guardiansContacted: "No",
+        classOfService: "ChronicManagement",
+        descriptionOfService: "Diabetes follow-up",
+        patientSummaryFromScreening: "High glucose",
+        remarksAtBooth: "None",
+      });
+      // When - it is saved again with everything cleared
+      const updated = await caller.referralRouter.updateBooth({
+        id: created.id,
+        referredToId: null,
+        memberInChargeId: null,
+        guardiansContacted: null,
+        classOfService: null,
+        descriptionOfService: "",
+        patientSummaryFromScreening: "   ",
+        remarksAtBooth: null,
+      });
+      // Then - every booth field is null
+      expect(updated).toMatchObject({
+        referredToId: null,
+        memberInChargeId: null,
+        guardiansContacted: null,
+        classOfService: null,
+        descriptionOfService: null,
+        patientSummaryFromScreening: null,
+        remarksAtBooth: null,
+      });
+    });
+
+    it("rejects a referral that does not exist", async () => {
+      // When - the booth section of a missing referral is saved
+      const update = caller.referralRouter.updateBooth({
+        id: -1,
+        referredToId: null,
+        memberInChargeId: null,
+        guardiansContacted: null,
+        classOfService: null,
       });
       // Then - it fails with NOT_FOUND instead of silently succeeding
       await expect(update).rejects.toMatchObject({ code: "NOT_FOUND" });
