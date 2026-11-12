@@ -4,7 +4,7 @@
 // instance configured in .env so FK constraints and returning() clauses are
 // exercised for real.
 // Prereqs: `supabase start` (or `pnpm seed:db`) so migrations are applied,
-//          and at least one auth.users row (`pnpm seed:users`).
+//          and at least one login linked to public.users (`pnpm seed:users`).
 import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
 import { eq } from "drizzle-orm";
 import { appRouter } from "@/server/routers/_app";
@@ -17,8 +17,8 @@ import {
   visits,
   patients,
   villageCodes,
-  authUsers,
 } from "@/db/schema";
+import { getLinkedTestUser } from "./testUsers";
 
 const SEED_PATIENT = {
   name: "Referral Test Patient",
@@ -31,29 +31,22 @@ const SEED_PATIENT = {
   patientImagePublicId: "test/placeholder",
 } as const;
 
-function callerFor(userId: string) {
-  return appRouter.createCaller({ user: { id: userId } } as unknown as Context);
+function callerFor(authUserId: string) {
+  return appRouter.createCaller({
+    user: { id: authUserId },
+  } as unknown as Context);
 }
 
 describe("consultsRouter (integration)", () => {
   let userId: string;
+  let authUserId: string;
   let villageCodeId: number;
   let patientId: number;
   let visitId: number;
   let caller: ReturnType<typeof callerFor>;
 
   beforeAll(async () => {
-    const [user] = await db
-      .select({ id: authUsers.id })
-      .from(authUsers)
-      .limit(1);
-    if (!user) {
-      throw new Error(
-        "No auth.users row found. Run `pnpm seed:all` against local Supabase " +
-          "before running the router integration tests.",
-      );
-    }
-    userId = user.id;
+    ({ userId, authUserId } = await getLinkedTestUser());
 
     const [villageCode] = await db
       .select({ id: villageCodes.id })
@@ -77,7 +70,7 @@ describe("consultsRouter (integration)", () => {
       .values({ patientId, villageCodeId })
       .returning({ id: visits.id });
 
-    caller = callerFor(userId);
+    caller = callerFor(authUserId);
   });
 
   afterEach(async () => {
