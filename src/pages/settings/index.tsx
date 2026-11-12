@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MdOutlineLocationOn } from "react-icons/md";
+import { MdOutlineHandshake, MdOutlineLocationOn } from "react-icons/md";
 import PageHeader from "@/components/PageHeader";
 import { paths } from "@/utils/paths";
 
@@ -9,6 +9,12 @@ const settingsItems = [
     href: paths.settingsVillageCodes(),
     icon: MdOutlineLocationOn,
     description: "Manage village codes.",
+  },
+  {
+    name: "Referral Partners",
+    href: paths.settingsReferralPartners(),
+    icon: MdOutlineHandshake,
+    description: "Manage referral partners.",
   },
 ];
 
