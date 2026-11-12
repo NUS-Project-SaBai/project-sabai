@@ -86,4 +86,10 @@ describe("calculateAge", () => {
     vi.setSystemTime(new Date(2024, 5, 15)); // June 15, 2024
     expect(calculateAge(new Date(1990, 11, 31))).toBe(33); // December 31, 1990
   });
+
+  it("measures the age on the given date instead of today", () => {
+    vi.setSystemTime(new Date(2024, 5, 15)); // June 15, 2024
+    // Turned 18 on Jan 1, 2024, but was still 17 at a Dec 2023 referral
+    expect(calculateAge(new Date(2006, 0, 1), new Date(2023, 11, 20))).toBe(17);
+  });
 });
