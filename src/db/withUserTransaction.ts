@@ -12,8 +12,11 @@ export type Tx = PgTransaction<
 >;
 
 /**
- * Executes a Drizzle transaction with the user's Supabase ID attached.
- * This populates Supabase's `auth.uid()` inside Postgres triggers.
+ * Executes a Drizzle transaction attributed to a user.
+ * Sets `app.current_user_id` for the transaction, which `get_current_user_id()`
+ * reads inside Postgres triggers (e.g. the medication stock audit log).
+ *
+ * @param userId The public.users id (`ctx.appUser.id`), NOT the Supabase auth user id.
  */
 export async function withUserTransaction<T>(
   userId: string,
@@ -21,7 +24,7 @@ export async function withUserTransaction<T>(
 ): Promise<T> {
   return await db.transaction(async (tx) => {
     await tx.execute(
-      sql`SELECT set_config('request.jwt.claims', ${JSON.stringify({ sub: userId })}, true)`,
+      sql`SELECT set_config('app.current_user_id', ${userId}, true)`,
     );
 
     return await callback(tx);
