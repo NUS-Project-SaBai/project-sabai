@@ -1,5 +1,6 @@
 import { ReactNode, useId, useState } from "react";
 import { HiChevronDown } from "react-icons/hi2";
+import { clsx } from "clsx";
 
 /**
  * One collapsible section of an accordion. Sections open and close
@@ -31,14 +32,20 @@ export function AccordionSection({
           aria-expanded={isOpen}
           aria-controls={panelId}
           onClick={() => setIsOpen((open) => !open)}
-          className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left text-base font-semibold text-slate-900 transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-400"
+          className={clsx(
+            "flex w-full items-center justify-between gap-4 border-l-4 px-5 py-4 text-left text-lg font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-400",
+            isOpen
+              ? "border-indigo-500 bg-indigo-50 text-indigo-900 hover:bg-indigo-100"
+              : "border-transparent bg-slate-100 text-slate-900 hover:bg-slate-200",
+          )}
         >
           {title}
           <HiChevronDown
             aria-hidden="true"
-            className={`h-5 w-5 shrink-0 text-slate-500 transition-transform ${
-              isOpen ? "rotate-180" : ""
-            }`}
+            className={clsx(
+              "h-5 w-5 shrink-0 transition-transform",
+              isOpen ? "rotate-180 text-indigo-700" : "text-slate-600",
+            )}
           />
         </button>
       </h2>
@@ -47,7 +54,7 @@ export function AccordionSection({
         role="region"
         aria-labelledby={buttonId}
         hidden={!isOpen}
-        className="border-t border-slate-100 px-6 pb-6"
+        className="border-t border-slate-200 bg-white px-6 pb-6"
       >
         {children}
       </div>
