@@ -16,6 +16,8 @@ export const broadcastSeverityEnum = pgEnum("broadcast_severity", [
 
 export const broadcastSeverityValues = broadcastSeverityEnum.enumValues;
 
+export const BROADCAST_TITLE_MAX_LENGTH = 255;
+
 /*
 Broadcasts Table:
 - id: Primary key, auto-incrementing integer.
@@ -31,7 +33,7 @@ Broadcasts Table:
 */
 export const broadcasts = pgTable("broadcasts", {
   id: serial("id").primaryKey(),
-  title: varchar("title", { length: 255 }).notNull(),
+  title: varchar("title", { length: BROADCAST_TITLE_MAX_LENGTH }).notNull(),
   body: text("body").notNull(),
   severity: broadcastSeverityEnum("severity").default("info").notNull(),
   createdBy: varchar("created_by", { length: 255 }),
