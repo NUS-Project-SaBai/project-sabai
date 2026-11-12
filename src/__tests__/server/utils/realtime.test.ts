@@ -61,6 +61,7 @@ describe("publishBroadcast", () => {
             },
           ],
         }),
+        signal: expect.any(AbortSignal),
       },
     );
   });
