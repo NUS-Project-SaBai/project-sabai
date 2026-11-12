@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { appRouter } from "@/server/routers/_app";
 import { db } from "@/db/drizzle";
 import type { Context } from "@/server/context";
+import { getLinkedTestUser } from "./testUsers";
 import { vitals, visits, patients, villageCodes } from "@/db/schema";
 
 const SEED_PATIENT = {
@@ -39,10 +40,8 @@ const BLANK_NUMBERS = {
   hba1c: null,
 };
 
-// protectedProcedure only checks ctx.user, so a placeholder id is enough.
-const caller = appRouter.createCaller({
-  user: { id: "vitals-router-test-user" },
-} as unknown as Context);
+// protectedProcedure requires a login linked to public.users; set up in beforeAll.
+let caller: ReturnType<typeof appRouter.createCaller>;
 
 describe("vitalsRouter (integration)", () => {
   let villageCodeId: number;
@@ -50,6 +49,11 @@ describe("vitalsRouter (integration)", () => {
   let visitId: number;
 
   beforeAll(async () => {
+    const { authUserId } = await getLinkedTestUser();
+    caller = appRouter.createCaller({
+      user: { id: authUserId },
+    } as unknown as Context);
+
     [{ id: villageCodeId }] = await db
       .insert(villageCodes)
       .values(VILLAGE_CODE)
