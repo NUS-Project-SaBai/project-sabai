@@ -5,29 +5,17 @@ import toast from "react-hot-toast";
 import { HiOutlineEye } from "react-icons/hi2";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 import PageHeader from "@/components/PageHeader";
-import { PatientPhoto } from "@/components/PatientPhoto";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Button } from "@/components/interactive/Button/Button";
+import { AccordionSection } from "@/components/interactive/Accordion";
+import { DetailRow } from "@/components/referrals/DetailRow";
+import { ReferralOverviewSection } from "@/components/referrals/ReferralOverviewSection";
 import { ReferralStateDropdown } from "@/components/referrals/ReferralStateDropdown";
+import ReferralsLayout from "@/components/referrals/ReferralsLayout";
 import { formatPatientCode } from "@/lib/utils/patient";
 import { formatVisitDate } from "@/lib/utils/visit";
 import { trpc } from "@/utils/trpc";
 import { paths } from "@/utils/paths";
-
-function DetailRow({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="grid grid-cols-1 gap-1 py-4 sm:grid-cols-[12rem_1fr] sm:gap-4">
-      <dt className="text-sm font-medium text-slate-500">{label}</dt>
-      <dd className="text-sm text-slate-900">{children}</dd>
-    </div>
-  );
-}
 
 function ReferralDetailsPage() {
   const router = useRouter();
@@ -97,30 +85,16 @@ function ReferralDetailsPage() {
           { label: "Referral Details" },
         ]}
         title="Referral Details"
-        description={`${referral.patientName} (${patientCode})`}
+        description={"Viewing Referral Details"}
       />
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex items-center gap-4 border-b border-slate-100 p-6">
-          <PatientPhoto
-            pictureUrl={referral.patientImageUrl}
-            className="h-20 w-20 rounded-lg border border-slate-200 object-cover"
-          />
-          <div>
-            <p className="text-lg font-semibold text-slate-900">
-              {referral.patientName}
-            </p>
-            <p className="inline-flex items-center gap-2 text-sm text-slate-600">
-              <span
-                className="h-3 w-3 rounded-full"
-                style={{ backgroundColor: referral.villageColorHex }}
-                title={referral.villageCode}
-              />
-              {patientCode}
-            </p>
-          </div>
-        </div>
+      <div className="mb-4 divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <AccordionSection title="Patient Details" defaultOpen>
+          <ReferralOverviewSection referral={{ ...referral, patientCode }} />
+        </AccordionSection>
+      </div>
 
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         <dl className="divide-y divide-slate-100 px-6">
           <DetailRow label="Referral Status">
             <div className="max-w-xs">
@@ -132,10 +106,6 @@ function ReferralDetailsPage() {
           </DetailRow>
           <DetailRow label="Referral Date">
             {formatVisitDate(referral.createdAt)}
-          </DetailRow>
-          <DetailRow label="Referred For">{referral.referredFor}</DetailRow>
-          <DetailRow label="Referral Notes">
-            {referral.referralNotes || "No notes entered"}
           </DetailRow>
           <DetailRow label="Referral Outcome">
             {isEditing ? (
@@ -202,6 +172,7 @@ function ReferralDetailsPage() {
   );
 }
 
-ReferralDetailsPage.getLayout = (page: ReactNode) => withDefaultLayout(page);
+ReferralDetailsPage.getLayout = (page: ReactNode) =>
+  withDefaultLayout(<ReferralsLayout>{page}</ReferralsLayout>);
 
 export default ReferralDetailsPage;
