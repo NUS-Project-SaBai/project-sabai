@@ -23,6 +23,7 @@ const mockTrpc = vi.hoisted(() => ({
     updateState: { useMutation: vi.fn() },
     updateOutcome: { useMutation: vi.fn() },
     updateBooth: { useMutation: vi.fn() },
+    updateParty: { useMutation: vi.fn() },
   },
   referralPartnersRouter: {
     list: { useQuery: vi.fn(() => ({ data: [] })) },
@@ -65,6 +66,11 @@ const MOCK_REFERRAL = {
   descriptionOfService: null,
   patientSummaryFromScreening: null,
   remarksAtBooth: null,
+  memberOnRunId: null,
+  presentAtReferralParty: false,
+  referralPartyResults: null,
+  followUp: false,
+  doctorsUpdated: false,
 };
 
 function mockReferral(referral: Record<string, unknown> | null) {
@@ -100,6 +106,10 @@ describe("ReferralDetailsPage", () => {
       isPending: false,
     });
     mockTrpc.referralRouter.updateBooth.useMutation.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    });
+    mockTrpc.referralRouter.updateParty.useMutation.mockReturnValue({
       mutate: vi.fn(),
       isPending: false,
     });
@@ -179,6 +189,15 @@ describe("ReferralDetailsPage", () => {
     // Then - the booth section is there but starts collapsed
     expect(
       screen.getByRole("button", { name: "Referral Booth" }),
+    ).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("shows the referral party section collapsed below the booth", () => {
+    // Given - a referral is opened
+    render(<ReferralDetailsPage />);
+    // Then - the party section is there but starts collapsed
+    expect(
+      screen.getByRole("button", { name: "Referral Party" }),
     ).toHaveAttribute("aria-expanded", "false");
   });
 
