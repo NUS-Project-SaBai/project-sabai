@@ -35,3 +35,24 @@ export const updateReferralPartyInput = z.object({
 });
 
 export type UpdateReferralPartyInput = z.input<typeof updateReferralPartyInput>;
+
+// numeric(10, 2): up to 8 digits before the point and 2 after.
+export const USD_AMOUNT_PATTERN = /^\d{1,8}(\.\d{1,2})?$/;
+// Riels have no subunit, and the column is a Postgres integer.
+export const MAX_RIELS = 2_147_483_647;
+
+// Money section: how much was paid and who paid it. Every field is sent on
+// save, and null clears it.
+export const updateReferralMoneyInput = z.object({
+  id: z.number().int(),
+  // String, not number, so the amount reaches the numeric column exactly.
+  amountPaidUsd: z
+    .string()
+    .trim()
+    .regex(USD_AMOUNT_PATTERN, "Enter a USD amount with up to 2 decimals")
+    .nullable(),
+  amountPaidRiels: z.number().int().min(0).max(MAX_RIELS).nullable(),
+  memberWhoPaidId: z.uuid().nullable(),
+});
+
+export type UpdateReferralMoneyInput = z.input<typeof updateReferralMoneyInput>;
