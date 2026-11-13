@@ -23,3 +23,15 @@ export const updateReferralBoothInput = z.object({
 });
 
 export type UpdateReferralBoothInput = z.input<typeof updateReferralBoothInput>;
+
+// Fields filled in at the referral party. Every field is sent on save.
+export const updateReferralPartyInput = z.object({
+  id: z.number().int(),
+  memberOnRunId: z.uuid().nullable(),
+  presentAtReferralParty: z.boolean(),
+  referralPartyResults: optionalText,
+  followUp: z.boolean(),
+  doctorsUpdated: z.boolean(),
+});
+
+export type UpdateReferralPartyInput = z.input<typeof updateReferralPartyInput>;
