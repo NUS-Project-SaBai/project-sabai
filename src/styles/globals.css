@@ -117,7 +117,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial, Helvetica, var(--font-khmer, sans-serif), sans-serif;
 }
 
 input,
