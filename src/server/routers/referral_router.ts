@@ -12,7 +12,10 @@ import {
 import { eq, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { getPatientWithImageUrl } from "@/server/utils/cloudinary";
-import { updateReferralBoothInput } from "@/server/schemas/referrals";
+import {
+  updateReferralBoothInput,
+  updateReferralPartyInput,
+} from "@/server/schemas/referrals";
 
 const referralStateSchema = z.enum(referralStateEnum.enumValues);
 
@@ -37,6 +40,12 @@ const enrichedReferralQuery = () =>
       descriptionOfService: referrals.descriptionOfService,
       patientSummaryFromScreening: referrals.patientSummaryFromScreening,
       remarksAtBooth: referrals.remarksAtBooth,
+      // Referral party section
+      memberOnRunId: referrals.memberOnRunId,
+      presentAtReferralParty: referrals.presentAtReferralParty,
+      referralPartyResults: referrals.referralPartyResults,
+      followUp: referrals.followUp,
+      doctorsUpdated: referrals.doctorsUpdated,
       consultDate: consults.date,
       doctorId: consults.doctorId,
       patientId: patients.id,
@@ -177,6 +186,27 @@ export const referralRouter = router({
       const [result] = await db
         .update(referrals)
         .set(boothData)
+        .where(eq(referrals.id, id))
+        .returning();
+
+      if (!result) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Referral not found",
+        });
+      }
+      return result;
+    }),
+
+  // Update only the referral party fields, so saving the party section can
+  // never overwrite other sections that changed since the caller loaded it
+  updateParty: protectedProcedure
+    .input(updateReferralPartyInput)
+    .mutation(async ({ input }) => {
+      const { id, ...partyData } = input;
+      const [result] = await db
+        .update(referrals)
+        .set(partyData)
         .where(eq(referrals.id, id))
         .returning();
 
