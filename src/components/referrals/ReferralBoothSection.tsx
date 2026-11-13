@@ -1,7 +1,6 @@
 import { useId } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { clsx } from "clsx";
 import {
   DropdownOption,
   RHFDropdown,
@@ -9,6 +8,11 @@ import {
 import { RHFTextArea } from "@/components/interactive/RHF/RHFTextArea";
 import { Button } from "@/components/interactive/Button/Button";
 import { Tooltip } from "@/components/interactive/Tooltip";
+import { FormCheckbox } from "@/components/referrals/FormCheckbox";
+import {
+  NOT_SELECTED,
+  usePnMemberOptions,
+} from "@/components/referrals/referralFormOptions";
 import type { GuardiansContacted } from "@/lib/constants/referralGuardiansContacted";
 import {
   REFERRAL_SERVICE_CLASSES,
@@ -19,7 +23,6 @@ import { calculateAge } from "@/lib/utils/patient";
 import { trpc } from "@/utils/trpc";
 
 const ADULT_AGE = 18;
-const PN_TEAM = "PN";
 
 export const GUARDIANS_NOT_APPLICABLE_TOOLTIP =
   "Not applicable as the patient is an adult.";
@@ -47,9 +50,6 @@ type BoothFormValues = {
   remarksAtBooth: string;
 };
 
-// Lets a dropdown be cleared back to "nothing chosen" (saved as null).
-const NOT_SELECTED: DropdownOption = { label: "Not selected", value: "" };
-
 /**
  * Referral booth section of the referral details accordion: where the patient
  * is referred to and what for, who at the booth is in charge, and notes taken
@@ -68,7 +68,7 @@ export function ReferralBoothSection({
     calculateAge(referral.patientDateOfBirth, referral.createdAt) >= ADULT_AGE;
 
   const { data: partners } = trpc.referralPartnersRouter.list.useQuery();
-  const { data: users } = trpc.usersRouter.list.useQuery();
+  const pnMemberOptions = usePnMemberOptions(referral.memberInChargeId);
 
   const utils = trpc.useUtils();
   const updateBooth = trpc.referralRouter.updateBooth.useMutation({
@@ -111,18 +111,6 @@ export function ReferralBoothSection({
     })),
   ];
 
-  // Same idea for members: PN team only, plus whoever is already saved.
-  const pnMemberOptions: DropdownOption[] = [
-    NOT_SELECTED,
-    ...(users ?? [])
-      .filter(
-        (u) =>
-          u.team?.trim().toUpperCase() === PN_TEAM ||
-          u.id === referral.memberInChargeId,
-      )
-      .map((u) => ({ label: u.name, value: u.id })),
-  ];
-
   const onSubmit = (data: BoothFormValues) => {
     const guardiansContacted: GuardiansContacted = isAdult
       ? "NotApplicable"
@@ -143,23 +131,12 @@ export function ReferralBoothSection({
   };
 
   const guardiansCheckbox = (
-    <label
-      htmlFor="guardiansContacted"
-      className={clsx(
-        "inline-flex items-center gap-3 text-sm font-medium",
-        isAdult ? "cursor-not-allowed text-slate-400" : "cursor-pointer",
-      )}
-    >
-      <input
-        id="guardiansContacted"
-        type="checkbox"
-        disabled={isAdult}
-        aria-describedby={isAdult ? guardiansTooltipId : undefined}
-        className="h-4 w-4 cursor-pointer rounded border-gray-300 accent-blue-500 focus:ring-2 focus:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
-        {...methods.register("guardiansContacted")}
-      />
-      Guardians contacted
-    </label>
+    <FormCheckbox
+      name="guardiansContacted"
+      label="Guardians contacted"
+      disabled={isAdult}
+      describedBy={isAdult ? guardiansTooltipId : undefined}
+    />
   );
 
   return (
