@@ -35,11 +35,11 @@ export default function ChangeModal({
   const currentValues = isEditing
     ? activeForm
     : {
-      name: formData.name,
-      code: formData.code,
-      colorHex: formData.colorHex,
-      isVisible: formData.isVisible,
-    };
+        name: formData.name,
+        code: formData.code,
+        colorHex: formData.colorHex,
+        isVisible: formData.isVisible,
+      };
 
   const form = useForm<FormFields>({
     values: currentValues,
@@ -123,9 +123,7 @@ export default function ChangeModal({
         id: activeForm!.id!, // Non-null assertion operator because handleEdit only gets called by handleSubmit which already does the check
       });
     } else {
-      toast.error("Fields not changed!", 
-        {toasterId: "modal"}
-      );
+      toast.error("Fields not changed!", { toasterId: "modal" });
     }
   };
 

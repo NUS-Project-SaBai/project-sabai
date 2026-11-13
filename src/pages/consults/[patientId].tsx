@@ -67,7 +67,7 @@ function ConsultsPage() {
 
   return (
     <div className="min-h-screen flex-1 bg-slate-50 p-8">
-      <div className="mx-auto w-full max-w-7xl">
+      <div className="w-full max-w-7xl">
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },

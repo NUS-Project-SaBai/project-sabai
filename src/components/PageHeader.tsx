@@ -16,9 +16,9 @@ export default function PageHeader({
 }: PageHeaderProps) {
   return (
     <div className="w-full mx-auto">
+      <Breadcrumbs items={breadcrumbs} />
       <div className="flex justify-between items-center mb-8">
         <div>
-          <Breadcrumbs items={breadcrumbs} />
           <h1 className="text-3xl font-bold text-slate-900">{title}</h1>
           <p className="mt-2 text-slate-600">{description}</p>
         </div>

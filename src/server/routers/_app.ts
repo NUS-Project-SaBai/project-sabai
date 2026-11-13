@@ -14,6 +14,7 @@ import { pubertyRouter } from "./puberty_router";
 import { consultsRouter } from "./consults_router";
 import { referralRouter } from "./referral_router";
 import { filesRouter } from "./files_router";
+import { broadcastsRouter } from "./broadcasts_router";
 
 export const appRouter = router({
   healthcheck: publicProcedure.query(() => "yay!"),
@@ -30,6 +31,7 @@ export const appRouter = router({
   consultsRouter: consultsRouter,
   referralRouter: referralRouter,
   filesRouter: filesRouter,
+  broadcastsRouter: broadcastsRouter,
 });
 
 export const createCaller = createCallerFactory(appRouter);
