@@ -426,4 +426,112 @@ describe("referralRouter (integration)", () => {
       await expect(update).rejects.toMatchObject({ code: "NOT_FOUND" });
     });
   });
+
+  describe("updateParty()", () => {
+    it("defaults the party checkboxes to false on a new referral", async () => {
+      // When - a referral is created
+      const created = await caller.referralRouter.create({
+        consultId,
+        referredFor: "Ortho",
+      });
+      // Then - nothing is ticked yet
+      expect(created).toMatchObject({
+        presentAtReferralParty: false,
+        followUp: false,
+        doctorsUpdated: false,
+      });
+    });
+
+    it("saves the party fields without touching other sections", async () => {
+      // Given - a referral with booth details saved
+      const created = await caller.referralRouter.create({
+        consultId,
+        referredFor: "Ortho",
+      });
+      await caller.referralRouter.updateBooth({
+        id: created.id,
+        referredToId: null,
+        memberInChargeId: userId,
+        guardiansContacted: "Yes",
+        classOfService: "DefinitiveTreatment",
+        remarksAtBooth: "Booth remark",
+      });
+      // When - the party section is saved
+      const updated = await caller.referralRouter.updateParty({
+        id: created.id,
+        memberOnRunId: userId,
+        presentAtReferralParty: true,
+        referralPartyResults: "  Seen by surgeon  ",
+        followUp: true,
+        doctorsUpdated: true,
+      });
+      // Then - the party fields are saved (trimmed) and the booth is unchanged
+      expect(updated).toMatchObject({
+        memberOnRunId: userId,
+        presentAtReferralParty: true,
+        referralPartyResults: "Seen by surgeon",
+        followUp: true,
+        doctorsUpdated: true,
+        memberInChargeId: userId,
+        guardiansContacted: "Yes",
+        classOfService: "DefinitiveTreatment",
+        remarksAtBooth: "Booth remark",
+      });
+      // And - getById returns them for the party form
+      const found = await caller.referralRouter.getById({ id: created.id });
+      expect(found).toMatchObject({
+        memberOnRunId: userId,
+        presentAtReferralParty: true,
+        referralPartyResults: "Seen by surgeon",
+        followUp: true,
+        doctorsUpdated: true,
+      });
+    });
+
+    it("clears the member and blank results", async () => {
+      // Given - a referral with party details saved
+      const created = await caller.referralRouter.create({
+        consultId,
+        referredFor: "Ortho",
+      });
+      await caller.referralRouter.updateParty({
+        id: created.id,
+        memberOnRunId: userId,
+        presentAtReferralParty: true,
+        referralPartyResults: "Seen",
+        followUp: true,
+        doctorsUpdated: true,
+      });
+      // When - it is saved again cleared
+      const updated = await caller.referralRouter.updateParty({
+        id: created.id,
+        memberOnRunId: null,
+        presentAtReferralParty: false,
+        referralPartyResults: "   ",
+        followUp: false,
+        doctorsUpdated: false,
+      });
+      // Then - the member and results are null and the checkboxes false
+      expect(updated).toMatchObject({
+        memberOnRunId: null,
+        presentAtReferralParty: false,
+        referralPartyResults: null,
+        followUp: false,
+        doctorsUpdated: false,
+      });
+    });
+
+    it("rejects a referral that does not exist", async () => {
+      // When - the party section of a missing referral is saved
+      const update = caller.referralRouter.updateParty({
+        id: -1,
+        memberOnRunId: null,
+        presentAtReferralParty: false,
+        followUp: false,
+        doctorsUpdated: false,
+      });
+      // Then - it fails with NOT_FOUND instead of silently succeeding
+      await expect(update).rejects.toMatchObject({ code: "NOT_FOUND" });
+    });
+  });
 });
