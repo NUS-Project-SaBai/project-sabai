@@ -11,6 +11,7 @@ import { AccordionSection } from "@/components/interactive/Accordion";
 import { DetailRow } from "@/components/referrals/DetailRow";
 import { ReferralOverviewSection } from "@/components/referrals/ReferralOverviewSection";
 import { ReferralBoothSection } from "@/components/referrals/ReferralBoothSection";
+import { ReferralPartySection } from "@/components/referrals/ReferralPartySection";
 import { ReferralStateDropdown } from "@/components/referrals/ReferralStateDropdown";
 import ReferralsLayout from "@/components/referrals/ReferralsLayout";
 import { formatPatientCode } from "@/lib/utils/patient";
@@ -89,12 +90,15 @@ function ReferralDetailsPage() {
         description={"Viewing Referral Details"}
       />
 
-      <div className="mb-4 divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="mb-4 divide-y divide-slate-300 overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm">
         <AccordionSection title="Patient Details" defaultOpen>
           <ReferralOverviewSection referral={{ ...referral, patientCode }} />
         </AccordionSection>
         <AccordionSection title="Referral Booth">
           <ReferralBoothSection key={referral.id} referral={referral} />
+        </AccordionSection>
+        <AccordionSection title="Referral Party">
+          <ReferralPartySection key={referral.id} referral={referral} />
         </AccordionSection>
       </div>
 
