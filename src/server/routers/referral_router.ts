@@ -15,6 +15,7 @@ import { getPatientWithImageUrl } from "@/server/utils/cloudinary";
 import {
   updateReferralBoothInput,
   updateReferralPartyInput,
+  updateReferralMoneyInput,
 } from "@/server/schemas/referrals";
 
 const referralStateSchema = z.enum(referralStateEnum.enumValues);
@@ -46,6 +47,10 @@ const enrichedReferralQuery = () =>
       referralPartyResults: referrals.referralPartyResults,
       followUp: referrals.followUp,
       doctorsUpdated: referrals.doctorsUpdated,
+      // Money section
+      amountPaidUsd: referrals.amountPaidUsd,
+      amountPaidRiels: referrals.amountPaidRiels,
+      memberWhoPaidId: referrals.memberWhoPaidId,
       consultDate: consults.date,
       doctorId: consults.doctorId,
       patientId: patients.id,
@@ -207,6 +212,27 @@ export const referralRouter = router({
       const [result] = await db
         .update(referrals)
         .set(partyData)
+        .where(eq(referrals.id, id))
+        .returning();
+
+      if (!result) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Referral not found",
+        });
+      }
+      return result;
+    }),
+
+  // Update only the money fields, so saving the money section can never
+  // overwrite other sections that changed since the caller loaded it
+  updateMoney: protectedProcedure
+    .input(updateReferralMoneyInput)
+    .mutation(async ({ input }) => {
+      const { id, ...moneyData } = input;
+      const [result] = await db
+        .update(referrals)
+        .set(moneyData)
         .where(eq(referrals.id, id))
         .returning();
 
