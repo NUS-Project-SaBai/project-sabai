@@ -24,6 +24,7 @@ const mockTrpc = vi.hoisted(() => ({
     updateOutcome: { useMutation: vi.fn() },
     updateBooth: { useMutation: vi.fn() },
     updateParty: { useMutation: vi.fn() },
+    updateMoney: { useMutation: vi.fn() },
   },
   referralPartnersRouter: {
     list: { useQuery: vi.fn(() => ({ data: [] })) },
@@ -71,6 +72,9 @@ const MOCK_REFERRAL = {
   referralPartyResults: null,
   followUp: false,
   doctorsUpdated: false,
+  amountPaidUsd: null,
+  amountPaidRiels: null,
+  memberWhoPaidId: null,
 };
 
 function mockReferral(referral: Record<string, unknown> | null) {
@@ -110,6 +114,10 @@ describe("ReferralDetailsPage", () => {
       isPending: false,
     });
     mockTrpc.referralRouter.updateParty.useMutation.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    });
+    mockTrpc.referralRouter.updateMoney.useMutation.mockReturnValue({
       mutate: vi.fn(),
       isPending: false,
     });
@@ -199,6 +207,16 @@ describe("ReferralDetailsPage", () => {
     expect(
       screen.getByRole("button", { name: "Referral Party" }),
     ).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("shows the money section collapsed below the referral party", () => {
+    // Given - a referral is opened
+    render(<ReferralDetailsPage />);
+    // Then - the money section is there but starts collapsed
+    expect(screen.getByRole("button", { name: "Money" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
   });
 
   it("shows a not found message when the referral does not exist", () => {
