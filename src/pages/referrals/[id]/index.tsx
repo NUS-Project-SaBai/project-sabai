@@ -12,6 +12,7 @@ import { DetailRow } from "@/components/referrals/DetailRow";
 import { ReferralOverviewSection } from "@/components/referrals/ReferralOverviewSection";
 import { ReferralBoothSection } from "@/components/referrals/ReferralBoothSection";
 import { ReferralPartySection } from "@/components/referrals/ReferralPartySection";
+import { ReferralMoneySection } from "@/components/referrals/ReferralMoneySection";
 import { ReferralStateDropdown } from "@/components/referrals/ReferralStateDropdown";
 import ReferralsLayout from "@/components/referrals/ReferralsLayout";
 import { formatPatientCode } from "@/lib/utils/patient";
@@ -99,6 +100,9 @@ function ReferralDetailsPage() {
         </AccordionSection>
         <AccordionSection title="Referral Party">
           <ReferralPartySection key={referral.id} referral={referral} />
+        </AccordionSection>
+        <AccordionSection title="Money">
+          <ReferralMoneySection key={referral.id} referral={referral} />
         </AccordionSection>
       </div>
 
