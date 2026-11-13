@@ -534,4 +534,124 @@ describe("referralRouter (integration)", () => {
       await expect(update).rejects.toMatchObject({ code: "NOT_FOUND" });
     });
   });
+
+  describe("updateMoney()", () => {
+    it("saves the amounts exactly without touching other sections", async () => {
+      // Given - a referral with party details saved
+      const created = await caller.referralRouter.create({
+        consultId,
+        referredFor: "Ortho",
+      });
+      await caller.referralRouter.updateParty({
+        id: created.id,
+        memberOnRunId: userId,
+        presentAtReferralParty: true,
+        referralPartyResults: "Seen",
+        followUp: true,
+        doctorsUpdated: false,
+      });
+      // When - the money section is saved
+      const updated = await caller.referralRouter.updateMoney({
+        id: created.id,
+        amountPaidUsd: "0.30",
+        amountPaidRiels: 40000,
+        memberWhoPaidId: userId,
+      });
+      // Then - the amounts are stored exactly and the party is unchanged
+      expect(updated).toMatchObject({
+        amountPaidUsd: "0.30",
+        amountPaidRiels: 40000,
+        memberWhoPaidId: userId,
+        memberOnRunId: userId,
+        presentAtReferralParty: true,
+        referralPartyResults: "Seen",
+        followUp: true,
+      });
+      // And - getById returns them for the money form
+      const found = await caller.referralRouter.getById({ id: created.id });
+      expect(found).toMatchObject({
+        amountPaidUsd: "0.30",
+        amountPaidRiels: 40000,
+        memberWhoPaidId: userId,
+      });
+    });
+
+    it("pads whole USD amounts to 2 decimals", async () => {
+      // Given - a referral
+      const created = await caller.referralRouter.create({
+        consultId,
+        referredFor: "Ortho",
+      });
+      // When - a whole USD amount is saved
+      const updated = await caller.referralRouter.updateMoney({
+        id: created.id,
+        amountPaidUsd: "15",
+        amountPaidRiels: null,
+        memberWhoPaidId: null,
+      });
+      // Then - it comes back from numeric(10, 2) with 2 decimals
+      expect(updated.amountPaidUsd).toBe("15.00");
+    });
+
+    it("clears every money field sent as null", async () => {
+      // Given - a referral with a payment saved
+      const created = await caller.referralRouter.create({
+        consultId,
+        referredFor: "Ortho",
+      });
+      await caller.referralRouter.updateMoney({
+        id: created.id,
+        amountPaidUsd: "12.50",
+        amountPaidRiels: 40000,
+        memberWhoPaidId: userId,
+      });
+      // When - it is saved again cleared
+      const updated = await caller.referralRouter.updateMoney({
+        id: created.id,
+        amountPaidUsd: null,
+        amountPaidRiels: null,
+        memberWhoPaidId: null,
+      });
+      // Then - every money field is null
+      expect(updated).toMatchObject({
+        amountPaidUsd: null,
+        amountPaidRiels: null,
+        memberWhoPaidId: null,
+      });
+    });
+
+    it.each([
+      ["a USD amount with 3 decimals", { amountPaidUsd: "12.345" }],
+      ["a negative USD amount", { amountPaidUsd: "-5" }],
+      [
+        "a USD amount too large for numeric(10, 2)",
+        { amountPaidUsd: "123456789" },
+      ],
+      ["a fractional riels amount", { amountPaidRiels: 100.5 }],
+      ["a negative riels amount", { amountPaidRiels: -1 }],
+    ])("rejects %s", async (_label, invalid) => {
+      // When - an invalid amount is saved
+      const update = caller.referralRouter.updateMoney({
+        id: -1,
+        amountPaidUsd: null,
+        amountPaidRiels: null,
+        memberWhoPaidId: null,
+        ...invalid,
+      });
+      // Then - input validation rejects it before the database
+      await expect(update).rejects.toMatchObject({ code: "BAD_REQUEST" });
+    });
+
+    it("rejects a referral that does not exist", async () => {
+      // When - the money section of a missing referral is saved
+      const update = caller.referralRouter.updateMoney({
+        id: -1,
+        amountPaidUsd: null,
+        amountPaidRiels: null,
+        memberWhoPaidId: null,
+      });
+      // Then - it fails with NOT_FOUND instead of silently succeeding
+      await expect(update).rejects.toMatchObject({ code: "NOT_FOUND" });
+    });
+  });
 });
