@@ -176,6 +176,20 @@
       "when": 1793885774233,
       "tag": "0024_dental_diagnosis",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1794464871330,
+      "tag": "0025_create_users",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1794464882444,
+      "tag": "0026_repoint_user_fks",
+      "breakpoints": true
     }
   ]
 }

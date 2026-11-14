@@ -3,7 +3,7 @@
 // Integration tests for the referral tRPC router. These run against the
 // Postgres instance configured in .env so the joins, enum handling, and FK
 // constraints are exercised for real
-// Prereqs: `supabase start` (or `pnpm seed:db`) so migrations are applied, and at least one auth.users row (`pnpm seed:users`).
+// Prereqs: `supabase start` (or `pnpm seed:db`) so migrations are applied, and at least one login linked to public.users (`pnpm seed:users`).
 //
 // Runs in the node environment (not jsdom) because src/lib/envVariables.ts
 // switches on `typeof window` and only exposes DATABASE_URL server-side.
@@ -19,8 +19,8 @@ import {
   visits,
   patients,
   villageCodes,
-  authUsers,
 } from "@/db/schema";
+import { getLinkedTestUser } from "./testUsers";
 
 // Fixture inserted into Postgres for the FK chain (not mocks).
 const SEED_PATIENT = {
@@ -50,12 +50,15 @@ const LATER_VILLAGE_CODE = {
 const EXPECTED_IMAGE_URL = `${serverEnv.CLOUDINARY_URL_PREFIX}/${SEED_PATIENT.patientImagePublicId}`;
 
 // protectedProcedure only reads ctx.user, so a minimal context is enough.
-function callerFor(userId: string) {
-  return appRouter.createCaller({ user: { id: userId } } as unknown as Context);
+function callerFor(authUserId: string) {
+  return appRouter.createCaller({
+    user: { id: authUserId },
+  } as unknown as Context);
 }
 
 describe("referralRouter (integration)", () => {
   let userId: string;
+  let authUserId: string;
   let villageCodeId: number;
   let patientId: number;
   let visitId: number;
@@ -63,18 +66,8 @@ describe("referralRouter (integration)", () => {
   let caller: ReturnType<typeof callerFor>;
 
   beforeAll(async () => {
-    // A consult FK-references auth.users; reuse an existing seeded user.
-    const [user] = await db
-      .select({ id: authUsers.id })
-      .from(authUsers)
-      .limit(1);
-    if (!user) {
-      throw new Error(
-        "No auth.users row found. Run `pnpm seed:all` against local Supabase " +
-          "before running the router integration tests.",
-      );
-    }
-    userId = user.id;
+    // A consult FK-references public.users; reuse an existing seeded user.
+    ({ userId, authUserId } = await getLinkedTestUser());
 
     [{ id: villageCodeId }] = await db
       .insert(villageCodes)
@@ -100,7 +93,7 @@ describe("referralRouter (integration)", () => {
       .values({ doctorId: userId, visitId })
       .returning({ id: consults.id });
 
-    caller = callerFor(userId);
+    caller = callerFor(authUserId);
   });
 
   // Each test creates its own referrals; wipe them so counts stay deterministic.

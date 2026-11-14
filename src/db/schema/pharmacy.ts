@@ -13,7 +13,7 @@ import {
 
 import { sql } from "drizzle-orm";
 
-import { authUsers } from "./auth";
+import { users } from "./users";
 
 import { consults } from "./consults";
 
@@ -132,7 +132,7 @@ export const stockChanges = pgTable("stock_changes", {
   newValue: varchar("new_value").notNull(),
   userId: uuid("user_id")
     .notNull()
-    .references(() => authUsers.id),
+    .references(() => users.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
