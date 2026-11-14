@@ -6,7 +6,8 @@ import { trpc, RouterOutput } from "@/utils/trpc";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { Button } from "@/components/interactive/Button/Button";
-import { toDateInputValue } from "@/lib/utils/patient";
+import { formatDate, parseDateInput, toDateInputValue } from "@/lib/utils/date";
+import { RHFDateInput } from "@/components/interactive/RHF/RHFDateInput";
 import { genderDropdown, type Gender } from "@/types/patient";
 
 type Patient = NonNullable<RouterOutput["patientsRouter"]["getById"]>;
@@ -43,9 +44,9 @@ export default function EditPatientForm({
       contactNo: patient.contactNo ?? "",
       gender: patient.gender,
       drugAllergy: patient.drugAllergy,
-      // <input type="date"> only accepts a yyyy-MM-dd value; patient.dateOfBirth
-      // arrives as a Date/ISO string, so convert it or the field renders blank.
-      dateOfBirth: toDateInputValue(patient.dateOfBirth),
+      dateOfBirth: toDateInputValue(patient.dateOfBirth)
+        ? formatDate(patient.dateOfBirth)
+        : "",
       hasPoorCard: patient.hasPoorCard,
       hasBS2Card: patient.hasBS2Card,
       hasSabaiCard: patient.hasSabaiCard,
@@ -68,6 +69,7 @@ export default function EditPatientForm({
       {
         id: patient.id,
         ...data,
+        dateOfBirth: parseDateInput(data.dateOfBirth)!,
         ...(isNewPhoto ? { patientImage: imageDetails! } : {}),
       },
       {
@@ -125,12 +127,7 @@ export default function EditPatientForm({
             type="text"
             isRequired
           />
-          <RHFInput
-            name="dateOfBirth"
-            label="Date of Birth"
-            type="date"
-            isRequired
-          />
+          <RHFDateInput name="dateOfBirth" label="Date of Birth" isRequired />
           <RHFInput
             name="hasPoorCard"
             label="Has POOR Card?"
