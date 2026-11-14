@@ -19,9 +19,7 @@ import { Button } from "@/components/interactive/Button/Button";
 import toast from "react-hot-toast";
 import { formatVisitDate } from "@/lib/utils/visit";
 import FormSection from "@/components/interactive/inputs/FormSection";
-import { useState } from "react";
-import Modal from "@/components/interactive/Modal";
-import EditPatientForm from "@/components/patient/EditPatientForm";
+import { EditPatientDetailsButton } from "@/components/patient/EditPatientDetailsButton";
 import { HeightWeightChart } from "@/components/vitals/HeightWeightChart";
 import clsx from "clsx";
 import type { Gender } from "@/types/patient";
@@ -53,7 +51,6 @@ export default function PatientVitalsPage() {
   const { id } = router.query;
   const methods = useForm();
   const { setValue } = methods;
-  const [isEditingPatient, setIsEditingPatient] = useState(false);
 
   // Fetch patient
   const { data: patient, isLoading: patientLoading } =
@@ -118,26 +115,9 @@ export default function PatientVitalsPage() {
           <h1 className="text-3xl font-bold text-slate-900">
             Patient Vitals — {patient.name}
           </h1>
-          <Button
-            title="Edit Patient Details"
-            colour="indigo"
-            onClick={() => setIsEditingPatient(true)}
-            className="shrink-0"
-          />
+          <EditPatientDetailsButton patientId={patient.id} />
         </div>
 
-        {isEditingPatient && (
-          <Modal
-            title="Edit Patient Details"
-            onClose={() => setIsEditingPatient(false)}
-            maxWidthClassName="max-w-2xl"
-          >
-            <EditPatientForm
-              patient={patient}
-              onSuccess={() => setIsEditingPatient(false)}
-            />
-          </Modal>
-        )}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-clip">
           <FormProvider {...methods}>
             <div className="p-6 border-b border-slate-100 bg-slate-50/50">
