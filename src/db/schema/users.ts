@@ -1,6 +1,17 @@
-import { pgTable, uuid, varchar, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  timestamp,
+  pgEnum,
+} from "drizzle-orm/pg-core";
 
 import { authUsers } from "./auth";
+
+import { teams } from "@/lib/constants/users";
+
+export const teamsEnum = pgEnum("users_team", teams);
 
 /*
 Users Table:
@@ -26,7 +37,7 @@ export const users = pgTable("users", {
     .references(() => authUsers.id, { onDelete: "set null" }),
   name: varchar("name", { length: 255 }).notNull(),
   year: varchar("year", { length: 255 }),
-  team: varchar("team", { length: 255 }),
+  team: teamsEnum("team"),
   role: varchar("role", { length: 255 }),
   remarks: text("remarks"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
