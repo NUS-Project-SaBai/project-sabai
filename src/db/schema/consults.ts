@@ -9,7 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { visits } from "./patients";
-import { authUsers } from "./auth";
+import { users } from "./users";
 /*
 Consults Table:
 - id: Primary key, auto-incrementing integer.
@@ -18,7 +18,7 @@ Consults Table:
 - consultation: Doctor's consultation notes.
 - treatmentPlan: Treatment plan.
 - remarks: Additional remarks.
-- doctorId: Foreign key referencing the Supabase auth user (doctor).
+- doctorId: Foreign key referencing the user (doctor).
 - visitId: Foreign key referencing the visit.
 */
 export const consults = pgTable("consults", {
@@ -30,11 +30,11 @@ export const consults = pgTable("consults", {
   remarks: text("remarks"),
   doctorId: uuid("doctor_id")
     .notNull()
-    .references(() => authUsers.id),
+    .references(() => users.id),
   visitId: integer("visit_id")
     .notNull()
     .references(() => visits.id),
-});
+}).enableRLS();
 
 export type Consult = typeof consults.$inferSelect;
 export type NewConsult = typeof consults.$inferInsert;
@@ -53,7 +53,7 @@ export const diagnosis = pgTable("diagnosis", {
   consultId: integer("consult_id")
     .notNull()
     .references(() => consults.id),
-});
+}).enableRLS();
 
 export type Diagnosis = typeof diagnosis.$inferSelect;
 export type NewDiagnosis = typeof diagnosis.$inferInsert;
