@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { useEffect } from "react";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
+import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/utils/trpc";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -70,7 +71,7 @@ function UpdateVisionPage() {
 
   return (
     <div className="min-h-screen flex-1 p-8 bg-slate-50">
-      <div className="w-full mx-auto max-w-5xl">
+      <div className="w-full max-w-5xl">
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },
@@ -144,6 +145,13 @@ function UpdateVisionPage() {
   );
 }
 
-UpdateVisionPage.getLayout = (page: React.ReactNode) => withDefaultLayout(page);
+UpdateVisionPage.getLayout = (page: React.ReactNode) =>
+  withDefaultLayout(
+    <PatientTopMenuLayout
+      getPatientLink={(id) => `/vision/update-vision/${id}`}
+    >
+      {page}
+    </PatientTopMenuLayout>,
+  );
 
 export default UpdateVisionPage;

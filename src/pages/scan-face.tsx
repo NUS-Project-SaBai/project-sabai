@@ -21,7 +21,7 @@ function ScanFacePage() {
       <Breadcrumbs
         items={[{ label: "Home", href: "/" }, { label: "Scan Face" }]}
       />
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl">
         <h1 className="text-3xl font-bold text-slate-900">Scan Face</h1>
         <div className="flex flex-col space-y-2">
           <WebcamInput

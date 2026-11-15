@@ -104,8 +104,8 @@ export default function PatientVitalsPage() {
     : null;
 
   return (
-    <div className="min-h-screen flex-1 p-4 bg-slate-50">
-      <div className="w-full mx-auto max-w-5xl has-[[data-growth-chart]]:max-w-7xl">
+    <div className="min-h-screen flex-1 p-8 bg-slate-50">
+      <div className="w-full max-w-5xl has-[[data-growth-chart]]:max-w-7xl">
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },

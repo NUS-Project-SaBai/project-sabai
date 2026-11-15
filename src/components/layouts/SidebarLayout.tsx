@@ -5,11 +5,12 @@ import { supabase } from "@/lib/supabaseClient";
 import { AiOutlineSetting, AiOutlineUser } from "react-icons/ai";
 import { BsEyeglasses } from "react-icons/bs";
 import { MdMonitorHeart } from "react-icons/md";
-import { FaStethoscope } from "react-icons/fa";
+import { FaStethoscope, FaTooth } from "react-icons/fa";
 import { PiSignOutFill } from "react-icons/pi";
 import { IoMdMenu } from "react-icons/io";
 import { LuScanFace } from "react-icons/lu";
-import { GiMedicines } from "react-icons/gi";
+import { GiMedicines, GiNotebook } from "react-icons/gi";
+import { HiOutlineArrowTrendingUp } from "react-icons/hi2";
 import LogoTitle from "@/components/LogoTitle";
 import { paths } from "@/utils/paths";
 import SabaiLogo from "@/components/SabaiLogo";
@@ -30,9 +31,9 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
     <div className="flex h-screen flex-col lg:flex-row">
       {/* mobile sidebar */}
       <div className="lg:hidden relative" ref={dropdownRef}>
-        <div className="grid grid-cols-3 w-full p-2 items-center bg-[var(--color-navbar)]">
+        <div className="grid grid-cols-[auto_1fr_auto] w-full items-center gap-2 p-2 bg-[var(--color-navbar)]">
           <SabaiLogo />
-          <div className="flex justify-center">
+          <div className="flex min-w-0 justify-center">
             <VillageSelector />
           </div>
           <div className="flex justify-end">
@@ -45,13 +46,13 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
           </div>
         </div>
         <div
-          className={`${mobileSidebarOpen ? "flex" : "hidden"} flex-col absolute z-2 w-full p-2 top-full bg-neutral-50 shadow-2xl`}
+          className={`${mobileSidebarOpen ? "flex" : "hidden"} flex-col absolute z-2 w-full p-2 top-full max-h-[70dvh] overflow-y-auto bg-neutral-50 shadow-2xl`}
         >
           <SidebarNavButtons />
         </div>
       </div>
       {/* desktop sidebar */}
-      <div className="hidden lg:flex flex-col min-w-64 p-2 gap-6 bg-[var(--color-navbar)]">
+      <div className="hidden lg:flex flex-col min-w-64 shrink-0 overflow-y-auto p-2 gap-6 bg-[var(--color-navbar)]">
         <LogoTitle className="m-2" />
         <div className="px-2">
           <VillageSelector />
@@ -77,11 +78,22 @@ function SidebarNavButtons() {
     { name: "Patient", href: paths.patient(), icon: AiOutlineUser },
     { name: "Vitals", href: paths.vitals(), icon: MdMonitorHeart },
     { name: "Vision", href: paths.vision(), icon: BsEyeglasses },
+    { name: "Dental", href: paths.dental(), icon: FaTooth },
     { name: "Consults", href: paths.consults(), icon: FaStethoscope },
+    {
+      name: "Referrals",
+      href: paths.referrals(),
+      icon: HiOutlineArrowTrendingUp,
+    },
     {
       name: "Medication Stock",
       href: paths.medicationStock(),
       icon: GiMedicines,
+    },
+    {
+      name: "Orders",
+      href: paths.orders(),
+      icon: GiNotebook,
     },
     {
       name: "Settings",

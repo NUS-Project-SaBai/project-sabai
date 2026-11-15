@@ -34,6 +34,9 @@ const serverSchema = clientSchema.extend({
   AWS_SECRET_ACCESS_KEY: z.string().min(1),
   AWS_REGION: z.string().min(1),
   COLLECTION_ID: z.string().min(1),
+  // Optional and may be empty (as in .env.example), so a missing S3 setup only
+  // breaks patient file features (src/server/utils/s3.ts reports it), not the whole app.
+  S3_BUCKET_NAME: z.string().optional(),
 });
 
 /*

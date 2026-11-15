@@ -15,7 +15,7 @@ const settingsItems = [
 export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-slate-50 p-8">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl">
         <PageHeader
           breadcrumbs={[{ label: "Home", href: "/" }, { label: "Settings" }]}
           title="Settings"

@@ -1,5 +1,5 @@
 {
-  "id": "afae1883-4610-4795-89cf-308293167693",
+  "id": "0cca73eb-c68d-4964-a0b8-1f2384876a0d",
   "prevId": "0bb28c0d-5804-4e06-9fea-73865e2184e0",
   "version": "7",
   "dialect": "postgresql",
@@ -213,6 +213,108 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.files": {
+      "name": "files",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "patient_id": {
+          "name": "patient_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "s3_key": {
+          "name": "s3_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content_type": {
+          "name": "content_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "file_name": {
+          "name": "file_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "is_deleted": {
+          "name": "is_deleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "files_patient_id_created_at_idx": {
+          "name": "files_patient_id_created_at_idx",
+          "columns": [
+            {
+              "expression": "patient_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "files_patient_id_patients_id_fk": {
+          "name": "files_patient_id_patients_id_fk",
+          "tableFrom": "files",
+          "tableTo": "patients",
+          "columnsFrom": ["patient_id"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "files_s3_key_unique": {
+          "name": "files_s3_key_unique",
+          "nullsNotDistinct": false,
+          "columns": ["s3_key"]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -528,8 +630,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "stock_id": {
-          "name": "stock_id",
+        "stock_change_id": {
+          "name": "stock_change_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -546,20 +648,20 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "order_items_stock_id_medication_stock_id_fk": {
-          "name": "order_items_stock_id_medication_stock_id_fk",
+        "order_items_stock_change_id_stock_changes_id_fk": {
+          "name": "order_items_stock_change_id_stock_changes_id_fk",
           "tableFrom": "order_items",
-          "tableTo": "medication_stock",
-          "columnsFrom": ["stock_id"],
+          "tableTo": "stock_changes",
+          "columnsFrom": ["stock_change_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
-        "order_items_order_id_stock_id_pk": {
-          "name": "order_items_order_id_stock_id_pk",
-          "columns": ["order_id", "stock_id"]
+        "order_items_order_id_stock_change_id_pk": {
+          "name": "order_items_order_id_stock_change_id_pk",
+          "columns": ["order_id", "stock_change_id"]
         }
       },
       "uniqueConstraints": {},

@@ -3,13 +3,13 @@ import { zfd } from "zod-form-data";
 import {
   uploadToCloudinary,
   deleteFromCloudinary,
+  getPatientWithImageUrl,
 } from "@/server/utils/cloudinary";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { patients, genderValues, visits } from "@/db/schema/patients";
 import { vitals, childVitals, puberty } from "@/db/schema/vitals";
 import { villageCodes } from "@/db/schema/villageCodes";
-import serverEnv from "@/lib/envVariables";
 import { TRPCError } from "@trpc/server";
 import { eq, and, ne, desc, inArray, isNotNull } from "drizzle-orm";
 import {
@@ -19,26 +19,6 @@ import {
   dataUrlToFile,
 } from "@/lib/utils/facialRecognition";
 import { calculateAge } from "@/lib/utils/patient";
-
-const cloudinaryUrlPrefix = serverEnv.CLOUDINARY_URL_PREFIX;
-
-/**
- * Transforms a patient object by adding a complete image URL.
- *
- * @param patient - The patient object to transform
- * @returns A new patient object with the `patientImageUrl` property added. If the patient has a `patientImagePublicId`,
- *          the URL is constructed as `{cloudinaryUrl}/{patientImagePublicId}`. Otherwise, `patientImageUrl` is `null`.
- */
-const getPatientWithImageUrl = <
-  T extends { patientImagePublicId: string | null },
->(
-  patient: T,
-) => ({
-  ...patient,
-  patientImageUrl: patient.patientImagePublicId
-    ? `${cloudinaryUrlPrefix}/${patient.patientImagePublicId}`
-    : null,
-});
 
 export const patientsRouter = router({
   // List all of patients (no visit data)

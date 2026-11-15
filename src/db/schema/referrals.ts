@@ -7,17 +7,10 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 
+import { REFERRAL_STATES } from "@/lib/constants/referralStates";
 import { consults } from "./consults";
 
-export const referralStateEnum = pgEnum("referral_state", [
-  "CompletedFailure",
-  "New",
-  "Seen",
-  "Outgoing",
-  "CompletedSuccess",
-  "Completed",
-  "None",
-]);
+export const referralStateEnum = pgEnum("referral_state", REFERRAL_STATES);
 
 /*
 Referrals Table:

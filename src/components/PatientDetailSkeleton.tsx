@@ -2,6 +2,8 @@ export default function PatientDetailSkeleton() {
   return (
     <div className="min-h-screen flex-1 p-8">
       <div className="w-full mx-auto">
+        {/* Matches Breadcrumbs height */}
+        <div className="h-5 w-48 bg-slate-200 rounded mb-6" />
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 animate-pulse">
           <div className="h-8 w-48 bg-slate-200 rounded mb-4" />
           <div className="h-4 w-64 bg-slate-200 rounded mb-2" />

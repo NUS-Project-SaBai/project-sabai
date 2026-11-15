@@ -1,6 +1,6 @@
 {
-  "id": "50c2fe98-ceaa-4385-81f3-c2eb2a0b9508",
-  "prevId": "afae1883-4610-4795-89cf-308293167693",
+  "id": "f7526748-31fd-4e96-b24a-e89e738ef921",
+  "prevId": "0cca73eb-c68d-4964-a0b8-1f2384876a0d",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -213,6 +213,407 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dental": {
+      "name": "dental",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "previous_dental_visit": {
+          "name": "previous_dental_visit",
+          "type": "dental_yes_no_unknown",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extraction": {
+          "name": "extraction",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "previous_dental_treatment": {
+          "name": "previous_dental_treatment",
+          "type": "dental_yes_no_unknown",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "toothache": {
+          "name": "toothache",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dental_trauma": {
+          "name": "dental_trauma",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "current_toothache": {
+          "name": "current_toothache",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tooth_sensitivity": {
+          "name": "tooth_sensitivity",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bleeding_gums": {
+          "name": "bleeding_gums",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "brushing_frequency": {
+          "name": "brushing_frequency",
+          "type": "dental_brushing_frequency",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fluoride_toothpaste": {
+          "name": "fluoride_toothpaste",
+          "type": "dental_yes_no_unknown",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sugar_consumption": {
+          "name": "sugar_consumption",
+          "type": "dental_sugar_consumption",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "other_dental_history": {
+          "name": "other_dental_history",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "chief_complaint": {
+          "name": "chief_complaint",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "facial_symmetry": {
+          "name": "facial_symmetry",
+          "type": "dental_facial_symmetry",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "facial_swelling": {
+          "name": "facial_swelling",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lymphadenopathy": {
+          "name": "lymphadenopathy",
+          "type": "dental_absent_present_not_assessed",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mouth_opening": {
+          "name": "mouth_opening",
+          "type": "dental_normal_limited",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "oral_hygiene": {
+          "name": "oral_hygiene",
+          "type": "dental_oral_hygiene",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "plaque": {
+          "name": "plaque",
+          "type": "dental_plaque",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "calculus": {
+          "name": "calculus",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gingival_condition": {
+          "name": "gingival_condition",
+          "type": "dental_gingival_condition",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "caries": {
+          "name": "caries",
+          "type": "dental_caries",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "missing_teeth": {
+          "name": "missing_teeth",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fractured_teeth": {
+          "name": "fractured_teeth",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mucosal_lesions": {
+          "name": "mucosal_lesions",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "malocclusion": {
+          "name": "malocclusion",
+          "type": "dental_malocclusion",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fluoride_status": {
+          "name": "fluoride_status",
+          "type": "dental_done_not_done",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fluoride_operator": {
+          "name": "fluoride_operator",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fluoride_tooth_number": {
+          "name": "fluoride_tooth_number",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sealant_status": {
+          "name": "sealant_status",
+          "type": "dental_done_not_done",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sealant_operator": {
+          "name": "sealant_operator",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sealant_tooth_number": {
+          "name": "sealant_tooth_number",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sdf_status": {
+          "name": "sdf_status",
+          "type": "dental_done_not_done",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sdf_operator": {
+          "name": "sdf_operator",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sdf_tooth_number": {
+          "name": "sdf_tooth_number",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scaling_status": {
+          "name": "scaling_status",
+          "type": "dental_done_not_done",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scaling_operator": {
+          "name": "scaling_operator",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scaling_tooth_number": {
+          "name": "scaling_tooth_number",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "remarks": {
+          "name": "remarks",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "visit_id": {
+          "name": "visit_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "dental_visit_id_visits_id_fk": {
+          "name": "dental_visit_id_visits_id_fk",
+          "tableFrom": "dental",
+          "tableTo": "visits",
+          "columnsFrom": ["visit_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.files": {
+      "name": "files",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "patient_id": {
+          "name": "patient_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "s3_key": {
+          "name": "s3_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content_type": {
+          "name": "content_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "file_name": {
+          "name": "file_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "is_deleted": {
+          "name": "is_deleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "files_patient_id_created_at_idx": {
+          "name": "files_patient_id_created_at_idx",
+          "columns": [
+            {
+              "expression": "patient_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "files_patient_id_patients_id_fk": {
+          "name": "files_patient_id_patients_id_fk",
+          "tableFrom": "files",
+          "tableTo": "patients",
+          "columnsFrom": ["patient_id"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "files_s3_key_unique": {
+          "name": "files_s3_key_unique",
+          "nullsNotDistinct": false,
+          "columns": ["s3_key"]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -528,8 +929,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "stock_id": {
-          "name": "stock_id",
+        "stock_change_id": {
+          "name": "stock_change_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -546,20 +947,20 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "order_items_stock_id_medication_stock_id_fk": {
-          "name": "order_items_stock_id_medication_stock_id_fk",
+        "order_items_stock_change_id_stock_changes_id_fk": {
+          "name": "order_items_stock_change_id_stock_changes_id_fk",
           "tableFrom": "order_items",
-          "tableTo": "medication_stock",
-          "columnsFrom": ["stock_id"],
+          "tableTo": "stock_changes",
+          "columnsFrom": ["stock_change_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
-        "order_items_order_id_stock_id_pk": {
-          "name": "order_items_order_id_stock_id_pk",
-          "columns": ["order_id", "stock_id"]
+        "order_items_order_id_stock_change_id_pk": {
+          "name": "order_items_order_id_stock_change_id_pk",
+          "columns": ["order_id", "stock_change_id"]
         }
       },
       "uniqueConstraints": {},
@@ -676,29 +1077,7 @@
           "default": "now()"
         }
       },
-      "indexes": {
-        "stock_changes_stock_id_id_idx": {
-          "name": "stock_changes_stock_id_id_idx",
-          "columns": [
-            {
-              "expression": "stock_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "stock_changes_stock_id_medication_stock_id_fk": {
           "name": "stock_changes_stock_id_medication_stock_id_fk",
@@ -1280,6 +1659,66 @@
       "name": "broadcast_severity",
       "schema": "public",
       "values": ["info", "warning", "critical"]
+    },
+    "public.dental_absent_present_not_assessed": {
+      "name": "dental_absent_present_not_assessed",
+      "schema": "public",
+      "values": ["absent", "present", "not assessed"]
+    },
+    "public.dental_brushing_frequency": {
+      "name": "dental_brushing_frequency",
+      "schema": "public",
+      "values": ["once", "twice", "3+ times", "occasionally", "never"]
+    },
+    "public.dental_caries": {
+      "name": "dental_caries",
+      "schema": "public",
+      "values": ["absent", "non-cavitated", "cavitated"]
+    },
+    "public.dental_done_not_done": {
+      "name": "dental_done_not_done",
+      "schema": "public",
+      "values": ["done", "not done"]
+    },
+    "public.dental_facial_symmetry": {
+      "name": "dental_facial_symmetry",
+      "schema": "public",
+      "values": ["normal", "asymmetrical"]
+    },
+    "public.dental_gingival_condition": {
+      "name": "dental_gingival_condition",
+      "schema": "public",
+      "values": ["healthy", "inflamed", "bleeding"]
+    },
+    "public.dental_malocclusion": {
+      "name": "dental_malocclusion",
+      "schema": "public",
+      "values": ["not suspected", "suspected"]
+    },
+    "public.dental_normal_limited": {
+      "name": "dental_normal_limited",
+      "schema": "public",
+      "values": ["normal", "limited"]
+    },
+    "public.dental_oral_hygiene": {
+      "name": "dental_oral_hygiene",
+      "schema": "public",
+      "values": ["good", "fair", "poor"]
+    },
+    "public.dental_plaque": {
+      "name": "dental_plaque",
+      "schema": "public",
+      "values": ["none", "mild", "moderate", "heavy"]
+    },
+    "public.dental_sugar_consumption": {
+      "name": "dental_sugar_consumption",
+      "schema": "public",
+      "values": ["low", "moderate", "high"]
+    },
+    "public.dental_yes_no_unknown": {
+      "name": "dental_yes_no_unknown",
+      "schema": "public",
+      "values": ["yes", "no", "unknown"]
     },
     "public.gender": {
       "name": "gender",
