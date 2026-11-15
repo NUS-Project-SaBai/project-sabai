@@ -9,6 +9,7 @@ import { medicationStatusValues } from "@/db/schema/pharmacy";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import { validateSplits } from "@/lib/utils/medication-stock";
+import ModalToast from "@/components/interactive/ModalToast";
 import { MAX_SPLITS, MIN_SPLITS } from "@/lib/constants/medicationStock";
 
 export default function SplittingModal({
@@ -36,7 +37,9 @@ export default function SplittingModal({
     },
     onError: (err) => {
       console.error(err);
-      toast.error(err.message ?? "An error occurred while splitting stock.");
+      toast.error(err.message ?? "An error occurred while splitting stock.", {
+        toasterId: "modal",
+      });
     },
   });
 
@@ -70,11 +73,12 @@ export default function SplittingModal({
       return;
     }
 
-    toast.error(validationResults.message);
+    toast.error(validationResults.message, { toasterId: "modal" });
   }
 
   return (
     <Modal title="Split Stock" onClose={onClose}>
+      <ModalToast />
       <h3 className="text-l font-bold mb-4">Parent stock details</h3>
       <table>
         <tbody>
@@ -83,11 +87,11 @@ export default function SplittingModal({
             <td>{stock.location}</td>
           </tr>
           <tr>
-            <td>Active Ingredient</td>
+            <td>Active Ingredient:</td>
             <td>{stock.medicationActiveIngredientName}</td>
           </tr>
           <tr>
-            <td>Brand Name</td>
+            <td>Brand Name:</td>
             <td>{stock.medicationBrandName}</td>
           </tr>
           <tr>
@@ -100,7 +104,13 @@ export default function SplittingModal({
           </tr>
           <tr>
             <td>Remarks:</td>
-            <td>{stock.remarks}</td>
+            <td>
+              {stock.remarks ? (
+                stock.remarks
+              ) : (
+                <span className="text-sm text-gray-500">No remarks added</span>
+              )}
+            </td>
           </tr>
         </tbody>
       </table>

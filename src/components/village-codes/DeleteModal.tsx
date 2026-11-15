@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import Modal from "@/components/interactive/Modal";
 import { FormFields } from "@/types/village-codes";
 import { Button } from "@/components/interactive/Button/Button";
+import ModalToast from "@/components/interactive/ModalToast";
 
 export default function DeleteModal({
   activeForm,
@@ -22,12 +23,14 @@ export default function DeleteModal({
       console.error(err);
       toast.error(
         "Unable to delete village code. Check that there are no visits with this village code before deleting.",
+        { toasterId: "modal" },
       );
     },
   });
 
   return (
     <Modal title="Confirm Deletion" onClose={onClose}>
+      <ModalToast />
       <p>Code: {activeForm?.code}</p>
       <p>Name: {activeForm?.name}</p>
 

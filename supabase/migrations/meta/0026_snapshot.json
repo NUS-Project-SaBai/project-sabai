@@ -1,5 +1,5 @@
 {
-  "id": "75da2875-05c1-4c7e-8286-e3fabd400901",
+  "id": "afae1883-4610-4795-89cf-308293167693",
   "prevId": "ece687f5-ccd7-44a6-ab0a-965e4d8205d3",
   "version": "7",
   "dialect": "postgresql",
@@ -148,6 +148,7 @@
           "name": "consults_doctor_id_users_id_fk",
           "tableFrom": "consults",
           "tableTo": "users",
+          "schemaTo": "auth",
           "columnsFrom": ["doctor_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
@@ -969,8 +970,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "stock_change_id": {
-          "name": "stock_change_id",
+        "stock_id": {
+          "name": "stock_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -987,20 +988,20 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "order_items_stock_change_id_stock_changes_id_fk": {
-          "name": "order_items_stock_change_id_stock_changes_id_fk",
+        "order_items_stock_id_medication_stock_id_fk": {
+          "name": "order_items_stock_id_medication_stock_id_fk",
           "tableFrom": "order_items",
-          "tableTo": "stock_changes",
-          "columnsFrom": ["stock_change_id"],
+          "tableTo": "medication_stock",
+          "columnsFrom": ["stock_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
-        "order_items_order_id_stock_change_id_pk": {
-          "name": "order_items_order_id_stock_change_id_pk",
-          "columns": ["order_id", "stock_change_id"]
+        "order_items_order_id_stock_id_pk": {
+          "name": "order_items_order_id_stock_id_pk",
+          "columns": ["order_id", "stock_id"]
         }
       },
       "uniqueConstraints": {},
@@ -1132,6 +1133,7 @@
           "name": "stock_changes_user_id_users_id_fk",
           "tableFrom": "stock_changes",
           "tableTo": "users",
+          "schemaTo": "auth",
           "columnsFrom": ["user_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
@@ -1208,94 +1210,6 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.users": {
-      "name": "users",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "auth_user_id": {
-          "name": "auth_user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "year": {
-          "name": "year",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "team": {
-          "name": "team",
-          "type": "users_team",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "role": {
-          "name": "role",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "remarks": {
-          "name": "remarks",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "users_auth_user_id_users_id_fk": {
-          "name": "users_auth_user_id_users_id_fk",
-          "tableFrom": "users",
-          "tableTo": "users",
-          "schemaTo": "auth",
-          "columnsFrom": ["auth_user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "users_auth_user_id_unique": {
-          "name": "users_auth_user_id_unique",
-          "nullsNotDistinct": false,
-          "columns": ["auth_user_id"]
-        }
-      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1774,6 +1688,94 @@
           "name": "vitals_visit_id_unique",
           "nullsNotDistinct": false,
           "columns": ["visit_id"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "auth_user_id": {
+          "name": "auth_user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "year": {
+          "name": "year",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "team": {
+          "name": "team",
+          "type": "users_team",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "remarks": {
+          "name": "remarks",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "users_auth_user_id_users_id_fk": {
+          "name": "users_auth_user_id_users_id_fk",
+          "tableFrom": "users",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": ["auth_user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_auth_user_id_unique": {
+          "name": "users_auth_user_id_unique",
+          "nullsNotDistinct": false,
+          "columns": ["auth_user_id"]
         }
       },
       "policies": {},

@@ -9,3 +9,4 @@ export * from "@/db/schema/referrals";
 export * from "@/db/schema/users";
 export * from "@/db/schema/villageCodes";
 export * from "@/db/schema/vitals";
+export * from "@/db/schema/users";
