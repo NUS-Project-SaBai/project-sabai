@@ -9,6 +9,8 @@ import { medicationStatusValues } from "@/db/schema/pharmacy";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import { validateSplits } from "@/lib/utils/medication-stock";
+import ModalToast from "@/components/interactive/ModalToast";
+import { MAX_SPLITS, MIN_SPLITS } from "@/lib/constants/medicationStock";
 
 export default function SplittingModal({
   onClose,
@@ -35,7 +37,9 @@ export default function SplittingModal({
     },
     onError: (err) => {
       console.error(err);
-      toast.error(err.message ?? "An error occurred while splitting stock.");
+      toast.error(err.message ?? "An error occurred while splitting stock.", {
+        toasterId: "modal",
+      });
     },
   });
 
@@ -52,6 +56,8 @@ export default function SplittingModal({
     setSplits(newSplits);
   }
 
+  const hasReachedMaxSplits = splits.length >= MAX_SPLITS;
+
   function handleSubmit() {
     const payload = splits.map((split) => ({
       location: split.location,
@@ -67,12 +73,12 @@ export default function SplittingModal({
       return;
     }
 
-    toast.error(validationResults.message);
+    toast.error(validationResults.message, { toasterId: "modal" });
   }
 
   return (
-    <Modal onClose={onClose}>
-      <h2 className="text-xl font-bold mb-4">Split Stock</h2>
+    <Modal title="Split Stock" onClose={onClose}>
+      <ModalToast />
       <h3 className="text-l font-bold mb-4">Parent stock details</h3>
       <table>
         <tbody>
@@ -81,11 +87,11 @@ export default function SplittingModal({
             <td>{stock.location}</td>
           </tr>
           <tr>
-            <td>Active Ingredient</td>
+            <td>Active Ingredient:</td>
             <td>{stock.medicationActiveIngredientName}</td>
           </tr>
           <tr>
-            <td>Brand Name</td>
+            <td>Brand Name:</td>
             <td>{stock.medicationBrandName}</td>
           </tr>
           <tr>
@@ -98,12 +104,26 @@ export default function SplittingModal({
           </tr>
           <tr>
             <td>Remarks:</td>
-            <td>{stock.remarks}</td>
+            <td>
+              {stock.remarks ? (
+                stock.remarks
+              ) : (
+                <span className="text-sm text-gray-500">No remarks added</span>
+              )}
+            </td>
           </tr>
         </tbody>
       </table>
       <h3 className="text-l font-bold mb-4 mt-4">Child stock details</h3>
-      {splits.length === 0 && "No splits added, add a split to begin."}
+      <p
+        className="mb-4 text-sm text-gray-600"
+        role="counter"
+        aria-atomic="true"
+      >
+        {splits.length}/{MAX_SPLITS} splits added (min. {MIN_SPLITS} splits
+        required!)
+      </p>
+      {splits.length === 0 && "Add a split to begin."}
       {splits.length > 0 && (
         <table>
           <thead className="text-center">
@@ -172,12 +192,19 @@ export default function SplittingModal({
           </tbody>
         </table>
       )}
-      <Button
-        title="Add Split"
-        colour="indigo"
-        onClick={() => setSplits([...splits, stock])}
-        className="my-4"
-      />
+      <div className="my-4">
+        <Button
+          title="Add Split"
+          colour="indigo"
+          onClick={() => setSplits((s) => [...s, stock])}
+          disabled={hasReachedMaxSplits}
+        />
+        {hasReachedMaxSplits && (
+          <p className="mt-1 text-sm text-red-600" role="status">
+            Maximum of {MAX_SPLITS} splits reached!
+          </p>
+        )}
+      </div>
       <Button
         title="Confirm"
         colour="emerald"

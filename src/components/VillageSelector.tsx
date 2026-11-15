@@ -21,7 +21,7 @@ export default function VillageSelector() {
 
   if (isLoading) {
     return (
-      <div className="relative w-52 min-w-52 max-w-52">
+      <div className="relative w-full max-w-52">
         <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-slate-200">
           <span className="text-sm text-slate-600">Loading...</span>
         </div>
@@ -31,7 +31,7 @@ export default function VillageSelector() {
 
   if (!villageCodes || villageCodes.length === 0) {
     return (
-      <div className="relative w-52 min-w-52 max-w-52">
+      <div className="relative w-full max-w-52">
         <div className="px-3 py-2 bg-amber-50 text-amber-700 rounded-lg border border-amber-200 text-sm">
           No villages available
         </div>
@@ -45,7 +45,7 @@ export default function VillageSelector() {
   };
 
   return (
-    <div className="relative w-52 min-w-52 max-w-52" ref={dropdownRef}>
+    <div className="relative w-full max-w-52" ref={dropdownRef}>
       <div className="text-xs text-slate-500 mb-3 px-1 text-white">
         Village for new patients & visits
       </div>
@@ -56,19 +56,21 @@ export default function VillageSelector() {
         {selectedVillage ? (
           <>
             <div
-              className="w-3 h-3 rounded-full"
+              className="w-3 h-3 shrink-0 rounded-full"
               style={{ backgroundColor: selectedVillage.colorHex }}
             />
-            <span className="text-sm font-medium text-slate-700">
+            <span className="truncate text-sm font-medium text-slate-700">
               {selectedVillage.name}
             </span>
           </>
         ) : (
-          <span className="text-sm text-slate-500">Select Village</span>
+          <span className="truncate text-sm text-slate-500">
+            Select Village
+          </span>
         )}
         <HiChevronDown
           className={clsx(
-            "w-4 h-4 text-slate-500 transition-transform ml-auto",
+            "w-4 h-4 shrink-0 text-slate-500 transition-transform ml-auto",
             isOpen && "rotate-180",
           )}
         />

@@ -10,6 +10,7 @@ import {
   CreateFormFields,
 } from "@/types/medication-stock";
 import { Button } from "@/components/interactive/Button/Button";
+import ModalToast from "@/components/interactive/ModalToast";
 
 export default function CreateModal({
   setModalIsOpen,
@@ -35,7 +36,7 @@ export default function CreateModal({
     },
     onError: (err) => {
       console.error(err);
-      toast.error("An error has occurred.");
+      toast.error("An error has occurred.", { toasterId: "modal" });
     },
   });
 
@@ -44,10 +45,8 @@ export default function CreateModal({
   };
 
   return (
-    <Modal onClose={() => setModalIsOpen(false)}>
-      <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-4">
-        Add New Stock
-      </h2>
+    <Modal title="Add New Stock" onClose={() => setModalIsOpen(false)}>
+      <ModalToast />
       <FormProvider {...form}>
         <form
           onSubmit={(e) => {

@@ -7,12 +7,17 @@ export const paths = {
   vitals: () => "/vitals",
   vitalsDetail: (patientId: number) => `/vitals/${patientId}`,
   vision: () => "/vision",
-  visionUpdateGlasses: (patientId: number) =>
-    `/vision/update-glasses/${patientId}`,
+  dental: () => "/dental",
+  visionUpdateVision: (patientId: number) =>
+    `/vision/update-vision/${patientId}`,
   consults: () => "/consults",
   consultsDetail: (patientId: number) => `/consults/${patientId}`,
+  referrals: () => "/referrals",
+  referralsDetail: (referralId: number) => `/referrals/${referralId}`,
   medicationStock: () => "/medication-stock",
   medicationBrands: () => "/medication-brands",
   medicationActiveIngredients: () => "/medication-active-ingredients",
-  settings: () => "/settings/village-codes",
+  orders: () => "/orders",
+  settings: () => "/settings",
+  settingsVillageCodes: () => "/settings/village-codes",
 };

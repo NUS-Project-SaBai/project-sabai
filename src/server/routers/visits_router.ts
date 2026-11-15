@@ -3,7 +3,7 @@ import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { visits, patients } from "@/db/schema/patients";
 import { villageCodes } from "@/db/schema/villageCodes";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, gte } from "drizzle-orm";
 
 export const visitsRouter = router({
   // List all visits with patient and village code details
@@ -68,6 +68,31 @@ export const visitsRouter = router({
         .orderBy(desc(visits.date));
 
       return result;
+    }),
+
+  // Check if a visit was created for the patient within the last minute
+  hasRecentVisit: protectedProcedure
+    .input(z.object({ patientId: z.number().int() }))
+    .query(async ({ input }) => {
+      const DUPLICATE_WINDOW_MS = 60 * 1000;
+      const windowStart = new Date(Date.now() - DUPLICATE_WINDOW_MS);
+
+      const [recentVisit] = await db
+        .select({ id: visits.id, date: visits.date })
+        .from(visits)
+        .where(
+          and(
+            eq(visits.patientId, input.patientId),
+            gte(visits.date, windowStart),
+          ),
+        )
+        .orderBy(desc(visits.date))
+        .limit(1);
+
+      return {
+        hasRecentVisit: !!recentVisit,
+        existingVisitDate: recentVisit?.date ?? null,
+      };
     }),
 
   // Create new visit

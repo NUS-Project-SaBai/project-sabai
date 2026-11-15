@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DIAGNOSIS_CATEGORIES } from "@/lib/constants/diagnosisCategories";
+import { REFERRAL_CATEGORIES } from "@/lib/constants/referralCategories";
 
 export const diagnosisInput = z.object({
   details: z.string().trim().min(1, "Diagnosis details are required"),
@@ -28,6 +29,17 @@ export const consultFormSchema = createConsultInput
       z.object({
         details: z.string().trim().min(1, "Diagnosis details are required"),
         category: z.string().min(1, "Please select a category"),
+      }),
+    ),
+    referredFor: z.enum(REFERRAL_CATEGORIES),
+    referralNotes: z.string().optional(),
+    // Pending orders are validated in OrderModal and again by the orders router on submit.
+    orders: z.array(
+      z.object({
+        quantity: z.number().int().positive(),
+        dosageInstructions: z.string(),
+        activeIngredientId: z.string(),
+        activeIngredientName: z.string(), // only so that the pending order list has name it
       }),
     ),
   });

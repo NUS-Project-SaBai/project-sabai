@@ -111,7 +111,10 @@ describe("VillageCodesPage", () => {
       screen.getByRole("heading", { name: "Village Codes" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Home" })).toBeInTheDocument();
-    expect(screen.getByText("Settings")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Settings" })).toHaveAttribute(
+      "href",
+      "/settings",
+    );
   });
 
   it("displays loading state", () => {

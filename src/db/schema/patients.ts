@@ -13,6 +13,11 @@ import { villageCodes } from "./villageCodes";
 
 export const genderEnum = pgEnum("gender", ["male", "female"]);
 
+// Derive runtime values and the TypeScript type from the database enum so
+// validation and UI consumers cannot drift from the persisted values.
+export const genderValues = genderEnum.enumValues;
+export type Gender = (typeof genderValues)[number];
+
 /*
 Patients Table:
 - id: Primary key, auto-incrementing integer.

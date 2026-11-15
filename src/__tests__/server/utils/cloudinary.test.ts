@@ -1,3 +1,7 @@
+// @vitest-environment node
+//
+// cloudinary.ts reads server-only env vars, which envVariables.ts only exposes
+// outside a browser-like (jsdom) environment.
 import { extractCloudinaryPublicId } from "@/server/utils/cloudinary";
 
 describe("extractCloudinaryPublicId", () => {

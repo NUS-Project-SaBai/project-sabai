@@ -41,30 +41,6 @@ function Header() {
           />
         }
       />
-      <div className="mb-8">
-        <button
-          type="submit"
-          className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
-        >
-          <Link
-            href={paths.medicationBrands()}
-            className="group flex items-center p-2 rounded-md"
-          >
-            <span>Manage Brands</span>
-          </Link>
-        </button>
-        <button
-          type="submit"
-          className={`flex-1 px-4 py-2 rounded-lg font-medium bg-red-300`}
-        >
-          <Link
-            href={paths.medicationActiveIngredients()}
-            className="group flex items-center p-2 rounded-md"
-          >
-            <span>Manage Active Ingredients</span>
-          </Link>
-        </button>
-      </div>
     </>
   );
 }
@@ -135,6 +111,30 @@ function MedicationStockBasePage() {
     <div className="min-h-screen flex-1 p-8">
       <Header />
       {renderContent()}
+      <div className="mt-8">
+        <button
+          type="submit"
+          className={`mb-2 flex-1 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 mr-3`}
+        >
+          <Link
+            href={paths.medicationBrands()}
+            className="group flex items-center p-2 rounded-md"
+          >
+            <span>Manage Brands</span>
+          </Link>
+        </button>
+        <button
+          type="submit"
+          className={`flex-1 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 mr-3`}
+        >
+          <Link
+            href={paths.medicationActiveIngredients()}
+            className="group flex items-center p-2 rounded-md"
+          >
+            <span>Manage Active Ingredients</span>
+          </Link>
+        </button>
+      </div>
     </div>
   );
 }
@@ -195,7 +195,10 @@ function Row({
   };
 
   return (
-    <TableRow key={item.id}>
+    <TableRow
+      key={item.id}
+      className={item.isLowStock ? "bg-red-50 hover:!bg-red-100" : ""}
+    >
       <FormProvider {...form}>
         <TableCell>
           <span className="text-sm font-medium text-slate-900">

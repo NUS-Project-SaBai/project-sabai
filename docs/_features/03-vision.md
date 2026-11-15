@@ -6,7 +6,7 @@ permalink: /features/vision/
 
 ## Introduction
 
-The Vision page manages vision prescriptions and eye care records for patients. The landing page (`/vision`) lists every patient, and each patient links through to their own glasses form (`/vision/update-glasses/{patientId}`) where eyesight data is recorded against a specific visit.
+The Vision page manages vision prescriptions and eye care records for patients. The landing page (`/vision`) lists every patient, and each patient links through to their own vision form (`/vision/update-vision/{patientId}`) where eyesight data is recorded against a specific visit.
 
 ## Patient List
 
@@ -14,13 +14,13 @@ The main Vision page shows every patient with the following details:
 - ID: Patient code, colour-coded by village.
 - Photo: Patient's photo.
 - Name: Patient's name.
-- Actions: An 'Update Glasses' button that opens the glasses form for that patient.
+- Actions: An 'Update Vision' button that opens the vision form for that patient.
 
 The list is responsive — it renders as a full table on tablet and desktop, and as stacked cards on mobile. If no patients exist, a "No patients found. Add patients to manage their vision records." message is shown.
 
-## Updating Glasses
+## Updating Vision
 
-Clicking 'Update Glasses' navigates to the patient's glasses form. Before any eyesight data can be entered, a visit must be selected:
+Clicking 'Update Vision' navigates to the patient's vision form. Before any eyesight data can be entered, a visit must be selected:
 
 - **Choose visit**: A dropdown listing the patient's visits by date. If the patient has only one visit, it is selected automatically. If the patient has no visits, a message is shown prompting the user to create a visit first.
 

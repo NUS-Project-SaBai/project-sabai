@@ -2,7 +2,8 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
-import { eq, desc, ne } from "drizzle-orm";
+import { withUserTransaction } from "@/db/withUserTransaction";
+import { eq, desc, ne, gte, and, sum } from "drizzle-orm";
 import {
   medicationBrands,
   medicationStatusEnum,
@@ -43,6 +44,8 @@ export const medicationStockRouter = router({
         remarks: medicationStock.remarks,
         medicationBrandName: medicationBrands.name,
         medicationActiveIngredientName: medicationActiveIngredients.name,
+        medicationActiveIngredientId: medicationActiveIngredients.id,
+        fallBelow: medicationActiveIngredients.fallBelow,
       })
       .from(medicationStock)
       .innerJoin(
@@ -55,6 +58,56 @@ export const medicationStockRouter = router({
       )
       .where(ne(medicationStock.quantity, 0))
       .orderBy(desc(medicationStock.id));
+
+    const totals = new Map<number, number>();
+    for (const item of result) {
+      if (item.stockStatus !== "active") {
+        continue;
+      }
+      const currentTotal = totals.get(item.medicationActiveIngredientId) || 0;
+      totals.set(
+        item.medicationActiveIngredientId,
+        currentTotal + item.quantity,
+      );
+    }
+
+    return result.map((item) => ({
+      ...item,
+      isLowStock:
+        item.stockStatus === "active" &&
+        (totals.get(item.medicationActiveIngredientId) ?? 0) <= item.fallBelow,
+    }));
+  }),
+
+  listGroupByActiveIngredient: protectedProcedure.query(async () => {
+    const result = await db
+      .select({
+        id: medicationActiveIngredients.id,
+        activeIngredientName: medicationActiveIngredients.name,
+        unitOfMeasurement: medicationActiveIngredients.unitOfMeasurement,
+        quantity: sum(medicationStock.quantity),
+      })
+      .from(medicationStock)
+      .innerJoin(
+        medicationBrands,
+        eq(medicationStock.medicationBrandId, medicationBrands.id),
+      )
+      .innerJoin(
+        medicationActiveIngredients,
+        eq(medicationActiveIngredients.id, medicationBrands.activeIngredientId),
+      )
+      .where(
+        and(
+          eq(medicationStock.stockStatus, "active"),
+          gte(medicationStock.expiry, new Date()),
+        ),
+      )
+      .groupBy(
+        medicationActiveIngredients.id,
+        medicationActiveIngredients.name,
+        medicationActiveIngredients.unitOfMeasurement,
+      );
+
     return result;
   }),
 
@@ -69,27 +122,15 @@ export const medicationStockRouter = router({
         remarks: zfd.text(z.string().optional()),
       }),
     )
-    .mutation(async ({ input }) => {
-      const [newStock] = await db
-        .insert(medicationStock)
-        .values(input)
-        .returning();
-      return newStock;
-    }),
+    .mutation(async ({ input, ctx }) => {
+      return await withUserTransaction(ctx.user.id, async (tx) => {
+        const [newStock] = await tx
+          .insert(medicationStock)
+          .values(input)
+          .returning();
 
-  delete: protectedProcedure
-    .input(
-      zfd.formData({
-        id: zfd.numeric(z.number().int()),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const [result] = await db
-        .delete(medicationStock)
-        .where(eq(medicationStock.id, input.id))
-        .returning({ id: medicationStock.id });
-
-      return { success: !!result };
+        return newStock;
+      });
     }),
 
   update: protectedProcedure
@@ -110,15 +151,17 @@ export const medicationStockRouter = router({
         ),
       }),
     )
-    .mutation(async ({ input }) => {
-      const { id, ...updateData } = input;
-      const [result] = await db
-        .update(medicationStock)
-        .set({ ...updateData })
-        .where(eq(medicationStock.id, id))
-        .returning();
+    .mutation(async ({ input, ctx }) => {
+      return await withUserTransaction(ctx.user.id, async (tx) => {
+        const { id, ...updateData } = input;
+        const [result] = await tx
+          .update(medicationStock)
+          .set({ ...updateData })
+          .where(eq(medicationStock.id, id))
+          .returning();
 
-      return result ? result : null;
+        return result ? result : null;
+      });
     }),
 
   createSplits: protectedProcedure
@@ -128,10 +171,10 @@ export const medicationStockRouter = router({
         splits: z.array(splitSchema).min(MIN_SPLITS).max(MAX_SPLITS),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { splits, parentId } = input;
 
-      return db.transaction(async (tx) => {
+      return await withUserTransaction(ctx.user.id, async (tx) => {
         const [parent] = await tx
           .select()
           .from(medicationStock)

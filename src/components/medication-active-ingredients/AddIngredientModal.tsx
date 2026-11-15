@@ -7,6 +7,7 @@ import { Button } from "@/components/interactive/Button/Button";
 import { trpc } from "@/utils/trpc";
 import { positiveNumberOptions } from "@/lib/utils/medication";
 import { AddFormFields } from "./types";
+import ModalToast from "@/components/interactive/ModalToast";
 
 export default function AddIngredientModal() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
@@ -25,7 +26,9 @@ export default function AddIngredientModal() {
       },
       onError: (err) => {
         console.error(err);
-        toast.error("An error has occurred.");
+        toast.error("An error has occurred.", {
+          toasterId: "modal",
+        });
       },
     });
 
@@ -36,10 +39,11 @@ export default function AddIngredientModal() {
   return (
     <>
       {modalIsOpen && (
-        <Modal onClose={() => setModalIsOpen(false)}>
-          <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-4">
-            Add New Active Ingredient
-          </h2>
+        <Modal
+          title="Add New Active Ingredient"
+          onClose={() => setModalIsOpen(false)}
+        >
+          <ModalToast />
           <FormProvider {...form}>
             <form
               onSubmit={(e) => {
