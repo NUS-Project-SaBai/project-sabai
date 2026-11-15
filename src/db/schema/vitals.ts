@@ -54,7 +54,7 @@ export const vitals = pgTable("vitals", {
     .references(() => visits.id, {
       onDelete: "cascade",
     }),
-});
+}).enableRLS();
 
 export type Vital = typeof vitals.$inferSelect;
 export type NewVital = typeof vitals.$inferInsert;
@@ -90,7 +90,7 @@ export const eyesight = pgTable("eyesight", {
   comments: text("comments"),
   leftPrescribedGlassesDegree: text("left_prescribed_glasses_degree"),
   rightPrescribedGlassesDegree: text("right_prescribed_glasses_degree"),
-});
+}).enableRLS();
 
 export type Eyesight = typeof eyesight.$inferSelect;
 export type NewEyesight = typeof eyesight.$inferInsert;
@@ -130,7 +130,7 @@ export const puberty = pgTable("puberty", {
     .references(() => vitals.id, {
       onDelete: "cascade",
     }),
-});
+}).enableRLS();
 
 export type Puberty = typeof puberty.$inferSelect;
 export type NewPuberty = typeof puberty.$inferInsert;
@@ -166,7 +166,7 @@ export const childVitals = pgTable("child_vitals", {
     .references(() => vitals.id, {
       onDelete: "cascade",
     }),
-});
+}).enableRLS();
 
 export type ChildVital = typeof childVitals.$inferSelect;
 export type NewChildVital = typeof childVitals.$inferInsert;

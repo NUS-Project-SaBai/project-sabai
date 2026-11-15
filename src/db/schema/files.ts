@@ -44,7 +44,7 @@ export const files = pgTable(
       table.createdAt.desc(),
     ),
   ],
-);
+).enableRLS();
 
 export type PatientFile = typeof files.$inferSelect;
 export type NewPatientFile = typeof files.$inferInsert;
