@@ -126,7 +126,7 @@ export function VisitSummaryPanel({ visitId }: { visitId: number }) {
             </VitalsGroup>
 
             <ReadOnlyField
-              label="Urine Dip Test"
+              label="Urinalysis Diagnostics"
               value={vitals?.urineTest}
               className="w-full"
             />
