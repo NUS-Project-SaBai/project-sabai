@@ -10,6 +10,9 @@
 
 import { initTRPC, TRPCError } from "@trpc/server";
 import { transformer } from "@/utils/transformer";
+import { eq } from "drizzle-orm";
+import { db } from "@/db/drizzle";
+import { users } from "@/db/schema";
 import type { Context } from "./context";
 
 const t = initTRPC.context<Context>().create({
@@ -37,16 +40,35 @@ export const router = t.router;
  **/
 export const publicProcedure = t.procedure;
 
-const isAuthed = t.middleware(({ ctx, next }) => {
+const isAuthed = t.middleware(async ({ ctx, next }) => {
   if (!ctx.user) {
     // ctx.user comes from context creation logic using Supabase Auth
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+
+  // Every login must be linked by hand to a public.users row. That row's id
+  // (not the auth user id) is what FKs such as consults.doctor_id reference.
+  const [appUser] = await db
+    .select()
+    .from(users)
+    .where(eq(users.authUserId, ctx.user.id))
+    .limit(1);
+
+  if (!appUser) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message:
+        "This account has not been linked to a user yet. Ask an admin to link your account.",
+    });
+  }
+
   return next({
     ctx: {
       ...ctx,
       // infers that `user` is non-nullable to downstream resolvers
       user: ctx.user,
+      // The public.users row for the logged-in account. Use appUser.id for FKs.
+      appUser,
     },
   });
 });

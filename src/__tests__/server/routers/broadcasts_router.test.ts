@@ -8,17 +8,23 @@
 // Runs in Node because envVariables.ts only exposes DATABASE_URL server-side.
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { randomUUID } from "crypto";
 import { inArray } from "drizzle-orm";
 
 import { broadcasts } from "@/db/schema";
 import { db } from "@/db/drizzle";
 import { appRouter } from "@/server/routers/_app";
 import type { Context } from "@/server/context";
+import { getLinkedTestUser } from "./testUsers";
 
-// Creates an authenticated request
-const caller = appRouter.createCaller({
-  user: { id: "broadcasts-test-user" },
-} as unknown as Context);
+function callerFor(authUserId: string) {
+  return appRouter.createCaller({
+    user: { id: authUserId },
+  } as unknown as Context);
+}
+
+// Authenticated caller, set up in beforeAll with a login linked to public.users
+let caller: ReturnType<typeof callerFor>;
 
 const unauthenticatedCaller = appRouter.createCaller({
   user: null,
@@ -28,6 +34,8 @@ describe("broadcastsRouter.list (integration)", () => {
   let fixtureIds: number[] = [];
 
   beforeAll(async () => {
+    caller = callerFor((await getLinkedTestUser()).authUserId);
+
     // Create more than 50 rows to test default limit behaviour
     const inserted = await db
       .insert(broadcasts)
@@ -105,6 +113,14 @@ describe("broadcastsRouter.list (integration)", () => {
       unauthenticatedCaller.broadcastsRouter.list(),
     ).rejects.toMatchObject({
       code: "UNAUTHORIZED",
+    });
+  });
+
+  it("rejects logins that are not linked to a user", async () => {
+    await expect(
+      callerFor(randomUUID()).broadcastsRouter.list(),
+    ).rejects.toMatchObject({
+      code: "FORBIDDEN",
     });
   });
 

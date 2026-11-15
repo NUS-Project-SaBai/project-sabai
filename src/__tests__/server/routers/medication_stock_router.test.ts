@@ -4,7 +4,7 @@
 // `log_medication_stock_changes` audit trigger. These run against the local
 // Supabase Postgres instance configured in .env so the trigger, the
 // `get_current_user_id()` lookup and transaction rollback are exercised for real.
-// Prereqs: `supabase start` (or `pnpm seed:db`) so migrations are applied, and at least one auth.users row (`pnpm seed:users`).
+// Prereqs: `supabase start` (or `pnpm seed:db`) so migrations are applied, and at least one login linked to public.users (`pnpm seed:users`).
 //
 // Runs in the node environment (not jsdom) because src/lib/envVariables.ts
 // switches on `typeof window` and only exposes DATABASE_URL server-side.
@@ -15,7 +15,8 @@ import { appRouter } from "@/server/routers/_app";
 import { db } from "@/db/drizzle";
 import { withUserTransaction } from "@/db/withUserTransaction";
 import type { Context } from "@/server/context";
-import { authUsers } from "@/db/schema";
+import { users } from "@/db/schema";
+import { getLinkedTestUser } from "./testUsers";
 import {
   medicationBrands,
   medicationStock,
@@ -37,12 +38,15 @@ const SEED_STOCK = {
 } as const;
 
 // protectedProcedure only reads ctx.user, so a minimal context is enough.
-function callerFor(userId: string) {
-  return appRouter.createCaller({ user: { id: userId } } as unknown as Context);
+function callerFor(authUserId: string) {
+  return appRouter.createCaller({
+    user: { id: authUserId },
+  } as unknown as Context);
 }
 
 describe("medicationStockRouter + stock change trigger (integration)", () => {
   let userId: string;
+  let authUserId: string;
   let brandId: number;
   let caller: ReturnType<typeof callerFor>;
 
@@ -96,18 +100,8 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
   }
 
   beforeAll(async () => {
-    // stock_changes FK-references auth.users; reuse an existing seeded user.
-    const [user] = await db
-      .select({ id: authUsers.id })
-      .from(authUsers)
-      .limit(1);
-    if (!user) {
-      throw new Error(
-        "No auth.users row found. Run `pnpm seed:all` against local Supabase " +
-          "before running the router integration tests.",
-      );
-    }
-    userId = user.id;
+    // stock_changes FK-references public.users; reuse an existing seeded user.
+    ({ userId, authUserId } = await getLinkedTestUser());
 
     // Reuse a seeded brand: the brand seed inserts explicit ids, so inserting
     // a new brand here can collide with the out-of-sync id sequence.
@@ -123,7 +117,7 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
     }
     brandId = brand.id;
 
-    caller = callerFor(userId);
+    caller = callerFor(authUserId);
   });
 
   afterEach(async () => {
@@ -349,12 +343,13 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
     });
 
     it("does not save the stock row when writing its history fails", async () => {
-      // A user id that is not in auth.users makes the trigger's insert into
+      // A user id that is not in public.users makes the trigger's insert into
       // stock_changes violate its foreign key
       await expect(
-        callerFor(randomUUID()).medicationStockRouter.create({
-          medicationBrandId: brandId,
-          ...SEED_STOCK,
+        withUserTransaction(randomUUID(), async (tx) => {
+          await tx
+            .insert(medicationStock)
+            .values({ medicationBrandId: brandId, ...SEED_STOCK });
         }),
       ).rejects.toThrow();
 
@@ -388,6 +383,66 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
       const changes = await changesFor(stockId);
       expect(changes.length).toBeGreaterThan(0);
       expect(changes.every((c) => c.userId === userId)).toBe(true);
+    });
+
+    it("attributes writes made with auth.uid() to the linked public.users row", async () => {
+      const stockId = await db.transaction(async (tx) => {
+        await tx.execute(
+          sql`SELECT set_config('request.jwt.claims', ${JSON.stringify({ sub: authUserId })}, true)`,
+        );
+        const [row] = await tx
+          .insert(medicationStock)
+          .values({ medicationBrandId: brandId, ...SEED_STOCK })
+          .returning({ id: medicationStock.id });
+        return row.id;
+      });
+
+      const changes = await changesFor(stockId);
+      expect(changes.length).toBeGreaterThan(0);
+      expect(changes.every((c) => c.userId === userId)).toBe(true);
+    });
+
+    it("rejects writes made with an auth.uid() that is not linked to a user", async () => {
+      await expect(
+        db.transaction(async (tx) => {
+          await tx.execute(
+            sql`SELECT set_config('request.jwt.claims', ${JSON.stringify({ sub: randomUUID() })}, true)`,
+          );
+          await tx
+            .insert(medicationStock)
+            .values({ medicationBrandId: brandId, ...SEED_STOCK });
+        }),
+      ).rejects.toThrow();
+
+      expect(await testStockRows()).toHaveLength(0);
+    });
+
+    it("attributes writes to a user without a login", async () => {
+      const [noLoginUser] = await db
+        .insert(users)
+        .values({ name: "Stock test user without login" })
+        .returning({ id: users.id });
+
+      try {
+        const stockId = await withUserTransaction(
+          noLoginUser.id,
+          async (tx) => {
+            const [row] = await tx
+              .insert(medicationStock)
+              .values({ medicationBrandId: brandId, ...SEED_STOCK })
+              .returning({ id: medicationStock.id });
+            return row.id;
+          },
+        );
+
+        const changes = await changesFor(stockId);
+        expect(changes.length).toBeGreaterThan(0);
+        expect(changes.every((c) => c.userId === noLoginUser.id)).toBe(true);
+      } finally {
+        // stock_changes references the user, so drop the history first.
+        await cleanUpStock();
+        await db.delete(users).where(eq(users.id, noLoginUser.id));
+      }
     });
 
     it("skips logging when app.bypass_triggers is set", async () => {
@@ -491,16 +546,7 @@ describe("medicationStockRouter low-stock flags (integration)", () => {
   }
 
   beforeAll(async () => {
-    const [user] = await db
-      .select({ id: authUsers.id })
-      .from(authUsers)
-      .limit(1);
-
-    if (!user) {
-      throw new Error("Run pnpm seed:users before these integration tests.");
-    }
-
-    caller = callerFor(user.id);
+    caller = callerFor((await getLinkedTestUser()).authUserId);
 
     ingredientA = await createIngredient(100);
     ingredientB = await createIngredient(50);
