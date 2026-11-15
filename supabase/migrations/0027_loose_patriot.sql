@@ -1,0 +1,21 @@
+ALTER TABLE "broadcasts" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "consults" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "diagnosis" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "dental" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "dental_diagnosis" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "files" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "patients" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "visits" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "medication_active_ingredients" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "medication_brands" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "medication_stock" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "order_items" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "orders" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "stock_changes" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "referrals" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "users" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "village_codes" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "child_vitals" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "eyesight" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "puberty" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "vitals" ENABLE ROW LEVEL SECURITY;
