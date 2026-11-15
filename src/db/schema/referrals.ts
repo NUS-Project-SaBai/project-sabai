@@ -34,7 +34,7 @@ export const referrals = pgTable("referrals", {
       onDelete: "restrict",
     }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}).enableRLS();
 
 export type Referral = typeof referrals.$inferSelect;
 export type NewReferral = typeof referrals.$inferInsert;

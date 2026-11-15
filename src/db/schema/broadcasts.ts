@@ -38,7 +38,7 @@ export const broadcasts = pgTable("broadcasts", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   publishedAt: timestamp("published_at"),
   attempts: integer("attempts").default(0).notNull(),
-});
+}).enableRLS();
 
 export type Broadcast = typeof broadcasts.$inferSelect;
 export type NewBroadcast = typeof broadcasts.$inferInsert;

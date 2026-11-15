@@ -27,7 +27,7 @@ export const villageCodes = pgTable("village_codes", {
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
-});
+}).enableRLS();
 
 export type VillageCode = typeof villageCodes.$inferSelect;
 export type NewVillageCode = typeof villageCodes.$inferInsert;
