@@ -27,7 +27,7 @@ export default function AddIngredientModal() {
       onError: (err) => {
         console.error(err);
         toast.error("An error has occurred.", {
-          toasterId: "modal"
+          toasterId: "modal",
         });
       },
     });

@@ -44,8 +44,6 @@ export default function CreateModal({
     createMutation.mutate(data);
   };
 
-
-
   return (
     <Modal title="Add New Stock" onClose={() => setModalIsOpen(false)}>
       <ModalToast />

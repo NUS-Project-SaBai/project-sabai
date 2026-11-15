@@ -22,8 +22,8 @@ export default function DeleteModal({
     onError: (err) => {
       console.error(err);
       toast.error(
-        "Unable to delete village code. Check that there are no visits with this village code before deleting.", 
-        {toasterId: "modal"}
+        "Unable to delete village code. Check that there are no visits with this village code before deleting.",
+        { toasterId: "modal" },
       );
     },
   });
