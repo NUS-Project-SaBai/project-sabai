@@ -375,10 +375,11 @@ function VitalsForm({
       </FormSection>
 
       {/* Growth chart: below Body Measurements on narrow screens, pinned in a
-          side column spanning every form row on wide screens. */}
+          side column spanning every form row on wide screens, offset below the
+          sticky patient search bar. */}
       {showChart && (
         <div
-          className="min-[1128px]:col-start-2 min-[1128px]:row-start-1 min-[1128px]:row-span-6 self-start sticky top-4"
+          className="min-[1128px]:col-start-2 min-[1128px]:row-start-1 min-[1128px]:row-span-6 self-start min-[1128px]:sticky min-[1128px]:top-20"
           data-growth-chart
         >
           <FormSection
