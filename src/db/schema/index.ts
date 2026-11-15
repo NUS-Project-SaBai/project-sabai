@@ -8,3 +8,4 @@ export * from "@/db/schema/pharmacy";
 export * from "@/db/schema/referrals";
 export * from "@/db/schema/villageCodes";
 export * from "@/db/schema/vitals";
+export * from "@/db/schema/users";
