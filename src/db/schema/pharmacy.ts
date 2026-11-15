@@ -9,6 +9,7 @@ import {
   uuid,
   primaryKey,
   check,
+  index,
 } from "drizzle-orm/pg-core";
 
 import { sql } from "drizzle-orm";
@@ -122,19 +123,25 @@ Stock Changes Table:
 - userId: Foreign key referencing the user who changed the field.
 - createdAt: The timestamp of when the field was changed.
 */
-export const stockChanges = pgTable("stock_changes", {
-  id: serial("id").primaryKey(),
-  stockId: integer("stock_id")
-    .notNull()
-    .references(() => medicationStock.id),
-  field: stockChangeFieldEnum("field").notNull(),
-  previousValue: varchar("previous_value").notNull(),
-  newValue: varchar("new_value").notNull(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => authUsers.id),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const stockChanges = pgTable(
+  "stock_changes",
+  {
+    id: serial("id").primaryKey(),
+    stockId: integer("stock_id")
+      .notNull()
+      .references(() => medicationStock.id),
+    field: stockChangeFieldEnum("field").notNull(),
+    previousValue: varchar("previous_value").notNull(),
+    newValue: varchar("new_value").notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => authUsers.id),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("stock_changes_stock_id_id_idx").on(table.stockId, table.id),
+  ],
+);
 
 export type StockChange = typeof stockChanges.$inferSelect;
 export type NewStockChange = typeof stockChanges.$inferInsert;
