@@ -109,7 +109,6 @@ export function VisitSummaryPanel({ visitId }: { visitId: number }) {
               <ReadOnlyField label="BP (mmHg)" value={bloodPressure} />
               <ReadOnlyField label="Heart Rate" value={vitals?.heartRate} />
               <ReadOnlyField label="Temperature" value={vitals?.temperature} />
-              <ReadOnlyField label="Urine Dip Test" value={vitals?.urineTest} />
               <ReadOnlyField label="Hemocue Hb" value={vitals?.hemocueCount} />
             </VitalsGroup>
 
@@ -127,7 +126,13 @@ export function VisitSummaryPanel({ visitId }: { visitId: number }) {
             </VitalsGroup>
 
             <ReadOnlyField
-              label="Others"
+              label="Urine Dip Test"
+              value={vitals?.urineTest}
+              className="w-full"
+            />
+
+            <ReadOnlyField
+              label="Additional Clinical Remarks"
               value={vitals?.others}
               className="w-full"
             />
