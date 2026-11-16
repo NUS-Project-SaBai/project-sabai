@@ -8,9 +8,9 @@ import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 import { useState } from "react";
 import Modal from "@/components/interactive/Modal";
 import EditPatientForm from "@/components/patient/EditPatientForm";
-import { Button } from "@/components/interactive/Button/Button";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { paths } from "@/utils/paths";
+import { EditPatientDetailsButton } from "@/components/patient/EditPatientDetailsButton";
 
 function parsePatientId(id: string | string[] | undefined) {
   if (typeof id !== "string") {
@@ -114,12 +114,7 @@ export default function PatientPage() {
               </h1>
               <p className="text-slate-600">Simple patient profile details</p>
             </div>
-            <Button
-              title="Edit Patient Details"
-              colour="indigo"
-              onClick={() => setIsEditingPatient(true)}
-              className="shrink-0"
-            />
+            <EditPatientDetailsButton patient={patient} />
           </div>
 
           {isEditingPatient && (
