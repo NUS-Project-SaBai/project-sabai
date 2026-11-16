@@ -1,4 +1,10 @@
-import { toDateInputValue, formatDate, parseDateInput } from "@/lib/utils/date";
+import {
+  toDateInputValue,
+  formatDate,
+  parseDateInput,
+  todayIso,
+  isFutureDate,
+} from "@/lib/utils/date";
 describe("toDateInputValue", () => {
   it("returns yyyy-MM-dd for an ISO string with a time component", () => {
     // The shape <input type='date'> requires; the time must be dropped.
@@ -67,5 +73,25 @@ describe("date display and parsing", () => {
     ])
       expect(parseDateInput(value)).toBeNull();
     expect(parseDateInput("29/02/2000")).toBe("2000-02-29");
+  });
+});
+
+describe("todayIso", () => {
+  afterEach(() => vi.useRealTimers());
+  it("returns the local calendar day, zero-padded", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 0, 5, 23, 59));
+    expect(todayIso()).toBe("2024-01-05");
+  });
+});
+
+describe("isFutureDate", () => {
+  afterEach(() => vi.useRealTimers());
+  it("is true only after today's local day", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 0, 5, 23, 59));
+    expect(isFutureDate("2024-01-06")).toBe(true);
+    expect(isFutureDate("2024-01-05")).toBe(false);
+    expect(isFutureDate("2023-12-31")).toBe(false);
   });
 });
