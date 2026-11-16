@@ -261,7 +261,6 @@ function Row({
         <TableCell>
           {item.stockStatus === "reserved" ? (
             <span className="text-sm font-medium text-slate-900">
-              {" "}
               Manage in Orders page
             </span>
           ) : item.stockStatus !== "dispensed" ? (
