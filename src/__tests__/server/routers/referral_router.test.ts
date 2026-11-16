@@ -49,7 +49,9 @@ const LATER_VILLAGE_CODE = {
 
 const EXPECTED_IMAGE_URL = `${serverEnv.CLOUDINARY_URL_PREFIX}/${SEED_PATIENT.patientImagePublicId}`;
 
-// protectedProcedure only reads ctx.user, so a minimal context is enough.
+// protectedProcedure reads only ctx.user and looks up ctx.appUser itself, so a
+// minimal context is enough, but authUserId must be linked to a public.users
+// row (see getLinkedTestUser) or the call fails with FORBIDDEN.
 function callerFor(authUserId: string) {
   return appRouter.createCaller({
     user: { id: authUserId },
