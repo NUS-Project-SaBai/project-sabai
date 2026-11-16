@@ -1,43 +1,94 @@
 ---
 title: Scan Face
-excerpt: This page handles the registration of patients by facial recognition.
+excerpt: Capture a patient's photo to find an existing patient or register a new one.
 permalink: /features/scan-face/
 ---
 
-## Introduction 
+## Introduction
 
-The Scan Face page captures the patient's face and is the first step in the clinic process. The page captures patient's faces to register them with the biometrics app for subsequent stations, as well as to check if they have been previously registered before. After leaving the station, the patient should have a visit registered.
+The Scan Face page is used at the start of the clinic process. It captures a
+patient's photo and searches for existing patients with a matching face.
 
-## Taking pictures and matching faces 
+If a matching patient is found, you can create a visit for them. If the patient
+is new or the matches are incorrect, you can register them and create their
+first visit.
 
-After a patient's picture is in the camera view, clicking the 'Capture' button at the bottom of the view will take their picture. The button will then turn into a red 'Retake Photo' button.
+## Taking a photo and finding matches
 
-A loading spinner appears while the application searches for patients matching the current picture taken. 
-- If there are no matching patients, the screen shows 'No matches found' and a purple 'Register New Patient' appears on the bottom left corner. Clicking the button displays a registration form on the screen. See [Registering New Patients](#registering-new-patients) for more information.
-- If there are matching patients, the screen shows 'Found matches:' and a table with the matching patients. The table displays the ID, photo, name, and an actions column, which will, in the future, contain a button that creates a visit. A button appears on the bottom left of the screen with text 'Register New Patient Instead' for false matches.
+1. Position the patient in the camera view.
+2. Click **Capture** to take a photo.
+3. To take another photo, click **Retake Photo**, then click **Capture** again.
 
-## Registering New Patients 
+After a photo is captured, the application automatically searches for matching
+patients. While it searches, it displays **Finding face matches...**.
 
-The registration page contains a registration form and two buttons on the bottom, 'Create New Patient' and 'Match Instead'. The 'Match Instead' button attempts to match the patient's face again. See [Taking pictures and matching faces section](#taking-pictures-and-matching-faces) for more information.
+### No matches
 
-The registration form contains some fields, some of which are compulsory (with '*' on the side).
+If no patient is found, the page displays **No matches found**. Click
+**Register New Patient** to open the registration form.
 
-Fields:
+### Matching patients
+
+If patients are found, the page displays **Found matches:** and a table with
+each patient's ID, photo and full name.
+
+To create a visit for a matching patient, click **Create Visit** in their row.
+The visit uses the currently selected village code.
+
+If a visit was created for that patient within the last minute, a
+**Duplicate Visit** confirmation appears. Click **Confirm** to create another
+visit, or **Cancel** to return to the results.
+
+When a visit is created, the page displays **Visit created successfully!**.
+If it cannot be created, the page displays
+**Failed to create visit. Please try again.**
+
+If none of the results is the correct patient, click
+**Register New Patient Instead** to open the registration form.
+
+## Registering a new patient
+
+The registration form uses the photo captured above. Fields marked with **\***
+are required.
+
+- Photo*
+- Village code* (selected outside the form)
 - Name*
 - Identification Number*
 - Contact Number*
-- Gender* (M/F Dropdown)
+- Gender*
 - Drug Allergy*
 - Date of Birth*
-- Has POOR Card? (Checkbox, default 'no')
-- Has BS2 Card? (Checkbox, default 'no')
-- Has Sabai Card? (Checkbox, default 'yes')
+- Has POOR Card? (optional checkbox, initially unchecked)
+- Has BS2 Card? (optional checkbox, initially unchecked)
+- Has Sabai Card? (optional checkbox, initially unchecked)
 
-Clicking "Create New Patient" with any field missing/without any image captured should display an error.
+### Child vitals
 
-If all fields are valid, the patient is registered and a visit is also automatically created for them at the time of registration.
+If the patient's date of birth indicates that they are under 18, the form also
+shows optional **Child Vitals** fields:
 
-## Upcoming Features
+- **Scoliosis:** Normal or Abnormal
+- **Pallor:** Yes or No
+- **Pubarche:** Yes or No
 
-- For repeat patients where the facial recognition system is unable to recognize them (especially children), there would be another button in order to manually select the patient through a regular search system. The patient's picture would then be updated with the currently captured picture.
-- The table that displays matching patients would have the button at the side where a visit can be created by clicking on the button.
+If **Pubarche** is set to **Yes**, a **Pubarche Age** field appears. If entered,
+the age must be at least 1 and cannot exceed the patient's current age.
+
+### Creating the patient
+
+Click **Create New Patient** after completing the required fields. The
+application creates the patient and automatically creates their first visit
+using the selected village code.
+
+On success, the page displays **Patient created successfully!**, clears the
+photo and resets the form. If creation fails, it displays
+**Failed to create patient. Please try again.**
+
+To return to the matching results using the current photo, click
+**Match Instead**.
+
+## Upcoming features
+
+Manual selection of an existing patient when facial matching cannot find them
+is not yet available from this page.
