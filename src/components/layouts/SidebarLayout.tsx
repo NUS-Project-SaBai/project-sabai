@@ -10,6 +10,7 @@ import { PiSignOutFill } from "react-icons/pi";
 import { IoMdMenu } from "react-icons/io";
 import { LuScanFace } from "react-icons/lu";
 import { GiMedicines, GiNotebook } from "react-icons/gi";
+import { HiOutlineArrowTrendingUp } from "react-icons/hi2";
 import LogoTitle from "@/components/LogoTitle";
 import { paths } from "@/utils/paths";
 import SabaiLogo from "@/components/SabaiLogo";
@@ -30,9 +31,9 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
     <div className="flex h-screen flex-col lg:flex-row">
       {/* mobile sidebar */}
       <div className="lg:hidden relative" ref={dropdownRef}>
-        <div className="grid grid-cols-3 w-full p-2 items-center bg-[var(--color-navbar)]">
+        <div className="grid grid-cols-[auto_1fr_auto] w-full items-center gap-2 p-2 bg-[var(--color-navbar)]">
           <SabaiLogo />
-          <div className="flex justify-center">
+          <div className="flex min-w-0 justify-center">
             <VillageSelector />
           </div>
           <div className="flex justify-end">
@@ -79,6 +80,11 @@ function SidebarNavButtons() {
     { name: "Vision", href: paths.vision(), icon: BsEyeglasses },
     { name: "Dental", href: paths.dental(), icon: FaTooth },
     { name: "Consults", href: paths.consults(), icon: FaStethoscope },
+    {
+      name: "Referrals",
+      href: paths.referrals(),
+      icon: HiOutlineArrowTrendingUp,
+    },
     {
       name: "Medication Stock",
       href: paths.medicationStock(),

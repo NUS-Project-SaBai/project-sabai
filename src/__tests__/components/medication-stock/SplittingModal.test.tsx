@@ -101,11 +101,11 @@ describe("SplittingModal", () => {
     // Then the remarks cell is empty
     assertTableContents(parentTable, [
       ["Location:", MOCK_STOCK.location],
-      ["Active Ingredient", MOCK_STOCK.medicationActiveIngredientName],
-      ["Brand Name", MOCK_STOCK.medicationBrandName],
+      ["Active Ingredient:", MOCK_STOCK.medicationActiveIngredientName],
+      ["Brand Name:", MOCK_STOCK.medicationBrandName],
       ["Quantity:", String(MOCK_STOCK.quantity)],
       ["Status:", MOCK_STOCK.stockStatus],
-      ["Remarks:", ""],
+      ["Remarks:", "No remarks added"],
     ]);
   });
 

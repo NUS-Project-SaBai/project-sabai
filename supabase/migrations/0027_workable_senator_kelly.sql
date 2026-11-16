@@ -1,0 +1,1 @@
+CREATE INDEX "stock_changes_stock_id_id_idx" ON "stock_changes" USING btree ("stock_id","id");

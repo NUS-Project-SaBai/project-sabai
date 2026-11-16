@@ -6,6 +6,14 @@ import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 import { Toaster } from "react-hot-toast";
+import { Noto_Sans_Khmer } from "next/font/google";
+
+/**
+ * Arial has no Khmer glyphs, so without this Khmer text falls back to
+ * whatever font the device has (or tofu boxes if none). Only the Khmer
+ * subset is loaded; Latin text keeps rendering in Arial.
+ */
+const notoSansKhmer = Noto_Sans_Khmer({ subsets: ["khmer"] });
 
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -38,6 +46,12 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
 
   return getLayout(
     <>
+      {/* Set on :root */}
+      <style jsx global>{`
+        :root {
+          --font-khmer: ${notoSansKhmer.style.fontFamily};
+        }
+      `}</style>
       <Component
         {...pageProps}
         key={isPatientRoute ? router.asPath : undefined}
