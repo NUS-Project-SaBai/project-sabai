@@ -3,7 +3,7 @@
 -- matching public.users IDs between dropping the old FKs and adding the new ones.
 
 -- 1. Ensure every auth user has a linked public.users row. Rows already linked
---    (e.g. by the roster import in supabase/snippets/import_users.sql) are kept;
+--    (e.g. by the roster import, `pnpm import:users`) are kept;
 --    any remaining login gets a placeholder row to be filled in by hand later.
 INSERT INTO "public"."users" ("auth_user_id", "name")
 SELECT a."id", COALESCE(NULLIF(a."raw_user_meta_data"->>'display_name', ''), a."email", a."id"::text)
