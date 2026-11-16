@@ -2,6 +2,7 @@ import { RHFDateInput } from "@/components/interactive/RHF/RHFDateInput";
 import { FormProvider, useForm } from "react-hook-form";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+
 function Form({ submit }: { submit: (data: { date: string }) => void }) {
   const form = useForm({ defaultValues: { date: "01/01/2000" } });
   return (
@@ -19,6 +20,7 @@ function Form({ submit }: { submit: (data: { date: string }) => void }) {
     </FormProvider>
   );
 }
+
 it("validates input and reflects reset values", async () => {
   const user = userEvent.setup();
   const submit = vi.fn();

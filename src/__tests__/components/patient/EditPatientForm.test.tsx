@@ -69,6 +69,20 @@ it("validates dates and required fields before submitting a changed ISO DOB", as
   );
 });
 
+it("rejects a future date of birth", async () => {
+  const user = userEvent.setup();
+  render(<EditPatientForm patient={patient} />);
+  const date = screen.getByPlaceholderText("DD/MM/YYYY");
+  const nextYear = new Date().getFullYear() + 1;
+  await user.clear(date);
+  await user.type(date, `01/01/${nextYear}`);
+  await user.click(screen.getByRole("button", { name: "Save Changes" }));
+  expect(
+    await screen.findByText("Date of Birth cannot be in the future"),
+  ).toBeInTheDocument();
+  expect(mutate).not.toHaveBeenCalled();
+});
+
 it.each([null, new Date(NaN)])(
   "keeps absent or invalid DOB and contact empty and blocks save",
   async (dob) => {

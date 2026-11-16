@@ -30,7 +30,7 @@ export function formatDate(
     .join("");
 }
 
-/** Convert a Date/ISO timestamp to its UTC calendar day for date input state. */
+/** Convert a Date/ISO timestamp to its UTC calendar day (yyyy-MM-dd), or "" if invalid. */
 export function toDateInputValue(value: Date | string | null | undefined) {
   if (value == null || (typeof value === "string" && !value.trim())) return "";
   if (hasInvalidIsoDay(value)) return "";
@@ -51,4 +51,17 @@ export function parseDateInput(value: string): string | null {
   const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   if (day < 1 || day > days[month - 1]) return null;
   return `${yearText}-${monthText}-${dayText}`;
+}
+
+/** Today's local calendar day as yyyy-MM-dd, comparable with parseDateInput output. */
+export function todayIso() {
+  const now = new Date();
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
+/** True when a yyyy-MM-dd day (e.g. from parseDateInput) is after today, local time. */
+export function isFutureDate(iso: string) {
+  // Zero-padded yyyy-MM-dd strings sort chronologically.
+  return iso > todayIso();
 }

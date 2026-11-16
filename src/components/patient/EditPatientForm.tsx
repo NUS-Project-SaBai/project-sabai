@@ -69,7 +69,7 @@ export default function EditPatientForm({
       {
         id: patient.id,
         ...data,
-        dateOfBirth: parseDateInput(data.dateOfBirth)!,
+        dateOfBirth: parseDateInput(data.dateOfBirth) ?? undefined,
         ...(isNewPhoto ? { patientImage: imageDetails! } : {}),
       },
       {
