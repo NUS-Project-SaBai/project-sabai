@@ -8,7 +8,8 @@ const PUBLISH_TIMEOUT_MS = 5000;
 type PublishBroadcastParams = {
   topic: "notifications";
   event: "new";
-  payload: Broadcast;
+  // Includes the sender's name so clients can render the toast without a lookup.
+  payload: Broadcast & { senderName: string | null };
 };
 
 export async function publishBroadcast({

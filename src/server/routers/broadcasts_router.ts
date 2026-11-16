@@ -1,11 +1,11 @@
-import { desc, eq, gt, sql } from "drizzle-orm";
-import type { User } from "@supabase/supabase-js";
+import { desc, eq, getTableColumns, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import {
   BROADCAST_TITLE_MAX_LENGTH,
   broadcasts,
   broadcastSeverityValues,
+  users,
 } from "@/db/schema";
 import { db } from "@/db/drizzle";
 import { protectedProcedure, router } from "@/server/trpc";
@@ -15,8 +15,6 @@ const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 200;
 // Keeps every broadcast far below Supabase Realtime's payload limit.
 const BODY_MAX_LENGTH = 5000;
-// created_by is varchar(255).
-const SENDER_MAX_LENGTH = 255;
 
 const listInputSchema = z
   .object({
@@ -31,14 +29,6 @@ const sendInputSchema = z.object({
   severity: z.enum(broadcastSeverityValues).default("info"),
 });
 
-// display_name is user-editable metadata, so check its type and length.
-function getSenderName(user: User): string | null {
-  const displayName = user.user_metadata?.display_name;
-  const name =
-    (typeof displayName === "string" && displayName.trim()) || user.email;
-  return name ? name.slice(0, SENDER_MAX_LENGTH) : null;
-}
-
 export const broadcastsRouter = router({
   list: protectedProcedure.input(listInputSchema).query(async ({ input }) => {
     const limit = input?.limit ?? DEFAULT_LIMIT;
@@ -46,8 +36,9 @@ export const broadcastsRouter = router({
 
     // SQL query to fetch broadcasts
     return db
-      .select()
+      .select({ ...getTableColumns(broadcasts), senderName: users.name })
       .from(broadcasts)
+      .leftJoin(users, eq(broadcasts.createdBy, users.id))
       .where(since === undefined ? undefined : gt(broadcasts.id, since))
       .orderBy(desc(broadcasts.id))
       .limit(limit);
@@ -59,10 +50,21 @@ export const broadcastsRouter = router({
   send: protectedProcedure
     .input(sendInputSchema)
     .mutation(async ({ input, ctx }) => {
-      const [row] = await db
+      // An auth account may not be linked to a users row yet. Send anyway,
+      // with no sender.
+      const [sender] = await db
+        .select({ id: users.id, name: users.name })
+        .from(users)
+        .where(eq(users.authUserId, ctx.user.id))
+        .limit(1);
+      const senderName = sender?.name ?? null;
+
+      const [inserted] = await db
         .insert(broadcasts)
-        .values({ ...input, createdBy: getSenderName(ctx.user) })
+        .values({ ...input, createdBy: sender?.id ?? null })
         .returning();
+      // Same shape as list, so clients can render the toast without a lookup.
+      const row = { ...inserted, senderName };
 
       let published = true;
       try {
@@ -88,7 +90,7 @@ export const broadcastsRouter = router({
           )
           .where(eq(broadcasts.id, row.id))
           .returning();
-        return updatedRow;
+        return { ...updatedRow, senderName };
       } catch (error) {
         console.error(
           `Failed to record publish result for broadcast ${row.id}:`,

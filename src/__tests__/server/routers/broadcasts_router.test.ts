@@ -3,9 +3,10 @@
 // Integration tests for the broadcasts tRPC router against the local
 // Postgres instance configured in .env.
 // Covers list (ordering, limits, since filtering) and send (outbox publish
-// success/failure, sender name, input validation), plus authentication checks.
+// success/failure, sender lookup, input validation), plus authentication checks.
 // publishBroadcast is mocked, so Supabase Realtime is not needed.
-// Prereqs: local Supabase running with migrations applied.
+// Prereqs: local Supabase running with migrations applied and seeded
+// (`pnpm seed:all`) so that an auth.users row exists.
 //
 // Runs in Node because envVariables.ts only exposes DATABASE_URL server-side.
 
@@ -18,9 +19,10 @@ import {
   it,
   vi,
 } from "vitest";
+import { randomUUID } from "node:crypto";
 import { eq, inArray } from "drizzle-orm";
 
-import { broadcasts } from "@/db/schema";
+import { authUsers, broadcasts, users } from "@/db/schema";
 import { db } from "@/db/drizzle";
 import { appRouter } from "@/server/routers/_app";
 import type { Context } from "@/server/context";
@@ -136,13 +138,9 @@ describe("broadcastsRouter.list (integration)", () => {
 });
 
 describe("broadcastsRouter.send (integration)", () => {
-  const senderCaller = appRouter.createCaller({
-    user: {
-      id: "broadcasts-send-test-user",
-      email: "sender@example.com",
-      user_metadata: { display_name: "Test Sender" },
-    },
-  } as unknown as Context);
+  let sender: { id: string; name: string };
+  let createdUserId: string | undefined;
+  let senderCaller: ReturnType<typeof appRouter.createCaller>;
 
   const validInput = {
     title: "Paracetamol low in stock",
@@ -152,6 +150,36 @@ describe("broadcastsRouter.send (integration)", () => {
 
   const createdIds: number[] = [];
 
+  beforeAll(async () => {
+    const [authUser] = await db
+      .select({ id: authUsers.id })
+      .from(authUsers)
+      .limit(1);
+    if (!authUser) {
+      throw new Error(
+        "No auth.users row found. Run `pnpm seed:all` against local Supabase " +
+          "before running the router integration tests.",
+      );
+    }
+
+    // Reuse the users row linked to this account, or create one.
+    [sender] = await db
+      .select({ id: users.id, name: users.name })
+      .from(users)
+      .where(eq(users.authUserId, authUser.id));
+    if (!sender) {
+      [sender] = await db
+        .insert(users)
+        .values({ name: "Broadcast Test Sender", authUserId: authUser.id })
+        .returning({ id: users.id, name: users.name });
+      createdUserId = sender.id;
+    }
+
+    senderCaller = appRouter.createCaller({
+      user: { id: authUser.id },
+    } as unknown as Context);
+  });
+
   afterEach(() => {
     publishBroadcastMock.mockReset();
     vi.restoreAllMocks();
@@ -160,6 +188,9 @@ describe("broadcastsRouter.send (integration)", () => {
   afterAll(async () => {
     if (createdIds.length > 0) {
       await db.delete(broadcasts).where(inArray(broadcasts.id, createdIds));
+    }
+    if (createdUserId) {
+      await db.delete(users).where(eq(users.id, createdUserId));
     }
   });
 
@@ -179,11 +210,12 @@ describe("broadcastsRouter.send (integration)", () => {
 
     expect(result).toMatchObject({
       ...validInput,
-      createdBy: "Test Sender",
+      createdBy: sender.id,
+      senderName: sender.name,
       attempts: 0,
     });
     expect(result.publishedAt).toBeInstanceOf(Date);
-    expect(await findRow(result.id)).toEqual(result);
+    expect(result).toMatchObject(await findRow(result.id));
 
     // The pushed payload is the committed row, before it was marked published.
     expect(publishBroadcastMock).toHaveBeenCalledWith({
@@ -191,6 +223,7 @@ describe("broadcastsRouter.send (integration)", () => {
       event: "new",
       payload: expect.objectContaining({
         id: result.id,
+        senderName: sender.name,
         publishedAt: null,
         attempts: 0,
       }),
@@ -211,7 +244,7 @@ describe("broadcastsRouter.send (integration)", () => {
       publishedAt: null,
       attempts: 1,
     });
-    expect(await findRow(result.id)).toEqual(result);
+    expect(result).toMatchObject(await findRow(result.id));
     expect(consoleErrorSpy).toHaveBeenCalled();
   });
 
@@ -227,51 +260,29 @@ describe("broadcastsRouter.send (integration)", () => {
     expect(result.severity).toBe("info");
   });
 
-  it("falls back to the sender's email when there is no display name", async () => {
+  it("stores no sender when the account has no linked users row", async () => {
     publishBroadcastMock.mockResolvedValue(undefined);
-    const emailOnlyCaller = appRouter.createCaller({
-      user: {
-        id: "broadcasts-send-email-user",
-        email: "fallback@example.com",
-        user_metadata: {},
-      },
+    const unlinkedCaller = appRouter.createCaller({
+      user: { id: randomUUID() },
     } as unknown as Context);
 
-    const result = await emailOnlyCaller.broadcastsRouter.send(validInput);
+    const result = await unlinkedCaller.broadcastsRouter.send(validInput);
     createdIds.push(result.id);
 
-    expect(result.createdBy).toBe("fallback@example.com");
+    expect(result).toMatchObject({ createdBy: null, senderName: null });
+    expect(result.publishedAt).toBeInstanceOf(Date);
   });
 
-  it("truncates a display name longer than the created_by column", async () => {
+  it("lists the sender name by joining users", async () => {
     publishBroadcastMock.mockResolvedValue(undefined);
-    const longNameCaller = appRouter.createCaller({
-      user: {
-        id: "broadcasts-send-long-name-user",
-        email: "long-name@example.com",
-        user_metadata: { display_name: "a".repeat(300) },
-      },
-    } as unknown as Context);
 
-    const result = await longNameCaller.broadcastsRouter.send(validInput);
+    const result = await senderCaller.broadcastsRouter.send(validInput);
     createdIds.push(result.id);
 
-    expect(result.createdBy).toBe("a".repeat(255));
-  });
-
-  it("stores no sender when there is no display name or email", async () => {
-    publishBroadcastMock.mockResolvedValue(undefined);
-    const anonymousCaller = appRouter.createCaller({
-      user: {
-        id: "broadcasts-send-no-name-user",
-        user_metadata: { display_name: "  " },
-      },
-    } as unknown as Context);
-
-    const result = await anonymousCaller.broadcastsRouter.send(validInput);
-    createdIds.push(result.id);
-
-    expect(result.createdBy).toBeNull();
+    const [listed] = await senderCaller.broadcastsRouter.list({
+      since: result.id - 1,
+    });
+    expect(listed).toEqual(result);
   });
 
   it("returns the saved row when marking it published fails", async () => {
