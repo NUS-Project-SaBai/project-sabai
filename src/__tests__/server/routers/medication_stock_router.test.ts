@@ -86,6 +86,26 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
     return { stock, insertChangeCount: insertChanges.length };
   }
 
+  async function insertStock(stockStatus: StockStatus) {
+    const stock = await withUserTransaction(userId, async (tx) => {
+      const [row] = await tx
+        .insert(medicationStock)
+        .values({
+          medicationBrandId: brandId,
+          ...SEED_STOCK,
+          stockStatus,
+        })
+        .returning();
+
+      return row;
+    });
+
+    return {
+      stock,
+      insertChangeCount: (await changesFor(stock.id)).length,
+    };
+  }
+
   async function cleanUpStock() {
     const rows = await testStockRows();
     const ids = rows.map((r) => r.id);
@@ -166,6 +186,54 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
       const fields = (await changesFor(stock.id)).map((c) => c.field);
       expect(fields).toEqual(["quantity", "location", "stock_status"]);
     });
+
+    it("rejects creating reserved stock", async () => {
+      await expect(
+        caller.medicationStockRouter.create({
+          medicationBrandId: brandId,
+          ...SEED_STOCK,
+          stockStatus: "reserved",
+        }),
+      ).rejects.toMatchObject({
+        code: "BAD_REQUEST",
+      });
+
+      expect(await testStockRows()).toHaveLength(0);
+    });
+
+    it("rejects creating dispensed stock", async () => {
+      await expect(
+        caller.medicationStockRouter.create({
+          medicationBrandId: brandId,
+          ...SEED_STOCK,
+          stockStatus: "dispensed",
+        }),
+      ).rejects.toMatchObject({
+        code: "BAD_REQUEST",
+      });
+
+      expect(await testStockRows()).toHaveLength(0);
+    });
+
+    it.each(["active", "discarded", "donated"] as const)(
+      "allows creating %s stock",
+      async (status) => {
+        const stock = await caller.medicationStockRouter.create({
+          medicationBrandId: brandId,
+          ...SEED_STOCK,
+          stockStatus: status,
+        });
+
+        const rows = await testStockRows();
+
+        expect(rows).toHaveLength(1);
+        expect(rows[0]).toMatchObject({
+          id: stock.id,
+          stockStatus: status,
+          quantity: SEED_STOCK.quantity,
+        });
+      },
+    );
   });
 
   describe("on update", () => {
@@ -254,6 +322,125 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
 
       expect(await changesFor(stock.id)).toHaveLength(insertChangeCount);
     });
+
+    it.each(["reserved", "dispensed"] as const)(
+      "rejects editing the location and remarks of %s stock",
+      async (status) => {
+        const { stock, insertChangeCount } = await insertStock(status);
+
+        await expect(
+          caller.medicationStockRouter.update({
+            id: stock.id,
+            location: "Shelf B",
+            remarks: "changed remarks",
+          }),
+        ).rejects.toMatchObject({
+          code: "CONFLICT",
+        });
+
+        expect(await testStockRows()).toEqual([stock]);
+        expect(await changesFor(stock.id)).toHaveLength(insertChangeCount);
+      },
+    );
+
+    it.each(["reserved", "dispensed"] as const)(
+      "rejects changing existing %s stock to active",
+      async (status) => {
+        const { stock, insertChangeCount } = await insertStock(status);
+
+        await expect(
+          caller.medicationStockRouter.update({
+            id: stock.id,
+            stockStatus: "active",
+            remarks: SEED_STOCK.remarks,
+          }),
+        ).rejects.toMatchObject({
+          code: "CONFLICT",
+        });
+
+        expect(await testStockRows()).toEqual([stock]);
+        expect(await changesFor(stock.id)).toHaveLength(insertChangeCount);
+      },
+    );
+
+    it.each(["reserved", "dispensed"] as const)(
+      "rejects changing active stock to %s",
+      async (status) => {
+        const { stock, insertChangeCount } = await createStock();
+
+        await expect(
+          caller.medicationStockRouter.update({
+            id: stock.id,
+            stockStatus: status,
+            remarks: SEED_STOCK.remarks,
+          }),
+        ).rejects.toMatchObject({
+          code: "BAD_REQUEST",
+        });
+
+        expect(await testStockRows()).toEqual([stock]);
+        expect(await changesFor(stock.id)).toHaveLength(insertChangeCount);
+      },
+    );
+
+    it.each(["active", "discarded", "donated"] as const)(
+      "allows editing the location of %s stock",
+      async (status) => {
+        const { stock } = await insertStock(status);
+
+        await caller.medicationStockRouter.update({
+          id: stock.id,
+          location: "Shelf B",
+          remarks: SEED_STOCK.remarks,
+        });
+
+        const [row] = await testStockRows();
+
+        expect(row).toEqual({
+          ...stock,
+          location: "Shelf B",
+        });
+      },
+    );
+
+    it.each(["active", "discarded", "donated"] as const)(
+      "allows changing discarded stock to %s",
+      async (status) => {
+        const { stock } = await insertStock("discarded");
+
+        await caller.medicationStockRouter.update({
+          id: stock.id,
+          stockStatus: status,
+          remarks: SEED_STOCK.remarks,
+        });
+
+        const [row] = await testStockRows();
+
+        expect(row).toEqual({
+          ...stock,
+          stockStatus: status,
+        });
+      },
+    );
+
+    it("returns NOT_FOUND when updating a nonexistent stock", async () => {
+      const { stock } = await createStock();
+
+      // Delete the fixture so this ID is guaranteed not to exist.
+      await cleanUpStock();
+
+      await expect(
+        caller.medicationStockRouter.update({
+          id: stock.id,
+          location: "Shelf B",
+          remarks: "changed remarks",
+        }),
+      ).rejects.toMatchObject({
+        code: "NOT_FOUND",
+      });
+
+      expect(await testStockRows()).toHaveLength(0);
+    });
   });
 
   describe("createSplits()", () => {
@@ -264,7 +451,7 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
         parentId: parent.id,
         splits: [
           { quantity: 60, location: "Shelf D", stockStatus: "active" },
-          { quantity: 40, location: "Shelf E", stockStatus: "reserved" },
+          { quantity: 40, location: "Shelf E", stockStatus: "donated" },
         ],
       });
 
@@ -314,6 +501,104 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
       expect(rows[0].quantity).toBe(SEED_STOCK.quantity);
       expect(await changesFor(parent.id)).toHaveLength(insertChangeCount);
     });
+
+    it.each(["reserved", "dispensed"] as const)(
+      "rejects splitting %s stock",
+      async (status) => {
+        const { stock: parent, insertChangeCount } = await insertStock(status);
+
+        await expect(
+          caller.medicationStockRouter.createSplits({
+            parentId: parent.id,
+            splits: [
+              { quantity: 60, location: "Shelf D", stockStatus: "active" },
+              { quantity: 40, location: "Shelf E", stockStatus: "donated" },
+            ],
+          }),
+        ).rejects.toMatchObject({
+          code: "CONFLICT",
+        });
+
+        expect(await testStockRows()).toEqual([parent]);
+        expect(await changesFor(parent.id)).toHaveLength(insertChangeCount);
+      },
+    );
+
+    it.each(["reserved", "dispensed"] as const)(
+      "rejects creating a %s child stock",
+      async (status) => {
+        const { stock: parent, insertChangeCount } = await createStock();
+
+        await expect(
+          caller.medicationStockRouter.createSplits({
+            parentId: parent.id,
+            splits: [
+              { quantity: 60, location: "Shelf D", stockStatus: "active" },
+              {
+                quantity: 40,
+                location: "Shelf E",
+                // Deliberately submit invalid input to test runtime validation.
+                // @ts-expect-error Restricted statuses are not valid split inputs.
+                stockStatus: status,
+              },
+            ],
+          }),
+        ).rejects.toMatchObject({
+          code: "BAD_REQUEST",
+        });
+
+        expect(await testStockRows()).toEqual([parent]);
+        expect(await changesFor(parent.id)).toHaveLength(insertChangeCount);
+      },
+    );
+
+    it.each(["active", "discarded", "donated"] as const)(
+      "allows splitting %s stock into children with allowed statuses",
+      async (status) => {
+        const { stock: parent } = await insertStock(status);
+
+        await expect(
+          caller.medicationStockRouter.createSplits({
+            parentId: parent.id,
+            splits: [
+              { quantity: 50, location: "Shelf D", stockStatus: "active" },
+              { quantity: 30, location: "Shelf E", stockStatus: "discarded" },
+              { quantity: 20, location: "Shelf F", stockStatus: "donated" },
+            ],
+          }),
+        ).resolves.toEqual({ success: true });
+
+        const rows = await testStockRows();
+        const updatedParent = rows.find((row) => row.id === parent.id);
+        const children = rows.filter((row) => row.id !== parent.id);
+
+        expect(updatedParent).toEqual({
+          ...parent,
+          quantity: 0,
+        });
+
+        expect(children).toHaveLength(3);
+        expect(children).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              quantity: 50,
+              location: "Shelf D",
+              stockStatus: "active",
+            }),
+            expect.objectContaining({
+              quantity: 30,
+              location: "Shelf E",
+              stockStatus: "discarded",
+            }),
+            expect.objectContaining({
+              quantity: 20,
+              location: "Shelf F",
+              stockStatus: "donated",
+            }),
+          ]),
+        );
+      },
+    );
   });
 
   describe("rollback", () => {
@@ -409,6 +694,7 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
 
 describe("medicationStockRouter low-stock flags (integration)", () => {
   let caller: ReturnType<typeof callerFor>;
+  let userId: string;
   let ingredientA: number;
   let ingredientB: number;
   let brandA: number;
@@ -453,11 +739,18 @@ describe("medicationStockRouter low-stock flags (integration)", () => {
     quantity: number,
     stockStatus: StockStatus = "active",
   ) {
-    return caller.medicationStockRouter.create({
-      ...SEED_STOCK,
-      medicationBrandId,
-      quantity,
-      stockStatus,
+    return withUserTransaction(userId, async (tx) => {
+      const [stock] = await tx
+        .insert(medicationStock)
+        .values({
+          ...SEED_STOCK,
+          medicationBrandId,
+          quantity,
+          stockStatus,
+        })
+        .returning();
+
+      return stock;
     });
   }
 
@@ -500,7 +793,8 @@ describe("medicationStockRouter low-stock flags (integration)", () => {
       throw new Error("Run pnpm seed:users before these integration tests.");
     }
 
-    caller = callerFor(user.id);
+    userId = user.id;
+    caller = callerFor(userId);
 
     ingredientA = await createIngredient(100);
     ingredientB = await createIngredient(50);

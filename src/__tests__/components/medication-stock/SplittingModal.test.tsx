@@ -173,6 +173,81 @@ describe("SplittingModal", () => {
     });
   });
 
+  it("only offers active, discarded and donated statuses for child stock", async () => {
+    // Given the modal is open
+    const user = userEvent.setup();
+    renderModal();
+
+    // When a child split is added
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    // Then its status dropdown contains exactly the allowed options
+    const dialog = screen.getByRole("dialog");
+    const childTable = within(dialog).getAllByRole("table")[1];
+    const dropdown = within(childTable).getByRole("combobox");
+    const options = within(dropdown).getAllByRole("option");
+
+    expect(options.map((option) => option.textContent)).toEqual([
+      "active",
+      "discarded",
+      "donated",
+    ]);
+  });
+
+  it.each(["active", "discarded", "donated"] as const)(
+    "defaults new child stock to the parent's %s status",
+    async (status) => {
+      // Given a parent stock with an allowed status
+      const user = userEvent.setup();
+      renderModal({ ...MOCK_STOCK, stockStatus: status });
+
+      // When a child split is added
+      await user.click(
+        await screen.findByRole("button", { name: "Add Split" }),
+      );
+
+      // Then the child inherits the parent's status
+      const dialog = screen.getByRole("dialog");
+      const childTable = within(dialog).getAllByRole("table")[1];
+
+      expect(within(childTable).getByRole("combobox")).toHaveValue(status);
+    },
+  );
+
+  it("does not add child stock when the parent is reserved", async () => {
+    // Given reserved stock is passed directly to the modal
+    const user = userEvent.setup();
+    renderModal({ ...MOCK_STOCK, stockStatus: "reserved" });
+
+    // When the user clicks Add Split
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    // Then no child table appears and the empty state remains
+    const dialog = screen.getByRole("dialog");
+
+    expect(within(dialog).getAllByRole("table")).toHaveLength(1);
+    expect(screen.getByText("Add a split to begin.")).toBeInTheDocument();
+    expect(screen.getByRole("counter")).toHaveTextContent("0/10 splits added");
+    expect(createSplitsMutate).not.toHaveBeenCalled();
+  });
+
+  it("does not add child stock when the parent is dispensed", async () => {
+    // Given dispensed stock is passed directly to the modal
+    const user = userEvent.setup();
+    renderModal({ ...MOCK_STOCK, stockStatus: "dispensed" });
+
+    // When the user clicks Add Split
+    await user.click(await screen.findByRole("button", { name: "Add Split" }));
+
+    // Then no child table appears and the empty state remains
+    const dialog = screen.getByRole("dialog");
+
+    expect(within(dialog).getAllByRole("table")).toHaveLength(1);
+    expect(screen.getByText("Add a split to begin.")).toBeInTheDocument();
+    expect(screen.getByRole("counter")).toHaveTextContent("0/10 splits added");
+    expect(createSplitsMutate).not.toHaveBeenCalled();
+  });
+
   // --- Remove child row ---
 
   it("removes the correct row when '-' is clicked", async () => {
