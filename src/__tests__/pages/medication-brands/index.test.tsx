@@ -186,7 +186,7 @@ describe("MedicationBrandsBasePage", () => {
       container.querySelector('input[name="name"]'),
     ).not.toBeInTheDocument();
     expect(
-      container.querySelector('input[name="remarks"]'),
+      container.querySelector('textarea[name="remarks"]'),
     ).not.toBeInTheDocument();
     expect(
       container.querySelector(
@@ -201,7 +201,7 @@ describe("MedicationBrandsBasePage", () => {
     expect(container.querySelector('input[name="name"]')).toHaveValue(
       "Panadol",
     );
-    expect(container.querySelector('input[name="remarks"]')).toHaveValue(
+    expect(container.querySelector('textarea[name="remarks"]')).toHaveValue(
       "test",
     );
     expect(
