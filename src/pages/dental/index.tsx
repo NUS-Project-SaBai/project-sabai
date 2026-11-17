@@ -21,7 +21,7 @@ export default function DentalPage() {
   } = trpc.patientsRouter.listWithLatestVisit.useQuery();
 
   const openDentalPage = (patientId: number) =>
-    router.push(`/dental/${patientId}`);
+    router.push(paths.dentalDetail(patientId));
 
   function renderContent() {
     if (isError) {
@@ -108,7 +108,7 @@ export default function DentalPage() {
 
 DentalPage.getLayout = (page: React.ReactNode) =>
   withDefaultLayout(
-    <PatientTopMenuLayout getPatientLink={(id) => `/dental/${id}`}>
+    <PatientTopMenuLayout getPatientLink={paths.dentalDetail}>
       {page}
     </PatientTopMenuLayout>,
   );
