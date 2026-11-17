@@ -110,10 +110,10 @@ function VillageCodesPage() {
             { label: "Village Codes" },
           ]}
         />
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
           <h1 className="text-3xl font-bold text-slate-900">Village Codes</h1>
-          <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 text-sm text-slate-600">
+          <div className="flex flex-col items-center gap-3">
+            <label className="flex items-center gap-2 text-sm text-slate-600 whitespace-nowrap">
               <input
                 type="checkbox"
                 checked={showHidden}
