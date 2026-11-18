@@ -4,17 +4,10 @@ import { asc, eq } from "drizzle-orm";
 import { db } from "@/db/drizzle";
 import { router, protectedProcedure } from "@/server/trpc";
 import { referralPartners } from "@/db/schema/referralPartners";
-
-const partnerFields = {
-  name: z.string().trim().min(1, "Name is required").max(255),
-  // Blank remarks are stored as NULL. Always sending a value means an update can clear it.
-  remarks: z
-    .string()
-    .trim()
-    .nullish()
-    .transform((v) => v || null),
-  isActive: z.boolean().default(true),
-};
+import {
+  createPartnerInput,
+  updatePartnerInput,
+} from "@/server/schemas/referralPartners";
 
 export const referralPartnersRouter = router({
   list: protectedProcedure.query(async () => {
@@ -25,7 +18,7 @@ export const referralPartnersRouter = router({
   }),
 
   create: protectedProcedure
-    .input(z.object(partnerFields))
+    .input(createPartnerInput)
     .mutation(async ({ input }) => {
       const [newPartner] = await db
         .insert(referralPartners)
@@ -35,7 +28,7 @@ export const referralPartnersRouter = router({
     }),
 
   update: protectedProcedure
-    .input(z.object({ id: z.uuid(), ...partnerFields }))
+    .input(updatePartnerInput)
     .mutation(async ({ input }) => {
       const { id, ...data } = input;
       const [updated] = await db
