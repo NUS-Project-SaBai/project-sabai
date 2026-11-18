@@ -8,13 +8,16 @@ import { Button } from "@/components/interactive/Button/Button";
 import { ReferralPartner } from "@/db/schema";
 import { trpc } from "@/utils/trpc";
 import DeleteConfirmModal from "./DeleteConfirmModal";
-import { EditFormFields, nameRegisterOptions } from "./types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { editPartnerFormSchema } from "@/server/schemas/referralPartners";
+import type { EditFormFields } from "./types";
 
 export default function PartnerRow(partner: ReferralPartner) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const form = useForm<EditFormFields>({
+    resolver: zodResolver(editPartnerFormSchema),
     values: {
       id: partner.id,
       name: partner.name,
@@ -75,7 +78,6 @@ export default function PartnerRow(partner: ReferralPartner) {
               name="name"
               type="text"
               value={partner.name}
-              registerOptions={nameRegisterOptions}
             />
           </span>
         </TableCell>

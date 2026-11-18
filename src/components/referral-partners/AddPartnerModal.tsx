@@ -5,7 +5,9 @@ import Modal from "@/components/interactive/Modal";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { Button } from "@/components/interactive/Button/Button";
 import { trpc } from "@/utils/trpc";
-import { AddFormFields, nameRegisterOptions } from "./types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { partnerFormSchema } from "@/server/schemas/referralPartners";
+import type { AddFormFields } from "./types";
 
 const DEFAULT_VALUES: AddFormFields = {
   name: "",
@@ -16,7 +18,10 @@ const DEFAULT_VALUES: AddFormFields = {
 export default function AddPartnerModal() {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
 
-  const form = useForm<AddFormFields>({ defaultValues: DEFAULT_VALUES });
+  const form = useForm<AddFormFields>({
+    resolver: zodResolver(partnerFormSchema),
+    defaultValues: DEFAULT_VALUES,
+  });
 
   const utils = trpc.useUtils();
 
@@ -52,13 +57,7 @@ export default function AddPartnerModal() {
                 form.handleSubmit(handleSubmit)(e);
               }}
             >
-              <RHFInput
-                name="name"
-                label="Name"
-                type="text"
-                isRequired
-                registerOptions={nameRegisterOptions}
-              />
+              <RHFInput name="name" label="Name" type="text" isRequired />
               <RHFInput name="remarks" label="Remarks" type="text" />
               <RHFInput name="isActive" label="Is Active?" type="checkbox" />
               <div className="flex flex-row gap-2">
