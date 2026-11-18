@@ -39,6 +39,11 @@ export default function PartnerRow(partner: ReferralPartner) {
     },
   });
 
+  function cancelEdit() {
+    form.reset();
+    setIsEditing(false);
+  }
+
   const deleteMutation = trpc.referralPartnersRouter.delete.useMutation({
     onSuccess: () => {
       toast.success("Successfully deleted.");
@@ -114,35 +119,28 @@ export default function PartnerRow(partner: ReferralPartner) {
         <TableCell>
           <div className="flex gap-2">
             {isEditing ? (
-              <Button
-                colour="emerald"
-                disabled={isSaving}
-                onClick={() => form.handleSubmit(handleSubmit)()}
-                title={isSaving ? "Saving..." : "Save"}
-              />
+              <>
+                <Button
+                  colour="emerald"
+                  disabled={isSaving}
+                  onClick={() => form.handleSubmit(handleSubmit)()}
+                  title={isSaving ? "Saving..." : "Save"}
+                />
+                <Button colour="red" onClick={cancelEdit} title="Cancel" />
+              </>
             ) : (
-              <Button
-                colour="emerald"
-                onClick={() => setIsEditing(true)}
-                title="Edit"
-              />
-            )}
-
-            {isEditing ? (
-              <Button
-                onClick={() => {
-                  form.reset();
-                  setIsEditing(false);
-                }}
-                colour="red"
-                title="Cancel"
-              />
-            ) : (
-              <Button
-                onClick={() => setIsDeleting(true)}
-                colour="red"
-                title="Delete"
-              />
+              <>
+                <Button
+                  colour="emerald"
+                  onClick={() => setIsEditing(true)}
+                  title="Edit"
+                />
+                <Button
+                  colour="red"
+                  onClick={() => setIsDeleting(true)}
+                  title="Delete"
+                />
+              </>
             )}
 
             {isDeleting && (
