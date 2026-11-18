@@ -78,15 +78,13 @@ describe("broadcastsRouter.list (integration)", () => {
     expect(rows.map(({ id }) => id)).toEqual([...fixtureIds].reverse());
   });
 
-  it("returns broadcasts up to the requested limit", async () => {
+  it("ignores the limit when since is given", async () => {
     const rows = await caller.broadcastsRouter.list({
       limit: 5,
       since: fixtureIds[0] - 1,
     });
 
-    expect(rows.map(({ id }) => id)).toEqual(
-      [...fixtureIds].reverse().slice(0, 5),
-    );
+    expect(rows.map(({ id }) => id)).toEqual([...fixtureIds].reverse());
   });
 
   it("defaults to 50 rows when no input is provided", async () => {
@@ -98,9 +96,7 @@ describe("broadcastsRouter.list (integration)", () => {
   });
 
   it("defaults to 50 rows when limit is omitted", async () => {
-    const rows = await caller.broadcastsRouter.list({
-      since: fixtureIds[0] - 1,
-    });
+    const rows = await caller.broadcastsRouter.list({});
 
     expect(rows.map(({ id }) => id)).toEqual(
       [...fixtureIds].reverse().slice(0, 50),
@@ -283,6 +279,26 @@ describe("broadcastsRouter.send (integration)", () => {
       since: result.id - 1,
     });
     expect(listed).toEqual(result);
+  });
+
+  it("blocks deleting a user who has sent broadcasts", async () => {
+    const [user] = await db
+      .insert(users)
+      .values({ name: "Broadcast Restrict Test" })
+      .returning({ id: users.id });
+    const [row] = await db
+      .insert(broadcasts)
+      .values({ ...validInput, createdBy: user.id })
+      .returning({ id: broadcasts.id });
+
+    try {
+      await expect(
+        db.delete(users).where(eq(users.id, user.id)),
+      ).rejects.toThrow();
+    } finally {
+      await db.delete(broadcasts).where(eq(broadcasts.id, row.id));
+      await db.delete(users).where(eq(users.id, user.id));
+    }
   });
 
   it("returns the saved row when marking it published fails", async () => {

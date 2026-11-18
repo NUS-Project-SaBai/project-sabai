@@ -1,47 +1,50 @@
 import { desc, eq, getTableColumns, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 
-import {
-  BROADCAST_TITLE_MAX_LENGTH,
-  broadcasts,
-  broadcastSeverityValues,
-  users,
-} from "@/db/schema";
+import { broadcasts, broadcastSeverityValues, users } from "@/db/schema";
 import { db } from "@/db/drizzle";
+import {
+  BROADCAST_BODY_MAX_LENGTH,
+  BROADCAST_LIST_DEFAULT_LIMIT,
+  BROADCAST_LIST_MAX_LIMIT,
+  BROADCAST_TITLE_MAX_LENGTH,
+} from "@/lib/constants/broadcasts";
 import { protectedProcedure, router } from "@/server/trpc";
 import { publishBroadcast } from "@/server/utils/realtime";
 
-const DEFAULT_LIMIT = 50;
-const MAX_LIMIT = 200;
-// Keeps every broadcast far below Supabase Realtime's payload limit.
-const BODY_MAX_LENGTH = 5000;
-
 const listInputSchema = z
   .object({
-    limit: z.number().int().min(1).max(MAX_LIMIT).default(DEFAULT_LIMIT),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(BROADCAST_LIST_MAX_LIMIT)
+      .default(BROADCAST_LIST_DEFAULT_LIMIT),
     since: z.number().int().optional(),
   })
   .optional();
 
 const sendInputSchema = z.object({
   title: z.string().trim().min(1).max(BROADCAST_TITLE_MAX_LENGTH),
-  body: z.string().trim().min(1).max(BODY_MAX_LENGTH),
+  body: z.string().trim().min(1).max(BROADCAST_BODY_MAX_LENGTH),
   severity: z.enum(broadcastSeverityValues).default("info"),
 });
 
 export const broadcastsRouter = router({
   list: protectedProcedure.input(listInputSchema).query(async ({ input }) => {
-    const limit = input?.limit ?? DEFAULT_LIMIT;
+    const limit = input?.limit ?? BROADCAST_LIST_DEFAULT_LIMIT;
     const since = input?.since;
 
-    // SQL query to fetch broadcasts
-    return db
+    const query = db
       .select({ ...getTableColumns(broadcasts), senderName: users.name })
       .from(broadcasts)
       .leftJoin(users, eq(broadcasts.createdBy, users.id))
       .where(since === undefined ? undefined : gt(broadcasts.id, since))
-      .orderBy(desc(broadcasts.id))
-      .limit(limit);
+      .orderBy(desc(broadcasts.id));
+
+    // With since, return every newer row. A limit would keep only the newest
+    // ones, and a client that moves since past them would never get the rest.
+    return since === undefined ? query.limit(limit) : query;
   }),
 
   // Transactional outbox: the INSERT is the source of truth and the Realtime
