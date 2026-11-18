@@ -30,6 +30,7 @@ import {
   classifyBloodPressure,
   describeBloodPressureThreshold,
 } from "@/lib/utils/vitals";
+import { EditPatientDetailsButton } from "@/components/patient/EditPatientDetailsButton";
 
 type VitalsFormValues = {
   height?: string | null;
@@ -118,12 +119,7 @@ export default function PatientVitalsPage() {
           <h1 className="text-3xl font-bold text-slate-900">
             Patient Vitals — {patient.name}
           </h1>
-          <Button
-            title="Edit Patient Details"
-            colour="indigo"
-            onClick={() => setIsEditingPatient(true)}
-            className="shrink-0"
-          />
+          <EditPatientDetailsButton patient={patient} />
         </div>
 
         {isEditingPatient && (
