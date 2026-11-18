@@ -334,7 +334,7 @@ describe("ReferralPartnersPage", () => {
     await user.click(within(dialog).getByRole("button", { name: "Save" }));
 
     expect(
-      await within(dialog).findByText("Missing Name!"),
+      await within(dialog).findByText("Please input a name."),
     ).toBeInTheDocument();
     expect(mutate).not.toHaveBeenCalled();
   });
