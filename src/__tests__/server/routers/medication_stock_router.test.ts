@@ -841,7 +841,9 @@ describe("medicationStockRouter low-stock flags (integration)", () => {
   }
 
   beforeAll(async () => {
-    caller = callerFor((await getLinkedTestUser()).authUserId);
+    const testUser = await getLinkedTestUser();
+    userId = testUser.userId;
+    caller = callerFor(testUser.authUserId);
 
     ingredientA = await createIngredient(100);
     ingredientB = await createIngredient(50);

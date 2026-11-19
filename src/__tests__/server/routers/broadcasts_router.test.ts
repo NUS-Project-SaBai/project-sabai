@@ -271,17 +271,11 @@ describe("broadcastsRouter.send (integration)", () => {
     expect(result.severity).toBe("info");
   });
 
-  it("stores no sender when the account has no linked users row", async () => {
-    publishBroadcastMock.mockResolvedValue(undefined);
-    const unlinkedCaller = appRouter.createCaller({
-      user: { id: randomUUID() },
-    } as unknown as Context);
-
-    const result = await unlinkedCaller.broadcastsRouter.send(validInput);
-    createdIds.push(result.id);
-
-    expect(result).toMatchObject({ createdBy: null, senderName: null });
-    expect(result.publishedAt).toBeInstanceOf(Date);
+  it("rejects sending from an account with no linked users row", async () => {
+    await expect(
+      callerFor(randomUUID()).broadcastsRouter.send(validInput),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(publishBroadcastMock).not.toHaveBeenCalled();
   });
 
   it("lists the sender name by joining users", async () => {
