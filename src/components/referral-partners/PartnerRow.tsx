@@ -86,7 +86,7 @@ export default function PartnerRow(partner: ReferralPartner) {
             />
           </span>
         </TableCell>
-        <TableCell>
+        <TableCell className="whitespace-normal! wrap-anywhere min-w-48">
           <span className="text-sm font-medium text-slate-900">
             <EditableCell
               isEditing={isEditing}
