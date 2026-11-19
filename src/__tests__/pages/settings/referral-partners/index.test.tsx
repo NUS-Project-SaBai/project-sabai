@@ -175,7 +175,7 @@ describe("ReferralPartnersPage", () => {
     await user.click(within(firstRow).getByRole("button", { name: "Edit" }));
 
     expect(container.querySelectorAll('input[name="name"]')).toHaveLength(1);
-    expect(container.querySelector('input[name="remarks"]')).not.toBeNull();
+    expect(container.querySelector('textarea[name="remarks"]')).not.toBeNull();
     expect(
       screen.getByRole("checkbox", { name: "Angkor Hospital is active" }),
     ).toBeEnabled();
@@ -222,8 +222,8 @@ describe("ReferralPartnersPage", () => {
     await user.click(within(firstRow).getByRole("button", { name: "Edit" }));
 
     const remarksInput = container.querySelector(
-      'input[name="remarks"]',
-    ) as HTMLInputElement;
+      'textarea[name="remarks"]',
+    ) as HTMLTextAreaElement;
     await user.clear(remarksInput);
     await user.type(remarksInput, "All departments");
     await user.click(
