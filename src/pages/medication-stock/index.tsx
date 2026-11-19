@@ -247,7 +247,7 @@ function Row({
             )}
           </span>
         </TableCell>
-        <TableCell>
+        <TableCell className="!whitespace-normal max-w-xs break-words">
           <span className="text-sm font-medium text-slate-900">
             <EditableCell
               isEditing={isEditing}
@@ -255,6 +255,7 @@ function Row({
               type="text"
               value={form.getValues().remarks}
               label=""
+              multiline
             />
           </span>
         </TableCell>

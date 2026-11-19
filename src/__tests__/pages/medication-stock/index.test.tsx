@@ -580,8 +580,11 @@ describe("MedicationStockPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
-    // Location and remarks field (free text)
-    expect(document.querySelectorAll("input").length).toBe(2);
+    // Location field (free text input) and remarks field (free text textarea)
+    expect(document.querySelectorAll("input").length).toBe(1);
+    expect(document.querySelectorAll('textarea[name="remarks"]').length).toBe(
+      1,
+    );
 
     // Dropdown field
     expect(
@@ -694,7 +697,7 @@ describe("MedicationStockPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
-    const remarksInput = document.querySelector('input[name="remarks"]');
+    const remarksInput = document.querySelector('textarea[name="remarks"]');
 
     await user.type(remarksInput!, "valid remarks");
 
@@ -773,7 +776,7 @@ describe("MedicationStockPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
-    const remarksInput = document.querySelector('input[name="remarks"]');
+    const remarksInput = document.querySelector('textarea[name="remarks"]');
 
     await user.type(remarksInput!, "valid remarks");
 
