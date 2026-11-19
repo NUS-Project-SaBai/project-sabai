@@ -6,7 +6,10 @@ import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { Button } from "@/components/interactive/Button/Button";
 import { trpc } from "@/utils/trpc";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { partnerFormSchema } from "@/server/schemas/referralPartners";
+import {
+  partnerFormSchema,
+  REMARKS_MAX_LENGTH,
+} from "@/server/schemas/referralPartners";
 import type { AddFormFields } from "./types";
 
 const DEFAULT_VALUES: AddFormFields = {
@@ -58,7 +61,12 @@ export default function AddPartnerModal() {
               }}
             >
               <RHFInput name="name" label="Name" type="text" isRequired />
-              <RHFInput name="remarks" label="Remarks" type="text" />
+              <RHFInput
+                name="remarks"
+                label="Remarks"
+                type="text"
+                maxLength={REMARKS_MAX_LENGTH}
+              />
               <RHFInput name="isActive" label="Is Active?" type="checkbox" />
               <div className="flex flex-row gap-2">
                 <Button

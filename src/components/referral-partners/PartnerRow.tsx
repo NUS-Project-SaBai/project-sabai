@@ -9,7 +9,10 @@ import { ReferralPartner } from "@/db/schema";
 import { trpc } from "@/utils/trpc";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { editPartnerFormSchema } from "@/server/schemas/referralPartners";
+import {
+  editPartnerFormSchema,
+  REMARKS_MAX_LENGTH,
+} from "@/server/schemas/referralPartners";
 import type { EditFormFields } from "./types";
 
 export default function PartnerRow(partner: ReferralPartner) {
@@ -93,6 +96,8 @@ export default function PartnerRow(partner: ReferralPartner) {
               name="remarks"
               type="text"
               value={partner.remarks ?? ""}
+              maxLength={REMARKS_MAX_LENGTH}
+              multiline
             />
           </span>
         </TableCell>
