@@ -1,12 +1,22 @@
 import { z } from "zod";
 
+export const REMARKS_MAX_LENGTH = 255;
+
+const remarksSchema = z
+  .string()
+  .trim()
+  .max(
+    REMARKS_MAX_LENGTH,
+    `Remarks must be ${REMARKS_MAX_LENGTH} characters or fewer.`,
+  );
+
 export const partnerFormSchema = z.object({
   name: z
     .string()
     .trim()
     .min(1, "Please input a name.")
     .max(255, "Name must be 255 characters or fewer."),
-  remarks: z.string().trim(),
+  remarks: remarksSchema,
   isActive: z.boolean(),
 });
 
@@ -16,11 +26,7 @@ export const editPartnerFormSchema = partnerFormSchema.extend({
 
 export const createPartnerInput = partnerFormSchema.extend({
   // Blank remarks are stored as NULL. Always sending a value means an update can clear it.
-  remarks: z
-    .string()
-    .trim()
-    .nullish()
-    .transform((value) => value || null),
+  remarks: remarksSchema.nullish().transform((value) => value || null),
 });
 
 export const updatePartnerInput = createPartnerInput.extend({
