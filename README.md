@@ -9,10 +9,11 @@ This is a local-first monorepo for "Project Sa'bai". This guide focuses on getti
 Before you begin, ensure you have the following installed:
 
 1.  **Node.js 20+**: [Download Link](https://nodejs.org/)
-2.  **pnpm**: Recommended package manager.
+2.  **pnpm** (via Corepack): This repo pins its pnpm version in `package.json` (`packageManager` field). Corepack ships with Node.js — enable it once and the correct pnpm version is used automatically:
     ```bash
-    npm install -g pnpm
+    corepack enable
     ```
+    > **Do not** run `npm install -g pnpm`. That installs the latest pnpm (currently v11), which changed how native build scripts are approved and will fail `pnpm install` for this project. Corepack keeps you on the pinned v10.
 3.  **Docker Desktop**: Required for running the local Supabase instance. [Download Link](https://www.docker.com/products/docker-desktop/)
 4.  **Supabase CLI**: Required to manage the local database.
     ```bash
