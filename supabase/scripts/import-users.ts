@@ -11,7 +11,7 @@
 //   Leave email empty for members without a login.
 //   Connects to DATABASE_URL (from .env or the environment).
 //
-// Safe to run before or after migration 0028: if 0028 already created a
+// Safe to run before or after migration 0029: if 0029 already created a
 // placeholder row for a login, that row is updated in place (keeping its ID, so
 // existing consults / stock_changes references stay valid).
 
