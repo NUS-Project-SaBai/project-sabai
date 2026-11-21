@@ -1,10 +1,13 @@
 import { desc, eq, getTableColumns, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 
-import { broadcasts, broadcastSeverityValues, users } from "@/db/schema";
+import { broadcasts, users } from "@/db/schema";
 import { db } from "@/db/drizzle";
 import {
   BROADCAST_BODY_MAX_LENGTH,
+  BROADCAST_NEW_EVENT,
+  BROADCAST_SEVERITIES,
+  BROADCAST_TOPIC,
   BROADCAST_LIST_DEFAULT_LIMIT,
   BROADCAST_LIST_MAX_LIMIT,
   BROADCAST_TITLE_MAX_LENGTH,
@@ -27,7 +30,7 @@ const listInputSchema = z
 const sendInputSchema = z.object({
   title: z.string().trim().min(1).max(BROADCAST_TITLE_MAX_LENGTH),
   body: z.string().trim().min(1).max(BROADCAST_BODY_MAX_LENGTH),
-  severity: z.enum(broadcastSeverityValues).default("info"),
+  severity: z.enum(BROADCAST_SEVERITIES).default("info"),
 });
 
 export const broadcastsRouter = router({
@@ -72,8 +75,8 @@ export const broadcastsRouter = router({
       let published = true;
       try {
         await publishBroadcast({
-          topic: "notifications",
-          event: "new",
+          topic: BROADCAST_TOPIC,
+          event: BROADCAST_NEW_EVENT,
           payload: row,
         });
       } catch (error) {
