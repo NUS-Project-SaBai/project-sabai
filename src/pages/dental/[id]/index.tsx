@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { DentalConsultationForm } from "@/components/dental/DentalConsultationForm";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
@@ -130,6 +131,14 @@ function PatientDentalContent({ id }: { id: string | string[] | undefined }) {
             </div>
           </FormProvider>
         </div>
+        {selectedVisit && (
+          <div className="mt-6">
+            <DentalConsultationForm
+              key={selectedVisit.id}
+              visitId={selectedVisit.id}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
