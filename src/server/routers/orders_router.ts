@@ -37,7 +37,7 @@ export const ordersRouter = router({
   create: protectedProcedure
     .input(createOrderInput)
     .mutation(async ({ input, ctx }) => {
-      return await withUserTransaction(ctx.user.id, async (tx) => {
+      return await withUserTransaction(ctx.appUser.id, async (tx) => {
         // The brand filter is a subquery rather than a join to keep FOR UPDATE
         // off the medication_brands rows.
         const candidates = await tx

@@ -118,8 +118,37 @@ how to add new pages and sidebar links.
 ## 5. Auth model (short)
 
 - Login sets HttpOnly cookies via Supabase.
-- `createContext` reads cookies and provides `ctx.user`.
-- `protectedProcedure` blocks requests without a user.
+- `createContext` reads cookies and provides `ctx.user` (the Supabase auth user).
+- `protectedProcedure` blocks requests without a user (`UNAUTHORIZED`). It also
+  blocks logins that are not linked to a `public.users` row (`FORBIDDEN`), and
+  provides that row as `ctx.appUser`.
+
+There are two kinds of user records:
+
+- `auth.users` (managed by Supabase) is a **login**: email and password.
+- `public.users` is a **person** as the app knows them: name, year, team, role.
+  Its `auth_user_id` links it to a login. That link is optional, so members without
+  a login (e.g. past volunteers) can still be recorded.
+
+Foreign keys that record who did something (`consults.doctor_id`,
+`stock_changes.user_id`) reference `public.users.id`. So in procedures:
+
+- Use `ctx.appUser.id` for foreign keys and `withUserTransaction`.
+- Use `ctx.user.id` only for Supabase Auth calls. Writing it into an FK column fails
+  with a foreign key violation.
+
+What happens on delete:
+
+- Deleting a login (`auth.users`) sets the linked `public.users.auth_user_id` to
+  `NULL`. The person and their consults and stock changes are kept, but they can no
+  longer log in.
+- A `public.users` row that is still referenced by a consult or stock change
+  cannot be deleted.
+
+New logins must be linked to a `public.users` row before they can use the app.
+Run `pnpm import:users path/to/roster.csv` to link them from the member roster
+(matched by email), or insert the row by hand. `pnpm seed:users` creates the
+local test logins already linked.
 
 See [tRPC docs]({{ '/docs/trpc/' | relative_url }}) for the full flow.
 

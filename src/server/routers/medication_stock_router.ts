@@ -122,7 +122,7 @@ export const medicationStockRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      return await withUserTransaction(ctx.user.id, async (tx) => {
+      return await withUserTransaction(ctx.appUser.id, async (tx) => {
         const [newStock] = await tx
           .insert(medicationStock)
           .values(input)
@@ -149,7 +149,7 @@ export const medicationStockRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      return await withUserTransaction(ctx.user.id, async (tx) => {
+      return await withUserTransaction(ctx.appUser.id, async (tx) => {
         const { id, ...updateData } = input;
 
         const [prevStock] = await tx
@@ -196,7 +196,7 @@ export const medicationStockRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { splits, parentId } = input;
 
-      return await withUserTransaction(ctx.user.id, async (tx) => {
+      return await withUserTransaction(ctx.appUser.id, async (tx) => {
         const [parent] = await tx
           .select()
           .from(medicationStock)
