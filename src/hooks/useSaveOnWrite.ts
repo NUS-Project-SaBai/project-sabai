@@ -51,7 +51,11 @@ export function useSaveOnWrite<T extends object>(
   const debouncedValue = useDebounce(value, debounceMs);
 
   const saveToStorage = useEffectEvent(() => {
-    localStorage.setItem(storageKey, JSON.stringify(debouncedValue));
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(debouncedValue));
+    } catch (error) {
+      console.warn(`Error writing localStorage key "${storageKey}":`, error);
+    }
   });
 
   useEffect(() => {
@@ -64,7 +68,11 @@ export function useSaveOnWrite<T extends object>(
    * Clears the stored value from localStorage and resets the state to the initial value.
    */
   const clear = useCallback(() => {
-    localStorage.removeItem(storageKey);
+    try {
+      localStorage.removeItem(storageKey);
+    } catch (error) {
+      console.warn(`Error removing localStorage key "${storageKey}":`, error);
+    }
     setValue(initialValueRef.current);
   }, [storageKey]);
 
