@@ -22,4 +22,5 @@ export const paths = {
   settings: () => "/settings",
   settingsVillageCodes: () => "/settings/village-codes",
   settingsReferralPartners: () => "/settings/referral-partners",
+  settingsNotifications: () => "/settings/notifications",
 };

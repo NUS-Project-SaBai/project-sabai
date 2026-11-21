@@ -7,7 +7,7 @@ import { BsEyeglasses } from "react-icons/bs";
 import { MdMonitorHeart } from "react-icons/md";
 import { FaStethoscope, FaTooth } from "react-icons/fa";
 import { PiSignOutFill } from "react-icons/pi";
-import { IoMdMenu } from "react-icons/io";
+import { IoMdMenu, IoMdNotificationsOutline } from "react-icons/io";
 import { LuScanFace } from "react-icons/lu";
 import { GiMedicines, GiNotebook } from "react-icons/gi";
 import { HiOutlineArrowTrendingUp } from "react-icons/hi2";
@@ -96,18 +96,31 @@ function SidebarNavButtons() {
       icon: GiNotebook,
     },
     {
+      name: "Notifications",
+      href: paths.settingsNotifications(),
+      icon: IoMdNotificationsOutline,
+    },
+    {
       name: "Settings",
       href: paths.settings(),
       icon: AiOutlineSetting,
     },
   ];
+  // Highlight only the most specific match, so /settings/notifications
+  // selects Notifications and not Settings as well.
+  const selectedHref = navigation
+    .map((item) => item.href)
+    .filter(
+      (href) =>
+        router.pathname === href || router.pathname.startsWith(`${href}/`),
+    )
+    .sort((a, b) => b.length - a.length)[0];
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex flex-1 flex-col gap-2">
         {navigation.map((item) => {
-          const selected =
-            router.pathname == item.href ||
-            router.pathname.startsWith(`${item.href}/`);
+          const selected = item.href === selectedHref;
           return (
             <Link
               key={item.name}
