@@ -20,7 +20,7 @@ export function PatientPhoto({
       alt="Patient Photo"
       height={128}
       width={128}
-      className="h-32 w-32 rounded-lg border border-slate-200 object-cover"
+      className="h-32 w-32 max-w-none shrink-0 rounded-lg border border-slate-200 object-cover"
       {...imgProps}
     />
   );
