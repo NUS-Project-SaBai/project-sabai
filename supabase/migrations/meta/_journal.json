@@ -211,6 +211,13 @@
       "when": 1795102962670,
       "tag": "0029_rainy_silk_fever",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1795317640873,
+      "tag": "0030_chunky_guardian",
+      "breakpoints": true
     }
   ]
 }
