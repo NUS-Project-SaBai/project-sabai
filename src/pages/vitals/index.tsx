@@ -65,10 +65,7 @@ export default function VitalsPage() {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <PatientPhoto
-                    pictureUrl={patient.patientImageUrl}
-                    className="rounded-lg border border-slate-200"
-                  />
+                  <PatientPhoto pictureUrl={patient.patientImageUrl} />
                 </TableCell>
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">

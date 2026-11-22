@@ -85,10 +85,7 @@ function PatientsBasePage() {
                     <span className="text-sm font-medium text-slate-900">
                       {formatPatientId(patient.id) || "No ID"}
                     </span>
-                    <PatientPhoto
-                      pictureUrl={patient.patientImageUrl}
-                      className="rounded-lg border border-slate-200"
-                    />
+                    <PatientPhoto pictureUrl={patient.patientImageUrl} />
                   </div>
                 </TableCell>
                 <TableCell>

@@ -54,10 +54,7 @@ function ReferralsPage() {
             {referrals.map((referral) => (
               <TableRow key={referral.id}>
                 <TableCell>
-                  <PatientPhoto
-                    pictureUrl={referral.patientImageUrl}
-                    className="h-12 w-12 rounded-lg border border-slate-200 object-cover sm:h-16 sm:w-16"
-                  />
+                  <PatientPhoto pictureUrl={referral.patientImageUrl} />
                 </TableCell>
                 <TableCell>
                   <div className="w-28 space-y-1 whitespace-normal text-sm sm:w-auto">
