@@ -7,6 +7,10 @@ import {
   medicationActiveIngredients,
   medicationBrands,
 } from "@/db/schema/pharmacy";
+import {
+  createBrandInput,
+  updateBrandInput,
+} from "@/server/schemas/medicationBrands";
 
 export const medicationBrandRouter = router({
   list: protectedProcedure.query(async () => {
@@ -26,25 +30,23 @@ export const medicationBrandRouter = router({
       .select({
         id: medicationBrands.id,
         name: medicationBrands.name,
+        activeIngredientId: medicationBrands.activeIngredientId,
         activeIngredientName: medicationActiveIngredients.name,
+        unitOfMeasurement: medicationActiveIngredients.unitOfMeasurement,
+        remarks: medicationBrands.remarks,
       })
       .from(medicationBrands)
       .innerJoin(
         medicationActiveIngredients,
         eq(medicationActiveIngredients.id, medicationBrands.activeIngredientId),
-      );
+      )
+      .orderBy(medicationBrands.id);
 
     return result;
   }),
 
   create: protectedProcedure
-    .input(
-      zfd.formData({
-        name: zfd.text(z.string().nonoptional()),
-        activeIngredientId: zfd.numeric(z.number().int()),
-        remarks: zfd.text().nonoptional(),
-      }),
-    )
+    .input(createBrandInput)
     .mutation(async ({ input }) => {
       const [newMedicationBrand] = await db
         .insert(medicationBrands)
@@ -54,14 +56,7 @@ export const medicationBrandRouter = router({
     }),
 
   update: protectedProcedure
-    .input(
-      zfd.formData({
-        id: zfd.numeric(z.number().int()).nonoptional(),
-        name: zfd.text().optional(),
-        activeIngredientId: zfd.numeric(z.number().int()),
-        remarks: zfd.text(),
-      }),
-    )
+    .input(updateBrandInput)
     .mutation(async ({ input }) => {
       const { id, ...updateData } = input;
       const [result] = await db
@@ -69,8 +64,7 @@ export const medicationBrandRouter = router({
         .set(updateData)
         .where(eq(medicationBrands.id, id))
         .returning();
-
-      return result ?? null;
+      return result;
     }),
 
   delete: protectedProcedure
@@ -80,7 +74,7 @@ export const medicationBrandRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      const result = await db
+      const [result] = await db
         .delete(medicationBrands)
         .where(eq(medicationBrands.id, input.id))
         .returning({ id: medicationBrands.id });

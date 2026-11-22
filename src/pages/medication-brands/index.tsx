@@ -2,8 +2,8 @@ import { trpc } from "@/utils/trpc";
 import PageHeader from "@/components/PageHeader";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import TableHeader from "@/components/TableHeader";
-import TableRow from "@/components/TableRow";
-import TableCell from "@/components/TableCell";
+import BrandRow from "@/components/medication-brands/BrandRow";
+import AddBrandModal from "@/components/medication-brands/AddBrandModal";
 
 function Header() {
   return (
@@ -15,6 +15,7 @@ function Header() {
       ]}
       title="Medication Brands"
       description="Manage medication brands."
+      actions={<AddBrandModal />}
     />
   );
 }
@@ -24,7 +25,7 @@ function MedicationBrandsBasePage() {
     data: brands,
     isLoading,
     isError,
-  } = trpc.medicationBrandRouter.list.useQuery();
+  } = trpc.medicationBrandRouter.listWithActiveIngredientName.useQuery();
 
   function renderContent() {
     if (isError) {
@@ -47,32 +48,18 @@ function MedicationBrandsBasePage() {
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200">
           <TableHeader
-            headers={["Brand ID", "Name", "Remarks", "Active Ingredient ID"]}
+            headers={[
+              "Brand ID",
+              "Brand Name",
+              "Active Ingredient Name",
+              "Unit of Measurement",
+              "Remarks",
+              "Actions",
+            ]}
           />
           <tbody className="bg-white divide-y divide-slate-200">
             {brands.map((brand) => (
-              <TableRow key={brand.id}>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {brand.id}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {brand.name}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {brand.remarks}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {brand.activeIngredientId}
-                  </span>
-                </TableCell>
-              </TableRow>
+              <BrandRow key={brand.id} {...brand} />
             ))}
           </tbody>
         </table>

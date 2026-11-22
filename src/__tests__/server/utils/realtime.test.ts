@@ -17,11 +17,12 @@ describe("publishBroadcast", () => {
     title: "Clinic update",
     body: "The clinic schedule has changed.",
     severity: "info",
-    createdBy: "Test User",
+    createdBy: "6f1c2d3e-4b5a-4c6d-8e7f-9a0b1c2d3e4f",
+    senderName: "Test User",
     createdAt: new Date("2026-10-24T00:00:00.000Z"),
     publishedAt: null,
     attempts: 0,
-  } satisfies Broadcast;
+  } satisfies Broadcast & { senderName: string | null };
 
   beforeEach(() => {
     vi.stubGlobal("fetch", fetchMock);
@@ -61,6 +62,7 @@ describe("publishBroadcast", () => {
             },
           ],
         }),
+        signal: expect.any(AbortSignal),
       },
     );
   });

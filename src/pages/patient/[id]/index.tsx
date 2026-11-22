@@ -118,7 +118,7 @@ export default function PatientPage() {
               title="Edit Patient Details"
               colour="indigo"
               onClick={() => setIsEditingPatient(true)}
-              className="shrink-0"
+              className="shrink-0 max-w-min text-center sm:max-w-none"
             />
           </div>
 
