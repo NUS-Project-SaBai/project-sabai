@@ -22,7 +22,7 @@ export type PatientForm = {
   contactNo: string;
   gender: Gender;
   drugAllergy: string;
-  dateOfBirth: Date;
+  dateOfBirth: string;
   hasPoorCard: boolean;
   hasBS2Card: boolean;
   hasSabaiCard: boolean;
@@ -62,7 +62,7 @@ export default function RegistrationPage({
   // UTC midnight, which produces wrong age near the 18th-birthday boundary for
   // users west of UTC.
   const patientAge = dobValue
-    ? calculateAge(new Date((dobValue as unknown as string) + "T00:00:00"))
+    ? calculateAge(new Date(dobValue + "T00:00:00"))
     : undefined;
 
   const isPediatric =

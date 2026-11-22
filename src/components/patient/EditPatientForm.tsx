@@ -6,23 +6,15 @@ import { trpc, RouterOutput } from "@/utils/trpc";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { Button } from "@/components/interactive/Button/Button";
-import { formatDate, parseDateInput, toDateInputValue } from "@/lib/utils/date";
-import { RHFDateInput } from "@/components/interactive/RHF/RHFDateInput";
-import { genderDropdown, type Gender } from "@/types/patient";
+import { toDateInputValue } from "@/lib/utils/date";
+import { genderDropdown } from "@/types/patient";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  editPatientFormSchema,
+  type EditPatientFormValues,
+} from "@/server/schemas/patients";
 
 type Patient = NonNullable<RouterOutput["patientsRouter"]["getById"]>;
-
-type EditPatientFormValues = {
-  name: string;
-  identificationNumber: string;
-  contactNo: string;
-  gender: Gender;
-  drugAllergy: string;
-  dateOfBirth: string;
-  hasPoorCard: boolean;
-  hasBS2Card: boolean;
-  hasSabaiCard: boolean;
-};
 
 /**
  * Reusable form for editing an existing patient's  details. Prefills
@@ -38,15 +30,14 @@ export default function EditPatientForm({
   onSuccess?: () => void;
 }) {
   const form = useForm<EditPatientFormValues>({
+    resolver: zodResolver(editPatientFormSchema),
     defaultValues: {
       name: patient.name,
       identificationNumber: patient.identificationNumber ?? "",
       contactNo: patient.contactNo ?? "",
       gender: patient.gender,
       drugAllergy: patient.drugAllergy,
-      dateOfBirth: toDateInputValue(patient.dateOfBirth)
-        ? formatDate(patient.dateOfBirth)
-        : "",
+      dateOfBirth: toDateInputValue(patient.dateOfBirth),
       hasPoorCard: patient.hasPoorCard,
       hasBS2Card: patient.hasBS2Card,
       hasSabaiCard: patient.hasSabaiCard,
@@ -69,7 +60,6 @@ export default function EditPatientForm({
       {
         id: patient.id,
         ...data,
-        dateOfBirth: parseDateInput(data.dateOfBirth) ?? undefined,
         ...(isNewPhoto ? { patientImage: imageDetails! } : {}),
       },
       {
@@ -127,7 +117,12 @@ export default function EditPatientForm({
             type="text"
             isRequired
           />
-          <RHFDateInput name="dateOfBirth" label="Date of Birth" isRequired />
+          <RHFInput
+            name="dateOfBirth"
+            label="Date of Birth"
+            type="date"
+            isRequired
+          />
           <RHFInput
             name="hasPoorCard"
             label="Has POOR Card?"

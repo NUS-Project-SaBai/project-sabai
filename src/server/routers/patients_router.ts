@@ -11,6 +11,7 @@ import { patients, genderValues, visits } from "@/db/schema/patients";
 import { vitals, childVitals, puberty } from "@/db/schema/vitals";
 import { villageCodes } from "@/db/schema/villageCodes";
 import { TRPCError } from "@trpc/server";
+import { dateOfBirthInput } from "@/server/schemas/patients";
 import { eq, and, ne, desc, inArray, isNotNull } from "drizzle-orm";
 import {
   generateFaceprint,
@@ -122,7 +123,7 @@ export const patientsRouter = router({
           name: zfd.text(),
           identificationNumber: zfd.text(),
           gender: zfd.text(z.enum(genderValues)),
-          dateOfBirth: zfd.text(z.coerce.date()),
+          dateOfBirth: zfd.text(dateOfBirthInput),
           drugAllergy: zfd.text(),
           hasPoorCard: z.boolean(),
           hasBS2Card: z.boolean(),
@@ -244,7 +245,7 @@ export const patientsRouter = router({
         identificationNumber: zfd.text(z.string().optional()),
         contactNo: zfd.text(z.string().optional()),
         gender: zfd.text(z.enum(genderValues).optional()),
-        dateOfBirth: zfd.text(z.coerce.date().optional()),
+        dateOfBirth: zfd.text(dateOfBirthInput.optional()),
         drugAllergy: zfd.text(z.string().optional()),
         hasPoorCard: z.boolean().optional(),
         hasBS2Card: z.boolean().optional(),
