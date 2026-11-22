@@ -218,6 +218,13 @@
       "when": 1795317640873,
       "tag": "0030_chunky_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1795341430909,
+      "tag": "0031_silky_tattoo",
+      "breakpoints": true
     }
   ]
 }
