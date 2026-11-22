@@ -222,18 +222,36 @@ export const publicProcedure = t.procedure;
 
 #### `protectedProcedure`
 
-Only authenticated users can call this. Throws `UNAUTHORIZED` if `ctx.user` is null.
+Only logged-in users **whose login is linked to a `public.users` row** can call this.
 
 ```typescript
-const isAuthed = t.middleware(({ ctx, next }) => {
+const isAuthed = t.middleware(async ({ ctx, next }) => {
   if (!ctx.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+
+  // Look up the public.users row linked to this login.
+  const [appUser] = await db
+    .select()
+    .from(users)
+    .where(eq(users.authUserId, ctx.user.id))
+    .limit(1);
+
+  if (!appUser) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message:
+        "This account has not been linked to a user yet. Ask an admin to link your account.",
+    });
+  }
+
   return next({
     ctx: {
       ...ctx,
       // TypeScript now knows `user` is non-nullable
       user: ctx.user,
+      // The public.users row for the logged-in account. Use appUser.id for FKs.
+      appUser,
     },
   });
 });
@@ -245,8 +263,38 @@ export const protectedProcedure = t.procedure.use(isAuthed);
 
 1. Every request goes through `createContext()`, which sets `ctx.user` (or `null`).
 2. `protectedProcedure` adds a middleware that checks `ctx.user`.
-3. If `ctx.user` is `null`, it throws a `TRPCError` with code `UNAUTHORIZED`.
-4. The client receives a 401 response.
+3. If `ctx.user` is `null`, it throws a `TRPCError` with code `UNAUTHORIZED` (401).
+4. Otherwise it looks up the `public.users` row whose `auth_user_id` is `ctx.user.id`.
+   If there is none, it throws `FORBIDDEN` (403): the person is logged in, but an
+   admin has not linked their login to a user yet.
+5. The procedure runs with both `ctx.user` and `ctx.appUser` set.
+
+### `ctx.user` vs `ctx.appUser`
+
+A protected procedure has two different IDs available. Most bugs here come from
+using the wrong one.
+
+| Value            | What it is                                                | Use it for                                      |
+| ---------------- | --------------------------------------------------------- | ----------------------------------------------- |
+| `ctx.appUser.id` | The `public.users` ID: the person, as the app knows them. | **Every foreign key** and `withUserTransaction` |
+| `ctx.user.id`    | The Supabase auth (`auth.users`) ID: the login.           | Supabase Auth calls only                        |
+
+Tables that record who did something (`consults.doctor_id`, `stock_changes.user_id`)
+reference `public.users.id`, not `auth.users.id`. Passing `ctx.user.id` instead
+fails with a foreign key violation:
+
+```typescript
+// ✅ Correct
+await tx.insert(consults).values({ ...consultData, doctorId: ctx.appUser.id });
+
+// ❌ FK violation: this is an auth.users ID, not a public.users ID
+await tx.insert(consults).values({ ...consultData, doctorId: ctx.user.id });
+```
+
+The same goes for `withUserTransaction(ctx.appUser.id, ...)`. It sets
+`app.current_user_id`, which `get_current_user_id()` reads inside triggers such as
+the medication stock audit log. That value must be a `public.users` ID, so the
+`stock_changes.user_id` FK holds.
 
 ---
 
@@ -639,10 +687,11 @@ export const appRouter = router({
 ### Accessing the User in Procedures
 
 ```typescript
-// In protectedProcedure, ctx.user is guaranteed non-null
+// In protectedProcedure, ctx.user and ctx.appUser are guaranteed non-null
 myProcedure: protectedProcedure.query(({ ctx }) => {
-  const userId = ctx.user.id;
-  const email = ctx.user.email;
+  const userId = ctx.appUser.id; // public.users ID: use this for FKs
+  const name = ctx.appUser.name;
+  const email = ctx.user.email; // email lives on the auth user only
   // ...
 });
 ```

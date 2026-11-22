@@ -26,6 +26,7 @@ import { authUsers, broadcasts, users } from "@/db/schema";
 import { db } from "@/db/drizzle";
 import { appRouter } from "@/server/routers/_app";
 import type { Context } from "@/server/context";
+import { getLinkedTestUser } from "./testUsers";
 
 // Stub the Realtime push so tests don't depend on Supabase Realtime.
 const { publishBroadcastMock } = vi.hoisted(() => ({
@@ -35,10 +36,14 @@ vi.mock("@/server/utils/realtime", () => ({
   publishBroadcast: publishBroadcastMock,
 }));
 
-// Creates an authenticated request
-const caller = appRouter.createCaller({
-  user: { id: "broadcasts-test-user" },
-} as unknown as Context);
+function callerFor(authUserId: string) {
+  return appRouter.createCaller({
+    user: { id: authUserId },
+  } as unknown as Context);
+}
+
+// Authenticated caller, set up in beforeAll with a login linked to public.users
+let caller: ReturnType<typeof callerFor>;
 
 const unauthenticatedCaller = appRouter.createCaller({
   user: null,
@@ -48,6 +53,8 @@ describe("broadcastsRouter.list (integration)", () => {
   let fixtureIds: number[] = [];
 
   beforeAll(async () => {
+    caller = callerFor((await getLinkedTestUser()).authUserId);
+
     // Create more than 50 rows to test default limit behaviour
     const inserted = await db
       .insert(broadcasts)
@@ -121,6 +128,14 @@ describe("broadcastsRouter.list (integration)", () => {
       unauthenticatedCaller.broadcastsRouter.list(),
     ).rejects.toMatchObject({
       code: "UNAUTHORIZED",
+    });
+  });
+
+  it("rejects logins that are not linked to a user", async () => {
+    await expect(
+      callerFor(randomUUID()).broadcastsRouter.list(),
+    ).rejects.toMatchObject({
+      code: "FORBIDDEN",
     });
   });
 
@@ -256,17 +271,11 @@ describe("broadcastsRouter.send (integration)", () => {
     expect(result.severity).toBe("info");
   });
 
-  it("stores no sender when the account has no linked users row", async () => {
-    publishBroadcastMock.mockResolvedValue(undefined);
-    const unlinkedCaller = appRouter.createCaller({
-      user: { id: randomUUID() },
-    } as unknown as Context);
-
-    const result = await unlinkedCaller.broadcastsRouter.send(validInput);
-    createdIds.push(result.id);
-
-    expect(result).toMatchObject({ createdBy: null, senderName: null });
-    expect(result.publishedAt).toBeInstanceOf(Date);
+  it("rejects sending from an account with no linked users row", async () => {
+    await expect(
+      callerFor(randomUUID()).broadcastsRouter.send(validInput),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(publishBroadcastMock).not.toHaveBeenCalled();
   });
 
   it("lists the sender name by joining users", async () => {
