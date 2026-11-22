@@ -12,6 +12,18 @@ import { paths } from "@/utils/paths";
 import { Button } from "@/components/interactive/Button/Button";
 import { CiMedicalClipboard } from "react-icons/ci";
 import { PatientCode } from "@/components/PatientCode";
+import { PatientCard, PatientCardList } from "@/components/PatientCard";
+
+function VitalsButton({ onClick }: { onClick: () => void }) {
+  return (
+    <Button
+      onClick={onClick}
+      title="Vitals"
+      icon={<CiMedicalClipboard className="h-6 w-6" />}
+      colour="emerald"
+    />
+  );
+}
 
 export default function VitalsPage() {
   const router = useRouter();
@@ -49,42 +61,65 @@ export default function VitalsPage() {
     }
 
     return (
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200">
-          <TableHeader headers={["ID", "Photo", "Name", "Actions"]} />
-          <tbody className="bg-white divide-y divide-slate-200">
-            {patients.map((patient) => (
-              <TableRow key={patient.id}>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    <PatientCode
-                      villageCode={patient.villageCode}
-                      villageColorHex={patient.villageColorHex}
-                      id={patient.id}
+      <>
+        {/* Mobile screens: stacked cards */}
+        <PatientCardList>
+          {patients.map((patient) => (
+            <PatientCard
+              key={patient.id}
+              pictureUrl={patient.patientImageUrl}
+              patientCode={
+                <PatientCode
+                  villageCode={patient.villageCode}
+                  villageColorHex={patient.villageColorHex}
+                  id={patient.id}
+                />
+              }
+              name={patient.name}
+            >
+              <VitalsButton onClick={() => handlePatientVitals(patient.id)} />
+            </PatientCard>
+          ))}
+        </PatientCardList>
+
+        {/* Tablet and desktop screens: full table */}
+        <div className="hidden overflow-x-auto md:block">
+          <table className="min-w-full divide-y divide-slate-200">
+            <TableHeader headers={["ID", "Photo", "Name", "Actions"]} />
+            <tbody className="bg-white divide-y divide-slate-200">
+              {patients.map((patient) => (
+                <TableRow key={patient.id}>
+                  <TableCell>
+                    <span className="text-sm font-medium text-slate-900">
+                      <PatientCode
+                        villageCode={patient.villageCode}
+                        villageColorHex={patient.villageColorHex}
+                        id={patient.id}
+                      />
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <PatientPhoto
+                      pictureUrl={patient.patientImageUrl}
+                      className="rounded-lg border border-slate-200"
                     />
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <PatientPhoto pictureUrl={patient.patientImageUrl} />
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {patient.name}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <Button
-                    onClick={() => handlePatientVitals(patient.id)}
-                    title="Vitals"
-                    icon={<CiMedicalClipboard className="h-6 w-6" />}
-                    colour="emerald"
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm font-medium text-slate-900">
+                      {patient.name}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <VitalsButton
+                      onClick={() => handlePatientVitals(patient.id)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </>
     );
   }
 

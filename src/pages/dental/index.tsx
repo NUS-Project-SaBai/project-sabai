@@ -2,6 +2,8 @@ import PageHeader from "@/components/PageHeader";
 import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 import { PatientPhoto } from "@/components/PatientPhoto";
+import { PatientCode } from "@/components/PatientCode";
+import { PatientCard, PatientCardList } from "@/components/PatientCard";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
@@ -11,6 +13,20 @@ import { trpc } from "@/utils/trpc";
 import { paths } from "@/utils/paths";
 import { useRouter } from "next/router";
 import { HiOutlinePencilSquare } from "react-icons/hi2";
+
+function OpenDentalButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title="Open Dental"
+      className="inline-flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white transition hover:bg-emerald-700"
+    >
+      <HiOutlinePencilSquare className="h-5 w-5" />
+      Open Dental
+    </button>
+  );
+}
 
 export default function DentalPage() {
   const router = useRouter();
@@ -41,48 +57,68 @@ export default function DentalPage() {
     }
 
     return (
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200">
-          <TableHeader headers={["ID", "Photo", "Name", "Actions"]} />
-          <tbody className="divide-y divide-slate-200 bg-white">
-            {patients.map((patient) => (
-              <TableRow key={patient.id}>
-                <TableCell>
-                  <span className="inline-flex items-center gap-2 text-sm font-medium text-slate-900">
-                    {patient.villageColorHex && (
-                      <span
-                        className="h-3 w-3 rounded-full"
-                        style={{ backgroundColor: patient.villageColorHex }}
-                        title={patient.villageCode ?? undefined}
-                      />
-                    )}
-                    {formatPatientCode(patient.villageCode, patient.id)}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <PatientPhoto pictureUrl={patient.patientImageUrl} />
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium text-slate-900">
-                    {patient.name}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <button
-                    type="button"
-                    onClick={() => openDentalPage(patient.id)}
-                    title="Open Dental"
-                    className="inline-flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white transition hover:bg-emerald-700"
-                  >
-                    <HiOutlinePencilSquare className="h-5 w-5" />
-                    Open Dental
-                  </button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <>
+        {/* Mobile screens: stacked cards */}
+        <PatientCardList>
+          {patients.map((patient) => (
+            <PatientCard
+              key={patient.id}
+              pictureUrl={patient.patientImageUrl}
+              patientCode={
+                <PatientCode
+                  villageCode={patient.villageCode}
+                  villageColorHex={patient.villageColorHex}
+                  id={patient.id}
+                />
+              }
+              name={patient.name}
+            >
+              <OpenDentalButton onClick={() => openDentalPage(patient.id)} />
+            </PatientCard>
+          ))}
+        </PatientCardList>
+
+        {/* Tablet and desktop screens: full table */}
+        <div className="hidden overflow-x-auto md:block">
+          <table className="min-w-full divide-y divide-slate-200">
+            <TableHeader headers={["ID", "Photo", "Name", "Actions"]} />
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {patients.map((patient) => (
+                <TableRow key={patient.id}>
+                  <TableCell>
+                    <span className="inline-flex items-center gap-2 text-sm font-medium text-slate-900">
+                      {patient.villageColorHex && (
+                        <span
+                          className="h-3 w-3 rounded-full"
+                          style={{ backgroundColor: patient.villageColorHex }}
+                          title={patient.villageCode ?? undefined}
+                        />
+                      )}
+                      {formatPatientCode(patient.villageCode, patient.id)}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <PatientPhoto
+                      pictureUrl={patient.patientImageUrl}
+                      className="h-12 w-12 rounded-lg border border-slate-200 object-cover"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm font-medium text-slate-900">
+                      {patient.name}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <OpenDentalButton
+                      onClick={() => openDentalPage(patient.id)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </>
     );
   }
 
