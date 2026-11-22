@@ -61,3 +61,44 @@ export function validateSplits(splits: SplitPayload[], parentQty: number) {
     message: "Splits are valid!",
   };
 }
+
+/**
+ * Allocates `quantity` across `candidates` in the order given.
+ * Stocks that are fully consumed are returned in `wholeStockIds`; the final stock,
+ * if only partly consumed, is returned as `partial` with the amount to take from it.
+ */
+export function allocateStock<T extends { id: number; quantity: number }>(
+  candidates: T[],
+  quantity: number,
+) {
+  let outstanding = quantity;
+  const wholeStockIds: number[] = [];
+  let partial: { stock: T; take: number } | null = null;
+
+  for (const stock of candidates) {
+    if (outstanding === 0) {
+      break;
+    }
+
+    if (stock.quantity <= outstanding) {
+      wholeStockIds.push(stock.id);
+      outstanding -= stock.quantity;
+    } else {
+      partial = { stock, take: outstanding };
+      outstanding = 0;
+    }
+  }
+
+  if (outstanding > 0) {
+    return {
+      success: false as const,
+      message: `Insufficient stock: ${quantity - outstanding} of ${quantity} available.`,
+    };
+  }
+
+  return {
+    success: true as const,
+    wholeStockIds,
+    partial,
+  };
+}

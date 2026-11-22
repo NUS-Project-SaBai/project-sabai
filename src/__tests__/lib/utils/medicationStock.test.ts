@@ -74,7 +74,7 @@ describe("validateSplits", () => {
   it("accepts splits that differ only by stock status", () => {
     const splits = [
       makeSplit({ quantity: 3, stockStatus: "active" }),
-      makeSplit({ quantity: 7, stockStatus: "reserved" }),
+      makeSplit({ quantity: 7, stockStatus: "donated" }),
     ];
 
     expect(validateSplits(splits, 10)).toEqual({

@@ -247,7 +247,7 @@ function Row({
             )}
           </span>
         </TableCell>
-        <TableCell>
+        <TableCell className="!whitespace-normal max-w-xs break-words">
           <span className="text-sm font-medium text-slate-900">
             <EditableCell
               isEditing={isEditing}
@@ -255,44 +255,51 @@ function Row({
               type="text"
               value={form.getValues().remarks}
               label=""
+              multiline
             />
           </span>
         </TableCell>
         <TableCell>
-          <span className="text-sm font-medium text-slate-900 flex flex-row gap-2">
-            {isEditing ? (
-              <Button
-                onClick={() => {
-                  form.handleSubmit(handleSubmit)();
-                }}
-                colour="emerald"
-                title="Save"
-                loading={updateMutation.isPending}
-              />
-            ) : (
-              <Button
-                onClick={() => setIsEditing(true)}
-                colour="emerald"
-                title="Edit"
-              />
-            )}
-            {isEditing ? (
-              <Button
-                onClick={() => {
-                  setIsEditing(false);
-                  form.reset();
-                }}
-                colour="red"
-                title="Cancel"
-              />
-            ) : (
-              <Button
-                onClick={() => setSplittingStock(item)}
-                colour="indigo"
-                title="Split"
-              />
-            )}
-          </span>
+          {item.stockStatus === "reserved" ? (
+            <span className="text-sm font-medium text-slate-900">
+              Manage in Orders page
+            </span>
+          ) : item.stockStatus !== "dispensed" ? (
+            <span className="text-sm font-medium text-slate-900 flex flex-row gap-2">
+              {isEditing ? (
+                <Button
+                  onClick={() => {
+                    form.handleSubmit(handleSubmit)();
+                  }}
+                  colour="emerald"
+                  title="Save"
+                  loading={updateMutation.isPending}
+                />
+              ) : (
+                <Button
+                  onClick={() => setIsEditing(true)}
+                  colour="emerald"
+                  title="Edit"
+                />
+              )}
+              {isEditing ? (
+                <Button
+                  onClick={() => {
+                    setIsEditing(false);
+                    form.reset();
+                  }}
+                  colour="red"
+                  title="Cancel"
+                />
+              ) : (
+                <Button
+                  onClick={() => setSplittingStock(item)}
+                  colour="indigo"
+                  title="Split"
+                />
+              )}
+            </span>
+          ) : null}
         </TableCell>
       </FormProvider>
     </TableRow>

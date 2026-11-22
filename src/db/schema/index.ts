@@ -7,5 +7,6 @@ export * from "@/db/schema/patients";
 export * from "@/db/schema/pharmacy";
 export * from "@/db/schema/referralPartners";
 export * from "@/db/schema/referrals";
+export * from "@/db/schema/users";
 export * from "@/db/schema/villageCodes";
 export * from "@/db/schema/vitals";

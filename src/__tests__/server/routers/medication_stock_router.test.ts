@@ -4,7 +4,7 @@
 // `log_medication_stock_changes` audit trigger. These run against the local
 // Supabase Postgres instance configured in .env so the trigger, the
 // `get_current_user_id()` lookup and transaction rollback are exercised for real.
-// Prereqs: `supabase start` (or `pnpm seed:db`) so migrations are applied, and at least one auth.users row (`pnpm seed:users`).
+// Prereqs: `supabase start` (or `pnpm seed:db`) so migrations are applied, and at least one login linked to public.users (`pnpm seed:users`).
 //
 // Runs in the node environment (not jsdom) because src/lib/envVariables.ts
 // switches on `typeof window` and only exposes DATABASE_URL server-side.
@@ -15,7 +15,8 @@ import { appRouter } from "@/server/routers/_app";
 import { db } from "@/db/drizzle";
 import { withUserTransaction } from "@/db/withUserTransaction";
 import type { Context } from "@/server/context";
-import { authUsers } from "@/db/schema";
+import { users } from "@/db/schema";
+import { getLinkedTestUser } from "./testUsers";
 import {
   medicationBrands,
   medicationStock,
@@ -36,13 +37,18 @@ const SEED_STOCK = {
   remarks: "initial remarks",
 } as const;
 
-// protectedProcedure only reads ctx.user, so a minimal context is enough.
-function callerFor(userId: string) {
-  return appRouter.createCaller({ user: { id: userId } } as unknown as Context);
+// protectedProcedure reads only ctx.user and looks up ctx.appUser itself, so a
+// minimal context is enough, but authUserId must be linked to a public.users
+// row (see getLinkedTestUser) or the call fails with FORBIDDEN.
+function callerFor(authUserId: string) {
+  return appRouter.createCaller({
+    user: { id: authUserId },
+  } as unknown as Context);
 }
 
 describe("medicationStockRouter + stock change trigger (integration)", () => {
   let userId: string;
+  let authUserId: string;
   let brandId: number;
   let caller: ReturnType<typeof callerFor>;
 
@@ -86,6 +92,26 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
     return { stock, insertChangeCount: insertChanges.length };
   }
 
+  async function insertStock(stockStatus: StockStatus) {
+    const stock = await withUserTransaction(userId, async (tx) => {
+      const [row] = await tx
+        .insert(medicationStock)
+        .values({
+          medicationBrandId: brandId,
+          ...SEED_STOCK,
+          stockStatus,
+        })
+        .returning();
+
+      return row;
+    });
+
+    return {
+      stock,
+      insertChangeCount: (await changesFor(stock.id)).length,
+    };
+  }
+
   async function cleanUpStock() {
     const rows = await testStockRows();
     const ids = rows.map((r) => r.id);
@@ -96,18 +122,8 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
   }
 
   beforeAll(async () => {
-    // stock_changes FK-references auth.users; reuse an existing seeded user.
-    const [user] = await db
-      .select({ id: authUsers.id })
-      .from(authUsers)
-      .limit(1);
-    if (!user) {
-      throw new Error(
-        "No auth.users row found. Run `pnpm seed:all` against local Supabase " +
-          "before running the router integration tests.",
-      );
-    }
-    userId = user.id;
+    // stock_changes FK-references public.users; reuse an existing seeded user.
+    ({ userId, authUserId } = await getLinkedTestUser());
 
     // Reuse a seeded brand: the brand seed inserts explicit ids, so inserting
     // a new brand here can collide with the out-of-sync id sequence.
@@ -123,7 +139,7 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
     }
     brandId = brand.id;
 
-    caller = callerFor(userId);
+    caller = callerFor(authUserId);
   });
 
   afterEach(async () => {
@@ -166,6 +182,54 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
       const fields = (await changesFor(stock.id)).map((c) => c.field);
       expect(fields).toEqual(["quantity", "location", "stock_status"]);
     });
+
+    it("rejects creating reserved stock", async () => {
+      await expect(
+        caller.medicationStockRouter.create({
+          medicationBrandId: brandId,
+          ...SEED_STOCK,
+          stockStatus: "reserved",
+        }),
+      ).rejects.toMatchObject({
+        code: "BAD_REQUEST",
+      });
+
+      expect(await testStockRows()).toHaveLength(0);
+    });
+
+    it("rejects creating dispensed stock", async () => {
+      await expect(
+        caller.medicationStockRouter.create({
+          medicationBrandId: brandId,
+          ...SEED_STOCK,
+          stockStatus: "dispensed",
+        }),
+      ).rejects.toMatchObject({
+        code: "BAD_REQUEST",
+      });
+
+      expect(await testStockRows()).toHaveLength(0);
+    });
+
+    it.each(["active", "discarded", "donated"] as const)(
+      "allows creating %s stock",
+      async (status) => {
+        const stock = await caller.medicationStockRouter.create({
+          medicationBrandId: brandId,
+          ...SEED_STOCK,
+          stockStatus: status,
+        });
+
+        const rows = await testStockRows();
+
+        expect(rows).toHaveLength(1);
+        expect(rows[0]).toMatchObject({
+          id: stock.id,
+          stockStatus: status,
+          quantity: SEED_STOCK.quantity,
+        });
+      },
+    );
   });
 
   describe("on update", () => {
@@ -254,6 +318,125 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
 
       expect(await changesFor(stock.id)).toHaveLength(insertChangeCount);
     });
+
+    it.each(["reserved", "dispensed"] as const)(
+      "rejects editing the location and remarks of %s stock",
+      async (status) => {
+        const { stock, insertChangeCount } = await insertStock(status);
+
+        await expect(
+          caller.medicationStockRouter.update({
+            id: stock.id,
+            location: "Shelf B",
+            remarks: "changed remarks",
+          }),
+        ).rejects.toMatchObject({
+          code: "CONFLICT",
+        });
+
+        expect(await testStockRows()).toEqual([stock]);
+        expect(await changesFor(stock.id)).toHaveLength(insertChangeCount);
+      },
+    );
+
+    it.each(["reserved", "dispensed"] as const)(
+      "rejects changing existing %s stock to active",
+      async (status) => {
+        const { stock, insertChangeCount } = await insertStock(status);
+
+        await expect(
+          caller.medicationStockRouter.update({
+            id: stock.id,
+            stockStatus: "active",
+            remarks: SEED_STOCK.remarks,
+          }),
+        ).rejects.toMatchObject({
+          code: "CONFLICT",
+        });
+
+        expect(await testStockRows()).toEqual([stock]);
+        expect(await changesFor(stock.id)).toHaveLength(insertChangeCount);
+      },
+    );
+
+    it.each(["reserved", "dispensed"] as const)(
+      "rejects changing active stock to %s",
+      async (status) => {
+        const { stock, insertChangeCount } = await createStock();
+
+        await expect(
+          caller.medicationStockRouter.update({
+            id: stock.id,
+            stockStatus: status,
+            remarks: SEED_STOCK.remarks,
+          }),
+        ).rejects.toMatchObject({
+          code: "BAD_REQUEST",
+        });
+
+        expect(await testStockRows()).toEqual([stock]);
+        expect(await changesFor(stock.id)).toHaveLength(insertChangeCount);
+      },
+    );
+
+    it.each(["active", "discarded", "donated"] as const)(
+      "allows editing the location of %s stock",
+      async (status) => {
+        const { stock } = await insertStock(status);
+
+        await caller.medicationStockRouter.update({
+          id: stock.id,
+          location: "Shelf B",
+          remarks: SEED_STOCK.remarks,
+        });
+
+        const [row] = await testStockRows();
+
+        expect(row).toEqual({
+          ...stock,
+          location: "Shelf B",
+        });
+      },
+    );
+
+    it.each(["active", "discarded", "donated"] as const)(
+      "allows changing discarded stock to %s",
+      async (status) => {
+        const { stock } = await insertStock("discarded");
+
+        await caller.medicationStockRouter.update({
+          id: stock.id,
+          stockStatus: status,
+          remarks: SEED_STOCK.remarks,
+        });
+
+        const [row] = await testStockRows();
+
+        expect(row).toEqual({
+          ...stock,
+          stockStatus: status,
+        });
+      },
+    );
+
+    it("returns NOT_FOUND when updating a nonexistent stock", async () => {
+      const { stock } = await createStock();
+
+      // Delete the fixture so this ID is guaranteed not to exist.
+      await cleanUpStock();
+
+      await expect(
+        caller.medicationStockRouter.update({
+          id: stock.id,
+          location: "Shelf B",
+          remarks: "changed remarks",
+        }),
+      ).rejects.toMatchObject({
+        code: "NOT_FOUND",
+      });
+
+      expect(await testStockRows()).toHaveLength(0);
+    });
   });
 
   describe("createSplits()", () => {
@@ -264,7 +447,7 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
         parentId: parent.id,
         splits: [
           { quantity: 60, location: "Shelf D", stockStatus: "active" },
-          { quantity: 40, location: "Shelf E", stockStatus: "reserved" },
+          { quantity: 40, location: "Shelf E", stockStatus: "donated" },
         ],
       });
 
@@ -314,6 +497,104 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
       expect(rows[0].quantity).toBe(SEED_STOCK.quantity);
       expect(await changesFor(parent.id)).toHaveLength(insertChangeCount);
     });
+
+    it.each(["reserved", "dispensed"] as const)(
+      "rejects splitting %s stock",
+      async (status) => {
+        const { stock: parent, insertChangeCount } = await insertStock(status);
+
+        await expect(
+          caller.medicationStockRouter.createSplits({
+            parentId: parent.id,
+            splits: [
+              { quantity: 60, location: "Shelf D", stockStatus: "active" },
+              { quantity: 40, location: "Shelf E", stockStatus: "donated" },
+            ],
+          }),
+        ).rejects.toMatchObject({
+          code: "CONFLICT",
+        });
+
+        expect(await testStockRows()).toEqual([parent]);
+        expect(await changesFor(parent.id)).toHaveLength(insertChangeCount);
+      },
+    );
+
+    it.each(["reserved", "dispensed"] as const)(
+      "rejects creating a %s child stock",
+      async (status) => {
+        const { stock: parent, insertChangeCount } = await createStock();
+
+        await expect(
+          caller.medicationStockRouter.createSplits({
+            parentId: parent.id,
+            splits: [
+              { quantity: 60, location: "Shelf D", stockStatus: "active" },
+              {
+                quantity: 40,
+                location: "Shelf E",
+                // Deliberately submit invalid input to test runtime validation.
+                // @ts-expect-error Restricted statuses are not valid split inputs.
+                stockStatus: status,
+              },
+            ],
+          }),
+        ).rejects.toMatchObject({
+          code: "BAD_REQUEST",
+        });
+
+        expect(await testStockRows()).toEqual([parent]);
+        expect(await changesFor(parent.id)).toHaveLength(insertChangeCount);
+      },
+    );
+
+    it.each(["active", "discarded", "donated"] as const)(
+      "allows splitting %s stock into children with allowed statuses",
+      async (status) => {
+        const { stock: parent } = await insertStock(status);
+
+        await expect(
+          caller.medicationStockRouter.createSplits({
+            parentId: parent.id,
+            splits: [
+              { quantity: 50, location: "Shelf D", stockStatus: "active" },
+              { quantity: 30, location: "Shelf E", stockStatus: "discarded" },
+              { quantity: 20, location: "Shelf F", stockStatus: "donated" },
+            ],
+          }),
+        ).resolves.toEqual({ success: true });
+
+        const rows = await testStockRows();
+        const updatedParent = rows.find((row) => row.id === parent.id);
+        const children = rows.filter((row) => row.id !== parent.id);
+
+        expect(updatedParent).toEqual({
+          ...parent,
+          quantity: 0,
+        });
+
+        expect(children).toHaveLength(3);
+        expect(children).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              quantity: 50,
+              location: "Shelf D",
+              stockStatus: "active",
+            }),
+            expect.objectContaining({
+              quantity: 30,
+              location: "Shelf E",
+              stockStatus: "discarded",
+            }),
+            expect.objectContaining({
+              quantity: 20,
+              location: "Shelf F",
+              stockStatus: "donated",
+            }),
+          ]),
+        );
+      },
+    );
   });
 
   describe("rollback", () => {
@@ -349,12 +630,13 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
     });
 
     it("does not save the stock row when writing its history fails", async () => {
-      // A user id that is not in auth.users makes the trigger's insert into
+      // A user id that is not in public.users makes the trigger's insert into
       // stock_changes violate its foreign key
       await expect(
-        callerFor(randomUUID()).medicationStockRouter.create({
-          medicationBrandId: brandId,
-          ...SEED_STOCK,
+        withUserTransaction(randomUUID(), async (tx) => {
+          await tx
+            .insert(medicationStock)
+            .values({ medicationBrandId: brandId, ...SEED_STOCK });
         }),
       ).rejects.toThrow();
 
@@ -390,6 +672,66 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
       expect(changes.every((c) => c.userId === userId)).toBe(true);
     });
 
+    it("attributes writes made with auth.uid() to the linked public.users row", async () => {
+      const stockId = await db.transaction(async (tx) => {
+        await tx.execute(
+          sql`SELECT set_config('request.jwt.claims', ${JSON.stringify({ sub: authUserId })}, true)`,
+        );
+        const [row] = await tx
+          .insert(medicationStock)
+          .values({ medicationBrandId: brandId, ...SEED_STOCK })
+          .returning({ id: medicationStock.id });
+        return row.id;
+      });
+
+      const changes = await changesFor(stockId);
+      expect(changes.length).toBeGreaterThan(0);
+      expect(changes.every((c) => c.userId === userId)).toBe(true);
+    });
+
+    it("rejects writes made with an auth.uid() that is not linked to a user", async () => {
+      await expect(
+        db.transaction(async (tx) => {
+          await tx.execute(
+            sql`SELECT set_config('request.jwt.claims', ${JSON.stringify({ sub: randomUUID() })}, true)`,
+          );
+          await tx
+            .insert(medicationStock)
+            .values({ medicationBrandId: brandId, ...SEED_STOCK });
+        }),
+      ).rejects.toThrow();
+
+      expect(await testStockRows()).toHaveLength(0);
+    });
+
+    it("attributes writes to a user without a login", async () => {
+      const [noLoginUser] = await db
+        .insert(users)
+        .values({ name: "Stock test user without login" })
+        .returning({ id: users.id });
+
+      try {
+        const stockId = await withUserTransaction(
+          noLoginUser.id,
+          async (tx) => {
+            const [row] = await tx
+              .insert(medicationStock)
+              .values({ medicationBrandId: brandId, ...SEED_STOCK })
+              .returning({ id: medicationStock.id });
+            return row.id;
+          },
+        );
+
+        const changes = await changesFor(stockId);
+        expect(changes.length).toBeGreaterThan(0);
+        expect(changes.every((c) => c.userId === noLoginUser.id)).toBe(true);
+      } finally {
+        // stock_changes references the user, so drop the history first.
+        await cleanUpStock();
+        await db.delete(users).where(eq(users.id, noLoginUser.id));
+      }
+    });
+
     it("skips logging when app.bypass_triggers is set", async () => {
       const stockId = await db.transaction(async (tx) => {
         await tx.execute(
@@ -409,6 +751,7 @@ describe("medicationStockRouter + stock change trigger (integration)", () => {
 
 describe("medicationStockRouter low-stock flags (integration)", () => {
   let caller: ReturnType<typeof callerFor>;
+  let userId: string;
   let ingredientA: number;
   let ingredientB: number;
   let brandA: number;
@@ -453,11 +796,18 @@ describe("medicationStockRouter low-stock flags (integration)", () => {
     quantity: number,
     stockStatus: StockStatus = "active",
   ) {
-    return caller.medicationStockRouter.create({
-      ...SEED_STOCK,
-      medicationBrandId,
-      quantity,
-      stockStatus,
+    return withUserTransaction(userId, async (tx) => {
+      const [stock] = await tx
+        .insert(medicationStock)
+        .values({
+          ...SEED_STOCK,
+          medicationBrandId,
+          quantity,
+          stockStatus,
+        })
+        .returning();
+
+      return stock;
     });
   }
 
@@ -491,16 +841,9 @@ describe("medicationStockRouter low-stock flags (integration)", () => {
   }
 
   beforeAll(async () => {
-    const [user] = await db
-      .select({ id: authUsers.id })
-      .from(authUsers)
-      .limit(1);
-
-    if (!user) {
-      throw new Error("Run pnpm seed:users before these integration tests.");
-    }
-
-    caller = callerFor(user.id);
+    const testUser = await getLinkedTestUser();
+    userId = testUser.userId;
+    caller = callerFor(testUser.authUserId);
 
     ingredientA = await createIngredient(100);
     ingredientB = await createIngredient(50);

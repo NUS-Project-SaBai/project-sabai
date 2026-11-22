@@ -1,11 +1,15 @@
 import type { Broadcast } from "@/db/schema/broadcasts";
 import envVariables from "@/lib/envVariables";
 
+// Fail fast so a hung Realtime call doesn't hold the request open.
+const PUBLISH_TIMEOUT_MS = 5000;
+
 // Add another object variant with `|` when a new topic/event contract is introduced.
 type PublishBroadcastParams = {
   topic: "notifications";
   event: "new";
-  payload: Broadcast;
+  // Includes the sender's name so clients can render the toast without a lookup.
+  payload: Broadcast & { senderName: string | null };
 };
 
 export async function publishBroadcast({
@@ -33,6 +37,7 @@ export async function publishBroadcast({
           },
         ],
       }),
+      signal: AbortSignal.timeout(PUBLISH_TIMEOUT_MS),
     },
   );
 

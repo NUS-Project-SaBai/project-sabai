@@ -9,7 +9,7 @@ export const consultsRouter = router({
   /**
    * Creates a consult and all of its diagnoses in a single transaction.
    * If any insert fails, the whole operation rolls back so nothing is
-   * persisted. `doctorId` comes from the authenticated Supabase session.
+   * persisted. `doctorId` is the public.users id of the logged-in account.
    */
   create: protectedProcedure
     .input(createConsultInput)
@@ -19,7 +19,7 @@ export const consultsRouter = router({
       return db.transaction(async (tx) => {
         const [consult] = await tx
           .insert(consults)
-          .values({ ...consultData, doctorId: ctx.user.id })
+          .values({ ...consultData, doctorId: ctx.appUser.id })
           .returning();
 
         if (diagnoses.length > 0) {
