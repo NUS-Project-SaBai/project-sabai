@@ -141,7 +141,6 @@ function PatientsBasePage() {
                     <IoEyeOutline />
                     View
                   </Link>
-                  {/*taking inspo from the referrals page implementation*/}
                 </TableCell>
               </TableRow>
             ))}
