@@ -124,7 +124,7 @@ export const dental = pgTable("dental", {
   image: text("image"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   visitId: integer("visit_id").references(() => visits.id),
-});
+}).enableRLS();
 
 export type Dental = typeof dental.$inferSelect;
 export type NewDental = typeof dental.$inferInsert;
@@ -136,7 +136,7 @@ export const dentalDiagnosis = pgTable("dental_diagnosis", {
     .notNull()
     .references(() => dental.id),
   description: text("description").notNull(),
-});
+}).enableRLS();
 
 export type DentalDiagnosis = typeof dentalDiagnosis.$inferSelect;
 export type NewDentalDiagnosis = typeof dentalDiagnosis.$inferInsert;

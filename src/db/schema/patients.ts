@@ -50,7 +50,7 @@ export const patients = pgTable("patients", {
   hasSabaiCard: boolean("has_sabai_card").notNull(),
   patientImagePublicId: text("patient_image_public_id").notNull(),
   rekognitionFaceId: text("rekognition_face_id"),
-});
+}).enableRLS();
 
 export type Patient = typeof patients.$inferSelect;
 export type NewPatient = typeof patients.$inferInsert;
@@ -71,7 +71,7 @@ export const visits = pgTable("visits", {
   villageCodeId: integer("village_code_id")
     .notNull()
     .references(() => villageCodes.id),
-});
+}).enableRLS();
 
 export type Visit = typeof visits.$inferSelect;
 export type NewVisit = typeof visits.$inferInsert;

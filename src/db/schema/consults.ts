@@ -34,7 +34,7 @@ export const consults = pgTable("consults", {
   visitId: integer("visit_id")
     .notNull()
     .references(() => visits.id),
-});
+}).enableRLS();
 
 export type Consult = typeof consults.$inferSelect;
 export type NewConsult = typeof consults.$inferInsert;
@@ -53,7 +53,7 @@ export const diagnosis = pgTable("diagnosis", {
   consultId: integer("consult_id")
     .notNull()
     .references(() => consults.id),
-});
+}).enableRLS();
 
 export type Diagnosis = typeof diagnosis.$inferSelect;
 export type NewDiagnosis = typeof diagnosis.$inferInsert;

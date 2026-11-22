@@ -58,7 +58,7 @@ export const medicationActiveIngredients = pgTable(
     fallBelow: integer("fall_below").notNull(),
     remarks: text("remarks"),
   },
-);
+).enableRLS();
 
 export type MedicationActiveIngredient =
   typeof medicationActiveIngredients.$inferSelect;
@@ -81,7 +81,7 @@ export const medicationBrands = pgTable("medication_brands", {
       onDelete: "restrict",
     }),
   remarks: text("remarks"),
-});
+}).enableRLS();
 
 export type MedicationBrand = typeof medicationBrands.$inferSelect;
 export type NewMedicationBrand = typeof medicationBrands.$inferInsert;
@@ -108,7 +108,7 @@ export const medicationStock = pgTable("medication_stock", {
   location: varchar("location", { length: 255 }).notNull(),
   stockStatus: medicationStatusEnum("stock_status").default("active").notNull(),
   remarks: text("remarks"),
-});
+}).enableRLS();
 
 export type MedicationStock = typeof medicationStock.$inferSelect;
 export type NewMedicationStock = typeof medicationStock.$inferInsert;
@@ -141,7 +141,7 @@ export const stockChanges = pgTable(
   (table) => [
     index("stock_changes_stock_id_id_idx").on(table.stockId, table.id),
   ],
-);
+).enableRLS();
 
 export type StockChange = typeof stockChanges.$inferSelect;
 export type NewStockChange = typeof stockChanges.$inferInsert;
@@ -166,7 +166,7 @@ export const orders = pgTable(
     quantity: integer("quantity").notNull(),
   },
   (table) => [check("quantity_check", sql`${table.quantity} > 0`)],
-);
+).enableRLS();
 
 export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
@@ -187,7 +187,7 @@ export const orderItems = pgTable(
       .references(() => medicationStock.id),
   },
   (table) => [primaryKey({ columns: [table.orderId, table.stockId] })],
-);
+).enableRLS();
 
 export type OrderItem = typeof orderItems.$inferSelect;
 export type NewOrderItem = typeof orderItems.$inferInsert;
