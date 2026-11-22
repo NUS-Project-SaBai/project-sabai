@@ -9,6 +9,9 @@ import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import { formatPatientId } from "@/lib/utils/patient";
+import { paths } from "@/utils/paths";
+import { IoEyeOutline } from "react-icons/io5";
+import Link from "next/link";
 
 function Wrapper({ children }: { children: ReactNode }) {
   return (
@@ -71,6 +74,7 @@ function PatientsBasePage() {
               "Basic Info",
               "Status Flags",
               "Allergies",
+              "Actions",
             ]}
           />
           <tbody className="bg-white divide-y divide-slate-200">
@@ -81,10 +85,7 @@ function PatientsBasePage() {
                     <span className="text-sm font-medium text-slate-900">
                       {formatPatientId(patient.id) || "No ID"}
                     </span>
-                    <PatientPhoto
-                      pictureUrl={patient.patientImageUrl}
-                      className="rounded-lg border border-slate-200"
-                    />
+                    <PatientPhoto pictureUrl={patient.patientImageUrl} />
                   </div>
                 </TableCell>
                 <TableCell>
@@ -128,6 +129,15 @@ function PatientsBasePage() {
                   <div className="text-sm text-slate-700 max-w-xs truncate">
                     {patient.drugAllergy}
                   </div>
+                </TableCell>
+                <TableCell>
+                  <Link
+                    href={paths.patientDetail(patient.id)}
+                    className="inline-flex items-center justify-center gap-2 whitespace-normal rounded-lg bg-gray-600 px-2 py-2 text-center text-xs text-white transition hover:bg-gray-800 sm:px-3 sm:text-sm"
+                  >
+                    <IoEyeOutline />
+                    View
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}

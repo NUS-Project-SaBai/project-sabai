@@ -130,7 +130,7 @@ export default function IngredientRow(ingredient: MedicationActiveIngredient) {
           </span>
         </TableCell>
         <TableCell>
-          <div className="flex items-left gap-2">
+          <div className="flex gap-2">
             {isEditing ? (
               <Button
                 colour="emerald"
