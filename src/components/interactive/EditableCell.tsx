@@ -15,6 +15,7 @@ interface EditableCellProps {
    * still wraps fully within the table cell.
    */
   multiline?: boolean;
+  maxLength?: number;
 }
 
 export default function EditableCell({
@@ -25,6 +26,7 @@ export default function EditableCell({
   isEditing,
   registerOptions = {},
   multiline = false,
+  maxLength,
 }: EditableCellProps) {
   if (isEditing) {
     return multiline ? (
@@ -33,6 +35,7 @@ export default function EditableCell({
         label={label}
         rows={2}
         registerOptions={registerOptions}
+        maxLength={maxLength}
       />
     ) : (
       <RHFInput
@@ -40,6 +43,7 @@ export default function EditableCell({
         name={name}
         label={label}
         registerOptions={registerOptions}
+        maxLength={maxLength}
       />
     );
   }
