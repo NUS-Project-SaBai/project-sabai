@@ -40,10 +40,7 @@ function PatientCard({
 }) {
   return (
     <div className="flex gap-10 p-4">
-      <PatientPhoto
-        pictureUrl={patient.patientImageUrl}
-        className="h-14 w-14 rounded-lg border border-slate-200 object-cover"
-      />
+      <PatientPhoto pictureUrl={patient.patientImageUrl} />
       <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
         <PatientCode
           villageCode={patient.villageCode}
@@ -86,10 +83,7 @@ function PatientTable({
                 />
               </TableCell>
               <TableCell>
-                <PatientPhoto
-                  pictureUrl={patient.patientImageUrl}
-                  className="h-12 w-12 rounded-lg border border-slate-200 object-cover"
-                />
+                <PatientPhoto pictureUrl={patient.patientImageUrl} />
               </TableCell>
               <TableCell>
                 <span className="text-sm font-medium text-slate-900">

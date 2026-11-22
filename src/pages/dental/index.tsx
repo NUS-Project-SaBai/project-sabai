@@ -60,10 +60,7 @@ export default function DentalPage() {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <PatientPhoto
-                    pictureUrl={patient.patientImageUrl}
-                    className="h-12 w-12 rounded-lg border border-slate-200 object-cover"
-                  />
+                  <PatientPhoto pictureUrl={patient.patientImageUrl} />
                 </TableCell>
                 <TableCell>
                   <span className="text-sm font-medium text-slate-900">
