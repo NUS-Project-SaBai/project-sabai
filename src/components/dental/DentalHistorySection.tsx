@@ -3,6 +3,13 @@ import FormSection from "@/components/interactive/inputs/FormSection";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFRadio } from "@/components/interactive/RHF/RHFRadio";
 import {
+  BooleanString,
+  fromBoolean,
+  toBoolean,
+  toOptions,
+  yesNoOptions,
+} from "@/components/dental/dentalFormUtils";
+import {
   brushingFrequencyValues,
   sugarConsumptionValues,
   yesNoUnknownValues,
@@ -11,8 +18,6 @@ import {
 type YesNoUnknown = (typeof yesNoUnknownValues)[number];
 type BrushingFrequency = (typeof brushingFrequencyValues)[number];
 type SugarConsumption = (typeof sugarConsumptionValues)[number];
-/** Boolean DB columns are held as strings by RHFRadio; "" means unanswered. */
-type BooleanString = "true" | "false";
 
 export type DentalHistoryFormValues = {
   previousDentalVisit: YesNoUnknown | "";
@@ -45,11 +50,6 @@ export const dentalHistoryDefaultValues: DentalHistoryFormValues = {
 };
 
 type DentalHistoryRecord = Pick<Dental, keyof DentalHistoryFormValues>;
-
-const fromBoolean = (value: boolean | null | undefined): BooleanString | "" =>
-  value == null ? "" : value ? "true" : "false";
-const toBoolean = (value: BooleanString | ""): boolean | null =>
-  value === "" ? null : value === "true";
 
 /** Maps a saved record (or none) to form values; `null` columns become "". */
 export function toDentalHistoryFormValues(
@@ -93,16 +93,6 @@ export function toDentalHistoryPayload(values: DentalHistoryFormValues) {
   };
 }
 
-const capitalise = (value: string) =>
-  value.charAt(0).toUpperCase() + value.slice(1);
-
-const toOptions = (values: readonly string[]) =>
-  values.map((value) => ({ label: capitalise(value), value }));
-
-const yesNoOptions = [
-  { label: "Yes", value: "true" },
-  { label: "No", value: "false" },
-];
 const yesNoUnknownOptions = toOptions(yesNoUnknownValues);
 
 // Ordered to match the mockup's row-by-row reading order.
