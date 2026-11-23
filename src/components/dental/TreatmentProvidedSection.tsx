@@ -45,7 +45,7 @@ export function TreatmentProvidedSection() {
               type="text"
               placeholder="Operator"
               maxLength={255}
-              className="[&>label]:sr-only"
+              className="relative [&>label]:sr-only"
             />
             <RHFInput
               name={`${prefix}ToothNumber`}
@@ -53,7 +53,7 @@ export function TreatmentProvidedSection() {
               type="text"
               placeholder="Tooth no."
               maxLength={255}
-              className="[&>label]:sr-only"
+              className="relative [&>label]:sr-only"
             />
           </div>
         ))}
