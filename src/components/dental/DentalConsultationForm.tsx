@@ -1,6 +1,6 @@
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import type { Dental } from "@/db/schema/dental";
+import type { DentalWithDiagnoses } from "@/db/schema/dental";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Button } from "@/components/interactive/Button/Button";
 import {
@@ -16,6 +16,12 @@ import {
   toClinicalExaminationPayload,
 } from "@/components/dental/ClinicalExaminationSection";
 import {
+  DentalDiagnosisFormValues,
+  DentalDiagnosisSection,
+  toDentalDiagnosisFormValues,
+  toDentalDiagnosisPayload,
+} from "@/components/dental/DentalDiagnosisSection";
+import {
   DentalHistoryFormValues,
   DentalHistorySection,
   toDentalHistoryFormValues,
@@ -26,18 +32,23 @@ import { trpc } from "@/utils/trpc";
 // Extend with each new section's values as the remaining sections are built.
 type DentalConsultationFormValues = DentalHistoryFormValues &
   ChiefComplaintFormValues &
-  ClinicalExaminationFormValues;
+  ClinicalExaminationFormValues &
+  DentalDiagnosisFormValues;
 
-const toFormValues = (record: Dental | null): DentalConsultationFormValues => ({
+const toFormValues = (
+  record: DentalWithDiagnoses | null,
+): DentalConsultationFormValues => ({
   ...toDentalHistoryFormValues(record),
   ...toChiefComplaintFormValues(record),
   ...toClinicalExaminationFormValues(record),
+  ...toDentalDiagnosisFormValues(record),
 });
 
 const toPayload = (values: DentalConsultationFormValues) => ({
   ...toDentalHistoryPayload(values),
   ...toChiefComplaintPayload(values),
   ...toClinicalExaminationPayload(values),
+  ...toDentalDiagnosisPayload(values),
 });
 
 /**
@@ -74,7 +85,7 @@ function DentalConsultationFormBody({
   record,
 }: {
   visitId: number;
-  record: Dental | null;
+  record: DentalWithDiagnoses | null;
 }) {
   const methods = useForm<DentalConsultationFormValues>({
     defaultValues: toFormValues(record),
@@ -84,7 +95,7 @@ function DentalConsultationFormBody({
   const utils = trpc.useUtils();
 
   const mutationOptions = {
-    onSuccess: (saved: Dental) => {
+    onSuccess: (saved: DentalWithDiagnoses) => {
       // Write the saved row straight into the cache so a second save updates
       // this record instead of creating a duplicate while a refetch is pending.
       utils.dentalRouter.getByVisitId.setData({ visitId }, saved);
@@ -117,6 +128,7 @@ function DentalConsultationFormBody({
         <DentalHistorySection />
         <ChiefComplaintSection />
         <ClinicalExaminationSection />
+        <DentalDiagnosisSection />
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
           <Button
             title="Reset Form"
