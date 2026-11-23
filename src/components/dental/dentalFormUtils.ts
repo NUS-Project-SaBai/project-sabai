@@ -1,14 +1,4 @@
-/** Boolean DB columns are held as strings by RHFRadio; "" means unanswered. */
-export type BooleanString = "true" | "false";
-
 export type RadioOption = { label: string; value: string };
-
-export const fromBoolean = (
-  value: boolean | null | undefined,
-): BooleanString | "" => (value == null ? "" : value ? "true" : "false");
-
-export const toBoolean = (value: BooleanString | ""): boolean | null =>
-  value === "" ? null : value === "true";
 
 const capitalise = (value: string) =>
   value.charAt(0).toUpperCase() + value.slice(1);
