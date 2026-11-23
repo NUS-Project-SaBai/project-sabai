@@ -12,6 +12,7 @@ import { formatPatientId } from "@/lib/utils/patient";
 import { ConsultForm } from "@/components/consults/ConsultForm";
 import { PreviousConsults } from "@/components/consults/PreviousConsults";
 import { VisitSummaryPanel } from "@/components/consults/VisitSummaryPanel";
+import PatientDocuments from "@/components/patient-documents/PatientDocuments";
 
 function ConsultsPage() {
   const router = useRouter();
@@ -76,13 +77,16 @@ function ConsultsPage() {
           ]}
         />
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">
-            Consult — {patient.name}
-          </h1>
-          <p className="mt-2 text-slate-600">
-            Patient ID: {formatPatientId(patient.id)}
-          </p>
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">
+              Consult — {patient.name}
+            </h1>
+            <p className="mt-2 text-slate-600">
+              Patient ID: {formatPatientId(patient.id)}
+            </p>
+          </div>
+          <PatientDocuments patientId={patient.id} />
         </div>
 
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
