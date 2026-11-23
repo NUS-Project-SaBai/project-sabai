@@ -38,12 +38,12 @@ describe("usersRouter (integration)", () => {
       // When - users are listed
       const result = await caller.usersRouter.list();
       // Then - the PN user is included with only the picker fields
-      expect(result).toContainEqual({
+      const pnUser = result.find((u) => u.id === pnUserId);
+      expect(pnUser).toStrictEqual({
         id: pnUserId,
         name: "Users Router Test PN",
         team: "PN",
       });
-      expect(Object.keys(result[0]).sort()).toEqual(["id", "name", "team"]);
     });
   });
 });
