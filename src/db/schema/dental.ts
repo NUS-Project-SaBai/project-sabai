@@ -140,3 +140,6 @@ export const dentalDiagnosis = pgTable("dental_diagnosis", {
 
 export type DentalDiagnosis = typeof dentalDiagnosis.$inferSelect;
 export type NewDentalDiagnosis = typeof dentalDiagnosis.$inferInsert;
+
+/** A dental record as the router returns it: with its diagnoses attached. */
+export type DentalWithDiagnoses = Dental & { diagnoses: DentalDiagnosis[] };
