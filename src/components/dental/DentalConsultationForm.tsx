@@ -10,6 +10,12 @@ import {
   toChiefComplaintPayload,
 } from "@/components/dental/ChiefComplaintSection";
 import {
+  ClinicalExaminationFormValues,
+  ClinicalExaminationSection,
+  toClinicalExaminationFormValues,
+  toClinicalExaminationPayload,
+} from "@/components/dental/ClinicalExaminationSection";
+import {
   DentalHistoryFormValues,
   DentalHistorySection,
   toDentalHistoryFormValues,
@@ -19,16 +25,19 @@ import { trpc } from "@/utils/trpc";
 
 // Extend with each new section's values as the remaining sections are built.
 type DentalConsultationFormValues = DentalHistoryFormValues &
-  ChiefComplaintFormValues;
+  ChiefComplaintFormValues &
+  ClinicalExaminationFormValues;
 
 const toFormValues = (record: Dental | null): DentalConsultationFormValues => ({
   ...toDentalHistoryFormValues(record),
   ...toChiefComplaintFormValues(record),
+  ...toClinicalExaminationFormValues(record),
 });
 
 const toPayload = (values: DentalConsultationFormValues) => ({
   ...toDentalHistoryPayload(values),
   ...toChiefComplaintPayload(values),
+  ...toClinicalExaminationPayload(values),
 });
 
 /**
@@ -107,6 +116,7 @@ function DentalConsultationFormBody({
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
         <DentalHistorySection />
         <ChiefComplaintSection />
+        <ClinicalExaminationSection />
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
           <Button
             title="Reset Form"
