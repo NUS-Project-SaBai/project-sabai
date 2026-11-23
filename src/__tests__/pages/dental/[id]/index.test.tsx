@@ -2,7 +2,7 @@ import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useRouter } from "next/router";
 import { Toaster, toast } from "react-hot-toast";
-import type { Dental } from "@/db/schema/dental";
+import type { DentalWithDiagnoses } from "@/db/schema/dental";
 import PatientDentalPage from "@/pages/dental/[id]";
 import { formatVisitDate } from "@/lib/utils/visit";
 import { trpc } from "@/utils/trpc";
@@ -37,14 +37,22 @@ const latest = { id: 20, date: new Date("2025-06-15T10:30:00") };
 const older = { id: 10, date: new Date("2024-06-15T10:30:00") };
 
 /** A saved dental row; columns the form doesn't read are left out. */
-const dentalRecord = (fields: Partial<Dental>) => fields as Dental;
+const dentalRecord = (fields: Partial<DentalWithDiagnoses>) =>
+  ({ diagnoses: [], ...fields }) as DentalWithDiagnoses;
+/** Saved diagnosis rows for a dental record, in entry order. */
+const diagnosisRows = (dentalId: number, descriptions: string[]) =>
+  descriptions.map((description, index) => ({
+    id: index + 1,
+    dentalId,
+    description,
+  }));
 
 // Saved records per visit id; a missing entry means no record yet.
-let savedRecords: Record<number, Dental> = {};
+let savedRecords: Record<number, DentalWithDiagnoses> = {};
 const createMutate = vi.fn();
 const updateMutate = vi.fn();
 const setData = vi.fn();
-type MutationOptions = { onSuccess: (saved: Dental) => void };
+type MutationOptions = { onSuccess: (saved: DentalWithDiagnoses) => void };
 let createOptions: MutationOptions;
 
 beforeEach(() => {
@@ -256,6 +264,25 @@ test("renders every clinical examination question with its options", () => {
   expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
 });
 
+test("Add Diagnosis shows a new textbox each click and Remove deletes one", async () => {
+  const user = userEvent.setup();
+  render(<PatientDentalPage />);
+  expect(
+    screen.getByRole("heading", { name: "Dental Diagnosis" }),
+  ).toBeInTheDocument();
+  expect(screen.queryByLabelText(/^Diagnosis \d+$/)).not.toBeInTheDocument();
+
+  await user.click(addDiagnosisButton());
+  expect(diagnosisInput(1)).toHaveValue("");
+  await user.type(diagnosisInput(1), "Caries on 36");
+  await user.click(addDiagnosisButton());
+  await user.type(diagnosisInput(2), "Gingivitis");
+
+  await user.click(screen.getByRole("button", { name: "Remove diagnosis 1" }));
+  expect(diagnosisInput(1)).toHaveValue("Gingivitis");
+  expect(screen.queryByLabelText("Diagnosis 2")).not.toBeInTheDocument();
+});
+
 test("renders the chief complaint section", () => {
   render(<PatientDentalPage />);
   expect(
@@ -324,6 +351,9 @@ const radio = (question: string, option: string) =>
 const otherHistoryInput = () =>
   screen.getByLabelText("Other dental history (optional)");
 const chiefComplaintInput = () => screen.getByLabelText("Chief complaint");
+const diagnosisInput = (n: number) => screen.getByLabelText(`Diagnosis ${n}`);
+const addDiagnosisButton = () =>
+  screen.getByRole("button", { name: "Add Diagnosis +" });
 
 test("loads each visit's saved record when switching visits and discards unsaved edits", async () => {
   const user = userEvent.setup();
@@ -337,6 +367,7 @@ test("loads each visit's saved record when switching visits and discards unsaved
       chiefComplaint: "Pain in lower left molar",
       calculus: true,
       plaque: "heavy",
+      diagnoses: diagnosisRows(1, ["Caries on 36", "Gingivitis"]),
     }),
     [older.id]: dentalRecord({ id: 2, visitId: older.id, toothache: false }),
   };
@@ -355,6 +386,8 @@ test("loads each visit's saved record when switching visits and discards unsaved
   expect(chiefComplaintInput()).toHaveValue("Pain in lower left molar");
   expect(radio("Calculus", "Present")).toHaveAttribute("aria-checked", "true");
   expect(radio("Plaque", "Heavy")).toHaveAttribute("aria-checked", "true");
+  expect(diagnosisInput(1)).toHaveValue("Caries on 36");
+  expect(diagnosisInput(2)).toHaveValue("Gingivitis");
   await user.click(radio("Bleeding gums", "Yes"));
 
   await user.click(screen.getByRole("button", { name: latestDate }));
@@ -372,6 +405,7 @@ test("loads each visit's saved record when switching visits and discards unsaved
   expect(otherHistoryInput()).toHaveValue("");
   expect(chiefComplaintInput()).toHaveValue("");
   expect(radio("Calculus", "Present")).toHaveAttribute("aria-checked", "false");
+  expect(screen.queryByLabelText("Diagnosis 1")).not.toBeInTheDocument();
 
   await user.click(screen.getByRole("button", { name: olderDate }));
   await user.click(screen.getByRole("button", { name: latestDate }));
@@ -399,6 +433,10 @@ test("creates a record for a visit without one, sending unanswered fields as nul
   await user.click(radio("Caries", "Non-cavitated"));
   await user.click(radio("Calculus", "Present"));
   await user.click(radio("Mucosal lesions", "Absent"));
+  await user.click(addDiagnosisButton());
+  await user.type(diagnosisInput(1), "  Caries on 36  ");
+  // A diagnosis textbox left blank is not saved.
+  await user.click(addDiagnosisButton());
   await user.click(
     screen.getByRole("button", { name: "Save Dental Consultation" }),
   );
@@ -431,6 +469,7 @@ test("creates a record for a visit without one, sending unanswered fields as nul
     fracturedTeeth: null,
     mucosalLesions: false,
     malocclusion: null,
+    diagnoses: ["Caries on 36"],
   });
   expect(updateMutate).not.toHaveBeenCalled();
 
@@ -464,6 +503,7 @@ test("updates the visit's existing record by id", async () => {
       visitId: latest.id,
       toothache: true,
       chiefComplaint: "Toothache",
+      diagnoses: diagnosisRows(7, ["Caries on 36", "Gingivitis"]),
     }),
   };
   render(<PatientDentalPage />);
@@ -471,17 +511,22 @@ test("updates the visit's existing record by id", async () => {
   await user.click(radio("Toothache", "No"));
   await user.clear(chiefComplaintInput());
   await user.type(chiefComplaintInput(), "   ");
+  await user.click(screen.getByRole("button", { name: "Remove diagnosis 1" }));
+  await user.click(addDiagnosisButton());
+  await user.type(diagnosisInput(2), "Calculus");
   await user.click(
     screen.getByRole("button", { name: "Save Dental Consultation" }),
   );
 
-  // A blank complaint is sent as null so it clears the saved value.
+  // A blank complaint is sent as null so it clears the saved value, and the
+  // full diagnosis list is sent so it replaces the saved diagnoses.
   expect(updateMutate).toHaveBeenCalledWith(
     expect.objectContaining({
       id: 7,
       toothache: false,
       extraction: null,
       chiefComplaint: null,
+      diagnoses: ["Gingivitis", "Calculus"],
     }),
   );
   expect(updateMutate.mock.calls[0][0]).not.toHaveProperty("visitId");
@@ -498,11 +543,13 @@ test("Reset Form restores the last saved values", async () => {
   await user.click(radio("Toothache", "No"));
   await user.type(otherHistoryInput(), "Filling");
   await user.type(chiefComplaintInput(), "Swelling");
+  await user.click(addDiagnosisButton());
   await user.click(screen.getByRole("button", { name: "Reset Form" }));
 
   expect(radio("Toothache", "Yes")).toHaveAttribute("aria-checked", "true");
   expect(otherHistoryInput()).toHaveValue("");
   expect(chiefComplaintInput()).toHaveValue("");
+  expect(screen.queryByLabelText("Diagnosis 1")).not.toBeInTheDocument();
 });
 
 test("shows loading and error states for the visit's dental record", () => {

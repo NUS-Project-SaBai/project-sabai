@@ -2,12 +2,18 @@
 // Integration tests against the local Postgres in .env (`supabase start`).
 // Node env because envVariables.ts only exposes DATABASE_URL server-side.
 import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { appRouter } from "@/server/routers/_app";
 import { db } from "@/db/drizzle";
 import type { Context } from "@/server/context";
 import { getLinkedTestUser } from "./testUsers";
-import { dental, visits, patients, villageCodes } from "@/db/schema";
+import {
+  dental,
+  dentalDiagnosis,
+  visits,
+  patients,
+  villageCodes,
+} from "@/db/schema";
 
 const SEED_PATIENT = {
   name: "Dental Test Patient",
@@ -45,6 +51,25 @@ const BLANK_HISTORY = {
 // protectedProcedure requires a login linked to public.users; set up in beforeAll.
 let caller: ReturnType<typeof appRouter.createCaller>;
 
+/** Deletes a visit's dental records, diagnoses first to satisfy the FK. */
+async function deleteDentalForVisit(visitId: number) {
+  await db
+    .delete(dentalDiagnosis)
+    .where(
+      inArray(
+        dentalDiagnosis.dentalId,
+        db
+          .select({ id: dental.id })
+          .from(dental)
+          .where(eq(dental.visitId, visitId)),
+      ),
+    );
+  await db.delete(dental).where(eq(dental.visitId, visitId));
+}
+
+const descriptions = (row: { diagnoses: { description: string }[] } | null) =>
+  row?.diagnoses.map((d) => d.description);
+
 describe("dentalRouter (integration)", () => {
   let villageCodeId: number;
   let patientId: number;
@@ -73,11 +98,11 @@ describe("dentalRouter (integration)", () => {
   });
 
   afterEach(async () => {
-    await db.delete(dental).where(eq(dental.visitId, visitId));
+    await deleteDentalForVisit(visitId);
   });
 
   afterAll(async () => {
-    await db.delete(dental).where(eq(dental.visitId, visitId));
+    await deleteDentalForVisit(visitId);
     await db.delete(visits).where(eq(visits.id, visitId));
     await db.delete(patients).where(eq(patients.id, patientId));
     await db.delete(villageCodes).where(eq(villageCodes.id, villageCodeId));
@@ -146,6 +171,30 @@ describe("dentalRouter (integration)", () => {
       expect(row).toMatchObject(examination);
     });
 
+    it("saves diagnoses in entry order, trimmed, linked to the record", async () => {
+      const created = await caller.dentalRouter.create({
+        visitId,
+        diagnoses: ["  Caries on 36 ", "Gingivitis"],
+      });
+      expect(descriptions(created)).toEqual(["Caries on 36", "Gingivitis"]);
+      created.diagnoses.forEach((d) => expect(d.dentalId).toBe(created.id));
+
+      const row = await caller.dentalRouter.getByVisitId({ visitId });
+      expect(descriptions(row)).toEqual(["Caries on 36", "Gingivitis"]);
+    });
+
+    it("returns an empty diagnoses list when none are given", async () => {
+      const created = await caller.dentalRouter.create({ visitId });
+      expect(created.diagnoses).toEqual([]);
+    });
+
+    it("rejects a blank diagnosis and saves nothing", async () => {
+      await expect(
+        caller.dentalRouter.create({ visitId, diagnoses: ["Caries", "  "] }),
+      ).rejects.toThrow();
+      expect(await caller.dentalRouter.getByVisitId({ visitId })).toBeNull();
+    });
+
     it("rejects values outside the column's enum", async () => {
       await expect(
         caller.dentalRouter.create({
@@ -190,9 +239,42 @@ describe("dentalRouter (integration)", () => {
       });
     });
 
+    it("replaces diagnoses when given and leaves them untouched when omitted", async () => {
+      const created = await caller.dentalRouter.create({
+        visitId,
+        diagnoses: ["Caries on 36", "Gingivitis"],
+      });
+
+      const untouched = await caller.dentalRouter.update({
+        id: created.id,
+        toothache: true,
+      });
+      expect(descriptions(untouched)).toEqual(["Caries on 36", "Gingivitis"]);
+
+      const replaced = await caller.dentalRouter.update({
+        id: created.id,
+        diagnoses: ["Gingivitis", "Calculus"],
+      });
+      expect(replaced).toMatchObject({ id: created.id, toothache: true });
+      expect(descriptions(replaced)).toEqual(["Gingivitis", "Calculus"]);
+
+      await caller.dentalRouter.update({ id: created.id, diagnoses: [] });
+      const row = await caller.dentalRouter.getByVisitId({ visitId });
+      expect(row?.diagnoses).toEqual([]);
+      expect(
+        await db
+          .select()
+          .from(dentalDiagnosis)
+          .where(eq(dentalDiagnosis.dentalId, created.id)),
+      ).toEqual([]);
+    });
+
     it("throws NOT_FOUND for an unknown id", async () => {
       await expect(
         caller.dentalRouter.update({ id: 2_147_483_647, toothache: true }),
+      ).rejects.toMatchObject({ code: "NOT_FOUND" });
+      await expect(
+        caller.dentalRouter.update({ id: 2_147_483_647, diagnoses: ["x"] }),
       ).rejects.toMatchObject({ code: "NOT_FOUND" });
     });
   });
