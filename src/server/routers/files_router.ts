@@ -5,16 +5,7 @@ import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { files, patients } from "@/db/schema";
 import { fileStorage, patientKeyPrefix } from "@/server/utils/s3";
-import { ALLOWED_FILE_TYPES, MAX_FILE_SIZE_BYTES } from "@/lib/constants/files";
-
-// Rejects a file whose size or type isn't allowed. Checked before upload
-function fileError(size: number, contentType: string | undefined) {
-  if (size === 0) return "File is empty";
-  if (size > MAX_FILE_SIZE_BYTES) return "File is too large!";
-  if (!(ALLOWED_FILE_TYPES as readonly unknown[]).includes(contentType))
-    return "Only PDF, JPEG, PNG and DOCX files are allowed";
-  return null;
-}
+import { getFileError } from "@/lib/utils/files";
 
 function badRequest(message: string) {
   return new TRPCError({ code: "BAD_REQUEST", message });
@@ -64,7 +55,7 @@ export const filesRouter = router({
           size: z.number().int(),
         })
         .superRefine((input, ctx) => {
-          const error = fileError(input.size, input.contentType);
+          const error = getFileError(input.size, input.contentType);
           if (error) {
             ctx.addIssue({
               code: "custom",
@@ -111,7 +102,7 @@ export const filesRouter = router({
       if (!uploaded)
         throw badRequest(`${input.fileName} - File was not uploaded`);
       // S3 already enforced these limits on upload; this is a safety net.
-      const error = fileError(uploaded.size, uploaded.contentType);
+      const error = getFileError(uploaded.size, uploaded.contentType);
       if (error) {
         // It can never be recorded, so remove it.
         await fileStorage.delete(input.key).catch(() => {});
@@ -123,7 +114,7 @@ export const filesRouter = router({
         .values({
           patientId: input.patientId,
           s3Key: input.key,
-          // Checked by fileError above.
+          // Checked by getFileError above.
           contentType: uploaded.contentType!,
           fileName: input.fileName,
           description: input.description,
