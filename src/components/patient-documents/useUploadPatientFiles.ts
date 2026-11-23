@@ -2,8 +2,6 @@ import { trpc } from "@/utils/trpc";
 
 type FileToUpload = { file: File; description: string };
 
-export type UploadFailure<T> = { item: T; message: string };
-
 // "a.pdf - reason". Server messages often already start with the file name.
 function failureMessage(file: File, reason: unknown) {
   const message = reason instanceof Error ? reason.message : "Upload failed";
@@ -43,20 +41,19 @@ export function useUploadPatientFiles(patientId: number) {
     });
   };
 
-  return async <T extends FileToUpload>(
-    items: T[],
-  ): Promise<UploadFailure<T>[]> => {
-    const results = await Promise.allSettled(items.map(uploadOne));
-
-    const failures: UploadFailure<T>[] = [];
-    results.forEach((result, i) => {
-      if (result.status === "fulfilled") return;
-      console.error(result.reason);
-      failures.push({
-        item: items[i],
-        message: failureMessage(items[i].file, result.reason),
-      });
-    });
+  return async (items: FileToUpload[]) => {
+    const results = await Promise.all(
+      items.map(async (item) => {
+        try {
+          await uploadOne(item);
+          return null;
+        } catch (error) {
+          console.error(error);
+          return { item, message: failureMessage(item.file, error) };
+        }
+      }),
+    );
+    const failures = results.filter((result) => result !== null);
 
     if (failures.length < items.length) {
       utils.filesRouter.listByPatientId.invalidate({ patientId });
