@@ -283,6 +283,37 @@ test("Add Diagnosis shows a new textbox each click and Remove deletes one", asyn
   expect(screen.queryByLabelText("Diagnosis 2")).not.toBeInTheDocument();
 });
 
+test("renders a treatment row with status, operator and tooth number for each treatment", () => {
+  render(<PatientDentalPage />);
+  expect(
+    screen.getByRole("heading", { name: "Treatment Provided" }),
+  ).toBeInTheDocument();
+
+  for (const treatment of ["Fluoride", "Sealant", "SDF", "Scaling"]) {
+    const radios = within(
+      screen.getByRole("radiogroup", { name: treatment }),
+    ).getAllByRole("radio");
+    expect(radios.map((radio) => radio.textContent)).toEqual([
+      "Done",
+      "Not done",
+    ]);
+    radios.forEach((radio) =>
+      expect(radio).toHaveAttribute("aria-checked", "false"),
+    );
+
+    const operator = screen.getByLabelText(`${treatment} operator`);
+    expect(operator).toHaveAttribute("type", "text");
+    expect(operator).toHaveAttribute("placeholder", "Operator");
+    expect(operator).toHaveAttribute("maxLength", "255");
+    const toothNumber = screen.getByLabelText(`${treatment} tooth no.`);
+    expect(toothNumber).toHaveAttribute("type", "text");
+    expect(toothNumber).toHaveAttribute("placeholder", "Tooth no.");
+    expect(toothNumber).toHaveAttribute("maxLength", "255");
+  }
+  // The mockup's date column is intentionally left out.
+  expect(screen.queryByPlaceholderText("Date")).not.toBeInTheDocument();
+});
+
 test("renders the remarks section", () => {
   render(<PatientDentalPage />);
   expect(screen.getByRole("heading", { name: "Remarks" })).toBeInTheDocument();
@@ -380,6 +411,9 @@ test("loads each visit's saved record when switching visits and discards unsaved
       plaque: "heavy",
       diagnoses: diagnosisRows(1, ["Caries on 36", "Gingivitis"]),
       remarks: "Review in 6 months",
+      sdfStatus: "done",
+      sdfOperator: "Dr Tan",
+      sdfToothNumber: "36, 46",
     }),
     [older.id]: dentalRecord({ id: 2, visitId: older.id, toothache: false }),
   };
@@ -401,6 +435,9 @@ test("loads each visit's saved record when switching visits and discards unsaved
   expect(diagnosisInput(1)).toHaveValue("Caries on 36");
   expect(diagnosisInput(2)).toHaveValue("Gingivitis");
   expect(remarksInput()).toHaveValue("Review in 6 months");
+  expect(radio("SDF", "Done")).toHaveAttribute("aria-checked", "true");
+  expect(screen.getByLabelText("SDF operator")).toHaveValue("Dr Tan");
+  expect(screen.getByLabelText("SDF tooth no.")).toHaveValue("36, 46");
   await user.click(radio("Bleeding gums", "Yes"));
 
   await user.click(screen.getByRole("button", { name: latestDate }));
@@ -420,6 +457,8 @@ test("loads each visit's saved record when switching visits and discards unsaved
   expect(radio("Calculus", "Present")).toHaveAttribute("aria-checked", "false");
   expect(screen.queryByLabelText("Diagnosis 1")).not.toBeInTheDocument();
   expect(remarksInput()).toHaveValue("");
+  expect(radio("SDF", "Done")).toHaveAttribute("aria-checked", "false");
+  expect(screen.getByLabelText("SDF operator")).toHaveValue("");
 
   await user.click(screen.getByRole("button", { name: olderDate }));
   await user.click(screen.getByRole("button", { name: latestDate }));
@@ -452,6 +491,10 @@ test("creates a record for a visit without one, sending unanswered fields as nul
   // A diagnosis textbox left blank is not saved.
   await user.click(addDiagnosisButton());
   await user.type(remarksInput(), "  Anxious patient  ");
+  await user.click(radio("Fluoride", "Done"));
+  await user.type(screen.getByLabelText("Fluoride operator"), "  Dr Lim ");
+  await user.type(screen.getByLabelText("Fluoride tooth no."), "Full mouth");
+  await user.click(radio("Scaling", "Not done"));
   await user.click(
     screen.getByRole("button", { name: "Save Dental Consultation" }),
   );
@@ -485,6 +528,18 @@ test("creates a record for a visit without one, sending unanswered fields as nul
     mucosalLesions: false,
     malocclusion: null,
     diagnoses: ["Caries on 36"],
+    fluorideStatus: "done",
+    fluorideOperator: "Dr Lim",
+    fluorideToothNumber: "Full mouth",
+    sealantStatus: null,
+    sealantOperator: null,
+    sealantToothNumber: null,
+    sdfStatus: null,
+    sdfOperator: null,
+    sdfToothNumber: null,
+    scalingStatus: "not done",
+    scalingOperator: null,
+    scalingToothNumber: null,
     remarks: "Anxious patient",
   });
   expect(updateMutate).not.toHaveBeenCalled();
@@ -521,6 +576,8 @@ test("updates the visit's existing record by id", async () => {
       chiefComplaint: "Toothache",
       diagnoses: diagnosisRows(7, ["Caries on 36", "Gingivitis"]),
       remarks: "Review in 6 months",
+      sealantStatus: "done",
+      sealantOperator: "Dr Tan",
     }),
   };
   render(<PatientDentalPage />);
@@ -532,6 +589,8 @@ test("updates the visit's existing record by id", async () => {
   await user.click(addDiagnosisButton());
   await user.type(diagnosisInput(2), "Calculus");
   await user.clear(remarksInput());
+  await user.clear(screen.getByLabelText("Sealant operator"));
+  await user.click(radio("Sealant", "Not done"));
   await user.click(
     screen.getByRole("button", { name: "Save Dental Consultation" }),
   );
@@ -546,6 +605,8 @@ test("updates the visit's existing record by id", async () => {
       chiefComplaint: null,
       diagnoses: ["Gingivitis", "Calculus"],
       remarks: null,
+      sealantStatus: "not done",
+      sealantOperator: null,
     }),
   );
   expect(updateMutate.mock.calls[0][0]).not.toHaveProperty("visitId");
@@ -564,6 +625,8 @@ test("Reset Form restores the last saved values", async () => {
   await user.type(chiefComplaintInput(), "Swelling");
   await user.click(addDiagnosisButton());
   await user.type(remarksInput(), "Follow up");
+  await user.click(radio("Scaling", "Done"));
+  await user.type(screen.getByLabelText("Scaling operator"), "Dr Lim");
   await user.click(screen.getByRole("button", { name: "Reset Form" }));
 
   expect(radio("Toothache", "Yes")).toHaveAttribute("aria-checked", "true");
@@ -571,6 +634,8 @@ test("Reset Form restores the last saved values", async () => {
   expect(chiefComplaintInput()).toHaveValue("");
   expect(screen.queryByLabelText("Diagnosis 1")).not.toBeInTheDocument();
   expect(remarksInput()).toHaveValue("");
+  expect(radio("Scaling", "Done")).toHaveAttribute("aria-checked", "false");
+  expect(screen.getByLabelText("Scaling operator")).toHaveValue("");
 });
 
 test("shows loading and error states for the visit's dental record", () => {

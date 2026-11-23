@@ -195,6 +195,27 @@ describe("dentalRouter (integration)", () => {
       expect(await caller.dentalRouter.getByVisitId({ visitId })).toBeNull();
     });
 
+    it("persists treatment status, operator and free-text tooth numbers", async () => {
+      const treatment = {
+        fluorideStatus: "done",
+        fluorideOperator: "Dr Lim",
+        fluorideToothNumber: "Full mouth",
+        sealantStatus: "not done",
+        sealantOperator: null,
+        sealantToothNumber: null,
+        sdfStatus: "done",
+        sdfOperator: "Dr Tan",
+        sdfToothNumber: "36, 46 (distal)",
+        scalingStatus: null,
+        scalingOperator: null,
+        scalingToothNumber: null,
+      } as const;
+      await caller.dentalRouter.create({ visitId, ...treatment });
+
+      const row = await caller.dentalRouter.getByVisitId({ visitId });
+      expect(row).toMatchObject(treatment);
+    });
+
     it("rejects values outside the column's enum", async () => {
       await expect(
         caller.dentalRouter.create({
