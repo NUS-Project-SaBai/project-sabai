@@ -124,6 +124,28 @@ describe("dentalRouter (integration)", () => {
       });
     });
 
+    it("persists clinical examination findings", async () => {
+      const examination = {
+        facialSymmetry: "asymmetrical",
+        facialSwelling: false,
+        lymphadenopathy: "not assessed",
+        mouthOpening: "limited",
+        oralHygiene: "poor",
+        plaque: "moderate",
+        calculus: true,
+        gingivalCondition: "bleeding",
+        caries: "non-cavitated",
+        missingTeeth: false,
+        fracturedTeeth: true,
+        mucosalLesions: null,
+        malocclusion: "not suspected",
+      } as const;
+      await caller.dentalRouter.create({ visitId, ...examination });
+
+      const row = await caller.dentalRouter.getByVisitId({ visitId });
+      expect(row).toMatchObject(examination);
+    });
+
     it("rejects values outside the column's enum", async () => {
       await expect(
         caller.dentalRouter.create({

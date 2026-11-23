@@ -218,6 +218,44 @@ test("renders every dental history question with its options", () => {
   ).toHaveAttribute("maxLength", "255");
 });
 
+test("renders every clinical examination question with its options", () => {
+  render(<PatientDentalPage />);
+  expect(
+    screen.getByRole("heading", { name: "Clinical Examination" }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("heading", { name: "A. Extraoral examination" }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("heading", { name: "B. Intraoral examination" }),
+  ).toBeInTheDocument();
+
+  const expected: Record<string, string[]> = {
+    "Facial symmetry": ["Normal", "Asymmetrical"],
+    "Facial swelling": ["Absent", "Present"],
+    Lymphadenopathy: ["Absent", "Present", "Not assessed"],
+    "Mouth opening": ["Normal", "Limited"],
+    "Oral hygiene": ["Good", "Fair", "Poor"],
+    Plaque: ["None", "Mild", "Moderate", "Heavy"],
+    Calculus: ["Absent", "Present"],
+    "Gingival condition": ["Healthy", "Inflamed", "Bleeding"],
+    Caries: ["Absent", "Non-cavitated", "Cavitated"],
+    "Missing teeth": ["Absent", "Present"],
+    "Fractured teeth": ["Absent", "Present"],
+    "Mucosal lesions": ["Absent", "Present"],
+    Malocclusion: ["Not suspected", "Suspected"],
+  };
+  for (const [question, options] of Object.entries(expected)) {
+    const group = screen.getByRole("radiogroup", { name: question });
+    const radios = within(group).getAllByRole("radio");
+    expect(radios.map((radio) => radio.textContent)).toEqual(options);
+    radios.forEach((radio) =>
+      expect(radio).toHaveAttribute("aria-checked", "false"),
+    );
+  }
+  expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+});
+
 test("renders the chief complaint section", () => {
   render(<PatientDentalPage />);
   expect(
@@ -297,6 +335,8 @@ test("loads each visit's saved record when switching visits and discards unsaved
       brushingFrequency: "twice",
       otherDentalHistory: "Braces",
       chiefComplaint: "Pain in lower left molar",
+      calculus: true,
+      plaque: "heavy",
     }),
     [older.id]: dentalRecord({ id: 2, visitId: older.id, toothache: false }),
   };
@@ -313,6 +353,8 @@ test("loads each visit's saved record when switching visits and discards unsaved
   );
   expect(otherHistoryInput()).toHaveValue("Braces");
   expect(chiefComplaintInput()).toHaveValue("Pain in lower left molar");
+  expect(radio("Calculus", "Present")).toHaveAttribute("aria-checked", "true");
+  expect(radio("Plaque", "Heavy")).toHaveAttribute("aria-checked", "true");
   await user.click(radio("Bleeding gums", "Yes"));
 
   await user.click(screen.getByRole("button", { name: latestDate }));
@@ -329,6 +371,7 @@ test("loads each visit's saved record when switching visits and discards unsaved
   );
   expect(otherHistoryInput()).toHaveValue("");
   expect(chiefComplaintInput()).toHaveValue("");
+  expect(radio("Calculus", "Present")).toHaveAttribute("aria-checked", "false");
 
   await user.click(screen.getByRole("button", { name: olderDate }));
   await user.click(screen.getByRole("button", { name: latestDate }));
@@ -352,6 +395,10 @@ test("creates a record for a visit without one, sending unanswered fields as nul
   await user.click(radio("Brushing frequency", "3+ times"));
   await user.type(otherHistoryInput(), "  Braces  ");
   await user.type(chiefComplaintInput(), "  Bleeding when brushing  ");
+  await user.click(radio("Lymphadenopathy", "Not assessed"));
+  await user.click(radio("Caries", "Non-cavitated"));
+  await user.click(radio("Calculus", "Present"));
+  await user.click(radio("Mucosal lesions", "Absent"));
   await user.click(
     screen.getByRole("button", { name: "Save Dental Consultation" }),
   );
@@ -371,6 +418,19 @@ test("creates a record for a visit without one, sending unanswered fields as nul
     sugarConsumption: null,
     otherDentalHistory: "Braces",
     chiefComplaint: "Bleeding when brushing",
+    facialSymmetry: null,
+    facialSwelling: null,
+    lymphadenopathy: "not assessed",
+    mouthOpening: null,
+    oralHygiene: null,
+    plaque: null,
+    calculus: true,
+    gingivalCondition: null,
+    caries: "non-cavitated",
+    missingTeeth: null,
+    fracturedTeeth: null,
+    mucosalLesions: false,
+    malocclusion: null,
   });
   expect(updateMutate).not.toHaveBeenCalled();
 
