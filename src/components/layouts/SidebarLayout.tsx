@@ -46,9 +46,10 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
           </div>
         </div>
         <div
+          data-testid="mobile-sidebar-menu"
           className={`${mobileSidebarOpen ? "flex" : "hidden"} flex-col absolute z-2 w-full p-2 top-full max-h-[70dvh] overflow-y-auto bg-neutral-50 shadow-2xl`}
         >
-          <SidebarNavButtons />
+          <SidebarNavButtons onNavigate={() => setMobileSidebarOpen(false)} />
         </div>
       </div>
       {/* desktop sidebar */}
@@ -65,7 +66,11 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
   );
 }
 
-function SidebarNavButtons() {
+interface SidebarNavButtonsProps {
+  onNavigate?: () => void;
+}
+
+function SidebarNavButtons({ onNavigate }: SidebarNavButtonsProps) {
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -117,6 +122,7 @@ function SidebarNavButtons() {
             <Link
               key={item.name}
               href={item.href}
+              onClick={onNavigate}
               className={`group flex items-center gap-2 p-2 pl-4 rounded-md ${selected ? "bg-secondary-50" : ""} hover:bg-secondary-75 hover:shadow-md`}
             >
               <item.icon className="h-5 w-5 text-gray-500 group-hover:text-gray-800" />
