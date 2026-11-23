@@ -4,6 +4,12 @@ import type { Dental } from "@/db/schema/dental";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Button } from "@/components/interactive/Button/Button";
 import {
+  ChiefComplaintFormValues,
+  ChiefComplaintSection,
+  toChiefComplaintFormValues,
+  toChiefComplaintPayload,
+} from "@/components/dental/ChiefComplaintSection";
+import {
   DentalHistoryFormValues,
   DentalHistorySection,
   toDentalHistoryFormValues,
@@ -12,13 +18,18 @@ import {
 import { trpc } from "@/utils/trpc";
 
 // Extend with each new section's values as the remaining sections are built.
-type DentalConsultationFormValues = DentalHistoryFormValues;
+type DentalConsultationFormValues = DentalHistoryFormValues &
+  ChiefComplaintFormValues;
 
-const toFormValues = (record: Dental | null): DentalConsultationFormValues =>
-  toDentalHistoryFormValues(record);
+const toFormValues = (record: Dental | null): DentalConsultationFormValues => ({
+  ...toDentalHistoryFormValues(record),
+  ...toChiefComplaintFormValues(record),
+});
 
-const toPayload = (values: DentalConsultationFormValues) =>
-  toDentalHistoryPayload(values);
+const toPayload = (values: DentalConsultationFormValues) => ({
+  ...toDentalHistoryPayload(values),
+  ...toChiefComplaintPayload(values),
+});
 
 /**
  * Loads and saves the dental consultation for one visit. Render it with
@@ -95,6 +106,7 @@ function DentalConsultationFormBody({
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
         <DentalHistorySection />
+        <ChiefComplaintSection />
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
           <Button
             title="Reset Form"
