@@ -1,89 +1,8 @@
-import type { Dental } from "@/db/schema/dental";
 import FormSection from "@/components/interactive/inputs/FormSection";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFRadio } from "@/components/interactive/RHF/RHFRadio";
 import { toOptions } from "@/components/dental/dentalFormUtils";
 import { doneNotDoneValues } from "@/lib/constants/dental";
-
-type DoneNotDone = (typeof doneNotDoneValues)[number];
-
-export type TreatmentProvidedFormValues = {
-  fluorideStatus: DoneNotDone | "";
-  fluorideOperator: string;
-  fluorideToothNumber: string;
-  sealantStatus: DoneNotDone | "";
-  sealantOperator: string;
-  sealantToothNumber: string;
-  sdfStatus: DoneNotDone | "";
-  sdfOperator: string;
-  sdfToothNumber: string;
-  scalingStatus: DoneNotDone | "";
-  scalingOperator: string;
-  scalingToothNumber: string;
-};
-
-export const treatmentProvidedDefaultValues: TreatmentProvidedFormValues = {
-  fluorideStatus: "",
-  fluorideOperator: "",
-  fluorideToothNumber: "",
-  sealantStatus: "",
-  sealantOperator: "",
-  sealantToothNumber: "",
-  sdfStatus: "",
-  sdfOperator: "",
-  sdfToothNumber: "",
-  scalingStatus: "",
-  scalingOperator: "",
-  scalingToothNumber: "",
-};
-
-type TreatmentProvidedRecord = Pick<Dental, keyof TreatmentProvidedFormValues>;
-
-/** Maps a saved record (or none) to form values; `null` columns become "". */
-export function toTreatmentProvidedFormValues(
-  record: TreatmentProvidedRecord | null,
-): TreatmentProvidedFormValues {
-  if (!record) return treatmentProvidedDefaultValues;
-  return {
-    fluorideStatus: record.fluorideStatus ?? "",
-    fluorideOperator: record.fluorideOperator ?? "",
-    fluorideToothNumber: record.fluorideToothNumber ?? "",
-    sealantStatus: record.sealantStatus ?? "",
-    sealantOperator: record.sealantOperator ?? "",
-    sealantToothNumber: record.sealantToothNumber ?? "",
-    sdfStatus: record.sdfStatus ?? "",
-    sdfOperator: record.sdfOperator ?? "",
-    sdfToothNumber: record.sdfToothNumber ?? "",
-    scalingStatus: record.scalingStatus ?? "",
-    scalingOperator: record.scalingOperator ?? "",
-    scalingToothNumber: record.scalingToothNumber ?? "",
-  };
-}
-
-const textOrNull = (value: string) => value.trim() || null;
-
-/**
- * Maps form values to the router payload. Unanswered fields are sent as
- * `null` (not `undefined`) so clearing a field actually clears it on update.
- */
-export function toTreatmentProvidedPayload(
-  values: TreatmentProvidedFormValues,
-) {
-  return {
-    fluorideStatus: values.fluorideStatus || null,
-    fluorideOperator: textOrNull(values.fluorideOperator),
-    fluorideToothNumber: textOrNull(values.fluorideToothNumber),
-    sealantStatus: values.sealantStatus || null,
-    sealantOperator: textOrNull(values.sealantOperator),
-    sealantToothNumber: textOrNull(values.sealantToothNumber),
-    sdfStatus: values.sdfStatus || null,
-    sdfOperator: textOrNull(values.sdfOperator),
-    sdfToothNumber: textOrNull(values.sdfToothNumber),
-    scalingStatus: values.scalingStatus || null,
-    scalingOperator: textOrNull(values.scalingOperator),
-    scalingToothNumber: textOrNull(values.scalingToothNumber),
-  };
-}
 
 type TreatmentPrefix = "fluoride" | "sealant" | "sdf" | "scaling";
 
@@ -98,7 +17,7 @@ const doneNotDoneOptions = toOptions(doneNotDoneValues);
 
 /**
  * **Important:** Must be rendered inside a `FormProvider` whose values include
- * `TreatmentProvidedFormValues`.
+ * `DentalScalarFormValues`.
  *
  * One row per treatment: status pills, then free-text operator and tooth
  * number. The text inputs keep their labels for screen readers but only show

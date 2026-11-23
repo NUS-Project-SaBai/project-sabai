@@ -1,14 +1,11 @@
-import type { Dental } from "@/db/schema/dental";
 import FormSection from "@/components/interactive/inputs/FormSection";
 import { RHFRadio } from "@/components/interactive/RHF/RHFRadio";
 import {
   absentPresentOptions,
-  BooleanString,
-  fromBoolean,
   RadioOption,
-  toBoolean,
   toOptions,
 } from "@/components/dental/dentalFormUtils";
+import type { DentalScalarField } from "@/components/dental/dentalFormValues";
 import {
   absentPresentNotAssessedValues,
   cariesValues,
@@ -20,102 +17,8 @@ import {
   plaqueValues,
 } from "@/lib/constants/dental";
 
-type FacialSymmetry = (typeof facialSymmetryValues)[number];
-type AbsentPresentNotAssessed = (typeof absentPresentNotAssessedValues)[number];
-type NormalLimited = (typeof normalLimitedValues)[number];
-type OralHygiene = (typeof oralHygieneValues)[number];
-type Plaque = (typeof plaqueValues)[number];
-type GingivalCondition = (typeof healthyInflamedBleedingValues)[number];
-type Caries = (typeof cariesValues)[number];
-type Malocclusion = (typeof malocclusionValues)[number];
-
-export type ClinicalExaminationFormValues = {
-  // Extraoral
-  facialSymmetry: FacialSymmetry | "";
-  facialSwelling: BooleanString | "";
-  lymphadenopathy: AbsentPresentNotAssessed | "";
-  mouthOpening: NormalLimited | "";
-  // Intraoral
-  oralHygiene: OralHygiene | "";
-  plaque: Plaque | "";
-  calculus: BooleanString | "";
-  gingivalCondition: GingivalCondition | "";
-  caries: Caries | "";
-  missingTeeth: BooleanString | "";
-  fracturedTeeth: BooleanString | "";
-  mucosalLesions: BooleanString | "";
-  malocclusion: Malocclusion | "";
-};
-
-export const clinicalExaminationDefaultValues: ClinicalExaminationFormValues = {
-  facialSymmetry: "",
-  facialSwelling: "",
-  lymphadenopathy: "",
-  mouthOpening: "",
-  oralHygiene: "",
-  plaque: "",
-  calculus: "",
-  gingivalCondition: "",
-  caries: "",
-  missingTeeth: "",
-  fracturedTeeth: "",
-  mucosalLesions: "",
-  malocclusion: "",
-};
-
-type ClinicalExaminationRecord = Pick<
-  Dental,
-  keyof ClinicalExaminationFormValues
->;
-
-/** Maps a saved record (or none) to form values; `null` columns become "". */
-export function toClinicalExaminationFormValues(
-  record: ClinicalExaminationRecord | null,
-): ClinicalExaminationFormValues {
-  if (!record) return clinicalExaminationDefaultValues;
-  return {
-    facialSymmetry: record.facialSymmetry ?? "",
-    facialSwelling: fromBoolean(record.facialSwelling),
-    lymphadenopathy: record.lymphadenopathy ?? "",
-    mouthOpening: record.mouthOpening ?? "",
-    oralHygiene: record.oralHygiene ?? "",
-    plaque: record.plaque ?? "",
-    calculus: fromBoolean(record.calculus),
-    gingivalCondition: record.gingivalCondition ?? "",
-    caries: record.caries ?? "",
-    missingTeeth: fromBoolean(record.missingTeeth),
-    fracturedTeeth: fromBoolean(record.fracturedTeeth),
-    mucosalLesions: fromBoolean(record.mucosalLesions),
-    malocclusion: record.malocclusion ?? "",
-  };
-}
-
-/**
- * Maps form values to the router payload. Unanswered fields are sent as
- * `null` (not `undefined`) so clearing a field actually clears it on update.
- */
-export function toClinicalExaminationPayload(
-  values: ClinicalExaminationFormValues,
-) {
-  return {
-    facialSymmetry: values.facialSymmetry || null,
-    facialSwelling: toBoolean(values.facialSwelling),
-    lymphadenopathy: values.lymphadenopathy || null,
-    mouthOpening: values.mouthOpening || null,
-    oralHygiene: values.oralHygiene || null,
-    plaque: values.plaque || null,
-    calculus: toBoolean(values.calculus),
-    gingivalCondition: values.gingivalCondition || null,
-    caries: values.caries || null,
-    missingTeeth: toBoolean(values.missingTeeth),
-    fracturedTeeth: toBoolean(values.fracturedTeeth),
-    mucosalLesions: toBoolean(values.mucosalLesions),
-    malocclusion: values.malocclusion || null,
-  };
-}
-
 type ExaminationField = {
-  name: keyof ClinicalExaminationFormValues;
+  name: DentalScalarField;
   label: string;
   options: RadioOption[];
 };
@@ -208,7 +111,7 @@ function ExaminationGroup({
 
 /**
  * **Important:** Must be rendered inside a `FormProvider` whose values include
- * `ClinicalExaminationFormValues`.
+ * `DentalScalarFormValues`.
  */
 export function ClinicalExaminationSection() {
   return (

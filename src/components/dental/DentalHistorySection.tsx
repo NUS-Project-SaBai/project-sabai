@@ -1,105 +1,25 @@
-import type { Dental } from "@/db/schema/dental";
 import FormSection from "@/components/interactive/inputs/FormSection";
 import { RHFInput } from "@/components/interactive/RHF/RHFInput";
 import { RHFRadio } from "@/components/interactive/RHF/RHFRadio";
 import {
-  BooleanString,
-  fromBoolean,
-  toBoolean,
+  RadioOption,
   toOptions,
   yesNoOptions,
 } from "@/components/dental/dentalFormUtils";
+import type { DentalScalarField } from "@/components/dental/dentalFormValues";
 import {
   brushingFrequencyValues,
   sugarConsumptionValues,
   yesNoUnknownValues,
 } from "@/lib/constants/dental";
 
-type YesNoUnknown = (typeof yesNoUnknownValues)[number];
-type BrushingFrequency = (typeof brushingFrequencyValues)[number];
-type SugarConsumption = (typeof sugarConsumptionValues)[number];
-
-export type DentalHistoryFormValues = {
-  previousDentalVisit: YesNoUnknown | "";
-  previousDentalTreatment: YesNoUnknown | "";
-  toothache: BooleanString | "";
-  extraction: BooleanString | "";
-  dentalTrauma: BooleanString | "";
-  currentToothache: BooleanString | "";
-  toothSensitivity: BooleanString | "";
-  bleedingGums: BooleanString | "";
-  brushingFrequency: BrushingFrequency | "";
-  fluorideToothpaste: YesNoUnknown | "";
-  sugarConsumption: SugarConsumption | "";
-  otherDentalHistory: string;
-};
-
-export const dentalHistoryDefaultValues: DentalHistoryFormValues = {
-  previousDentalVisit: "",
-  previousDentalTreatment: "",
-  toothache: "",
-  extraction: "",
-  dentalTrauma: "",
-  currentToothache: "",
-  toothSensitivity: "",
-  bleedingGums: "",
-  brushingFrequency: "",
-  fluorideToothpaste: "",
-  sugarConsumption: "",
-  otherDentalHistory: "",
-};
-
-type DentalHistoryRecord = Pick<Dental, keyof DentalHistoryFormValues>;
-
-/** Maps a saved record (or none) to form values; `null` columns become "". */
-export function toDentalHistoryFormValues(
-  record: DentalHistoryRecord | null,
-): DentalHistoryFormValues {
-  if (!record) return dentalHistoryDefaultValues;
-  return {
-    previousDentalVisit: record.previousDentalVisit ?? "",
-    previousDentalTreatment: record.previousDentalTreatment ?? "",
-    toothache: fromBoolean(record.toothache),
-    extraction: fromBoolean(record.extraction),
-    dentalTrauma: fromBoolean(record.dentalTrauma),
-    currentToothache: fromBoolean(record.currentToothache),
-    toothSensitivity: fromBoolean(record.toothSensitivity),
-    bleedingGums: fromBoolean(record.bleedingGums),
-    brushingFrequency: record.brushingFrequency ?? "",
-    fluorideToothpaste: record.fluorideToothpaste ?? "",
-    sugarConsumption: record.sugarConsumption ?? "",
-    otherDentalHistory: record.otherDentalHistory ?? "",
-  };
-}
-
-/**
- * Maps form values to the router payload. Unanswered fields are sent as
- * `null` (not `undefined`) so clearing a field actually clears it on update.
- */
-export function toDentalHistoryPayload(values: DentalHistoryFormValues) {
-  return {
-    previousDentalVisit: values.previousDentalVisit || null,
-    previousDentalTreatment: values.previousDentalTreatment || null,
-    toothache: toBoolean(values.toothache),
-    extraction: toBoolean(values.extraction),
-    dentalTrauma: toBoolean(values.dentalTrauma),
-    currentToothache: toBoolean(values.currentToothache),
-    toothSensitivity: toBoolean(values.toothSensitivity),
-    bleedingGums: toBoolean(values.bleedingGums),
-    brushingFrequency: values.brushingFrequency || null,
-    fluorideToothpaste: values.fluorideToothpaste || null,
-    sugarConsumption: values.sugarConsumption || null,
-    otherDentalHistory: values.otherDentalHistory.trim() || null,
-  };
-}
-
 const yesNoUnknownOptions = toOptions(yesNoUnknownValues);
 
 // Ordered to match the mockup's row-by-row reading order.
 const historyFields: {
-  name: Exclude<keyof DentalHistoryFormValues, "otherDentalHistory">;
+  name: DentalScalarField;
   label: string;
-  options: { label: string; value: string }[];
+  options: RadioOption[];
 }[] = [
   {
     name: "previousDentalVisit",
@@ -144,7 +64,7 @@ const historyFields: {
 
 /**
  * **Important:** Must be rendered inside a `FormProvider` whose values include
- * `DentalHistoryFormValues`.
+ * `DentalScalarFormValues`.
  */
 export function DentalHistorySection() {
   return (

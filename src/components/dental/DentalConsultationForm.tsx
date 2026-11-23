@@ -3,18 +3,8 @@ import toast from "react-hot-toast";
 import type { DentalWithDiagnoses } from "@/db/schema/dental";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Button } from "@/components/interactive/Button/Button";
-import {
-  ChiefComplaintFormValues,
-  ChiefComplaintSection,
-  toChiefComplaintFormValues,
-  toChiefComplaintPayload,
-} from "@/components/dental/ChiefComplaintSection";
-import {
-  ClinicalExaminationFormValues,
-  ClinicalExaminationSection,
-  toClinicalExaminationFormValues,
-  toClinicalExaminationPayload,
-} from "@/components/dental/ClinicalExaminationSection";
+import { ChiefComplaintSection } from "@/components/dental/ChiefComplaintSection";
+import { ClinicalExaminationSection } from "@/components/dental/ClinicalExaminationSection";
 import {
   DentalDiagnosisFormValues,
   DentalDiagnosisSection,
@@ -22,51 +12,28 @@ import {
   toDentalDiagnosisPayload,
 } from "@/components/dental/DentalDiagnosisSection";
 import {
-  DentalHistoryFormValues,
-  DentalHistorySection,
-  toDentalHistoryFormValues,
-  toDentalHistoryPayload,
-} from "@/components/dental/DentalHistorySection";
-import {
-  RemarksFormValues,
-  RemarksSection,
-  toRemarksFormValues,
-  toRemarksPayload,
-} from "@/components/dental/RemarksSection";
-import {
-  toTreatmentProvidedFormValues,
-  toTreatmentProvidedPayload,
-  TreatmentProvidedFormValues,
-  TreatmentProvidedSection,
-} from "@/components/dental/TreatmentProvidedSection";
+  DentalScalarFormValues,
+  toScalarFormValues,
+  toScalarPayload,
+} from "@/components/dental/dentalFormValues";
+import { DentalHistorySection } from "@/components/dental/DentalHistorySection";
+import { RemarksSection } from "@/components/dental/RemarksSection";
+import { TreatmentProvidedSection } from "@/components/dental/TreatmentProvidedSection";
 import { trpc } from "@/utils/trpc";
 
-// Extend with each new section's values as the remaining sections are built.
-type DentalConsultationFormValues = DentalHistoryFormValues &
-  ChiefComplaintFormValues &
-  ClinicalExaminationFormValues &
-  DentalDiagnosisFormValues &
-  TreatmentProvidedFormValues &
-  RemarksFormValues;
+type DentalConsultationFormValues = DentalScalarFormValues &
+  DentalDiagnosisFormValues;
 
 const toFormValues = (
   record: DentalWithDiagnoses | null,
 ): DentalConsultationFormValues => ({
-  ...toDentalHistoryFormValues(record),
-  ...toChiefComplaintFormValues(record),
-  ...toClinicalExaminationFormValues(record),
+  ...toScalarFormValues(record),
   ...toDentalDiagnosisFormValues(record),
-  ...toTreatmentProvidedFormValues(record),
-  ...toRemarksFormValues(record),
 });
 
 const toPayload = (values: DentalConsultationFormValues) => ({
-  ...toDentalHistoryPayload(values),
-  ...toChiefComplaintPayload(values),
-  ...toClinicalExaminationPayload(values),
+  ...toScalarPayload(values),
   ...toDentalDiagnosisPayload(values),
-  ...toTreatmentProvidedPayload(values),
-  ...toRemarksPayload(values),
 });
 
 /**
