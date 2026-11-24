@@ -105,8 +105,10 @@ function searchFor(query: string) {
   });
 }
 
+// Search result links only; the table's View buttons also link to patients.
 function searchResultIds() {
   return screen.queryAllByRole("link").flatMap((link) => {
+    if (link.closest("table")) return [];
     const match = link.getAttribute("href")?.match(/^\/patient\/(\d+)$/);
     return match ? [Number(match[1])] : [];
   });

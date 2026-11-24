@@ -7,7 +7,7 @@ import PatientsBasePage from "@/pages/patient";
 // Hoisted so the mock factory and the tests share one typed object.
 const mockTrpc = vi.hoisted(() => ({
   patientsRouter: {
-    list: { useQuery: vi.fn() },
+    listWithLatestVisit: { useQuery: vi.fn() },
   },
 }));
 
@@ -78,7 +78,7 @@ function getBodyRows() {
 describe("PatientsBasePage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockTrpc.patientsRouter.list.useQuery.mockReturnValue({
+    mockTrpc.patientsRouter.listWithLatestVisit.useQuery.mockReturnValue({
       data: MOCK_PATIENTS,
       isLoading: false,
       isError: false,
