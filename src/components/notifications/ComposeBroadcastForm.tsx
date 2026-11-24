@@ -68,6 +68,7 @@ export default function ComposeBroadcastForm() {
           type="text"
           isRequired
           maxLength={BROADCAST_TITLE_MAX_LENGTH}
+          placeholder="e.g. Paracetamol stock running low"
         />
         <RHFTextArea
           name="body"
@@ -75,6 +76,7 @@ export default function ComposeBroadcastForm() {
           isRequired
           rows={4}
           maxLength={BROADCAST_BODY_MAX_LENGTH}
+          placeholder="e.g. To those doing consults: please dispense paracetamol conservatively (max 10 tablets per patient)."
         />
         <RHFRadio
           name="severity"
