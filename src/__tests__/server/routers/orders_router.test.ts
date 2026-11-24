@@ -15,7 +15,6 @@ import { db } from "@/db/drizzle";
 import { withUserTransaction } from "@/db/withUserTransaction";
 import type { Context } from "@/server/context";
 import {
-  authUsers,
   consults,
   diagnosis,
   medicationActiveIngredients,
@@ -28,6 +27,7 @@ import {
   villageCodes,
   visits,
 } from "@/db/schema";
+import { getLinkedTestUser } from "./testUsers";
 
 const SEED_PATIENT = {
   name: "Orders Test Patient",
@@ -40,29 +40,37 @@ const SEED_PATIENT = {
   patientImagePublicId: "test/placeholder",
 } as const;
 
+// village_codes.code is unique, so suffix it per run: a fixed code collides
+// with rows left behind by an earlier run that failed before teardown.
+const VILLAGE_CODE_SUFFIX = randomUUID().slice(0, 8);
 const VILLAGE_CODE = {
-  code: "SATOR",
-  name: "SATOR Village",
+  code: `ORDTEST-${VILLAGE_CODE_SUFFIX}`,
+  name: `Orders Test Village ${VILLAGE_CODE_SUFFIX}`,
   colorHex: "#27AE60",
 };
 
 // Sentinel expiry so the stock this file creates is easy to tell apart.
 const TEST_EXPIRY = new Date("2099-12-31");
 
-// protectedProcedure only reads ctx.user, so a minimal context is enough.
-function callerFor(userId: string) {
-  return appRouter.createCaller({ user: { id: userId } } as unknown as Context);
+// protectedProcedure only reads ctx.user (the auth user id) and looks up the
+// linked public.users row itself, so a minimal context is enough.
+function callerFor(authUserId: string) {
+  return appRouter.createCaller({
+    user: { id: authUserId },
+  } as unknown as Context);
 }
 
 describe("ordersRouter listPending / resolve (integration)", () => {
+  // Left undefined/empty until beforeAll creates them, so teardown can skip
+  // whatever a partially failed setup never inserted.
   let userId: string;
-  let villageCodeId: number;
-  let patientId: number;
-  let visitId: number;
-  let consultIds: number[];
-  let ingredientId: number;
+  let villageCodeId: number | undefined;
+  let patientId: number | undefined;
+  let visitId: number | undefined;
+  let consultIds: number[] = [];
+  let ingredientId: number | undefined;
   let ingredientName: string;
-  let brandId: number;
+  let brandId: number | undefined;
   let brandName: string;
   let caller: ReturnType<typeof callerFor>;
 
@@ -70,7 +78,7 @@ describe("ordersRouter listPending / resolve (integration)", () => {
     return db
       .select()
       .from(medicationStock)
-      .where(eq(medicationStock.medicationBrandId, brandId))
+      .where(eq(medicationStock.medicationBrandId, brandId!))
       .orderBy(asc(medicationStock.id));
   }
 
@@ -79,7 +87,7 @@ describe("ordersRouter listPending / resolve (integration)", () => {
       const [stock] = await tx
         .insert(medicationStock)
         .values({
-          medicationBrandId: brandId,
+          medicationBrandId: brandId!,
           quantity,
           expiry: TEST_EXPIRY,
           location,
@@ -93,7 +101,7 @@ describe("ordersRouter listPending / resolve (integration)", () => {
   async function placeOrder(quantity: number, consultId = consultIds[0]) {
     return caller.ordersRouter.create({
       consultId,
-      activeIngredientId: ingredientId,
+      activeIngredientId: ingredientId!,
       quantity,
       dosageInstructions: "1 tab daily",
     });
@@ -105,16 +113,21 @@ describe("ordersRouter listPending / resolve (integration)", () => {
   }
 
   async function cleanUpOrdersAndStock() {
-    const orderRows = await db
-      .select({ id: orders.id })
-      .from(orders)
-      .where(inArray(orders.consultId, consultIds));
-    const orderIds = orderRows.map((row) => row.id);
-    if (orderIds.length > 0) {
-      await db.delete(orderItems).where(inArray(orderItems.orderId, orderIds));
-      await db.delete(orders).where(inArray(orders.id, orderIds));
+    if (consultIds.length > 0) {
+      const orderRows = await db
+        .select({ id: orders.id })
+        .from(orders)
+        .where(inArray(orders.consultId, consultIds));
+      const orderIds = orderRows.map((row) => row.id);
+      if (orderIds.length > 0) {
+        await db
+          .delete(orderItems)
+          .where(inArray(orderItems.orderId, orderIds));
+        await db.delete(orders).where(inArray(orders.id, orderIds));
+      }
     }
 
+    if (brandId === undefined) return;
     const stockIds = (await stockForBrand()).map((row) => row.id);
     if (stockIds.length > 0) {
       await db
@@ -127,18 +140,11 @@ describe("ordersRouter listPending / resolve (integration)", () => {
   }
 
   beforeAll(async () => {
-    const [user] = await db
-      .select({ id: authUsers.id })
-      .from(authUsers)
-      .limit(1);
-    if (!user) {
-      throw new Error(
-        "No auth.users row found. Run `pnpm seed:all` against local Supabase " +
-          "before running the router integration tests.",
-      );
-    }
-    userId = user.id;
-    caller = callerFor(userId);
+    // userId (public.users) goes on FKs and is what the stock audit records;
+    // the auth user id goes in ctx.user, which protectedProcedure resolves.
+    const testUser = await getLinkedTestUser();
+    userId = testUser.userId;
+    caller = callerFor(testUser.authUserId);
 
     [{ id: villageCodeId }] = await db
       .insert(villageCodes)
@@ -200,15 +206,29 @@ describe("ordersRouter listPending / resolve (integration)", () => {
 
   afterAll(async () => {
     await cleanUpOrdersAndStock();
-    await db.delete(diagnosis).where(inArray(diagnosis.consultId, consultIds));
-    await db.delete(consults).where(inArray(consults.id, consultIds));
-    await db.delete(visits).where(eq(visits.id, visitId));
-    await db.delete(patients).where(eq(patients.id, patientId));
-    await db.delete(villageCodes).where(eq(villageCodes.id, villageCodeId));
-    await db.delete(medicationBrands).where(eq(medicationBrands.id, brandId));
-    await db
-      .delete(medicationActiveIngredients)
-      .where(eq(medicationActiveIngredients.id, ingredientId));
+    if (consultIds.length > 0) {
+      await db
+        .delete(diagnosis)
+        .where(inArray(diagnosis.consultId, consultIds));
+      await db.delete(consults).where(inArray(consults.id, consultIds));
+    }
+    if (visitId !== undefined) {
+      await db.delete(visits).where(eq(visits.id, visitId));
+    }
+    if (patientId !== undefined) {
+      await db.delete(patients).where(eq(patients.id, patientId));
+    }
+    if (villageCodeId !== undefined) {
+      await db.delete(villageCodes).where(eq(villageCodes.id, villageCodeId));
+    }
+    if (brandId !== undefined) {
+      await db.delete(medicationBrands).where(eq(medicationBrands.id, brandId));
+    }
+    if (ingredientId !== undefined) {
+      await db
+        .delete(medicationActiveIngredients)
+        .where(eq(medicationActiveIngredients.id, ingredientId));
+    }
   });
 
   describe("listPending()", () => {

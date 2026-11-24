@@ -202,7 +202,7 @@ export const ordersRouter = router({
   resolve: protectedProcedure
     .input(resolveOrderInput)
     .mutation(async ({ input, ctx }) => {
-      return await withUserTransaction(ctx.user.id, async (tx) => {
+      return await withUserTransaction(ctx.appUser.id, async (tx) => {
         const [order] = await tx
           .select()
           .from(orders)
