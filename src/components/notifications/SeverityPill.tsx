@@ -20,7 +20,7 @@ export default function SeverityPill({ severity }: { severity: Severity }) {
   return (
     <span
       className={clsx(
-        "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset",
+        "inline-flex shrink-0 items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset",
         SEVERITY_CLASS[severity],
       )}
     >

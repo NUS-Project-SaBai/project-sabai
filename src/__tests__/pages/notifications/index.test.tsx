@@ -167,10 +167,34 @@ describe("NotificationsPage", () => {
       ).getAllByRole("listitem");
 
       expect(cards.map((card) => card.textContent)).toEqual([
-        `Critical${formatVisitDate(MOCK_BROADCASTS[0].createdAt)}Clinic closingPack up by 5pmFrom Alice`,
-        `Warning${formatVisitDate(MOCK_BROADCASTS[1].createdAt)}Low stockParacetamol is running lowFrom Unknown`,
-        `Info${formatVisitDate(MOCK_BROADCASTS[2].createdAt)}WelcomeHave a good tripFrom Bob`,
+        `Clinic closingCriticalPack up by 5pmAlice · ${formatVisitDate(MOCK_BROADCASTS[0].createdAt)}`,
+        `Low stockWarningParacetamol is running lowUnknown · ${formatVisitDate(MOCK_BROADCASTS[1].createdAt)}`,
+        `WelcomeInfoHave a good tripBob · ${formatVisitDate(MOCK_BROADCASTS[2].createdAt)}`,
       ]);
+    });
+
+    it("collapses long bodies behind a show more toggle", async () => {
+      const user = userEvent.setup();
+      const longBody = "Please dispense conservatively. ".repeat(10);
+      mockList({ data: [{ ...MOCK_BROADCASTS[0], body: longBody }] });
+      render(<NotificationsPage />);
+
+      const list = screen.getByRole("list", { name: "Broadcast history" });
+      const toggle = within(list).getByRole("button", { name: "Show more" });
+      expect(toggle).toHaveAttribute("aria-expanded", "false");
+
+      await user.click(toggle);
+
+      expect(toggle).toHaveTextContent("Show less");
+      expect(toggle).toHaveAttribute("aria-expanded", "true");
+    });
+
+    it("does not offer show more for short bodies", () => {
+      render(<NotificationsPage />);
+
+      expect(
+        screen.queryByRole("button", { name: "Show more" }),
+      ).not.toBeInTheDocument();
     });
 
     it("shows a loading state", () => {

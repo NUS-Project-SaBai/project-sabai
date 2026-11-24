@@ -1,13 +1,22 @@
+import { clsx } from "clsx";
 import { trpc } from "@/utils/trpc";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import TableHeader from "@/components/TableHeader";
 import TableRow from "@/components/TableRow";
 import TableCell from "@/components/TableCell";
 import SeverityPill from "@/components/notifications/SeverityPill";
+import ExpandableText from "@/components/notifications/ExpandableText";
 import { formatVisitDate } from "@/lib/utils/visit";
 import type { RouterOutput } from "@/utils/trpc";
 
 type BroadcastRow = RouterOutput["broadcastsRouter"]["list"][number];
+
+// Left accent on mobile cards, same colour as the severity pill.
+const CARD_ACCENT_CLASS: Record<BroadcastRow["severity"], string> = {
+  info: "border-l-info",
+  warning: "border-l-warning",
+  critical: "border-l-danger",
+};
 
 function senderLabel(broadcast: BroadcastRow) {
   return broadcast.senderName ?? "Unknown";
@@ -64,9 +73,10 @@ export default function BroadcastHistoryTable() {
                 <TableCell className="font-medium">{broadcast.title}</TableCell>
                 <TableCell>
                   {/* Bodies can be long; let them wrap instead of widening the table. */}
-                  <p className="min-w-64 max-w-md whitespace-pre-line break-words">
-                    {broadcast.body}
-                  </p>
+                  <ExpandableText
+                    text={broadcast.body}
+                    className="min-w-64 max-w-md"
+                  />
                 </TableCell>
                 <TableCell>{senderLabel(broadcast)}</TableCell>
                 <TableCell>{formatVisitDate(broadcast.createdAt)}</TableCell>
@@ -81,18 +91,25 @@ export default function BroadcastHistoryTable() {
 
 function BroadcastCard({ broadcast }: { broadcast: BroadcastRow }) {
   return (
-    <li className="flex flex-col gap-1 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+    <li
+      className={clsx(
+        "flex flex-col gap-2 border-l-4 px-4 py-3",
+        CARD_ACCENT_CLASS[broadcast.severity],
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <p className="font-semibold break-words text-slate-900">
+          {broadcast.title}
+        </p>
         <SeverityPill severity={broadcast.severity} />
-        <span className="text-xs text-slate-500">
-          {formatVisitDate(broadcast.createdAt)}
-        </span>
       </div>
-      <p className="font-medium break-words">{broadcast.title}</p>
-      <p className="whitespace-pre-line break-words text-sm">
-        {broadcast.body}
+      <ExpandableText
+        text={broadcast.body}
+        className="text-sm leading-relaxed text-slate-600"
+      />
+      <p className="text-xs text-slate-500">
+        {senderLabel(broadcast)} · {formatVisitDate(broadcast.createdAt)}
       </p>
-      <p className="text-xs text-slate-500">From {senderLabel(broadcast)}</p>
     </li>
   );
 }
