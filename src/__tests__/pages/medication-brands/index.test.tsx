@@ -189,9 +189,7 @@ describe("MedicationBrandsBasePage", () => {
       container.querySelector('textarea[name="remarks"]'),
     ).not.toBeInTheDocument();
     expect(
-      container.querySelector(
-        'button[name="activeIngredientId-dropdown-button"]',
-      ),
+      container.querySelector('select[name="activeIngredientId"]'),
     ).not.toBeInTheDocument();
 
     expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
@@ -205,10 +203,8 @@ describe("MedicationBrandsBasePage", () => {
       "test",
     );
     expect(
-      container.querySelector(
-        'button[name="activeIngredientId-dropdown-button"]',
-      ),
-    ).toHaveTextContent("Paracetamol");
+      container.querySelector('select[name="activeIngredientId"]'),
+    ).toHaveDisplayValue("Paracetamol");
 
     expect(screen.getByText("mg")).toBeInTheDocument();
     expect(
@@ -323,13 +319,12 @@ describe("MedicationBrandsBasePage", () => {
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
     const dropdown = container.querySelector(
-      'button[name="activeIngredientId-dropdown-button"]',
+      'select[name="activeIngredientId"]',
     )!;
 
-    expect(dropdown).toHaveTextContent("Paracetamol");
+    expect(dropdown).toHaveDisplayValue("Paracetamol");
 
-    await user.click(dropdown);
-    await user.click(screen.getByRole("button", { name: "Ibuprofen" }));
+    await user.selectOptions(dropdown, "Ibuprofen");
 
     expect(screen.getByText("tablets")).toBeInTheDocument();
 
@@ -463,7 +458,7 @@ describe("MedicationBrandsBasePage", () => {
     expect(dialog.querySelector('input[name="name"]')).toBeInTheDocument();
     expect(dialog.querySelector('input[name="remarks"]')).toBeInTheDocument();
     expect(
-      dialog.querySelector('button[name="activeIngredientId-dropdown-button"]'),
+      dialog.querySelector('select[name="activeIngredientId"]'),
     ).toBeInTheDocument();
   });
 
@@ -547,13 +542,9 @@ describe("MedicationBrandsBasePage", () => {
     await user.type(nameInput, "New Brand");
     await user.type(remarksInput, "New remarks");
 
-    await user.click(
-      dialog.querySelector(
-        'button[name="activeIngredientId-dropdown-button"]',
-      )!,
-    );
-    await user.click(
-      within(dialog).getByRole("button", { name: "Paracetamol" }),
+    await user.selectOptions(
+      dialog.querySelector('select[name="activeIngredientId"]')!,
+      "Paracetamol",
     );
     await user.click(within(dialog).getByRole("button", { name: "Save" }));
 

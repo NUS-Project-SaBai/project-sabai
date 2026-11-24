@@ -353,16 +353,11 @@ describe("MedicationStockPage", () => {
     await user.click(screen.getByRole("button", { name: "Add Stock" }));
 
     const dialog = await screen.findByRole("dialog");
-    const statusButton = dialog.querySelector(
-      'button[name="stockStatus-dropdown-button"]',
-    );
+    const statusSelect = dialog.querySelector('select[name="stockStatus"]');
 
-    expect(statusButton).toBeInTheDocument();
-    await user.click(statusButton!);
+    expect(statusSelect).toBeInTheDocument();
 
-    const options = dialog.querySelectorAll(
-      'button[name^="stockStatus-"][name$="-dropdown-option"]',
-    );
+    const options = statusSelect!.querySelectorAll("option:not([disabled])");
 
     expect(Array.from(options, (option) => option.textContent)).toEqual([
       "active",
@@ -443,31 +438,18 @@ describe("MedicationStockPage", () => {
     expect(quantityInput).toBeInTheDocument();
     expect(expiryInput).toBeInTheDocument();
 
-    // dropdown uses buttons
-    const brandIdButton = dialog.querySelector(
-      'button[name="medicationBrandId-dropdown-button"]',
+    const brandIdSelect = dialog.querySelector(
+      'select[name="medicationBrandId"]',
     );
-    const statusButton = dialog.querySelector(
-      'button[name="stockStatus-dropdown-button"]',
-    );
+    const statusSelect = dialog.querySelector('select[name="stockStatus"]');
 
-    expect(brandIdButton).toBeInTheDocument();
-    expect(statusButton).toBeInTheDocument();
+    expect(brandIdSelect).toBeInTheDocument();
+    expect(statusSelect).toBeInTheDocument();
 
     await user.type(locationInput!, "valid location");
     fireEvent.change(expiryInput!, { target: { value: "2026-12-31" } });
-    await user.click(brandIdButton!);
-
-    const brandDropdownButton = dialog.querySelector(
-      'button[name="medicationBrandId-1-dropdown-option"]',
-    );
-    await user.click(brandDropdownButton!);
-
-    await user.click(statusButton!);
-    const stockDropdownOption = dialog.querySelector(
-      'button[name="stockStatus-active-dropdown-option"]',
-    );
-    await user.click(stockDropdownOption!);
+    await user.selectOptions(brandIdSelect!, "1");
+    await user.selectOptions(statusSelect!, "active");
 
     await user.type(quantityInput!, "-1");
     await user.click(screen.getByRole("button", { name: "Save" }));
@@ -527,32 +509,19 @@ describe("MedicationStockPage", () => {
     expect(quantityInput).toBeInTheDocument();
     expect(expiryInput).toBeInTheDocument();
 
-    // dropdown uses buttons
-    const brandIdButton = dialog.querySelector(
-      'button[name="medicationBrandId-dropdown-button"]',
+    const brandIdSelect = dialog.querySelector(
+      'select[name="medicationBrandId"]',
     );
-    const statusButton = dialog.querySelector(
-      'button[name="stockStatus-dropdown-button"]',
-    );
+    const statusSelect = dialog.querySelector('select[name="stockStatus"]');
 
-    expect(brandIdButton).toBeInTheDocument();
-    expect(statusButton).toBeInTheDocument();
+    expect(brandIdSelect).toBeInTheDocument();
+    expect(statusSelect).toBeInTheDocument();
 
     await user.type(locationInput!, "valid location");
     await user.type(quantityInput!, "100");
     fireEvent.change(expiryInput!, { target: { value: "2026-12-31" } });
-    await user.click(brandIdButton!);
-
-    const brandDropdownButton = dialog.querySelector(
-      'button[name="medicationBrandId-1-dropdown-option"]',
-    );
-    await user.click(brandDropdownButton!);
-
-    await user.click(statusButton!);
-    const stockDropdownOption = dialog.querySelector(
-      'button[name="stockStatus-active-dropdown-option"]',
-    );
-    await user.click(stockDropdownOption!);
+    await user.selectOptions(brandIdSelect!, "1");
+    await user.selectOptions(statusSelect!, "active");
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 
@@ -588,7 +557,7 @@ describe("MedicationStockPage", () => {
 
     // Dropdown field
     expect(
-      document.querySelector('button[name="stockStatus-dropdown-button"]'),
+      document.querySelector('select[name="stockStatus"]'),
     ).toBeInTheDocument();
 
     expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
@@ -601,16 +570,11 @@ describe("MedicationStockPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
-    const statusButton = document.querySelector(
-      'button[name="stockStatus-dropdown-button"]',
-    );
+    const statusSelect = document.querySelector('select[name="stockStatus"]');
 
-    expect(statusButton).toBeInTheDocument();
-    await user.click(statusButton!);
+    expect(statusSelect).toBeInTheDocument();
 
-    const options = document.querySelectorAll(
-      'button[name^="stockStatus-"][name$="-dropdown-option"]',
-    );
+    const options = statusSelect!.querySelectorAll("option:not([disabled])");
 
     expect(Array.from(options, (option) => option.textContent)).toEqual([
       "active",
@@ -732,16 +696,9 @@ describe("MedicationStockPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
 
-    const dropdownButton = document.querySelector(
-      'button[name="stockStatus-dropdown-button"]',
-    );
+    const statusSelect = document.querySelector('select[name="stockStatus"]');
 
-    await user.click(dropdownButton!);
-
-    const dropdownButtonDonated = document.querySelector(
-      'button[name="stockStatus-donated-dropdown-option"]',
-    );
-    await user.click(dropdownButtonDonated!);
+    await user.selectOptions(statusSelect!, "donated");
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 

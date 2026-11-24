@@ -72,13 +72,13 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
     // Then: the DOB field is present but child vitals fields are not
     expect(dobInput).toBeInTheDocument();
     expect(
-      container.querySelector('button[name="scoliosis-dropdown-button"]'),
+      container.querySelector('select[name="scoliosis"]'),
     ).not.toBeInTheDocument();
     expect(
-      container.querySelector('button[name="pallor-dropdown-button"]'),
+      container.querySelector('select[name="pallor"]'),
     ).not.toBeInTheDocument();
     expect(
-      container.querySelector('button[name="pubarche-dropdown-button"]'),
+      container.querySelector('select[name="pubarche"]'),
     ).not.toBeInTheDocument();
   });
 
@@ -94,7 +94,7 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
     // Then: the child vitals section remains hidden
     await waitFor(() => {
       expect(
-        container.querySelector('button[name="scoliosis-dropdown-button"]'),
+        container.querySelector('select[name="scoliosis"]'),
       ).not.toBeInTheDocument();
     });
   });
@@ -111,13 +111,13 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
     // Then: all three child vitals dropdowns are visible
     await waitFor(() => {
       expect(
-        container.querySelector('button[name="scoliosis-dropdown-button"]'),
+        container.querySelector('select[name="scoliosis"]'),
       ).toBeInTheDocument();
       expect(
-        container.querySelector('button[name="pallor-dropdown-button"]'),
+        container.querySelector('select[name="pallor"]'),
       ).toBeInTheDocument();
       expect(
-        container.querySelector('button[name="pubarche-dropdown-button"]'),
+        container.querySelector('select[name="pubarche"]'),
       ).toBeInTheDocument();
     });
   });
@@ -131,7 +131,7 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
     await user.type(dobInput, dobYearsAgo(10));
     await waitFor(() => {
       expect(
-        container.querySelector('button[name="scoliosis-dropdown-button"]'),
+        container.querySelector('select[name="scoliosis"]'),
       ).toBeInTheDocument();
     });
 
@@ -142,7 +142,7 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
     // Then: the child vitals section is hidden
     await waitFor(() => {
       expect(
-        container.querySelector('button[name="scoliosis-dropdown-button"]'),
+        container.querySelector('select[name="scoliosis"]'),
       ).not.toBeInTheDocument();
     });
   });
@@ -157,7 +157,7 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
     await user.type(dobInput, dobYearsAgo(10));
     await waitFor(() => {
       expect(
-        container.querySelector('button[name="pubarche-dropdown-button"]'),
+        container.querySelector('select[name="pubarche"]'),
       ).toBeInTheDocument();
     });
 
@@ -175,16 +175,14 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
     await user.type(dobInput, dobYearsAgo(10));
     await waitFor(() => {
       expect(
-        container.querySelector('button[name="pubarche-dropdown-button"]'),
+        container.querySelector('select[name="pubarche"]'),
       ).toBeInTheDocument();
     });
 
     // When: pubarche is set to "Yes"
-    await user.click(
-      container.querySelector('button[name="pubarche-dropdown-button"]')!,
-    );
-    await user.click(
-      container.querySelector('button[name="pubarche-yes-dropdown-option"]')!,
+    await user.selectOptions(
+      container.querySelector('select[name="pubarche"]')!,
+      "yes",
     );
 
     // Then: the pubarcheAge input appears
@@ -203,14 +201,12 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
     await user.type(dobInput, dobYearsAgo(10));
     await waitFor(() => {
       expect(
-        container.querySelector('button[name="pubarche-dropdown-button"]'),
+        container.querySelector('select[name="pubarche"]'),
       ).toBeInTheDocument();
     });
-    await user.click(
-      container.querySelector('button[name="pubarche-dropdown-button"]')!,
-    );
-    await user.click(
-      container.querySelector('button[name="pubarche-yes-dropdown-option"]')!,
+    await user.selectOptions(
+      container.querySelector('select[name="pubarche"]')!,
+      "yes",
     );
     await waitFor(() => {
       expect(
@@ -223,11 +219,9 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
     );
 
     // When: pubarche is changed to "No"
-    await user.click(
-      container.querySelector('button[name="pubarche-dropdown-button"]')!,
-    );
-    await user.click(
-      container.querySelector('button[name="pubarche-no-dropdown-option"]')!,
+    await user.selectOptions(
+      container.querySelector('select[name="pubarche"]')!,
+      "no",
     );
 
     // Then: the pubarcheAge input is hidden
@@ -238,11 +232,9 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
     });
 
     // And: switching back to "Yes" shows an empty pubarcheAge (value was cleared)
-    await user.click(
-      container.querySelector('button[name="pubarche-dropdown-button"]')!,
-    );
-    await user.click(
-      container.querySelector('button[name="pubarche-yes-dropdown-option"]')!,
+    await user.selectOptions(
+      container.querySelector('select[name="pubarche"]')!,
+      "yes",
     );
     await waitFor(() => {
       expect(
@@ -260,14 +252,12 @@ describe("RegistrationPage — child vitals conditional visibility", () => {
     await user.type(dobInput, dobYearsAgo(10));
     await waitFor(() => {
       expect(
-        container.querySelector('button[name="pubarche-dropdown-button"]'),
+        container.querySelector('select[name="pubarche"]'),
       ).toBeInTheDocument();
     });
-    await user.click(
-      container.querySelector('button[name="pubarche-dropdown-button"]')!,
-    );
-    await user.click(
-      container.querySelector('button[name="pubarche-yes-dropdown-option"]')!,
+    await user.selectOptions(
+      container.querySelector('select[name="pubarche"]')!,
+      "yes",
     );
     await waitFor(() => {
       expect(

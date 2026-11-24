@@ -50,12 +50,12 @@ test("selects the newest visit and preserves a manual choice on refetch, then re
   const olderDate = formatVisitDate(older.date);
   await waitFor(() =>
     expect(
-      screen.getByRole("button", { name: latestDate }),
-    ).toBeInTheDocument(),
+      screen.getByRole("combobox", { name: /Choose visit/ }),
+    ).toHaveDisplayValue(latestDate),
   );
-  await user.click(screen.getByRole("button", { name: latestDate }));
-  await user.click(screen.getByRole("button", { name: olderDate }));
-  expect(screen.getByRole("button", { name: olderDate })).toBeInTheDocument();
+  const visitSelect = screen.getByRole("combobox", { name: /Choose visit/ });
+  await user.selectOptions(visitSelect, olderDate);
+  expect(visitSelect).toHaveDisplayValue(olderDate);
 
   visitsQuery.mockReturnValue({
     data: [{ ...latest }, { ...older }],
@@ -63,7 +63,7 @@ test("selects the newest visit and preserves a manual choice on refetch, then re
     isError: false,
   } as unknown as ReturnType<typeof visitsQuery>);
   rerender(<PatientDentalPage />);
-  expect(screen.getByRole("button", { name: olderDate })).toBeInTheDocument();
+  expect(visitSelect).toHaveDisplayValue(olderDate);
 
   router.mockReturnValue({
     query: { id: "2" },
@@ -77,8 +77,8 @@ test("selects the newest visit and preserves a manual choice on refetch, then re
   rerender(<PatientDentalPage />);
   await waitFor(() =>
     expect(
-      screen.getByRole("button", { name: latestDate }),
-    ).toBeInTheDocument(),
+      screen.getByRole("combobox", { name: /Choose visit/ }),
+    ).toHaveDisplayValue(latestDate),
   );
   expect(screen.getByRole("heading", { name: /Jane Doe/ })).toBeInTheDocument();
 });
