@@ -132,16 +132,3 @@ input[type="submit"] {
 label {
   @apply text-sm font-semibold md:text-base;
 }
-
-/* Broadcast toasts (src/components/BroadcastToast.tsx): outline by severity */
-.broadcast-toast-info {
-  border: 2px solid var(--color-info);
-}
-
-.broadcast-toast-warning {
-  border: 2px solid var(--color-warning);
-}
-
-.broadcast-toast-critical {
-  border: 2px solid var(--color-danger);
-}

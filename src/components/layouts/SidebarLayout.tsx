@@ -97,7 +97,7 @@ function SidebarNavButtons() {
     },
     {
       name: "Notifications",
-      href: paths.settingsNotifications(),
+      href: paths.notifications(),
       icon: IoMdNotificationsOutline,
     },
     {
@@ -106,21 +106,13 @@ function SidebarNavButtons() {
       icon: AiOutlineSetting,
     },
   ];
-  // Highlight only the most specific match, so /settings/notifications
-  // selects Notifications and not Settings as well.
-  const selectedHref = navigation
-    .map((item) => item.href)
-    .filter(
-      (href) =>
-        router.pathname === href || router.pathname.startsWith(`${href}/`),
-    )
-    .sort((a, b) => b.length - a.length)[0];
-
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex flex-1 flex-col gap-2">
         {navigation.map((item) => {
-          const selected = item.href === selectedHref;
+          const selected =
+            router.pathname == item.href ||
+            router.pathname.startsWith(`${item.href}/`);
           return (
             <Link
               key={item.name}

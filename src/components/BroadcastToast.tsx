@@ -10,6 +10,13 @@ const TOAST_DURATION_MS: Partial<
   critical: Infinity,
 };
 
+// Outline colour by severity.
+const TOAST_BORDER_CLASS: Record<BroadcastNotification["severity"], string> = {
+  info: "border-2 border-info",
+  warning: "border-2 border-warning",
+  critical: "border-2 border-danger",
+};
+
 export function showBroadcastToast(broadcast: BroadcastNotification) {
   toast(
     (t) => (
@@ -43,7 +50,7 @@ export function showBroadcastToast(broadcast: BroadcastNotification) {
     ),
     {
       id: `broadcast-${broadcast.id}`,
-      className: `broadcast-toast-${broadcast.severity}`,
+      className: TOAST_BORDER_CLASS[broadcast.severity],
       duration: TOAST_DURATION_MS[broadcast.severity],
       // react-hot-toast sizes toasts to their text and caps them at 350px.
       // Use one fixed width so every broadcast is easy to read, keeping a 16px

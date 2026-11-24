@@ -37,17 +37,17 @@ describe("showBroadcastToast", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it.each([
-    ["info", undefined],
-    ["warning", 8000],
-    ["critical", Infinity],
+    ["info", "border-2 border-info", undefined],
+    ["warning", "border-2 border-warning", 8000],
+    ["critical", "border-2 border-danger", Infinity],
   ] as const)(
     "gives %s toasts their outline class and display time",
-    (severity, duration) => {
+    (severity, className, duration) => {
       const options = show(broadcast(severity));
 
       expect(options).toMatchObject({
         id: "broadcast-11",
-        className: `broadcast-toast-${severity}`,
+        className,
         duration,
       });
     },

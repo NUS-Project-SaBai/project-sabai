@@ -25,12 +25,12 @@ describe("SidebarLayout", () => {
     render(<SidebarLayout>page</SidebarLayout>);
 
     for (const link of navLinks("Notifications")) {
-      expect(link).toHaveAttribute("href", "/settings/notifications");
+      expect(link).toHaveAttribute("href", "/notifications");
     }
   });
 
-  it("highlights only the most specific nav item", () => {
-    router.pathname = "/settings/notifications";
+  it("highlights Notifications only on the notifications page", () => {
+    router.pathname = "/notifications";
     render(<SidebarLayout>page</SidebarLayout>);
 
     for (const link of navLinks("Notifications")) {
