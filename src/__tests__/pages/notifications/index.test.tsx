@@ -1,4 +1,10 @@
-import { render, screen, cleanup, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  cleanup,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { toast, Toaster } from "react-hot-toast";
 import NotificationsPage from "@/pages/notifications";
@@ -153,6 +159,20 @@ describe("NotificationsPage", () => {
       ]);
     });
 
+    it("renders every field of each broadcast as a card for mobile", () => {
+      render(<NotificationsPage />);
+
+      const cards = within(
+        screen.getByRole("list", { name: "Broadcast history" }),
+      ).getAllByRole("listitem");
+
+      expect(cards.map((card) => card.textContent)).toEqual([
+        `Critical${formatVisitDate(MOCK_BROADCASTS[0].createdAt)}Clinic closingPack up by 5pmFrom Alice`,
+        `Warning${formatVisitDate(MOCK_BROADCASTS[1].createdAt)}Low stockParacetamol is running lowFrom Unknown`,
+        `Info${formatVisitDate(MOCK_BROADCASTS[2].createdAt)}WelcomeHave a good tripFrom Bob`,
+      ]);
+    });
+
     it("shows a loading state", () => {
       mockList({ isLoading: true });
       render(<NotificationsPage />);
@@ -166,6 +186,7 @@ describe("NotificationsPage", () => {
 
       expect(screen.getByText("No broadcasts yet")).toBeInTheDocument();
       expect(screen.queryByRole("table")).not.toBeInTheDocument();
+      expect(screen.queryByRole("list")).not.toBeInTheDocument();
     });
 
     it("shows an error state", () => {
