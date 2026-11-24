@@ -82,7 +82,7 @@ export default function ComposeBroadcastForm() {
           name="severity"
           label="Severity"
           radioOptions={SEVERITY_OPTIONS}
-          numberOfColumns={3}
+          inline
           isRequired
         />
         <Button

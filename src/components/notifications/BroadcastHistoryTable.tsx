@@ -1,4 +1,3 @@
-import { clsx } from "clsx";
 import { trpc } from "@/utils/trpc";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import TableHeader from "@/components/TableHeader";
@@ -10,13 +9,6 @@ import { formatVisitDate } from "@/lib/utils/visit";
 import type { RouterOutput } from "@/utils/trpc";
 
 type BroadcastRow = RouterOutput["broadcastsRouter"]["list"][number];
-
-// Left accent on mobile cards, same colour as the severity pill.
-const CARD_ACCENT_CLASS: Record<BroadcastRow["severity"], string> = {
-  info: "border-l-info",
-  warning: "border-l-warning",
-  critical: "border-l-danger",
-};
 
 function senderLabel(broadcast: BroadcastRow) {
   return broadcast.senderName ?? "Unknown";
@@ -30,7 +22,9 @@ export default function BroadcastHistoryTable() {
     isError,
   } = trpc.broadcastsRouter.list.useQuery();
 
-  if (isError) {
+  // A failed background refetch keeps the cached rows, so only show the error
+  // when there is nothing to display.
+  if (isError && !broadcasts) {
     return (
       <p className="p-12 text-center text-red-500">
         Failed to load broadcasts.
@@ -70,7 +64,12 @@ export default function BroadcastHistoryTable() {
                 <TableCell>
                   <SeverityPill severity={broadcast.severity} />
                 </TableCell>
-                <TableCell className="font-medium">{broadcast.title}</TableCell>
+                <TableCell className="font-medium">
+                  {/* Titles can be up to 255 chars; wrap them like bodies. */}
+                  <p className="max-w-xs whitespace-normal break-words">
+                    {broadcast.title}
+                  </p>
+                </TableCell>
                 <TableCell>
                   {/* Bodies can be long; let them wrap instead of widening the table. */}
                   <ExpandableText
@@ -91,12 +90,7 @@ export default function BroadcastHistoryTable() {
 
 function BroadcastCard({ broadcast }: { broadcast: BroadcastRow }) {
   return (
-    <li
-      className={clsx(
-        "flex flex-col gap-2 border-l-4 px-4 py-3",
-        CARD_ACCENT_CLASS[broadcast.severity],
-      )}
-    >
+    <li className="flex flex-col gap-2 px-4 py-3">
       <div className="flex items-start justify-between gap-3">
         <p className="font-semibold break-words text-slate-900">
           {broadcast.title}
@@ -105,7 +99,7 @@ function BroadcastCard({ broadcast }: { broadcast: BroadcastRow }) {
       </div>
       <ExpandableText
         text={broadcast.body}
-        className="text-sm leading-relaxed text-slate-600"
+        className="leading-relaxed text-slate-700"
       />
       <p className="text-xs text-slate-500">
         {senderLabel(broadcast)} · {formatVisitDate(broadcast.createdAt)}

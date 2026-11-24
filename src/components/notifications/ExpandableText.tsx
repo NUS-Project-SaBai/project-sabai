@@ -3,6 +3,7 @@ import { clsx } from "clsx";
 
 // Long text starts collapsed so one broadcast can't push the rest off screen.
 const COLLAPSE_AFTER_CHARS = 200;
+// Must match the line-clamp-3 class used when collapsed.
 const COLLAPSE_AFTER_LINES = 3;
 
 function isLongText(text: string) {

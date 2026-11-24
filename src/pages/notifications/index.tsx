@@ -4,7 +4,7 @@ import ComposeBroadcastForm from "@/components/notifications/ComposeBroadcastFor
 
 function NotificationsPage() {
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="max-w-5xl">
         <PageHeader
           breadcrumbs={[
@@ -21,7 +21,7 @@ function NotificationsPage() {
           >
             New broadcast
           </h2>
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow md:p-6">
             <ComposeBroadcastForm />
           </div>
         </section>
