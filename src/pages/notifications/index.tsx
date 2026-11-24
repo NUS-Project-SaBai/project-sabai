@@ -1,5 +1,6 @@
 import PageHeader from "@/components/PageHeader";
 import BroadcastHistoryTable from "@/components/notifications/BroadcastHistoryTable";
+import ComposeBroadcastForm from "@/components/notifications/ComposeBroadcastForm";
 
 function NotificationsPage() {
   return (
@@ -13,6 +14,17 @@ function NotificationsPage() {
           title="Notifications"
           description="Send a broadcast to everyone signed in, and see past broadcasts."
         />
+        <section aria-labelledby="compose-heading" className="mb-8">
+          <h2
+            id="compose-heading"
+            className="mb-4 text-xl font-semibold text-slate-900"
+          >
+            New broadcast
+          </h2>
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow">
+            <ComposeBroadcastForm />
+          </div>
+        </section>
         <section aria-labelledby="history-heading">
           <h2
             id="history-heading"

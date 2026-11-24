@@ -1,4 +1,6 @@
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { toast, Toaster } from "react-hot-toast";
 import NotificationsPage from "@/pages/notifications";
 import { trpc } from "@/utils/trpc";
 import {
@@ -9,8 +11,10 @@ import { formatVisitDate } from "@/lib/utils/visit";
 
 vi.mock("@/utils/trpc", () => ({
   trpc: {
+    useUtils: vi.fn(),
     broadcastsRouter: {
       list: { useQuery: vi.fn() },
+      send: { useMutation: vi.fn() },
     },
   },
 }));
@@ -55,10 +59,56 @@ function mockList(result: object) {
   });
 }
 
+const mockInvalidateList = vi.fn();
+const mockSend = vi.fn();
+
+/**
+ * Mocks broadcasts.send. `result` decides which callback a send triggers,
+ * run after the submit handler returns like a real network call.
+ */
+function mockSendMutation({
+  isPending = false,
+  result,
+}: { isPending?: boolean; result?: "success" | "error" } = {}) {
+  mockTrpc.broadcastsRouter.send.useMutation.mockImplementation(
+    (options: { onSuccess: () => void; onError: (err: Error) => void }) => {
+      mockSend.mockImplementation(() =>
+        queueMicrotask(() => {
+          if (result === "success") options.onSuccess();
+          if (result === "error") options.onError(new Error("Network error"));
+        }),
+      );
+      return { mutate: mockSend, isPending };
+    },
+  );
+}
+
+async function fillForm({
+  title,
+  body,
+  severity,
+}: {
+  title: string;
+  body: string;
+  severity?: string;
+}) {
+  const user = userEvent.setup();
+  await user.type(screen.getByLabelText(/Title/), title);
+  await user.type(screen.getByLabelText(/Message/), body);
+  if (severity) await user.click(screen.getByText(severity));
+  return user;
+}
+
 describe("NotificationsPage", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    toast.remove();
+    vi.spyOn(console, "error").mockImplementation(() => {});
     mockList({ data: MOCK_BROADCASTS });
+    mockTrpc.useUtils.mockReturnValue({
+      broadcastsRouter: { list: { invalidate: mockInvalidateList } },
+    });
+    mockSendMutation();
   });
 
   afterEach(() => {
@@ -125,6 +175,107 @@ describe("NotificationsPage", () => {
       expect(
         screen.getByText("Failed to load broadcasts."),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("compose form", () => {
+    beforeEach(() => {
+      // An empty history keeps severity labels unique on the page.
+      mockList({ data: [] });
+    });
+
+    it("shows validation errors and does not send when title and body are empty", async () => {
+      const user = userEvent.setup();
+      render(<NotificationsPage />);
+
+      await user.click(screen.getByRole("button", { name: "Send broadcast" }));
+
+      expect(
+        await screen.findByText("Please enter a title."),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Please enter a message.")).toBeInTheDocument();
+      expect(mockSend).not.toHaveBeenCalled();
+    });
+
+    it("treats whitespace-only fields as empty", async () => {
+      render(<NotificationsPage />);
+
+      const user = await fillForm({ title: "   ", body: "   " });
+      await user.click(screen.getByRole("button", { name: "Send broadcast" }));
+
+      expect(
+        await screen.findByText("Please enter a title."),
+      ).toBeInTheDocument();
+      expect(mockSend).not.toHaveBeenCalled();
+    });
+
+    it("sends the trimmed payload, then resets the form, toasts and refreshes history", async () => {
+      mockSendMutation({ result: "success" });
+      render(
+        <>
+          <NotificationsPage />
+          <Toaster />
+        </>,
+      );
+
+      const user = await fillForm({
+        title: "  Clinic closing ",
+        body: "Pack up by 5pm",
+        severity: "Critical",
+      });
+      await user.click(screen.getByRole("button", { name: "Send broadcast" }));
+
+      expect(mockSend).toHaveBeenCalledWith({
+        title: "Clinic closing",
+        body: "Pack up by 5pm",
+        severity: "critical",
+      });
+      expect(await screen.findByText("Broadcast sent!")).toBeInTheDocument();
+      expect(mockInvalidateList).toHaveBeenCalled();
+      await waitFor(() => {
+        expect(screen.getByLabelText(/Title/)).toHaveValue("");
+      });
+      expect(screen.getByLabelText(/Message/)).toHaveValue("");
+    });
+
+    it("defaults severity to info", async () => {
+      render(<NotificationsPage />);
+
+      const user = await fillForm({ title: "Hi", body: "There" });
+      await user.click(screen.getByRole("button", { name: "Send broadcast" }));
+
+      expect(mockSend).toHaveBeenCalledWith({
+        title: "Hi",
+        body: "There",
+        severity: "info",
+      });
+    });
+
+    it("disables submit while sending", () => {
+      mockSendMutation({ isPending: true });
+      render(<NotificationsPage />);
+
+      expect(screen.getByRole("button", { name: "Sending..." })).toBeDisabled();
+    });
+
+    it("keeps the form values and shows an error toast when sending fails", async () => {
+      mockSendMutation({ result: "error" });
+      render(
+        <>
+          <NotificationsPage />
+          <Toaster />
+        </>,
+      );
+
+      const user = await fillForm({ title: "Clinic closing", body: "5pm" });
+      await user.click(screen.getByRole("button", { name: "Send broadcast" }));
+
+      expect(
+        await screen.findByText("Failed to send broadcast."),
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText(/Title/)).toHaveValue("Clinic closing");
+      expect(screen.getByLabelText(/Message/)).toHaveValue("5pm");
+      expect(mockInvalidateList).not.toHaveBeenCalled();
     });
   });
 });
