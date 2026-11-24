@@ -19,6 +19,7 @@ export const paths = {
   medicationBrands: () => "/medication-brands",
   medicationActiveIngredients: () => "/medication-active-ingredients",
   orders: () => "/orders",
+  notifications: () => "/notifications",
   settings: () => "/settings",
   settingsVillageCodes: () => "/settings/village-codes",
   settingsReferralPartners: () => "/settings/referral-partners",

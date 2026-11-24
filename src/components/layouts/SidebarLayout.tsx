@@ -7,7 +7,7 @@ import { BsEyeglasses } from "react-icons/bs";
 import { MdMonitorHeart } from "react-icons/md";
 import { FaStethoscope, FaTooth } from "react-icons/fa";
 import { PiSignOutFill } from "react-icons/pi";
-import { IoMdMenu } from "react-icons/io";
+import { IoMdMenu, IoMdNotificationsOutline } from "react-icons/io";
 import { LuScanFace } from "react-icons/lu";
 import { GiMedicines, GiNotebook } from "react-icons/gi";
 import { HiOutlineArrowTrendingUp } from "react-icons/hi2";
@@ -94,6 +94,11 @@ function SidebarNavButtons() {
       name: "Orders",
       href: paths.orders(),
       icon: GiNotebook,
+    },
+    {
+      name: "Notifications",
+      href: paths.notifications(),
+      icon: IoMdNotificationsOutline,
     },
     {
       name: "Settings",

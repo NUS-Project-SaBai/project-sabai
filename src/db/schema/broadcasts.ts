@@ -11,15 +11,15 @@ import {
 
 import { users } from "./users";
 
-import { BROADCAST_TITLE_MAX_LENGTH } from "@/lib/constants/broadcasts";
+import {
+  BROADCAST_SEVERITIES,
+  BROADCAST_TITLE_MAX_LENGTH,
+} from "@/lib/constants/broadcasts";
 
-export const broadcastSeverityEnum = pgEnum("broadcast_severity", [
-  "info",
-  "warning",
-  "critical",
-]);
-
-export const broadcastSeverityValues = broadcastSeverityEnum.enumValues;
+export const broadcastSeverityEnum = pgEnum(
+  "broadcast_severity",
+  BROADCAST_SEVERITIES,
+);
 
 /*
 Broadcasts Table:

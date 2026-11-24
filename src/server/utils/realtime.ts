@@ -1,15 +1,21 @@
 import type { Broadcast } from "@/db/schema/broadcasts";
+import {
+  BROADCAST_NEW_EVENT,
+  BROADCAST_TOPIC,
+} from "@/lib/constants/broadcasts";
 import envVariables from "@/lib/envVariables";
 
 // Fail fast so a hung Realtime call doesn't hold the request open.
 const PUBLISH_TIMEOUT_MS = 5000;
 
+// Includes the sender's name so clients can render the toast without a lookup.
+type BroadcastPayload = Broadcast & { senderName: string | null };
+
 // Add another object variant with `|` when a new topic/event contract is introduced.
 type PublishBroadcastParams = {
-  topic: "notifications";
-  event: "new";
-  // Includes the sender's name so clients can render the toast without a lookup.
-  payload: Broadcast & { senderName: string | null };
+  topic: typeof BROADCAST_TOPIC;
+  event: typeof BROADCAST_NEW_EVENT;
+  payload: BroadcastPayload;
 };
 
 export async function publishBroadcast({
