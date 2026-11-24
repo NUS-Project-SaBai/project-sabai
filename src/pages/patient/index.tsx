@@ -1,6 +1,7 @@
 import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
 import { trpc } from "@/utils/trpc";
 import { PatientPhoto } from "@/components/PatientPhoto";
+import { PatientCard, PatientCardList } from "@/components/PatientCard";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -65,85 +66,96 @@ function PatientsBasePage() {
     }
 
     return (
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200">
-          <TableHeader
-            headers={[
-              "ID / Photo",
-              "Name",
-              "Basic Info",
-              "Status Flags",
-              "Allergies",
-              "Actions",
-            ]}
-          />
-          <tbody className="bg-white divide-y divide-slate-200">
-            {patients.map((patient) => (
-              <TableRow key={patient.id}>
-                <TableCell>
-                  <div className="flex flex-col items-center gap-2">
-                    <span className="text-sm font-medium text-slate-900">
-                      {formatPatientId(patient.id) || "No ID"}
-                    </span>
-                    <PatientPhoto pictureUrl={patient.patientImageUrl} />
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-slate-900">
-                      {patient.name}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm text-slate-700 capitalize">
-                      {patient.gender} •{" "}
-                      {calculateAge(new Date(patient.dateOfBirth))} yrs
-                    </span>
-                    <span className="text-xs text-slate-500">
-                      {patient.contactNo || "-"}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Badge
-                      label="Poor"
-                      active={patient.hasPoorCard}
-                      color="orange"
-                    />
-                    <Badge
-                      label="BS2"
-                      active={patient.hasBS2Card}
-                      color="blue"
-                    />
-                    <Badge
-                      label="Sabai"
-                      active={patient.hasSabaiCard}
-                      color="green"
-                    />
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="text-sm text-slate-700 max-w-xs truncate">
-                    {patient.drugAllergy}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Link
-                    href={paths.patientDetail(patient.id)}
-                    className="inline-flex items-center justify-center gap-2 whitespace-normal rounded-lg bg-gray-600 px-2 py-2 text-center text-xs text-white transition hover:bg-gray-800 sm:px-3 sm:text-sm"
-                  >
-                    <IoEyeOutline />
-                    View
-                  </Link>
-                </TableCell>
-              </TableRow>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <>
+        {/* Mobile screens: stacked cards */}
+        <PatientCardList>
+          {patients.map((patient) => (
+            <PatientCard
+              key={patient.id}
+              pictureUrl={patient.patientImageUrl}
+              patientCode={formatPatientId(patient.id) || "No ID"}
+              name={patient.name}
+            >
+              <span className="text-sm text-slate-700 capitalize">
+                {patient.gender} • {calculateAge(new Date(patient.dateOfBirth))}{" "}
+                yrs
+              </span>
+              <span className="text-xs text-slate-500">
+                {patient.contactNo || "-"}
+              </span>
+              <PatientBadges patient={patient} />
+              {patient.drugAllergy && (
+                <span className="text-sm text-slate-700">
+                  Allergies: {patient.drugAllergy}
+                </span>
+              )}
+              <ViewPatientLink patientId={patient.id} />
+            </PatientCard>
+          ))}
+        </PatientCardList>
+
+        {/* Tablet and desktop screens: full table */}
+        <div className="hidden overflow-x-auto md:block">
+          <table className="min-w-full divide-y divide-slate-200">
+            <TableHeader
+              headers={[
+                "ID / Photo",
+                "Name",
+                "Basic Info",
+                "Status Flags",
+                "Allergies",
+                "Actions",
+              ]}
+            />
+            <tbody className="bg-white divide-y divide-slate-200">
+              {patients.map((patient) => (
+                <TableRow key={patient.id}>
+                  <TableCell>
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="text-sm font-medium text-slate-900">
+                        {formatPatientId(patient.id) || "No ID"}
+                      </span>
+                      <PatientPhoto
+                        pictureUrl={patient.patientImageUrl}
+                        className="rounded-lg border border-slate-200"
+                      />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-slate-900">
+                        {patient.name}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-sm text-slate-700 capitalize">
+                        {patient.gender} •{" "}
+                        {calculateAge(new Date(patient.dateOfBirth))} yrs
+                      </span>
+                      <span className="text-xs text-slate-500">
+                        {patient.contactNo || "-"}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <PatientBadges patient={patient} />
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm text-slate-700 max-w-xs truncate">
+                      {patient.drugAllergy}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <ViewPatientLink patientId={patient.id} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </>
     );
   }
 
@@ -151,6 +163,32 @@ function PatientsBasePage() {
 }
 
 // Helper components & functions
+function ViewPatientLink({ patientId }: { patientId: number }) {
+  return (
+    <Link
+      href={paths.patientDetail(patientId)}
+      className="inline-flex items-center justify-center gap-2 whitespace-normal rounded-lg bg-gray-600 px-2 py-2 text-center text-xs text-white transition hover:bg-gray-800 sm:px-3 sm:text-sm"
+    >
+      <IoEyeOutline />
+      View
+    </Link>
+  );
+}
+
+function PatientBadges({
+  patient,
+}: {
+  patient: { hasPoorCard: boolean; hasBS2Card: boolean; hasSabaiCard: boolean };
+}) {
+  return (
+    <div className="flex gap-2">
+      <Badge label="Poor" active={patient.hasPoorCard} color="orange" />
+      <Badge label="BS2" active={patient.hasBS2Card} color="blue" />
+      <Badge label="Sabai" active={patient.hasSabaiCard} color="green" />
+    </div>
+  );
+}
+
 function Badge({
   label,
   active,

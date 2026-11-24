@@ -13,6 +13,7 @@ import TableCell from "@/components/TableCell";
 import { ReactNode } from "react";
 import { PatientsRouterListWithLatestVisitItem } from "@/utils/trpc-types";
 import { PatientCode } from "@/components/PatientCode";
+import { PatientCard, PatientCardList } from "@/components/PatientCard";
 
 function UpdateVisionButton({ onClick }: { onClick: () => void }) {
   return (
@@ -25,35 +26,6 @@ function UpdateVisionButton({ onClick }: { onClick: () => void }) {
       <HiOutlinePencilSquare className="h-5 w-5" />
       Update Vision
     </button>
-  );
-}
-
-/**
- * Stacked patient card used on small screens (e.g mobile)
- */
-function PatientCard({
-  patient,
-  onUpdateVision,
-}: {
-  patient: PatientsRouterListWithLatestVisitItem;
-  onUpdateVision: (patientId: number) => void;
-}) {
-  return (
-    <div className="flex gap-10 p-4">
-      <PatientPhoto pictureUrl={patient.patientImageUrl} />
-      <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
-        <PatientCode
-          villageCode={patient.villageCode}
-          villageColorHex={patient.villageColorHex}
-          id={patient.id}
-          className="text-xs font-medium text-slate-500"
-        />
-        <div className="break-words text-sm font-medium text-slate-900">
-          {patient.name}
-        </div>
-        <UpdateVisionButton onClick={() => onUpdateVision(patient.id)} />
-      </div>
-    </div>
   );
 }
 
@@ -158,15 +130,26 @@ function VisionPage() {
     return (
       <>
         {/* Mobile screens: stacked cards */}
-        <div className="divide-y divide-slate-200 md:hidden">
+        <PatientCardList>
           {patients.map((patient) => (
             <PatientCard
               key={patient.id}
-              patient={patient}
-              onUpdateVision={handleUpdateVision}
-            />
+              pictureUrl={patient.patientImageUrl}
+              patientCode={
+                <PatientCode
+                  villageCode={patient.villageCode}
+                  villageColorHex={patient.villageColorHex}
+                  id={patient.id}
+                />
+              }
+              name={patient.name}
+            >
+              <UpdateVisionButton
+                onClick={() => handleUpdateVision(patient.id)}
+              />
+            </PatientCard>
           ))}
-        </div>
+        </PatientCardList>
 
         {/* Tablet and desktop screens: full table */}
         <PatientTable patients={patients} onUpdateVision={handleUpdateVision} />
