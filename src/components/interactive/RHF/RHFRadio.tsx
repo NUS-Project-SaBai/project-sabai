@@ -14,6 +14,7 @@ type RHFRadioProps = {
     HTMLDivElement
   >["className"];
   numberOfColumns?: number;
+  inline?: boolean;
 };
 
 /**
@@ -31,6 +32,7 @@ type RHFRadioProps = {
  * @param {boolean} [isRequired=false] - Whether the field is required; shows validation error if true
  * @param {string} [className=""] - Additional CSS classes to apply to the container
  * @param {number} [numberOfColumns] - Number of grid columns for the radio options. If undefined, defaults to responsive grid (2 cols, 3 md, 4 lg)
+ * @param {boolean} [inline=false] - Lay options out in a wrapping row with an even gap instead of a grid. Ignores numberOfColumns.
  *
  * @example
  * const options = [
@@ -51,6 +53,7 @@ export function RHFRadio({
   isRequired = false,
   className = "",
   numberOfColumns = undefined,
+  inline = false,
 }: RHFRadioProps) {
   const { control, formState } = useFormContext();
   const fieldError = formState?.errors[name];
@@ -62,12 +65,15 @@ export function RHFRadio({
       </label>
       <div
         className={clsx([
-          "grid gap-2 p-1",
-          !numberOfColumns && "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
+          "gap-2 p-1",
+          inline ? "flex flex-wrap" : "grid",
+          !inline &&
+            !numberOfColumns &&
+            "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
           fieldError ? "border border-red-400 rounded" : "",
         ])}
         style={
-          numberOfColumns
+          !inline && numberOfColumns
             ? {
                 gridTemplateColumns: `repeat(${numberOfColumns}, minmax(0, 1fr))`,
               }

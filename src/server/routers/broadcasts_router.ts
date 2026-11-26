@@ -4,14 +4,12 @@ import { z } from "zod";
 import { broadcasts, users } from "@/db/schema";
 import { db } from "@/db/drizzle";
 import {
-  BROADCAST_BODY_MAX_LENGTH,
   BROADCAST_NEW_EVENT,
-  BROADCAST_SEVERITIES,
   BROADCAST_TOPIC,
   BROADCAST_LIST_DEFAULT_LIMIT,
   BROADCAST_LIST_MAX_LIMIT,
-  BROADCAST_TITLE_MAX_LENGTH,
 } from "@/lib/constants/broadcasts";
+import { sendBroadcastSchema } from "@/lib/validation/broadcasts";
 import { protectedProcedure, router } from "@/server/trpc";
 import { publishBroadcast } from "@/server/utils/realtime";
 
@@ -26,12 +24,6 @@ const listInputSchema = z
     since: z.number().int().optional(),
   })
   .optional();
-
-const sendInputSchema = z.object({
-  title: z.string().trim().min(1).max(BROADCAST_TITLE_MAX_LENGTH),
-  body: z.string().trim().min(1).max(BROADCAST_BODY_MAX_LENGTH),
-  severity: z.enum(BROADCAST_SEVERITIES).default("info"),
-});
 
 export const broadcastsRouter = router({
   list: protectedProcedure.input(listInputSchema).query(async ({ input }) => {
@@ -54,7 +46,7 @@ export const broadcastsRouter = router({
   // push is best-effort. Rows left with published_at = NULL are for a retry
   // relay to pick up (not built yet).
   send: protectedProcedure
-    .input(sendInputSchema)
+    .input(sendBroadcastSchema)
     .mutation(async ({ input, ctx }) => {
       // An auth account may not be linked to a users row yet. Send anyway,
       // with no sender.
