@@ -1,29 +1,17 @@
 ---
 title: Medication Brands
-excerpt: This page handles the viewing, editing, and deleting of medication brands.
+excerpt: This page displays medication brands and their associated active ingredient IDs.
 permalink: /features/medication-brands/
 ---
 
 ## Introduction
 
-The Medication Brands page is where users can see the medication brands. Each brand has the following attributes:
-- Active Ingredient (Chosen from dropdown, has to already exist in the application)
-- Name (text)
-- Remarks (text, optional)
+The Medication Brands page (`/medication-brands`) can be opened from **Manage Brands** on the Medication Stock page. It displays each brand's Brand ID, Name, Remarks, and Active Ingredient ID. The ID refers to an existing active ingredient; the table does not display its name.
 
-Currently, the page only supports viewing the details of the brands, and the editing and adding of brands will be done in a future update.
+The page is currently read-only: it has no controls to add, edit, or delete brands. Although the empty-state message mentions adding a record, this page does not provide an add form.
 
-## Editing Brands
+## Page States
 
-Upcoming feature
-
-## Adding Brands
-
-Upcoming feature
-
-## Upcoming Features
-
-The upcoming features are as follows:
-- Editing of brands (Name and Remarks only)
-- Adding of brands
-
+- While loading, the page shows `Loading brands...`.
+- If loading fails, it shows `An error has occurred!`.
+- If there are no brands, it shows `No medication brands found. Seed the database or add a new record.`
