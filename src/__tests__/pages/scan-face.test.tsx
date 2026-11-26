@@ -275,19 +275,14 @@ describe("ScanFacePage", () => {
       'input[name="drugAllergy"]',
     );
     const dobInput = container.querySelector('input[name="dateOfBirth"]');
-    const dropdownButton = container.querySelector(
-      'button[name="gender-dropdown-button"]',
-    );
+    const genderSelect = container.querySelector('select[name="gender"]');
 
     await user.type(nameInput!, "Valid name");
     await user.type(identificationNumberInput!, "Valid id");
     await user.type(contactNoInput!, "1234567");
     await user.type(drugAllergyInput!, "drug allergies");
     await user.type(dobInput!, "2000-10-10");
-    await user.click(dropdownButton!);
-    await user.click(
-      container.querySelector('button[name="gender-male-dropdown-option"]')!,
-    );
+    await user.selectOptions(genderSelect!, "male");
 
     // When: "Create New Patient" is clicked without a village code selected
     await user.click(
@@ -331,19 +326,14 @@ describe("ScanFacePage", () => {
       'input[name="drugAllergy"]',
     );
     const dobInput = container.querySelector('input[name="dateOfBirth"]');
-    const dropdownButton = container.querySelector(
-      'button[name="gender-dropdown-button"]',
-    );
+    const genderSelect = container.querySelector('select[name="gender"]');
 
     await user.type(nameInput!, "Valid name");
     await user.type(identificationNumberInput!, "Valid id");
     await user.type(contactNoInput!, "1234567");
     await user.type(drugAllergyInput!, "drug allergies");
     await user.type(dobInput!, "2000-10-10");
-    await user.click(dropdownButton!);
-    await user.click(
-      container.querySelector('button[name="gender-male-dropdown-option"]')!,
-    );
+    await user.selectOptions(genderSelect!, "male");
 
     const createButton = screen.getByRole("button", {
       name: "Create New Patient",
@@ -490,19 +480,14 @@ describe("ScanFacePage", () => {
       'input[name="drugAllergy"]',
     );
     const dobInput = container.querySelector('input[name="dateOfBirth"]');
-    const dropdownButton = container.querySelector(
-      'button[name="gender-dropdown-button"]',
-    );
+    const genderSelect = container.querySelector('select[name="gender"]');
 
     await user.type(nameInput!, "Valid name");
     await user.type(identificationNumberInput!, "Valid id");
     await user.type(contactNoInput!, "1234567");
     await user.type(drugAllergyInput!, "drug allergies");
     await user.type(dobInput!, "2000-10-10");
-    await user.click(dropdownButton!);
-    await user.click(
-      container.querySelector('button[name="gender-male-dropdown-option"]')!,
-    );
+    await user.selectOptions(genderSelect!, "male");
 
     const createButton = screen.getByRole("button", {
       name: "Create New Patient",
@@ -733,11 +718,9 @@ describe("ScanFacePage", () => {
       container.querySelector('input[name="dateOfBirth"]')!,
       "2000-01-01",
     );
-    await user.click(
-      container.querySelector('button[name="gender-dropdown-button"]')!,
-    );
-    await user.click(
-      container.querySelector('button[name="gender-male-dropdown-option"]')!,
+    await user.selectOptions(
+      container.querySelector('select[name="gender"]')!,
+      "male",
     );
 
     await user.click(
@@ -807,11 +790,9 @@ describe("ScanFacePage", () => {
       container.querySelector('input[name="dateOfBirth"]')!,
       "2000-01-01",
     );
-    await user.click(
-      container.querySelector('button[name="gender-dropdown-button"]')!,
-    );
-    await user.click(
-      container.querySelector('button[name="gender-male-dropdown-option"]')!,
+    await user.selectOptions(
+      container.querySelector('select[name="gender"]')!,
+      "male",
     );
 
     await user.click(

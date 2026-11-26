@@ -1,7 +1,7 @@
 import { ConsultForm } from "@/components/consults/ConsultForm";
 import { trpc } from "@/utils/trpc";
 import { Toaster, toast } from "react-hot-toast";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 vi.mock("@/utils/trpc", () => ({
@@ -70,8 +70,10 @@ function renderForm() {
 async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText(/Past Medical History/), "No history");
   await user.type(screen.getByLabelText(/Consultation/), "Patient is well");
-  await user.click(screen.getByRole("button", { name: "Choose a category" }));
-  await user.click(screen.getByRole("button", { name: "Cardiovascular" }));
+  await user.selectOptions(
+    screen.getByRole("combobox", { name: /Category/ }),
+    "Cardiovascular",
+  );
   await user.type(screen.getByLabelText(/Details/), "Hypertension");
 }
 
@@ -80,8 +82,10 @@ async function selectReferralCategory(
   user: ReturnType<typeof userEvent.setup>,
   category: string,
 ) {
-  await user.click(screen.getByRole("button", { name: "Not Referred" }));
-  await user.click(screen.getByRole("button", { name: category }));
+  await user.selectOptions(
+    screen.getByRole("combobox", { name: /Referred for/ }),
+    category,
+  );
 }
 
 /** Opens the order modal and saves one order for the seeded ingredient. */
@@ -93,10 +97,13 @@ async function addOrder(
   await user.click(screen.getByRole("button", { name: "Add Order" }));
   // Modal opens the <dialog> inside a requestAnimationFrame, so wait for it —
   // until it is open, its contents are hidden from role queries.
-  await user.click(
-    await screen.findByRole("button", { name: "Select an option" }),
+  const medicineSelect = await screen.findByRole("combobox", {
+    name: /Medicine/,
+  });
+  await user.selectOptions(
+    medicineSelect,
+    within(medicineSelect).getByRole("option", { name: /^Paracetamol,/ }),
   );
-  await user.click(screen.getByRole("button", { name: /^Paracetamol,/ }));
   await user.type(screen.getByLabelText(/Quantity to Order/), `${quantity}`);
   await user.type(
     screen.getByLabelText(/Dosage Instructions/),
@@ -349,7 +356,7 @@ describe("ConsultForm", () => {
     );
     // the dropdown shows what is left after the staged order
     expect(
-      screen.getByRole("button", { name: "Paracetamol, (tablets) (Qty: 20)" }),
+      screen.getByRole("option", { name: "Paracetamol, (tablets) (Qty: 20)" }),
     ).toBeInTheDocument();
     expect(screen.getAllByText(/^Quantity: /)).toHaveLength(1);
   });
@@ -382,8 +389,8 @@ describe("ConsultForm", () => {
       renderForm();
       // Then - dropdown shows "Not Referred" and notes textarea is hidden
       expect(
-        screen.getByRole("button", { name: "Not Referred" }),
-      ).toBeInTheDocument();
+        screen.getByRole("combobox", { name: /Referred for/ }),
+      ).toHaveDisplayValue("Not Referred");
       expect(screen.queryByLabelText(/Referral Notes/)).not.toBeInTheDocument();
     });
 
@@ -404,8 +411,10 @@ describe("ConsultForm", () => {
       await selectReferralCategory(user, "Diagnostic");
       expect(screen.getByLabelText(/Referral Notes/)).toBeInTheDocument();
       // When - user selects "Not Referred" again
-      await user.click(screen.getByRole("button", { name: "Diagnostic" }));
-      await user.click(screen.getByRole("button", { name: "Not Referred" }));
+      await user.selectOptions(
+        screen.getByRole("combobox", { name: /Referred for/ }),
+        "Not Referred",
+      );
       // Then - referral notes field is hidden
       expect(screen.queryByLabelText(/Referral Notes/)).not.toBeInTheDocument();
     });
@@ -554,8 +563,8 @@ describe("ConsultForm", () => {
         ).not.toBeInTheDocument(),
       );
       expect(
-        screen.getByRole("button", { name: "Not Referred" }),
-      ).toBeInTheDocument();
+        screen.getByRole("combobox", { name: /Referred for/ }),
+      ).toHaveDisplayValue("Not Referred");
     });
 
     test("disables the save button while the referral mutation is pending", () => {
