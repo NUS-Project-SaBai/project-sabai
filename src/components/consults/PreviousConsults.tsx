@@ -1,8 +1,11 @@
-import { trpc, RouterOutput } from "@/utils/trpc";
+import clsx from "clsx";
+import toast from "react-hot-toast";
+import { HiOutlinePencilSquare } from "react-icons/hi2";
+import { trpc } from "@/utils/trpc";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { formatVisitDate } from "@/lib/utils/visit";
-
-type Consult = RouterOutput["consultsRouter"]["getByVisitId"][number];
+import type { ConsultWithDiagnoses } from "@/types/consults";
+import { isWithinConsultEditWindow } from "@/lib/utils/consult";
 
 /**
  * A single labelled block of read-only consult text. Renders nothing when the
@@ -22,15 +25,58 @@ function Field({ label, value }: { label: string; value: string | null }) {
   );
 }
 
+type ConsultCardProps = {
+  consult: ConsultWithDiagnoses;
+  editingId: number | null;
+  onEdit: (consult: ConsultWithDiagnoses) => void;
+};
+
 /**
  * A read-only card for one saved consult: its date, notes, and diagnoses.
+ * Shows an Edit button that is disabled (with a toast explanation) once the
+ * 24-hour edit window has passed.
  */
-function ConsultCard({ consult }: { consult: Consult }) {
+function ConsultCard({ consult, editingId, onEdit }: ConsultCardProps) {
+  const editable = isWithinConsultEditWindow(consult.date);
+  const isBeingEdited = editingId === consult.id;
+
+  const handleEditClick = () => {
+    if (!editable) {
+      toast.error(
+        "This consult can no longer be edited (24-hour window has passed).",
+      );
+      return;
+    }
+    onEdit(consult);
+  };
+
   return (
-    <article className="space-y-3 rounded-lg border border-slate-200 p-4">
-      <p className="text-xs font-medium text-slate-400">
-        {formatVisitDate(consult.date)}
-      </p>
+    <article
+      className={clsx(
+        "space-y-3 rounded-lg border p-4",
+        isBeingEdited ? "border-emerald-400" : "border-slate-200",
+      )}
+    >
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-medium text-slate-400">
+          {formatVisitDate(consult.date)}
+        </p>
+        <button
+          type="button"
+          onClick={handleEditClick}
+          title={editable ? "Edit consult" : "Edit window has passed"}
+          className={clsx(
+            "inline-flex items-center gap-1 rounded p-1 text-sm transition",
+            editable
+              ? "cursor-pointer text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+              : "cursor-not-allowed text-slate-300",
+          )}
+        >
+          <HiOutlinePencilSquare className="h-4 w-4" />
+          Edit
+        </button>
+      </div>
+
       <Field label="Past Medical History" value={consult.pastMedicalHistory} />
       <Field label="Consultation" value={consult.consultation} />
 
@@ -56,12 +102,22 @@ function ConsultCard({ consult }: { consult: Consult }) {
   );
 }
 
+type PreviousConsultsProps = {
+  visitId: number;
+  editingId: number | null;
+  onEdit: (consult: ConsultWithDiagnoses) => void;
+};
+
 /**
  * Read-only list of previously-saved consults for a visit, most recent first.
  * A visit can accumulate multiple consults (append log), so this shows the
  * history alongside the form for recording a new one.
  */
-export function PreviousConsults({ visitId }: { visitId: number }) {
+export function PreviousConsults({
+  visitId,
+  editingId,
+  onEdit,
+}: PreviousConsultsProps) {
   const { data: consults, isLoading } =
     trpc.consultsRouter.getByVisitId.useQuery({ visitId });
 
@@ -82,7 +138,12 @@ export function PreviousConsults({ visitId }: { visitId: number }) {
       </h2>
       <div className="space-y-4">
         {consults.map((consult) => (
-          <ConsultCard key={consult.id} consult={consult} />
+          <ConsultCard
+            key={consult.id}
+            consult={consult}
+            editingId={editingId}
+            onEdit={onEdit}
+          />
         ))}
       </div>
     </section>

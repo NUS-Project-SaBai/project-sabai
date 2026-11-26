@@ -9,6 +9,7 @@ vi.mock("@/utils/trpc", () => ({
     useUtils: vi.fn(),
     consultsRouter: {
       create: { useMutation: vi.fn() },
+      update: { useMutation: vi.fn() },
     },
     referralRouter: {
       create: { useMutation: vi.fn() },
@@ -133,6 +134,10 @@ describe("ConsultForm", () => {
     mockTrpc.medicationStockRouter.listGroupByActiveIngredient.useQuery.mockReturnValue(
       { data: INGREDIENTS, isLoading: false, isError: false },
     );
+    mockTrpc.consultsRouter.update.useMutation.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    });
   });
 
   test("renders all fields and the save button", () => {
@@ -177,9 +182,9 @@ describe("ConsultForm", () => {
         visitId: VISIT_ID,
         pastMedicalHistory: "No history",
         consultation: "Patient is well",
-        // blank optional fields collapse to undefined
-        treatmentPlan: undefined,
-        remarks: undefined,
+        // blank fields are sent as-is; the server stores them as NULL
+        treatmentPlan: "",
+        remarks: "",
         diagnoses: [{ details: "Hypertension", category: "Cardiovascular" }],
       }),
     );

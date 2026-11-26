@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import withDefaultLayout from "@/components/layouts/withDefaultLayout";
 import PatientTopMenuLayout from "@/components/layouts/PatientTopMenuLayout";
@@ -12,10 +12,16 @@ import { formatPatientId } from "@/lib/utils/patient";
 import { ConsultForm } from "@/components/consults/ConsultForm";
 import { PreviousConsults } from "@/components/consults/PreviousConsults";
 import { VisitSummaryPanel } from "@/components/consults/VisitSummaryPanel";
+import type { ConsultWithDiagnoses } from "@/types/consults";
 
 function ConsultsPage() {
   const router = useRouter();
   const { patientId } = router.query;
+
+  const [editingState, setEditingState] = useState<{
+    visitId: number;
+    consult: ConsultWithDiagnoses;
+  } | null>(null);
 
   // A small form just for the visit selector so it can use `RHFDropdown`.
   const visitForm = useForm<{ visitSelect: string }>({
@@ -28,6 +34,10 @@ function ConsultsPage() {
   const selectedVisitId = selectedVisitValue
     ? Number(selectedVisitValue)
     : null;
+
+  // Derived: automatically null when the visit changes, no effect needed.
+  const editingConsult =
+    editingState?.visitId === selectedVisitId ? editingState.consult : null;
 
   const { data: patient, isLoading: patientLoading } =
     trpc.patientsRouter.getById.useQuery(
@@ -114,12 +124,24 @@ function ConsultsPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 lg:h-[calc(100vh-280px)]">
                 <aside className="min-w-0 overflow-y-auto p-6 lg:border-r lg:border-slate-100">
                   <VisitSummaryPanel visitId={selectedVisitId} />
-                  <PreviousConsults visitId={selectedVisitId} />
+                  <PreviousConsults
+                    visitId={selectedVisitId}
+                    editingId={editingConsult?.id ?? null}
+                    onEdit={(consult) =>
+                      setEditingState(
+                        selectedVisitId
+                          ? { visitId: selectedVisitId, consult }
+                          : null,
+                      )
+                    }
+                  />
                 </aside>
                 <div className="overflow-y-auto p-6">
                   <ConsultForm
                     key={selectedVisitId}
                     visitId={selectedVisitId}
+                    editingConsult={editingConsult}
+                    onCancelEdit={() => setEditingState(null)}
                   />
                 </div>
               </div>

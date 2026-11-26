@@ -1,9 +1,14 @@
 import { z } from "zod";
 import { eq, desc, inArray } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { consults, diagnosis } from "@/db/schema/consults";
-import { createConsultInput } from "@/server/schemas/consults";
+import { isWithinConsultEditWindow } from "@/lib/utils/consult";
+import {
+  createConsultInput,
+  updateConsultInput,
+} from "@/server/schemas/consults";
 
 export const consultsRouter = router({
   /**
@@ -61,6 +66,62 @@ export const consultsRouter = router({
         diagnoses: diagnoses.filter((d) => d.consultId === consult.id),
       }));
     }),
-});
 
-export type CreateConsultInput = z.infer<typeof createConsultInput>;
+  /**
+   * Updates an existing consult and replaces all of its diagnoses.
+   * Only the doctor who wrote the consult may edit it, and only within
+   * 24 hours of creation.
+   */
+  update: protectedProcedure
+    .input(updateConsultInput)
+    .mutation(async ({ input, ctx }) => {
+      const { id, diagnoses, ...fields } = input;
+
+      const [existing] = await db
+        .select({ date: consults.date, doctorId: consults.doctorId })
+        .from(consults)
+        .where(eq(consults.id, id));
+
+      if (!existing) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Consult not found.",
+        });
+      }
+
+      if (existing.doctorId !== ctx.appUser.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only the doctor who wrote this consult can edit it.",
+        });
+      }
+
+      if (!isWithinConsultEditWindow(existing.date)) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            "This consult can no longer be edited (24-hour window has passed).",
+        });
+      }
+
+      return db.transaction(async (tx) => {
+        const [updated] = await tx
+          .update(consults)
+          .set(fields)
+          .where(eq(consults.id, id))
+          .returning();
+
+        await tx.delete(diagnosis).where(eq(diagnosis.consultId, id));
+
+        await tx.insert(diagnosis).values(
+          diagnoses.map((d) => ({
+            details: d.details,
+            category: d.category,
+            consultId: id,
+          })),
+        );
+
+        return updated;
+      });
+    }),
+});
