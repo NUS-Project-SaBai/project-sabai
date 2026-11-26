@@ -12,6 +12,11 @@ import {
 import { eq, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { getPatientWithImageUrl } from "@/server/utils/cloudinary";
+import {
+  updateReferralBoothInput,
+  updateReferralPartyInput,
+  updateReferralMoneyInput,
+} from "@/server/schemas/referrals";
 
 const referralStateSchema = z.enum(referralStateEnum.enumValues);
 
@@ -27,10 +32,34 @@ const enrichedReferralQuery = () =>
       referralOutcome: referrals.referralOutcome,
       consultId: referrals.consultId,
       createdAt: referrals.createdAt,
+      updatedAt: referrals.updatedAt,
+      // Referral booth section
+      referredToId: referrals.referredToId,
+      memberInChargeId: referrals.memberInChargeId,
+      guardiansContacted: referrals.guardiansContacted,
+      classOfService: referrals.classOfService,
+      descriptionOfService: referrals.descriptionOfService,
+      patientSummaryFromScreening: referrals.patientSummaryFromScreening,
+      remarksAtBooth: referrals.remarksAtBooth,
+      // Referral party section
+      memberOnRunId: referrals.memberOnRunId,
+      presentAtReferralParty: referrals.presentAtReferralParty,
+      referralPartyResults: referrals.referralPartyResults,
+      followUp: referrals.followUp,
+      doctorsUpdated: referrals.doctorsUpdated,
+      // Money section
+      amountPaidUsd: referrals.amountPaidUsd,
+      amountPaidRiels: referrals.amountPaidRiels,
+      memberWhoPaidId: referrals.memberWhoPaidId,
       consultDate: consults.date,
       doctorId: consults.doctorId,
       patientId: patients.id,
       patientName: patients.name,
+      patientDateOfBirth: patients.dateOfBirth,
+      patientContactNo: patients.contactNo,
+      patientHasPoorCard: patients.hasPoorCard,
+      patientHasBS2Card: patients.hasBS2Card,
+      patientHasSabaiCard: patients.hasSabaiCard,
       patientImagePublicId: patients.patientImagePublicId,
       villageCodeId: visits.villageCodeId,
       villageCode: villageCodes.code,
@@ -142,6 +171,69 @@ export const referralRouter = router({
         .update(referrals)
         .set({ referralOutcome: input.referralOutcome })
         .where(eq(referrals.id, input.id))
+        .returning();
+
+      if (!result) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Referral not found",
+        });
+      }
+      return result;
+    }),
+
+  // Update only the referral booth fields, so saving the booth section can
+  // never overwrite other sections that changed since the caller loaded it
+  updateBooth: protectedProcedure
+    .input(updateReferralBoothInput)
+    .mutation(async ({ input }) => {
+      const { id, ...boothData } = input;
+      const [result] = await db
+        .update(referrals)
+        .set(boothData)
+        .where(eq(referrals.id, id))
+        .returning();
+
+      if (!result) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Referral not found",
+        });
+      }
+      return result;
+    }),
+
+  // Update only the referral party fields, so saving the party section can
+  // never overwrite other sections that changed since the caller loaded it
+  updateParty: protectedProcedure
+    .input(updateReferralPartyInput)
+    .mutation(async ({ input }) => {
+      const { id, ...partyData } = input;
+      const [result] = await db
+        .update(referrals)
+        .set(partyData)
+        .where(eq(referrals.id, id))
+        .returning();
+
+      if (!result) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Referral not found",
+        });
+      }
+      return result;
+    }),
+
+  // Update only the money fields, so saving the money section can never
+  // overwrite other sections that changed since the caller loaded it
+  updateMoney: protectedProcedure
+    .input(updateReferralMoneyInput)
+    .mutation(async ({ input }) => {
+      const { id, ...moneyData } = input;
+      const [result] = await db
+        .update(referrals)
+        .set(moneyData)
+        .where(eq(referrals.id, id))
         .returning();
 
       if (!result) {

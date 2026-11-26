@@ -225,6 +225,13 @@
       "when": 1795341430909,
       "tag": "0031_silky_tattoo",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1795516952620,
+      "tag": "0032_soft_mathemanic",
+      "breakpoints": true
     }
   ]
 }
