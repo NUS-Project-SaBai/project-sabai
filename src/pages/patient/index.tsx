@@ -12,6 +12,13 @@ import { formatPatientId } from "@/lib/utils/patient";
 import { paths } from "@/utils/paths";
 import { IoEyeOutline } from "react-icons/io5";
 import Link from "next/link";
+import type { PatientsRouterListWithLatestVisitOutput } from "@/utils/trpc-types";
+
+function selectPatientsForTable(
+  patients: PatientsRouterListWithLatestVisitOutput,
+) {
+  return [...patients].sort((a, b) => a.id - b.id);
+}
 
 function Wrapper({ children }: { children: ReactNode }) {
   return (
@@ -40,12 +47,13 @@ function Wrapper({ children }: { children: ReactNode }) {
 }
 
 function PatientsBasePage() {
-  // 1. Fetch data
   const {
     data: patients,
     isLoading,
     isError,
-  } = trpc.patientsRouter.list.useQuery();
+  } = trpc.patientsRouter.listWithLatestVisit.useQuery(undefined, {
+    select: selectPatientsForTable,
+  });
 
   function renderContent() {
     if (isError) {

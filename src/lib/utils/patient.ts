@@ -1,13 +1,12 @@
 /**
- * Formats a patient id as a zero-padded, 4-digit string, e.g. 12 → "0012".
+ * Pads a patient ID to at least four digits, e.g. 12 → "0012".
  */
 export function formatPatientId(id: number) {
   return id.toString().padStart(4, "0");
 }
 
 /**
- * Builds the display code for a patient, for example "PC0012". Falls back to the
- * zero-padded id alone when the patient has no village (no visits yet).
+ * Prefixes the padded ID with the village code when available, e.g. "PC0012".
  */
 export function formatPatientCode(villageCode: string | null, id: number) {
   return `${villageCode ?? ""}${formatPatientId(id)}`;

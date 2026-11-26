@@ -49,7 +49,11 @@ export default function EditPatientForm({
   );
 
   const utils = trpc.useUtils();
-  const updateMutation = trpc.patientsRouter.update.useMutation();
+  const updateMutation = trpc.patientsRouter.update.useMutation({
+    onSuccess() {
+      void utils.patientsRouter.invalidate();
+    },
+  });
 
   const handleSubmit = (data: EditPatientFormValues) => {
     // A freshly captured photo is a base64 data URL; the prefilled value is a
@@ -64,7 +68,6 @@ export default function EditPatientForm({
       },
       {
         onSuccess() {
-          utils.patientsRouter.getById.invalidate({ id: patient.id });
           toast.success("Patient details updated successfully!");
           onSuccess?.();
         },

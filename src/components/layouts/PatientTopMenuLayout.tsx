@@ -1,8 +1,9 @@
 import { ReactNode, useMemo, useState } from "react";
 import SearchInput from "@/components/interactive/inputs/SearchInput";
-import { usePatients } from "@/lib/context/PatientsContext";
+import { trpc } from "@/utils/trpc";
 import PatientSearchResults from "@/components/interactive/PatientSearchResults";
 import useDebounce from "@/hooks/useDebounce";
+import { createPatientSearch } from "@/lib/utils/patient-search";
 
 interface PatientTopMenuLayoutProps {
   children: ReactNode;
@@ -15,41 +16,33 @@ export default function PatientTopMenuLayout({
 }: PatientTopMenuLayoutProps) {
   const [searchText, setSearchText] = useState("");
   const debouncedSearchText = useDebounce(searchText, 300);
-  const { patientsById, isLoading, isRefetching } = usePatients();
+  const {
+    data: patients,
+    isLoading,
+    isRefetching,
+    isError,
+  } = trpc.patientsRouter.listWithLatestVisit.useQuery();
 
-  const filteredPatients = useMemo(() => {
-    const normalizedSearchText = debouncedSearchText.trim().toLowerCase();
-
-    if (!normalizedSearchText) {
-      return [];
-    }
-
-    return Object.values(patientsById).filter((patient) => {
-      const normalizedId = patient.id.toString();
-      const normalizedName = patient.name.toLowerCase();
-      const normalizedIdentificationNumber =
-        patient.identificationNumber?.toLowerCase() ?? "";
-
-      return (
-        normalizedId.includes(normalizedSearchText) ||
-        normalizedName.includes(normalizedSearchText) ||
-        normalizedIdentificationNumber.includes(normalizedSearchText)
-      );
-    });
-  }, [patientsById, debouncedSearchText]);
+  const searchPatients = useMemo(
+    () => createPatientSearch(patients ?? []),
+    [patients],
+  );
+  const filteredPatients = useMemo(
+    () => searchPatients(debouncedSearchText),
+    [searchPatients, debouncedSearchText],
+  );
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* top menu */}
       <div className="sticky top-0 z-1">
         <div className="relative flex flex-row p-2 bg-neutral-75 shadow-lg">
-          {/* search input */}
           <SearchInput searchText={searchText} setSearchText={setSearchText} />
           <PatientSearchResults
             searchText={debouncedSearchText}
             filteredPatients={filteredPatients}
             isLoading={isLoading}
             isRefetching={isRefetching}
+            isError={isError}
             onSelect={() => setSearchText("")}
             getPatientLink={getPatientLink}
           />

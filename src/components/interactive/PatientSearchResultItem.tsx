@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { calculateAge } from "@/lib/utils/patient";
 import { PatientPhoto } from "@/components/PatientPhoto";
-import { PatientsRouterListItem } from "@/utils/trpc-types";
+import { PatientCode } from "@/components/PatientCode";
+import { PatientsRouterListWithLatestVisitItem } from "@/utils/trpc-types";
 import { paths } from "@/utils/paths";
 
 interface PatientSearchResultItemProps {
-  patient: PatientsRouterListItem;
+  patient: PatientsRouterListWithLatestVisitItem;
   onSelect: () => void;
   linkPath?: string;
 }
@@ -29,9 +30,14 @@ export default function PatientSearchResultItem({
       />
       <div className="flex min-w-0 flex-col">
         <span className="font-medium truncate">{patient.name}</span>
-        <span className="text-xs text-neutral-500">
-          ID: {patient.id} • {calculateAge(patient.dateOfBirth)} yrs •{" "}
-          {patient.gender}
+        <span className="flex items-center gap-1 text-xs text-neutral-700">
+          ID:
+          <PatientCode
+            villageCode={patient.villageCode}
+            villageColorHex={patient.villageColorHex}
+            id={patient.id}
+          />
+          • {calculateAge(patient.dateOfBirth)} yrs • {patient.gender}
         </span>
       </div>
     </Link>

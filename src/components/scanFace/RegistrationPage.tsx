@@ -43,7 +43,12 @@ export default function RegistrationPage({
 }) {
   const form = useForm<PatientForm>();
 
-  const createMutation = trpc.patientsRouter.create.useMutation();
+  const utils = trpc.useUtils();
+  const createMutation = trpc.patientsRouter.create.useMutation({
+    onSuccess() {
+      void utils.patientsRouter.invalidate();
+    },
+  });
 
   const { selectedVillageCodeId } = useVillageCode();
 
