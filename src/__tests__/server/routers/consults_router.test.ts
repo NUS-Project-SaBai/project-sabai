@@ -6,6 +6,7 @@
 // Prereqs: `supabase start` (or `pnpm seed:db`) so migrations are applied,
 //          and at least one login linked to public.users (`pnpm seed:users`).
 import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
+import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { appRouter } from "@/server/routers/_app";
 import { db } from "@/db/drizzle";
@@ -17,7 +18,9 @@ import {
   visits,
   patients,
   villageCodes,
+  users,
 } from "@/db/schema";
+import { CONSULT_EDIT_WINDOW_MS } from "@/lib/constants/consults";
 import { getLinkedTestUser } from "./testUsers";
 
 const SEED_PATIENT = {
@@ -187,6 +190,118 @@ describe("consultsRouter (integration)", () => {
     it("returns an empty array for a visit with no consults", async () => {
       const rows = await caller.consultsRouter.getByVisitId({ visitId });
       expect(rows).toHaveLength(0);
+    });
+  });
+
+  describe("update()", () => {
+    const createConsult = () =>
+      caller.consultsRouter.create({
+        visitId,
+        consultation: "Initial notes",
+        remarks: "Follow up in a week",
+        diagnoses: [{ details: "Fever", category: "Infectious Diseases" }],
+      });
+
+    it("updates the consult text and replaces its diagnoses", async () => {
+      // Given - a consult written by the current doctor
+      const { id } = await createConsult();
+
+      // When
+      await caller.consultsRouter.update({
+        id,
+        consultation: "Corrected notes",
+        remarks: "Follow up in a week",
+        diagnoses: [
+          { details: "Dengue", category: "Infectious Diseases" },
+          { details: "Dehydration", category: "Others" },
+        ],
+      });
+
+      // Then - text is updated and the old diagnosis is gone
+      const [row] = await db.select().from(consults).where(eq(consults.id, id));
+      expect(row.consultation).toBe("Corrected notes");
+      const rows = await db
+        .select()
+        .from(diagnosis)
+        .where(eq(diagnosis.consultId, id));
+      expect(rows.map((d) => d.details).sort()).toEqual([
+        "Dehydration",
+        "Dengue",
+      ]);
+    });
+
+    it("clears a text field that is sent blank", async () => {
+      // Given - a consult with remarks
+      const { id } = await createConsult();
+
+      // When - the doctor clears the remarks
+      await caller.consultsRouter.update({
+        id,
+        consultation: "Initial notes",
+        remarks: "   ",
+        diagnoses: [{ details: "Fever", category: "Infectious Diseases" }],
+      });
+
+      // Then - remarks are stored as NULL rather than left unchanged
+      const [row] = await db.select().from(consults).where(eq(consults.id, id));
+      expect(row.remarks).toBeNull();
+    });
+
+    it("rejects edits once the 24-hour window has passed", async () => {
+      // Given - a consult created just over 24 hours ago
+      const { id } = await createConsult();
+      await db
+        .update(consults)
+        .set({ date: new Date(Date.now() - CONSULT_EDIT_WINDOW_MS - 60_000) })
+        .where(eq(consults.id, id));
+
+      // When / Then
+      await expect(
+        caller.consultsRouter.update({
+          id,
+          diagnoses: [{ details: "Late edit", category: "Others" }],
+        }),
+      ).rejects.toMatchObject({
+        code: "FORBIDDEN",
+        message: expect.stringContaining("24-hour"),
+      });
+    });
+
+    it("rejects edits from a doctor who did not write the consult", async () => {
+      // Given - a consult written by a different doctor
+      const [otherDoctor] = await db
+        .insert(users)
+        .values({ name: "Other Test Doctor" })
+        .returning({ id: users.id });
+      const [{ id }] = await db
+        .insert(consults)
+        .values({ visitId, doctorId: otherDoctor.id })
+        .returning({ id: consults.id });
+
+      try {
+        // When / Then
+        await expect(
+          caller.consultsRouter.update({
+            id,
+            diagnoses: [{ details: "Not mine", category: "Others" }],
+          }),
+        ).rejects.toMatchObject({
+          code: "FORBIDDEN",
+          message: expect.stringContaining("Only the doctor"),
+        });
+      } finally {
+        await db.delete(consults).where(eq(consults.id, id));
+        await db.delete(users).where(eq(users.id, otherDoctor.id));
+      }
+    });
+
+    it("returns NOT_FOUND for a consult that does not exist", async () => {
+      await expect(
+        caller.consultsRouter.update({
+          id: 2_000_000_000,
+          diagnoses: [{ details: "Ghost", category: "Others" }],
+        }),
+      ).rejects.toBeInstanceOf(TRPCError);
     });
   });
 });

@@ -4,12 +4,11 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "@/server/trpc";
 import { db } from "@/db/drizzle";
 import { consults, diagnosis } from "@/db/schema/consults";
-import { CONSULT_EDIT_WINDOW_MS } from "@/lib/constants/consults";
-import { createConsultInput } from "@/server/schemas/consults";
-
-const updateConsultInput = createConsultInput
-  .omit({ visitId: true })
-  .extend({ id: z.number().int().positive() });
+import { isWithinConsultEditWindow } from "@/lib/utils/consult";
+import {
+  createConsultInput,
+  updateConsultInput,
+} from "@/server/schemas/consults";
 
 export const consultsRouter = router({
   /**
@@ -90,15 +89,14 @@ export const consultsRouter = router({
         });
       }
 
-      if (existing.doctorId !== ctx.user.id) {
+      if (existing.doctorId !== ctx.appUser.id) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "Only the doctor who wrote this consult can edit it.",
         });
       }
 
-      const ageMs = Date.now() - new Date(existing.date).getTime();
-      if (ageMs > CONSULT_EDIT_WINDOW_MS) {
+      if (!isWithinConsultEditWindow(existing.date)) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message:

@@ -182,9 +182,9 @@ describe("ConsultForm", () => {
         visitId: VISIT_ID,
         pastMedicalHistory: "No history",
         consultation: "Patient is well",
-        // blank optional fields collapse to undefined
-        treatmentPlan: undefined,
-        remarks: undefined,
+        // blank fields are sent as-is; the server stores them as NULL
+        treatmentPlan: "",
+        remarks: "",
         diagnoses: [{ details: "Hypertension", category: "Cardiovascular" }],
       }),
     );

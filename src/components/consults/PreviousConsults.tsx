@@ -5,13 +5,7 @@ import { trpc } from "@/utils/trpc";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { formatVisitDate } from "@/lib/utils/visit";
 import type { ConsultWithDiagnoses } from "@/types/consults";
-import { CONSULT_EDIT_WINDOW_MS } from "@/lib/constants/consults";
-
-function isEditable(consult: ConsultWithDiagnoses): boolean {
-  return (
-    Date.now() - new Date(consult.date).getTime() <= CONSULT_EDIT_WINDOW_MS
-  );
-}
+import { isWithinConsultEditWindow } from "@/lib/utils/consult";
 
 /**
  * A single labelled block of read-only consult text. Renders nothing when the
@@ -43,7 +37,7 @@ type ConsultCardProps = {
  * 24-hour edit window has passed.
  */
 function ConsultCard({ consult, editingId, onEdit }: ConsultCardProps) {
-  const editable = isEditable(consult);
+  const editable = isWithinConsultEditWindow(consult.date);
   const isBeingEdited = editingId === consult.id;
 
   const handleEditClick = () => {

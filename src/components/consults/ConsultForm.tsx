@@ -9,36 +9,18 @@ import { RHFTextArea } from "@/components/interactive/RHF/RHFTextArea";
 import { RHFDropdown } from "@/components/interactive/RHF/RHFDropdown";
 import { Button } from "@/components/interactive/Button/Button";
 import { IsRequiredStar } from "@/components/IsRequiredStar";
-import {
-  DIAGNOSIS_CATEGORY_OPTIONS,
-  DiagnosisCategory,
-} from "@/lib/constants/consults";
+import { DIAGNOSIS_CATEGORY_OPTIONS } from "@/lib/constants/consults";
 import { REFERRAL_CATEGORY_OPTIONS } from "@/lib/constants/referralCategories";
+import {
+  toConsultFormValues,
+  toConsultInput,
+} from "@/lib/mappers/consult.mapper";
 import OrderModal from "./OrderModal";
 import {
   BLANK_CONSULT,
   ConsultFormValues,
   ConsultWithDiagnoses,
 } from "@/types/consults";
-
-function toFormValues(consult: ConsultWithDiagnoses): ConsultFormValues {
-  return {
-    pastMedicalHistory: consult.pastMedicalHistory ?? "",
-    consultation: consult.consultation ?? "",
-    treatmentPlan: consult.treatmentPlan ?? "",
-    remarks: consult.remarks ?? "",
-    diagnoses:
-      consult.diagnoses.length > 0
-        ? consult.diagnoses.map((d) => ({
-            details: d.details,
-            category: d.category ?? "",
-          }))
-        : [{ details: "", category: "" }],
-    referredFor: "Not Referred",
-    referralNotes: "",
-    orders: [],
-  };
-}
 
 type ConsultFormProps = {
   visitId: number;
@@ -63,13 +45,13 @@ export function ConsultForm({
   const methods = useForm<ConsultFormValues>({
     resolver: zodResolver(consultFormSchema),
     defaultValues: editingConsult
-      ? toFormValues(editingConsult)
+      ? toConsultFormValues(editingConsult)
       : BLANK_CONSULT,
   });
   const { control, handleSubmit, watch, reset } = methods;
 
   useEffect(() => {
-    reset(editingConsult ? toFormValues(editingConsult) : BLANK_CONSULT);
+    reset(editingConsult ? toConsultFormValues(editingConsult) : BLANK_CONSULT);
   }, [editingConsult, reset]);
 
   const referredFor = watch("referredFor");
@@ -106,23 +88,11 @@ export function ConsultForm({
     toast.error("Please fill in all required fields before saving.");
 
   const onSubmit = async (data: ConsultFormValues) => {
-    // Trimming and required-field checks are handled by consultFormSchema.
-    const shared = {
-      pastMedicalHistory: data.pastMedicalHistory || undefined,
-      consultation: data.consultation || undefined,
-      treatmentPlan: data.treatmentPlan || undefined,
-      remarks: data.remarks || undefined,
-      diagnoses: data.diagnoses.map((d) => ({
-        details: d.details,
-        category: d.category as DiagnosisCategory,
-      })),
-    };
-
     // Editing only updates the consult and its diagnoses; orders and referrals
     // are not editable here.
     if (isEditing && editingConsult) {
       updateConsult.mutate(
-        { id: editingConsult.id, ...shared },
+        { id: editingConsult.id, ...toConsultInput(data) },
         {
           onSuccess: () => {
             utils.consultsRouter.getByVisitId.invalidate({ visitId });
@@ -140,7 +110,10 @@ export function ConsultForm({
 
     let consult;
     try {
-      consult = await createConsult.mutateAsync({ visitId, ...shared });
+      consult = await createConsult.mutateAsync({
+        visitId,
+        ...toConsultInput(data),
+      });
     } catch {
       setIsSaving(false);
       toast.error("Failed to save consult.");
