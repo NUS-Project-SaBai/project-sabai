@@ -1,5 +1,4 @@
 import toast from "react-hot-toast";
-import { HiCheck, HiXMark } from "react-icons/hi2";
 import type { inferRouterOutputs } from "@trpc/server";
 import type { AppRouter } from "@/server/routers/_app";
 import { trpc } from "@/utils/trpc";
@@ -80,7 +79,7 @@ export function PendingOrderItem({ order }: { order: PendingOrder }) {
           }
           className="rounded-lg bg-emerald-600 p-3 text-white transition hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-50"
         >
-          <HiCheck className="h-5 w-5" />
+          Approve
         </button>
         <button
           type="button"
@@ -92,7 +91,7 @@ export function PendingOrderItem({ order }: { order: PendingOrder }) {
           }
           className="rounded-lg bg-red-600 p-3 text-white transition hover:bg-red-700 disabled:cursor-wait disabled:opacity-50"
         >
-          <HiXMark className="h-5 w-5" />
+          Reject
         </button>
       </div>
     </li>
