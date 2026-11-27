@@ -13,6 +13,7 @@ import { formatPatientCode } from "@/lib/utils/patient";
 import { formatVisitDate } from "@/lib/utils/visit";
 import { trpc } from "@/utils/trpc";
 import { paths } from "@/utils/paths";
+import PatientDocuments from "@/components/patient-documents/PatientDocuments";
 
 function DetailRow({
   label,
@@ -98,6 +99,7 @@ function ReferralDetailsPage() {
         ]}
         title="Referral Details"
         description={`${referral.patientName} (${patientCode})`}
+        actions={<PatientDocuments patientId={referral.patientId} />}
       />
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
